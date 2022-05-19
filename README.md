@@ -1,10 +1,10 @@
 <!-- badges: start -->
 
 [![procs version](https://www.r-pkg.org/badges/version/procs)](https://cran.r-project.org/package=procs)
-[![procs lifecycle](https://img.shields.io/badge/lifecycle-stable-blue.svg)](https://cran.r-project.org/package=procs)
+[![procs lifecycle](https://img.shields.io/badge/lifecycle-maturing-blue.svg)](https://cran.r-project.org/package=procs)
 [![procs downloads](https://cranlogs.r-pkg.org/badges/procs)](https://cran.r-project.org/package=procs)
 [![procs total downloads](https://cranlogs.r-pkg.org/badges/grand-total/procs)](https://cran.r-project.org/package=procs)
-[![R-CMD-check](https://github.com/dbosak01/procs/workflows/R-CMD-check/badge.svg)](https://github.com/dbosak01/procs/actions)
+<!--[![R-CMD-check](https://github.com/dbosak01/procs/workflows/R-CMD-check/badge.svg)](https://github.com/dbosak01/procs/actions)-->
 [![Codecov test coverage](https://codecov.io/gh/dbosak01/procs/branch/master/graph/badge.svg)](https://app.codecov.io/gh/dbosak01/procs?branch=master)
 
 <!-- badges: end -->
@@ -12,27 +12,18 @@
 # Introduction to **procs**
 <!-- <img src='man/images/procs.png' align="left" height="138" style="margin-right:10px"/>-->
 
-There are already several logging packages for R.  Why create another one? 
+R contains a wide range of statistical packages and functions.  However,
+these statistical functions frequently provide a fragmented output.  The user
+is often left to compile R statistical results into a readable output themselves.
 
-Because the other logging packages all have something in common: they were built
-for *R package developers*.  
+SAS software, on the other hand, provides the same statistical results, 
+but with a rich choice of outputs.  These outputs include multiple datasets
+and complete statistical reports.  
 
-What is different about the **procs** package is
-that it is built for *normal R users*: statisticians, analysts, researchers, 
-students, teachers, business people, etc.
-
-The **procs** package is for those people who just need a written record of their
-program execution.  It is designed to be as simple as possible, yet still
-produce a useful and complete log.  
-
-There are only three steps to creating a **procs** log:
-
-1. Open the log
-2. Print to the log
-3. Close the log
-
-Now this a logging system that anyone can use!  
-
+The purpose of the **procs** package is to recreate some SAS statistical
+procedures in R.  The first version of the package will attempt to recreate
+SAS 'proc freq'.  Subsequent versions of the package will add additional,
+commonly used procedures like 'proc means' and 'proc tabulate'.
 
 ### Installation
 
