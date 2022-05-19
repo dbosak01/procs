@@ -12,12 +12,12 @@
 # Introduction to **procs**
 <!-- <img src='man/images/procs.png' align="left" height="138" style="margin-right:10px"/>-->
 
-R contains a wide range of statistical packages and functions.  However,
-these statistical functions frequently provide a fragmented output.  The user
-is often left to compile R statistical results into a readable output themselves.
+R provides a wide range of statistical packages and functions.  However,
+these statistical functions frequently return a fragmented output.  The user
+is often left to compile R statistical results into a readable report themselves.
 
 SAS software, on the other hand, provides the same statistical results, 
-but with a rich choice of outputs.  These outputs include multiple datasets
+but with rich outputs.  These outputs include multiple datasets
 and complete statistical reports.  
 
 The purpose of the **procs** package is to recreate some SAS statistical
