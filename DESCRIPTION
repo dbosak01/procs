@@ -1,11 +1,37 @@
 Package: procs
 Type: Package
-Title: What the Package Does (Title Case)
-Version: 0.1.0
-Author: Who wrote it
-Maintainer: The package maintainer <yourself@somewhere.net>
-Description: More about what it does (maybe more than one line)
-    Use four spaces when indenting paragraphs within the Description.
-License: What license is it under?
+Title: Recreates some SAS statistical procedures in R
+Version: 0.0.9000
+Authors@R: c(
+    person(given = "David",
+           family = "Bosak",
+           role = c("aut", "cre"),
+           email = "dbosak01@gmail.com"))
+Maintainer: <dbosak01@gmail.com>
+Description: Contains function to simulate the most commonly used 
+    SAS statistical procedures.  Specifically, the package aims to 
+    simulate the functionality of SAS 'proc_freq' and 'proc_means'.
+    The simulation will include recreating all datasets and reports
+    with the highest fidelity possible. 
+License: CC0
 Encoding: UTF-8
-LazyData: true
+URL: https://procs.r-sassy.org
+BugReports: https://github.com/dbosak01/procs/issues
+Depends: R (>= 4.0.0)
+Suggests: 
+    knitr,
+    rmarkdown,
+    testthat,
+    covr, 
+    logr
+Imports: withr,
+         utils,
+         cli,
+         fmtr,
+         reporter,
+         libr,
+         ggplot2,
+         gridExtra,
+VignetteBuilder: knitr
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.1.2
