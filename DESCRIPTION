@@ -21,8 +21,8 @@ Depends: R (>= 4.0.0)
 Suggests: 
     knitr,
     rmarkdown,
-    testthat,
-    covr, 
+    testthat (>= 3.0.0),
+    covr,
     logr
 Imports: withr,
          utils,
@@ -35,3 +35,4 @@ Imports: withr,
 VignetteBuilder: knitr
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.1.2
+Config/testthat/edition: 3
