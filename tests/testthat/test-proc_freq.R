@@ -35,7 +35,7 @@ dat <- read.table(header = TRUE, text = '
   2 brown black  13
   ')
 
-test_that("Simple proc_freq test works.", {
+test_that("freq1: Simple proc_freq test works.", {
 
   library(fmtr)
 
@@ -45,9 +45,67 @@ test_that("Simple proc_freq test works.", {
 
   res <- proc_freq(dat, tables = c("Eyes"),
                    table_options = "FreqCount",
-                   titles = "My first Frequency Table")
+                   titles = "My first Frequency Table",
+                   print = "none")
 
-  expect_equal(nrow(res), 3)
-  expect_equal(ncol(res), 5)
+  res
 
-  })
+  expect_equal(nrow(res[[1]]), 3)
+  expect_equal(ncol(res[[1]]), 5)
+
+})
+
+
+test_that("freq2: Simple proc_freq test with print html works.", {
+
+  library(fmtr)
+
+  fl <- file.path(base_path, "freq2.html")
+
+  labels(dat) <- list(Eyes = "Eye Color",
+                      Hair = "Hair Color",
+                      Region = "Geographic Region")
+
+  res <- proc_freq(dat, tables = c("Eyes"),
+                   table_options = "FreqCount",
+                   titles = "My first Frequency Table",
+                   print = "HTML",
+                   print_location = fl)
+
+  res
+
+  ex <- file.exists(fl)
+
+  expect_equal(nrow(res[[1]]), 3)
+  expect_equal(ncol(res[[1]]), 5)
+  expect_equal(ex, TRUE)
+
+})
+
+test_that("freq2: Two table proc_freq test with print html works.", {
+
+  library(fmtr)
+
+  fl <- file.path(base_path, "freq2.html")
+
+  labels(dat) <- list(Eyes = "Eye Color",
+                      Hair = "Hair Color",
+                      Region = "Geographic Region")
+
+  res <- proc_freq(dat, tables = c("Eyes", "Hair"),
+                   table_options = "FreqCount",
+                   titles = "My first Frequency Table",
+                   print = "HTML",
+                   print_location = fl)
+
+  res
+
+  ex <- file.exists(fl)
+
+  expect_equal(nrow(res[[1]]), 3)
+  expect_equal(ncol(res[[1]]), 5)
+  expect_equal(ex, TRUE)
+
+})
+
+

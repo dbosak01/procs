@@ -39,26 +39,45 @@ proc_freq <- function(data,
                       titles = NULL,
                       digits = 4) {
 
-
-  var <- data[[tables]]
-
-  categories <- names(sort(table(var)))
-  frequencies <- as.vector(sort(table(var)))
-
-  n <- sum(frequencies)
-  percentages <- round(frequencies / n, digits)*100
-  cum_frequencies <- cumsum(frequencies)
-  cum_percentages <- cumsum(percentages)
-
-  result <- data.frame("Category" = categories,
-                       "Frequency" = frequencies,
-                       "Percentage" = percentages,
-                       "Cumulative.Frequency" = cum_frequencies,
-                       "Cumulative.Percentage" = cum_percentages,
-                       stringsAsFactors = FALSE)
+  res <- list()
 
 
+  for (tb in tables) {
 
-  return(result)
+    var <- data[[tb]]
+
+    categories <- names(sort(table(var)))
+    frequencies <- as.vector(sort(table(var)))
+
+    n <- sum(frequencies)
+    percentages <- round(frequencies / n, digits)*100
+    cum_frequencies <- cumsum(frequencies)
+    cum_percentages <- cumsum(percentages)
+
+    result <- data.frame("Category" = categories,
+                         "Frequency" = frequencies,
+                         "Percentage" = percentages,
+                         "Cumulative.Frequency" = cum_frequencies,
+                         "Cumulative.Percentage" = cum_percentages,
+                         stringsAsFactors = FALSE)
+
+    res[[length(res) + 1]] <- result
+  }
+
+  if (!any(print %in% c("none"))) {
+
+    loc <- get_location(print, print_location)
+    out <- output_report(res, proc_type = 'freq',
+                         path = print_location, out_type = print)
+
+
+    if (any(print %in% c("HTML"))) {
+
+      show_viewer(out)
+    }
+
+  }
+
+  return(res)
 
 }
