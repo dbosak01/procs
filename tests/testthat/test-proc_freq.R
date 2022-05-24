@@ -62,6 +62,7 @@ test_that("freq2: Simple proc_freq test with print html works.", {
 
   fl <- file.path(base_path, "freq2.html")
 
+
   labels(dat) <- list(Eyes = "Eye Color",
                       Hair = "Hair Color",
                       Region = "Geographic Region")
@@ -73,10 +74,7 @@ test_that("freq2: Simple proc_freq test with print html works.", {
                    print_location = fl)
 
   res
-
-  print(fl)
   ex <- file.exists(fl)
-  print(ex)
 
   expect_equal(nrow(res[[1]]), 3)
   expect_equal(ncol(res[[1]]), 5)
@@ -128,10 +126,8 @@ test_that("freq4: Simple proc_freq test with weight works.", {
                    print_location = fl)
 
   res
-
-  print(fl)
   ex <- file.exists(fl)
-  print(ex)
+
 
   expect_equal(nrow(res[[1]]), 3)
   expect_equal(ncol(res[[1]]), 5)
@@ -157,10 +153,8 @@ test_that("freq5: Two var proc_freq with weight works.", {
                    print_location = fl)
 
   res
-
-  #print(fl)
   ex <- file.exists(fl)
-  #print(ex)
+
 
   expect_equal(nrow(res[[1]]), 3)
   expect_equal(ncol(res[[1]]), 5)

@@ -11,7 +11,6 @@ dev <- FALSE
 # Works if html shows up in RStudio viewer.
 test_that("utils0: show_viewer works as expected with local path.", {
 
-  if (dev) {
     html <- "<html><body><p>test0</p></body></html>"
 
 
@@ -28,9 +27,8 @@ test_that("utils0: show_viewer works as expected with local path.", {
 
 
     res <- show_viewer(fp)
-  }
 
-  expect_equal(1, 1)
+    expect_equal(file.exists(res), TRUE)
 
 })
 
@@ -39,7 +37,7 @@ test_that("utils0: show_viewer works as expected with local path.", {
 # Works if html shows up in RStudio viewer.
 test_that("utils1: show_viewer works as expected with temp path.", {
 
-  if (dev) {
+
     html <- "<html><body><p>test1</p></body></html>"
 
     td <- tempdir()
@@ -60,10 +58,8 @@ test_that("utils1: show_viewer works as expected with temp path.", {
 
     res <- show_viewer(fp)
 
-  }
+    expect_equal(file.exists(res), TRUE)
 
-
-  expect_equal(1, 1)
 
 })
 
@@ -75,14 +71,13 @@ test_that("utils2: output_report works as expected.", {
 
   lst <- list(mtcars)
 
-  res <- output_report(lst, proc_type = "freq", fp)
+  res <- output_report(lst, proc_type = "freq", dir_name = base_path,
+                       file_name = "test2")
 
-  ex <- file.exists(res)
+  ex <- file.exists(fp)
 
   expect_equal(ex, TRUE)
 
-  # if (!dev & ex)
-  #   file.remove(ex)
 
 })
 

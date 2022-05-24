@@ -18,8 +18,10 @@
 #' requested by passing a vector of output types.  If the print_location parameter
 #' is specified, the outputs will be written to that location.  Otherwise,
 #' they will be written to a temp directory.  The default value is 'HTML'.
-#' @param print_location A full path to write any report output requested by
-#' the print parameter. If the location is not specified, files will be
+#' @param print_location A path to write any report output requested by
+#' the print parameter. The path may be either a full path will file name,
+#' or a directory name.  If the file name is not specified, the procedure
+#' type will be used.  If no path is specified, files will be
 #' written to a temp directory.  Default is NULL.
 #' @param titles A vector of one or more titles to use for the report output.
 #' @param digits The number of digits to round statistics produced
@@ -41,7 +43,8 @@ proc_freq <- function(data,
                       digits = 4) {
 
   res <- list()
-
+  # print("Orig print_location")
+  # print(print_location)
 
   for (tb in tables) {
 
@@ -53,7 +56,7 @@ proc_freq <- function(data,
       frequencies <- as.vector(sort(table(var)))
 
     } else {
-      #browser()
+
       cnts <- aggregate(data[[weight]], list(data[[tb]]), FUN = sum)
       categories <- cnts$Group.1
       frequencies <- cnts$x
@@ -80,24 +83,24 @@ proc_freq <- function(data,
                         Cumulative.Frequency = "Cumulative Frequency",
                         Cumulative.Percentage = "Cumulative Percentage")
 
-    res[[length(res) + 1]] <- result
+    res[[tb]] <- result
   }
 
   if (!any(print %in% c("none"))) {
 
-    loc <- get_location(print, print_location)
-    out <- output_report(res, proc_type = 'freq',
-                         path = print_location, out_type = print,
+    loc <- get_location(print, "freq", print_location)
+    out <- output_report(res, proc_type = 'freq', dir_name = loc["dir_name"],
+                         file_name = loc["file_name"], out_type = print,
                          titles = titles)
 
-    print("Print location:")
-    print(print_location)
-    print("Out value:")
-    print(out)
+    # print("Print location:")
+    # print(loc)
+    # print("Out value:")
+    # print(out)
 
     if (any(print %in% c("HTML"))) {
 
-      show_viewer(out)
+      show_viewer(paste0(file.path(loc["dir_name"], loc["file_name"]), '.html'))
     }
 
   }

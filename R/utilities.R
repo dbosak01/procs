@@ -2,21 +2,20 @@
 
 #' @import reporter
 #' @noRd
-output_report <- function(lst, proc_type = NULL,
-                          path = NULL, out_type = 'HTML',
+output_report <- function(lst, proc_type,
+                          dir_name, file_name, out_type = 'HTML',
                           titles = NULL) {
 
-  if (is.null(path)) {
-    targetDir <- tempdir()
-    if (!file.exists(targetDir))
-      dir.create(targetDir)
 
-    flnm <- proc_type
+  if (is.null(dir_name)) {
+    stop("Path cannot be null")
 
   } else {
-    targetDir <- dirname(path)
 
-    flnm <- filenm(basename(path))
+
+    targetDir <- dir_name
+
+    flnm <- file_name
   }
 
   rpt <- create_report(font = 'Arial')
@@ -25,7 +24,7 @@ output_report <- function(lst, proc_type = NULL,
 
   for (i in seq_len(length(lst))) {
 
-    tbl <- create_table(lst[[i]], borders = "all")
+    tbl <- create_table(lst[[i]], borders = c("top", "bottom"))
     if (!is.null(titles) & i == 1) {
       tbl <- titles(tbl, titles)
     }
@@ -60,19 +59,14 @@ show_viewer <- function(path) {
 
   if (file.exists(path)) {
 
-    targetDir <- tempdir()
-    if (!grepl(targetDir, path, fixed = TRUE)) {
+    dir <- tempdir()
+    if (dir.exists(dir) == FALSE)
+      dir.create(dir)
 
-      pth <- file.path(targetDir, basename(path))
+    pth <- tempfile(fileext = ".html")
 
-      if (file.exists(pth))
-        file.remove(pth)
+    file.copy(path, pth)
 
-      file.copy(path, pth)
-
-    } else {
-     pth <- path
-    }
 
     viewer <- getOption("viewer")
 
@@ -80,6 +74,8 @@ show_viewer <- function(path) {
       viewer(pth)
     else
       utils::browseURL(pth)
+
+    ret <- TRUE
 
   }
 
@@ -89,21 +85,33 @@ show_viewer <- function(path) {
 }
 
 #' @noRd
-get_location <- function(print, location) {
+get_location <- function(print, proc_type, location) {
 
-  if (is.null(location) | file.exists(location) == FALSE) {
-    targetDir <- tempdir()
+  ret <- c(dir_name = "",
+           file_name = "")
+
+  if (is.null(location)) {
+
+    ret["dir_name"] <- tempdir()
+    ret["file_name"] <- proc_type
+
+  } else if (dir.exists(location)) {
+
+    ret["dir_name"] <- location
+    ret["file_name"] <- proc_type
 
   } else {
-    targetDir <- location
+    ret["dir_name"] <- dirname(location)
+    ret["file_name"] <- filenm(location)
   }
 
-  if (file.exists(targetDir) == FALSE) {
-    dir.create(targetDir)
+  if (dir.exists(ret["dir_name"] ) == FALSE) {
+    dir.create(ret["dir_name"] )
 
   }
 
-  return(targetDir)
+
+  return(ret)
 
 }
 
