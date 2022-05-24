@@ -2,7 +2,9 @@
 
 #' @import reporter
 #' @noRd
-output_report <- function(lst, proc_type = NULL, path = NULL, out_type = 'HTML') {
+output_report <- function(lst, proc_type = NULL,
+                          path = NULL, out_type = 'HTML',
+                          titles = NULL) {
 
   if (is.null(path)) {
     targetDir <- tempdir()
@@ -19,10 +21,17 @@ output_report <- function(lst, proc_type = NULL, path = NULL, out_type = 'HTML')
 
   rpt <- create_report(font = 'Arial')
 
+
+
   for (i in seq_len(length(lst))) {
 
-    tbl <- create_table(lst[[i]])
+    tbl <- create_table(lst[[i]], borders = "all")
+    if (!is.null(titles) & i == 1) {
+      tbl <- titles(tbl, titles)
+    }
     rpt <- add_content(rpt, tbl, align = 'center', page_break = FALSE)
+
+
 
   }
 

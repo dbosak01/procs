@@ -25,6 +25,7 @@
 #' @param digits The number of digits to round statistics produced
 #' by the function.
 #' @return A list of data frames that contain the requested frequency tables.
+#' @import fmtr
 #' @export
 proc_freq <- function(data,
                       by = NULL,
@@ -46,8 +47,17 @@ proc_freq <- function(data,
 
     var <- data[[tb]]
 
-    categories <- names(sort(table(var)))
-    frequencies <- as.vector(sort(table(var)))
+    if (is.null(weight)) {
+
+      categories <- names(sort(table(var)))
+      frequencies <- as.vector(sort(table(var)))
+
+    } else {
+      #browser()
+      cnts <- aggregate(data[[weight]], list(data[[tb]]), FUN = sum)
+      categories <- cnts$Group.1
+      frequencies <- cnts$x
+    }
 
     n <- sum(frequencies)
     percentages <- round(frequencies / n, digits)*100
@@ -61,6 +71,15 @@ proc_freq <- function(data,
                          "Cumulative.Percentage" = cum_percentages,
                          stringsAsFactors = FALSE)
 
+    lbl <- attr(data[[tb]], "label")
+    if (is.null(lbl))
+      lbl <- tb
+
+
+    labels(result) <- c(Category = lbl,
+                        Cumulative.Frequency = "Cumulative Frequency",
+                        Cumulative.Percentage = "Cumulative Percentage")
+
     res[[length(res) + 1]] <- result
   }
 
@@ -68,8 +87,13 @@ proc_freq <- function(data,
 
     loc <- get_location(print, print_location)
     out <- output_report(res, proc_type = 'freq',
-                         path = print_location, out_type = print)
+                         path = print_location, out_type = print,
+                         titles = titles)
 
+    print("Print location:")
+    print(print_location)
+    print("Out value:")
+    print(out)
 
     if (any(print %in% c("HTML"))) {
 

@@ -5,7 +5,7 @@ base_path <- tempdir()
 data_dir <- "."
 
 dat <- read.table(header = TRUE, text = '
-  Group Eyes Hair Region
+  Region Eyes Hair Count
   1 blue  fair   23
   1 blue  dark   11
   1 green medium 18
@@ -74,7 +74,9 @@ test_that("freq2: Simple proc_freq test with print html works.", {
 
   res
 
+  print(fl)
   ex <- file.exists(fl)
+  print(ex)
 
   expect_equal(nrow(res[[1]]), 3)
   expect_equal(ncol(res[[1]]), 5)
@@ -82,11 +84,11 @@ test_that("freq2: Simple proc_freq test with print html works.", {
 
 })
 
-test_that("freq2: Two table proc_freq test with print html works.", {
+test_that("freq3: Two table proc_freq test with print html works.", {
 
   library(fmtr)
 
-  fl <- file.path(base_path, "freq2.html")
+  fl <- file.path(base_path, "freq3.html")
 
   labels(dat) <- list(Eyes = "Eye Color",
                       Hair = "Hair Color",
@@ -108,4 +110,60 @@ test_that("freq2: Two table proc_freq test with print html works.", {
 
 })
 
+test_that("freq4: Simple proc_freq test with weight works.", {
 
+  library(fmtr)
+
+  fl <- file.path(base_path, "freq4.html")
+
+  labels(dat) <- list(Eyes = "Eye Color",
+                      Hair = "Hair Color",
+                      Region = "Geographic Region")
+
+  res <- proc_freq(dat, tables = c("Eyes"),
+                   table_options = "FreqCount",
+                   weight = "Count",
+                   titles = "My first Frequency Table",
+                   print = "HTML",
+                   print_location = fl)
+
+  res
+
+  print(fl)
+  ex <- file.exists(fl)
+  print(ex)
+
+  expect_equal(nrow(res[[1]]), 3)
+  expect_equal(ncol(res[[1]]), 5)
+  expect_equal(ex, TRUE)
+
+})
+
+test_that("freq5: Two var proc_freq with weight works.", {
+
+  library(fmtr)
+
+  fl <- file.path(base_path, "freq5.html")
+
+  labels(dat) <- list(Eyes = "Eye Color",
+                      Hair = "Hair Color",
+                      Region = "Geographic Region")
+
+  res <- proc_freq(dat, tables = c("Eyes", "Hair"),
+                   table_options = "FreqCount",
+                   weight = "Count",
+                   titles = "Eye and Hair Color of European Children",
+                   print = "HTML",
+                   print_location = fl)
+
+  res
+
+  #print(fl)
+  ex <- file.exists(fl)
+  #print(ex)
+
+  expect_equal(nrow(res[[1]]), 3)
+  expect_equal(ncol(res[[1]]), 5)
+  expect_equal(ex, TRUE)
+
+})
