@@ -1,4 +1,4 @@
-base_path <- "c:/packages/procs/tests/testthat/utils"
+base_path <- "c:/packages/procs/tests/testthat"
 data_dir <- base_path
 
 base_path <- tempdir()
@@ -14,7 +14,11 @@ test_that("utils0: show_viewer works as expected with local path.", {
     html <- "<html><body><p>test0</p></body></html>"
 
 
-    fp <- file.path(base_path, "test0.html")
+    fp <- file.path(base_path, "/utils/test0.html")
+
+    dir <- dirname(fp)
+    if (dir.exists(dir) == FALSE)
+      dir.create(dir)
 
     if (file.exists(fp))
       file.remove(fp)
@@ -44,6 +48,10 @@ test_that("utils1: show_viewer works as expected with temp path.", {
     if (!file.exists(td))
       dir.create(td)
 
+    td <- file.path(td, "utils")
+    if (!file.exists(td))
+      dir.create(td)
+
     fp <- file.path(td, "test1.html")
 
     if (file.exists(fp))
@@ -67,11 +75,12 @@ test_that("utils1: show_viewer works as expected with temp path.", {
 test_that("utils2: output_report works as expected.", {
 
 
-  fp <- file.path(base_path, "test2.html")
+  fp <- file.path(base_path, "/utils/test2.html")
 
   lst <- list(mtcars)
 
-  res <- output_report(lst, proc_type = "freq", dir_name = base_path,
+  res <- output_report(lst, proc_type = "freq",
+                       dir_name = dirname(fp),
                        file_name = "test2")
 
   ex <- file.exists(fp)
@@ -85,7 +94,7 @@ test_that("utils2: output_report works as expected.", {
 test_that("utils3: filenm works as expected.", {
 
 
-  fl <- file.path(base_path, "test3.html")
+  fl <- file.path(base_path, "/utils/test3.html")
 
   res <- filenm(fl)
   res
@@ -101,3 +110,4 @@ test_that("utils3: filenm works as expected.", {
   expect_equal(res, "test3")
 
 })
+

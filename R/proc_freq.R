@@ -19,7 +19,7 @@
 #' is specified, the outputs will be written to that location.  Otherwise,
 #' they will be written to a temp directory.  The default value is 'HTML'.
 #' @param print_location A path to write any report output requested by
-#' the print parameter. The path may be either a full path will file name,
+#' the print parameter. The path may be either a full path with file name,
 #' or a directory name.  If the file name is not specified, the procedure
 #' type will be used.  If no path is specified, files will be
 #' written to a temp directory.  Default is NULL.
