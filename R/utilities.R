@@ -18,7 +18,8 @@ output_report <- function(lst, proc_type,
     flnm <- file_name
   }
 
-  rpt <- create_report(font = 'Arial')
+  rpt <- create_report(font = 'Arial', orientation = 'portrait')
+  rpt <- set_margins(rpt, top = 1, bottom = 1)
 
 
 

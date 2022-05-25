@@ -161,8 +161,96 @@ test_that("freq5: Two var proc_freq with weight works.", {
   expect_equal(ex, TRUE)
 
 })
-#
-# test_that("freq6: Crosstab proc_freq with weight works.", {
+
+
+test_that("freq6: Simple proc_freq in docx works.", {
+
+  library(fmtr)
+
+  fl <- file.path(base_path, "freq/freq6.docx")
+
+  labels(dat) <- list(Eyes = "Eye Color",
+                      Hair = "Hair Color",
+                      Region = "Geographic Region")
+
+  res <- proc_freq(dat, tables = c("Eyes"),
+                   table_options = "FreqCount",
+                   weight = "Count",
+                   titles = "My first Frequency Table",
+                   print = "DOCX",
+                   print_location = fl)
+
+  res
+  ex <- file.exists(fl)
+
+
+  expect_equal(nrow(res[[1]]), 3)
+  expect_equal(ncol(res[[1]]), 5)
+  expect_equal(ex, TRUE)
+
+})
+
+test_that("freq7: Simple proc_freq in pdf works.", {
+
+  library(fmtr)
+
+  fl <- file.path(base_path, "freq/freq7.pdf")
+
+  labels(dat) <- list(Eyes = "Eye Color",
+                      Hair = "Hair Color",
+                      Region = "Geographic Region")
+
+  res <- proc_freq(dat, tables = c("Eyes"),
+                   table_options = "FreqCount",
+                   weight = "Count",
+                   titles = "My first Frequency Table",
+                   print = "PDF",
+                   print_location = fl)
+
+  res
+  ex <- file.exists(fl)
+
+
+  expect_equal(nrow(res[[1]]), 3)
+  expect_equal(ncol(res[[1]]), 5)
+  expect_equal(ex, TRUE)
+
+})
+
+
+test_that("freq8: Simple proc_freq in multiple outputs works.", {
+
+  library(fmtr)
+
+  fl <- file.path(base_path, "freq/freq8")
+
+  labels(dat) <- list(Eyes = "Eye Color",
+                      Hair = "Hair Color",
+                      Region = "Geographic Region")
+
+  res <- proc_freq(dat, tables = c("Eyes"),
+                   table_options = "FreqCount",
+                   weight = "Count",
+                   titles = "My first Frequency Table",
+                   print = c("TXT", "RTF", "PDF"),
+                   print_location = fl)
+
+  res
+  ex1 <- file.exists(paste0(fl, ".txt"))
+  ex2 <- file.exists(paste0(fl, ".rtf"))
+  ex3 <- file.exists(paste0(fl, ".pdf"))
+
+
+  expect_equal(nrow(res[[1]]), 3)
+  expect_equal(ncol(res[[1]]), 5)
+  expect_equal(ex1, TRUE)
+  expect_equal(ex2, TRUE)
+  expect_equal(ex3, TRUE)
+
+})
+
+
+# test_that("freq9: Crosstab proc_freq with weight works.", {
 #
 #   library(fmtr)
 #
@@ -186,6 +274,28 @@ test_that("freq5: Two var proc_freq with weight works.", {
 #   expect_equal(nrow(res[[1]]), 3)
 #   expect_equal(ncol(res[[1]]), 5)
 #   expect_equal(ex, TRUE)
+#
+# })
+
+#
+# test_that("freq10: GTables", {
+#
+#
+#
+#
+#   res2 <- fisher.test(dat$Eyes, dat$Hair)
+#
+#   class(res2)
+#
+#   wb <- aggregate(warpbreaks$breaks,
+#                   by = list(w = warpbreaks$wool,
+#                             t = warpbreaks$tension),
+#                   FUN = mean)
+#   wb
+#   res3 <- friedman.test(wb$x, wb$w, wb$t)
+#
+#   unlist(res3)
+#   friedman.test(x ~ w | t, data = wb)
 #
 # })
 
