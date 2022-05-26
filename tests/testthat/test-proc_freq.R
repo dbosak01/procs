@@ -68,7 +68,6 @@ test_that("freq2: Simple proc_freq test with report_type html works.", {
                       Region = "Geographic Region")
 
   res <- proc_freq(dat, tables = c("Eyes"),
-                   table_options = "FreqCount",
                    titles = "My first Frequency Table",
                    report_type = "HTML",
                    report_location = fl)
@@ -92,8 +91,7 @@ test_that("freq3: Two table proc_freq test with report_type html works.", {
                       Hair = "Hair Color",
                       Region = "Geographic Region")
 
-  res <- proc_freq(dat, tables = c("Eyes", "Hair"),
-                   table_options = "FreqCount",
+  res <- proc_freq(dat, tables = c("Eyes", HairCount = "Hair"),
                    titles = "My first Frequency Table",
                    report_type = "HTML",
                    report_location = fl)

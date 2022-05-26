@@ -47,7 +47,10 @@ proc_freq <- function(data,
   # print("Orig print_location")
   # print(print_location)
 
-  for (tb in tables) {
+  for (i in seq_len(length(tables))) {
+
+    nm <- names(tables)[i]
+    tb <- tables[i]
 
     var <- data[[tb]]
 
@@ -76,6 +79,7 @@ proc_freq <- function(data,
                          stringsAsFactors = FALSE)
 
     lbl <- attr(data[[tb]], "label")
+
     if (is.null(lbl))
       lbl <- tb
 
@@ -84,7 +88,14 @@ proc_freq <- function(data,
                         Cum_Freq = "Cumulative Frequency",
                         Cum_Pct = "Cumulative Percentage")
 
-    res[[tb]] <- result
+    if (is.null(nm))
+      res[[tb]] <- result
+    else if (nchar(nm) == 0)
+      res[[tb]] <- result
+    else
+      res[[nm]] <- result
+
+
   }
 
   if (!is.null(report_type)) {
@@ -101,13 +112,14 @@ proc_freq <- function(data,
 
     if (view == TRUE) {
 
-      vrfl <- tempfile(fileext = ".html")
+
+      vrfl <- tempfile()
 
       out <- output_report(res, proc_type = 'freq', dir_name = dirname(vrfl),
-                           file_name = basename(vrfl), out_type = report_type,
+                           file_name = basename(vrfl), out_type = "HTML",
                            titles = titles)
 
-      show_viewer(vrfl)
+      show_viewer(out)
     }
 
   }
