@@ -44,7 +44,6 @@ test_that("freq1: Simple proc_freq test works.", {
                       Region = "Geographic Region")
 
   res <- proc_freq(dat, tables = c("Eyes"),
-                   table_options = "FreqCount",
                    titles = "My first Frequency Table",
                    view = FALSE)
 
@@ -117,7 +116,6 @@ test_that("freq4: Simple proc_freq test with weight works.", {
                       Region = "Geographic Region")
 
   res <- proc_freq(dat, tables = c("Eyes"),
-                   table_options = "FreqCount",
                    weight = "Count",
                    titles = "My first Frequency Table",
                    report_type = "HTML",
@@ -144,7 +142,6 @@ test_that("freq5: Two var proc_freq with weight works.", {
                       Region = "Geographic Region")
 
   res <- proc_freq(dat, tables = c("Eyes", "Hair"),
-                   table_options = "FreqCount",
                    weight = "Count",
                    titles = "Eye and Hair Color of European Children",
                    report_type = "HTML",
@@ -172,7 +169,6 @@ test_that("freq6: Simple proc_freq in docx works.", {
                       Region = "Geographic Region")
 
   res <- proc_freq(dat, tables = c("Eyes"),
-                   table_options = "FreqCount",
                    weight = "Count",
                    titles = "My first Frequency Table",
                    report_type = "DOCX",
@@ -199,7 +195,6 @@ test_that("freq7: Simple proc_freq in pdf works.", {
                       Region = "Geographic Region")
 
   res <- proc_freq(dat, tables = c("Eyes"),
-                   table_options = "FreqCount",
                    weight = "Count",
                    titles = "My first Frequency Table",
                    report_type = "PDF",
@@ -227,7 +222,6 @@ test_that("freq8: Simple proc_freq in multiple outputs works.", {
                       Region = "Geographic Region")
 
   res <- proc_freq(dat, tables = c("Eyes"),
-                   table_options = "FreqCount",
                    weight = "Count",
                    titles = "My first Frequency Table",
                    report_type = c("TXT", "RTF", "PDF"),
@@ -258,7 +252,6 @@ test_that("freq9: Simple proc_freq with no file name works.", {
                       Region = "Geographic Region")
 
   res <- proc_freq(dat, tables = c("Eyes"),
-                   table_options = "FreqCount",
                    weight = "Count",
                    titles = "My first Frequency Table",
                    report_type = "TXT",
