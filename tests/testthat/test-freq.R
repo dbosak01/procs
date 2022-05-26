@@ -268,32 +268,31 @@ test_that("freq9: Simple proc_freq with no file name works.", {
 })
 
 
-# test_that("freq10: Crosstab proc_freq works.", {
-#
-#   library(fmtr)
-#
-#   fl <- file.path(base_path, "freq/freq10.html")
-#
-#   labels(dat) <- list(Eyes = "Eye Color",
-#                       Hair = "Hair Color",
-#                       Region = "Geographic Region")
-#
-#   res <- proc_freq(dat, tables = c("Eyes * Hair"),
-#                    table_options = "FreqCount",
-#                    weight = "Count",
-#                    titles = "Eye and Hair Color of European Children",
-#                    report_type = "HTML",
-#                    report_location = fl)
-#
-#   res
-#   ex <- file.exists(fl)
-#
-#
-#   expect_equal(nrow(res[[1]]), 3)
-#   expect_equal(ncol(res[[1]]), 5)
-#   expect_equal(ex, TRUE)
-#
-# })
+test_that("freq10: Crosstab proc_freq works.", {
+
+  library(fmtr)
+
+  fl <- file.path(base_path, "freq/freq10.html")
+
+  labels(dat) <- list(Eyes = "Eye Color",
+                      Hair = "Hair Color",
+                      Region = "Geographic Region")
+
+  res <- proc_freq(dat, tables = c(FreqCount = "Eyes * Hair"),
+                   weight = "Count",
+                   titles = "Eye and Hair Color of European Children",
+                   report_type = "HTML",
+                   report_location = fl)
+
+  res
+  ex <- file.exists(fl)
+
+
+  expect_equal(nrow(res[[1]]), 14)
+  expect_equal(ncol(res[[1]]), 4)
+  expect_equal(ex, TRUE)
+
+})
 
 #
 # test_that("freq10: GTables", {
