@@ -46,7 +46,7 @@ test_that("freq1: Simple proc_freq test works.", {
   res <- proc_freq(dat, tables = c("Eyes"),
                    table_options = "FreqCount",
                    titles = "My first Frequency Table",
-                   print = "none")
+                   view = FALSE)
 
   res
 
@@ -56,7 +56,7 @@ test_that("freq1: Simple proc_freq test works.", {
 })
 
 
-test_that("freq2: Simple proc_freq test with print html works.", {
+test_that("freq2: Simple proc_freq test with report_type html works.", {
 
   library(fmtr)
 
@@ -70,8 +70,8 @@ test_that("freq2: Simple proc_freq test with print html works.", {
   res <- proc_freq(dat, tables = c("Eyes"),
                    table_options = "FreqCount",
                    titles = "My first Frequency Table",
-                   print = "HTML",
-                   print_location = fl)
+                   report_type = "HTML",
+                   report_location = fl)
 
   res
   ex <- file.exists(fl)
@@ -82,7 +82,7 @@ test_that("freq2: Simple proc_freq test with print html works.", {
 
 })
 
-test_that("freq3: Two table proc_freq test with print html works.", {
+test_that("freq3: Two table proc_freq test with report_type html works.", {
 
   library(fmtr)
 
@@ -95,8 +95,8 @@ test_that("freq3: Two table proc_freq test with print html works.", {
   res <- proc_freq(dat, tables = c("Eyes", "Hair"),
                    table_options = "FreqCount",
                    titles = "My first Frequency Table",
-                   print = "HTML",
-                   print_location = fl)
+                   report_type = "HTML",
+                   report_location = fl)
 
   res
 
@@ -122,8 +122,8 @@ test_that("freq4: Simple proc_freq test with weight works.", {
                    table_options = "FreqCount",
                    weight = "Count",
                    titles = "My first Frequency Table",
-                   print = "HTML",
-                   print_location = fl)
+                   report_type = "HTML",
+                   report_location = fl)
 
   res
   ex <- file.exists(fl)
@@ -149,8 +149,8 @@ test_that("freq5: Two var proc_freq with weight works.", {
                    table_options = "FreqCount",
                    weight = "Count",
                    titles = "Eye and Hair Color of European Children",
-                   print = "HTML",
-                   print_location = fl)
+                   report_type = "HTML",
+                   report_location = fl)
 
   res
   ex <- file.exists(fl)
@@ -177,8 +177,8 @@ test_that("freq6: Simple proc_freq in docx works.", {
                    table_options = "FreqCount",
                    weight = "Count",
                    titles = "My first Frequency Table",
-                   print = "DOCX",
-                   print_location = fl)
+                   report_type = "DOCX",
+                   report_location = fl)
 
   res
   ex <- file.exists(fl)
@@ -204,8 +204,8 @@ test_that("freq7: Simple proc_freq in pdf works.", {
                    table_options = "FreqCount",
                    weight = "Count",
                    titles = "My first Frequency Table",
-                   print = "PDF",
-                   print_location = fl)
+                   report_type = "PDF",
+                   report_location = fl)
 
   res
   ex <- file.exists(fl)
@@ -232,8 +232,8 @@ test_that("freq8: Simple proc_freq in multiple outputs works.", {
                    table_options = "FreqCount",
                    weight = "Count",
                    titles = "My first Frequency Table",
-                   print = c("TXT", "RTF", "PDF"),
-                   print_location = fl)
+                   report_type = c("TXT", "RTF", "PDF"),
+                   report_location = fl)
 
   res
   ex1 <- file.exists(paste0(fl, ".txt"))
@@ -249,23 +249,50 @@ test_that("freq8: Simple proc_freq in multiple outputs works.", {
 
 })
 
+test_that("freq9: Simple proc_freq with no file name works.", {
 
-# test_that("freq9: Crosstab proc_freq with weight works.", {
+  library(fmtr)
+
+  fl <- file.path(base_path, "freq")
+
+  labels(dat) <- list(Eyes = "Eye Color",
+                      Hair = "Hair Color",
+                      Region = "Geographic Region")
+
+  res <- proc_freq(dat, tables = c("Eyes"),
+                   table_options = "FreqCount",
+                   weight = "Count",
+                   titles = "My first Frequency Table",
+                   report_type = "TXT",
+                   report_location = fl)
+
+  res
+  ex <- file.exists(file.path(fl, "freq.txt"))
+
+
+  expect_equal(nrow(res[[1]]), 3)
+  expect_equal(ncol(res[[1]]), 5)
+  expect_equal(ex, TRUE)
+
+})
+
+
+# test_that("freq10: Crosstab proc_freq works.", {
 #
 #   library(fmtr)
 #
-#   fl <- file.path(base_path, "freq/freq6.html")
+#   fl <- file.path(base_path, "freq/freq10.html")
 #
 #   labels(dat) <- list(Eyes = "Eye Color",
 #                       Hair = "Hair Color",
 #                       Region = "Geographic Region")
 #
-#   res <- proc_freq(dat, tables = c("Eyes", "Hair", "Eyes * Hair"),
+#   res <- proc_freq(dat, tables = c("Eyes * Hair"),
 #                    table_options = "FreqCount",
 #                    weight = "Count",
 #                    titles = "Eye and Hair Color of European Children",
-#                    print = "HTML",
-#                    print_location = fl)
+#                    report_type = "HTML",
+#                    report_location = fl)
 #
 #   res
 #   ex <- file.exists(fl)

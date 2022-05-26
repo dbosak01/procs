@@ -15,6 +15,9 @@ output_report <- function(lst, proc_type,
 
     targetDir <- dir_name
 
+    if (dir.exists(targetDir) == FALSE)
+      dir.create(targetDir)
+
     flnm <- file_name
   }
 
@@ -60,14 +63,7 @@ show_viewer <- function(path) {
 
   if (file.exists(path)) {
 
-    dir <- tempdir()
-    if (dir.exists(dir) == FALSE)
-      dir.create(dir)
-
-    pth <- tempfile(fileext = ".html")
-
-    file.copy(path, pth)
-
+    pth <- path
 
     viewer <- getOption("viewer")
 
@@ -86,7 +82,7 @@ show_viewer <- function(path) {
 }
 
 #' @noRd
-get_location <- function(print, proc_type, location) {
+get_location <- function(proc_type, location) {
 
   ret <- c(dir_name = "",
            file_name = "")
