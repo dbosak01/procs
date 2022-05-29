@@ -268,7 +268,7 @@ test_that("freq9: Simple proc_freq with no file name works.", {
 })
 
 
-test_that("freq10: Crosstab proc_freq works.", {
+test_that("freq10: Two way proc_freq works.", {
 
   library(fmtr)
 
@@ -288,31 +288,83 @@ test_that("freq10: Crosstab proc_freq works.", {
   ex <- file.exists(fl)
 
 
-  expect_equal(nrow(res[[1]]), 14)
+  expect_equal(nrow(res[[1]]), 15)
   expect_equal(ncol(res[[1]]), 4)
   expect_equal(ex, TRUE)
 
 })
 
+
+test_that("freq11: Two way proc_freq no weight works.", {
+
+  library(fmtr)
+
+  fl <- file.path(base_path, "freq/freq11.html")
+
+  labels(dat) <- list(Eyes = "Eye Color",
+                      Hair = "Hair Color",
+                      Region = "Geographic Region")
+
+  res <- proc_freq(dat, tables = c(FreqCount = "Eyes * Hair"),
+                   titles = "Eye and Hair Color of European Children",
+                   report_type = "HTML",
+                   report_location = fl)
+
+  res
+  ex <- file.exists(fl)
+
+
+  expect_equal(nrow(res[[1]]), 15)
+  expect_equal(ncol(res[[1]]), 4)
+  expect_equal(ex, TRUE)
+
+})
+
+test_that("freq12: One way and two way proc_freq works.", {
+
+  library(fmtr)
+
+
+  fl <- file.path(base_path, "freq/freq12.html")
+
+  labels(dat) <- list(Eyes = "Eye Color",
+                      Hair = "Hair Color",
+                      Region = "Geographic Region")
+
+  res <- proc_freq(dat, tables = c("Eyes", "Hair", FreqCount = "Eyes * Hair"),
+                   weight = "Count",
+                   titles = "Eye and Hair Color of European Children",
+                   report_type = "HTML",
+                   report_location = fl)
+
+  res
+
+  ex <- file.exists(fl)
+
+  expect_equal(nrow(res[[1]]), 3)
+  expect_equal(ncol(res[[1]]), 5)
+  expect_equal(nrow(res[[2]]), 5)
+  expect_equal(ncol(res[[2]]), 5)
+  expect_equal(nrow(res[[3]]), 15)
+  expect_equal(ncol(res[[3]]), 4)
+  expect_equal(ex, TRUE)
+
+})
+
+
+# test_that("freq13: Transpose", {
 #
-# test_that("freq10: GTables", {
+#   df <- as.data.frame(HairEyeColor, stringsAsFactors = FALSE)
 #
 #
+#   res <- proc_freq(df,
+#             tables = c("Eye", "Hair", FreqCount = "Eye * Hair"),
+#             weight = "Freq")
+#
+#   ds <- res[["FreqCount"]]
 #
 #
-#   res2 <- fisher.test(dat$Eyes, dat$Hair)
-#
-#   class(res2)
-#
-#   wb <- aggregate(warpbreaks$breaks,
-#                   by = list(w = warpbreaks$wool,
-#                             t = warpbreaks$tension),
-#                   FUN = mean)
-#   wb
-#   res3 <- friedman.test(wb$x, wb$w, wb$t)
-#
-#   unlist(res3)
-#   friedman.test(x ~ w | t, data = wb)
+#   reshape(data = ds, idvar = "Category2", timevar = "Category1",
+#           direction = "wide", v.names = c("Frequency", "Percentage"))
 #
 # })
-

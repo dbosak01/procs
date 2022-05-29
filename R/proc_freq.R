@@ -129,6 +129,8 @@ proc_freq <- function(data,
 
 }
 
+
+#' @import fmtr
 #' @noRd
 freq_oneway <- function(data, tb, weight, digits) {
 
@@ -147,9 +149,10 @@ freq_oneway <- function(data, tb, weight, digits) {
   }
 
   n <- sum(frequencies)
-  percentages <- round(frequencies / n * 100, digits)
+  percentages <- frequencies / n * 100
   cum_frequencies <- cumsum(frequencies)
   cum_percentages <- cumsum(percentages)
+
 
   result <- data.frame("Category" = categories,
                        "Frequency" = frequencies,
@@ -157,6 +160,8 @@ freq_oneway <- function(data, tb, weight, digits) {
                        "Cum_Freq" = cum_frequencies,
                        "Cum_Pct" = cum_percentages,
                        stringsAsFactors = FALSE)
+
+
 
   lbl <- attr(data[[tb]], "label")
 
@@ -168,33 +173,51 @@ freq_oneway <- function(data, tb, weight, digits) {
                       Cum_Freq = "Cumulative Frequency",
                       Cum_Pct = "Cumulative Percentage")
 
+  fmt <- paste0("%.", digits, "f")
+
+  formats(result) <- list(Cum_Pct = fmt,
+                          Percentage = fmt)
+
 
   return(result)
 }
 
 
+#' @import fmtr
+#' @noRd
 freq_twoway <- function(data, tb1, tb2, weight, digits) {
 
 
+  data[["__cnt"]] <- 1
+  v1 <- data[[tb1]]
+  v2 <- data[[tb2]]
+
+  t1 <- names(sort(table(v1)))
+  t2 <- names(sort(table(v2)))
+  ex <- expand.grid(tb1 = t1, tb2 = t2, stringsAsFactors = FALSE)
+  ex[["__cnt"]] <- 0
+
   if (is.null(weight)) {
 
-    data[["__cnt"]] <- 1
-
-    cnts <- aggregate(data[["__cnt"]], list(data[[tb1]], data[[tb2]]), FUN = sum)
-    categories1 <- cnts$Group.1
-    categories2 <- cnts$Group.2
-    frequencies <- cnts$x
+    c1 <- data[["__cnt"]]
 
   } else {
 
-    cnts <- aggregate(data[[weight]], list(data[[tb1]], data[[tb2]]), FUN = sum)
-    categories1 <- cnts$Group.1
-    categories2 <- cnts$Group.2
-    frequencies <- cnts$x
+    c1 <-data[[weight]]
+
   }
 
+  c1 <- append(c1, ex[["__cnt"]])
+  v1 <- append(v1, ex[["tb1"]])
+  v2 <- append(v2, ex[["tb2"]])
+
+  cnts <- aggregate(c1, list(v1, v2), FUN = sum)
+  categories1 <- cnts$Group.1
+  categories2 <- cnts$Group.2
+  frequencies <- cnts$x
+
   n <- sum(frequencies)
-  percentages <- round(frequencies / n * 100, digits)
+  percentages <- frequencies / n * 100
 
 
   result <- data.frame("Category1" = categories1,
@@ -202,6 +225,7 @@ freq_twoway <- function(data, tb1, tb2, weight, digits) {
                        "Frequency" = frequencies,
                        "Percentage" = percentages,
                        stringsAsFactors = FALSE)
+
 
   result <- result[order(result$Category1, result$Category2), ]
 
@@ -215,6 +239,8 @@ freq_twoway <- function(data, tb1, tb2, weight, digits) {
 
   labels(result) <- c(Category1 = lbl1,
                       Category2 = lbl2)
+
+  formats(result) <- list(Percentage = paste0("%.", digits, "f"))
 
 
   return(result)
