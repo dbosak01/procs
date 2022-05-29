@@ -476,6 +476,32 @@ test_that("freq17: Sparse option works as expected.", {
 
 })
 
+test_that("freq18: Crosstab works.", {
+
+  library(fmtr)
+
+
+  labels(dat) <- list(Eyes = "Eye Color",
+                      Hair = "Hair Color",
+                      Region = "Geographic Region")
+
+  res <- proc_freq(dat, tables = c("Eyes * Hair"),
+                   weight = "Count",
+                   titles = "Eye and Hair Color of European Children")
+
+  res
+
+  freqdata <- res[[1]]
+
+
+
+  expect_equal(nrow(res[[1]]), 14)
+  expect_equal(ncol(res[[1]]), 8)
+
+
+})
+
+
 #
 # test_that("freq15: Crosstab table.", {
 #
@@ -493,8 +519,8 @@ test_that("freq17: Sparse option works as expected.", {
 #           direction = "wide", v.names = c("Frequency", "Percentage"))
 #
 # })
-#
-#
+
+
 # test_that("freq16: Format options on table.", {
 #
 #   res <- proc_freq(dat, tables = c("Eyes"),

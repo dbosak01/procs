@@ -67,7 +67,7 @@ proc_freq <- function(data,
 
       result <- freq_twoway(data, splt[1], splt[2], weight, table_options, out)
 
-      #crstab <- cross_tab(result)
+      crstab <- cross_tab(result)
 
     } else {
 
@@ -330,6 +330,73 @@ freq_twoway <- function(data, tb1, tb2, weight, options, out = FALSE) {
 
   return(result)
 
+}
+
+#' @noRd
+cross_tab <- function(freqdata, options) {
+
+
+  # Group by both dimensions
+  cat1grp <- aggregate(freqdata$Frequency, list(freqdata$Category1), FUN=sum)
+  cat2grp <- aggregate(freqdata$Frequency, list(freqdata$Category2), FUN=sum)
+
+  # Create lookup from cat1 group (rows)
+  lkp1 <- cat1grp$x
+  names(lkp1) <- cat1grp$Group.1
+
+  # Create lookup from cat2 group (columns)
+  lkp2 <- cat2grp$x
+  names(lkp2) <- cat2grp$Group.1
+
+  # Assign data to new variable
+  dt <- freqdata
+
+  # Create freq columns for both dimensions
+  dt$rowcnt <- lkp1[dt$Category1]
+  dt$colcnt <- lkp2[dt$Category2]
+
+  # Create percentages for both dimensions
+  dt$rowpct <- dt$Frequency / dt$rowcnt
+  dt$colpct <- dt$Frequency / dt$colcnt
+
+  dt1 <- reshape(dt, timevar = "Category2", idvar = "Category1",
+                 v.names = "Frequency", direction = "wide",
+                 drop = c("Percentage", "rowcnt", "colcnt", "rowpct", "colpct"))
+  dt1$Order <- 1
+  dt1$Label <- "Frequency"
+  names(dt1) <- gsub("Frequency.",  "", names(dt1), fixed = TRUE)
+
+  dt2 <- reshape(dt, timevar = "Category2", idvar = "Category1",
+                 v.names = "Percentage", direction = "wide",
+                 drop = c("Frequency", "rowcnt", "colcnt", "rowpct", "colpct"))
+  dt2$Order <- 2
+  dt2$Label <- "Percentage"
+  names(dt2) <- gsub("Percentage.",  "", names(dt2), fixed = TRUE)
+
+  dt3 <- reshape(dt, timevar = "Category2", idvar = "Category1",
+                 v.names = "rowpct", direction = "wide",
+                 drop = c("Percentage", "rowcnt", "colcnt", "Frequency", "colpct"))
+  dt3$Order <- 3
+  dt3$Label <- "Row Pct"
+  names(dt3) <- gsub("rowpct.",  "", names(dt3), fixed = TRUE)
+
+  dt4 <- reshape(dt, timevar = "Category2", idvar = "Category1",
+                 v.names = "colpct", direction = "wide",
+                 drop = c("Percentage", "rowcnt", "colcnt", "Frequency", "rowpct"))
+  dt4$Order <- 4
+  dt4$Label <- "Col Pct"
+  names(dt4) <- gsub("colpct.",  "", names(dt4), fixed = TRUE)
+
+  ret <- rbind(dt1, dt2, dt3, dt4,
+               make.row.names = FALSE,
+               stringsAsFactors = FALSE)
+
+  nnms <- names(ret)[!names(ret) %in% c("Category1", "Order", "Label")]
+
+
+  ret <- ret[order(ret$Category1, ret$Order), c("Category1", "Label", nnms) ]
+
+  return(ret)
 }
 
 
