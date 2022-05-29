@@ -111,3 +111,42 @@ test_that("utils3: filenm works as expected.", {
 
 })
 
+test_that("utils4: option_true() works as expected.", {
+
+  opt <- NULL
+
+  expect_equal(option_true(opt, "cumsum"), FALSE)
+
+  opt <- list(fork = TRUE)
+
+  expect_equal(option_true(opt, "cumsum"), FALSE)
+
+
+  opt <- list(fork = TRUE, cumsum = FALSE)
+
+  expect_equal(option_true(opt, "cumsum"), FALSE)
+
+
+  opt <- list(fork = TRUE, cumsum = TRUE)
+
+  expect_equal(option_true(opt, "cumsum"), TRUE)
+
+})
+
+test_that("utils4: option_true() works as expected.", {
+
+  opt <- NULL
+
+  expect_equal(has_option(opt, "cumsum"), FALSE)
+
+  opt <- list(fork = TRUE)
+
+  expect_equal(has_option(opt, "cumsum"), FALSE)
+
+
+  opt <- list(fork = TRUE, cumsum = FALSE)
+
+  expect_equal(has_option(opt, "cumsum"), TRUE)
+
+})
+

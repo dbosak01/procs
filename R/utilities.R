@@ -4,7 +4,7 @@
 #' @noRd
 output_report <- function(lst, proc_type,
                           dir_name, file_name, out_type = 'HTML',
-                          titles = NULL) {
+                          titles = NULL, margins = 1) {
 
 
   if (is.null(dir_name)) {
@@ -22,7 +22,8 @@ output_report <- function(lst, proc_type,
   }
 
   rpt <- create_report(font = 'Arial', orientation = 'portrait')
-  rpt <- set_margins(rpt, top = 1, bottom = 1)
+  rpt <- set_margins(rpt, top = margins, bottom = margins,
+                     left = margins, right = margins)
 
 
 
@@ -122,5 +123,41 @@ filenm <- function(path) {
   flnm <- pos[[1]][1]
 
   return(flnm)
+
+}
+
+#' @noRd
+option_true <- function(options, name, default = FALSE) {
+
+  ret <- default
+
+  if (!is.null(options)) {
+    vl <- options[[name]]
+    if (!is.null(vl)) {
+      if (vl == TRUE)
+        ret <- TRUE
+      else
+        ret <- FALSE
+    }
+
+  }
+
+  return(ret)
+
+}
+
+has_option <- function(options, name) {
+
+
+  ret <- FALSE
+
+  if (!is.null(options)) {
+    vl <- options[[name]]
+    if (!is.null(vl)) {
+      ret <- TRUE
+    }
+  }
+
+  return(ret)
 
 }

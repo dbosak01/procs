@@ -26,8 +26,6 @@
 #' type will be used.  If no path is specified, files will be
 #' written to a temp directory.  Default is NULL.
 #' @param titles A vector of one or more titles to use for the report output.
-#' @param digits The number of digits to round statistics produced
-#' by the function.
 #' @return A list of data frames that contain the requested frequency tables.
 #' The list item names are specified in the \code{tables} parameter.
 #' @import fmtr
@@ -42,43 +40,54 @@ proc_freq <- function(data,
                       output = NULL,
                       report_type = NULL,
                       report_location = NULL,
-                      titles = NULL,
-                      digits = 4) {
+                      titles = NULL) {
 
   res <- list()
   # print("Orig print_location")
   # print(print_location)
 
+  # Loop through tabel requests
   for (i in seq_len(length(tables))) {
 
     nm <- names(tables)[i]
     tb <- tables[i]
+    #browser()
+    out <- i == length(tables) & has_option(table_options, "out")
 
     crstab <- NULL
 
+    # Split cross variables
     splt <- trimws(strsplit(tb, "*", fixed = TRUE)[[1]])
 
+    # Perform either one-way or two-way frequency count
     if (length(splt) == 1) {
 
-      result <- freq_oneway(data, tb, weight, digits)
+      result <- freq_oneway(data, tb, weight, table_options, out)
     } else if (length(splt) == 2) {
 
-      result <- freq_twoway(data, splt[1], splt[2], weight, digits)
+      result <- freq_twoway(data, splt[1], splt[2], weight, table_options, out)
 
       #crstab <- cross_tab(result)
 
     } else {
 
-
+      stop("Procedure does not yet support n-way frequencies.")
     }
 
-    if (is.null(nm))
-      res[[tb]] <- result
-    else if (nchar(nm) == 0)
-      res[[tb]] <- result
-    else
-      res[[nm]] <- result
 
+    # Assign best name to list item
+    if ("out" %in% names(table_options) & i == length(tables))
+      res[[table_options[["out"]]]] <- result
+    else {
+      if (is.null(nm))
+        res[[tb]] <- result
+      else if (nchar(nm) == 0)
+        res[[tb]] <- result
+      else
+        res[[nm]] <- result
+    }
+
+    # If a cross tab was produced, add it to result
     if (!is.null(crstab)) {
 
       res[[length(res) + 1]] <- crstab
@@ -87,32 +96,34 @@ proc_freq <- function(data,
 
   }
 
-  if (!is.null(output)) {
+  # if (!is.null(output)) {
+  #
+  #   if (all(class(output) == "character")) {
+  #
+  #
+  #   } else if (class(output) %in% c("lib")) {
+  #
+  #     for (dt in names(res)) {
+  #
+  #       #lib_add(output
+  #     }
+  #
+  #   }
+  #
+  # }
 
-    if (all(class(output) == "character")) {
-
-
-    } else if (class(output) %in% c("lib")) {
-
-      for (dt in names(res)) {
-
-        #lib_add(output
-      }
-
-    }
-
-  }
-
+  # Create output reports if requested
   if (!is.null(report_type)) {
 
     loc <- get_location("freq", report_location)
     out <- output_report(res, proc_type = 'freq', dir_name = loc["dir_name"],
                          file_name = loc["file_name"], out_type = report_type,
-                         titles = titles)
+                         titles = titles, margins = 1)
 
 
   }
 
+  # Create viewer report if requested
   if (view == TRUE) {
 
 
@@ -120,7 +131,7 @@ proc_freq <- function(data,
 
     out <- output_report(res, proc_type = 'freq', dir_name = dirname(vrfl),
                          file_name = basename(vrfl), out_type = "HTML",
-                         titles = titles)
+                         titles = titles, margins = .5)
 
     show_viewer(out)
   }
@@ -132,10 +143,12 @@ proc_freq <- function(data,
 
 #' @import fmtr
 #' @noRd
-freq_oneway <- function(data, tb, weight, digits) {
+freq_oneway <- function(data, tb, weight, options, out = FALSE) {
 
+  # Get target variable vector
   var <- data[[tb]]
 
+  # Get frequency counts
   if (is.null(weight)) {
 
     categories <- names(sort(table(var)))
@@ -148,12 +161,14 @@ freq_oneway <- function(data, tb, weight, digits) {
     frequencies <- cnts$x
   }
 
+  # Perform calculations
   n <- sum(frequencies)
   percentages <- frequencies / n * 100
   cum_frequencies <- cumsum(frequencies)
   cum_percentages <- cumsum(percentages)
 
 
+  # Create result data frame
   result <- data.frame("Category" = categories,
                        "Frequency" = frequencies,
                        "Percentage" = percentages,
@@ -163,20 +178,48 @@ freq_oneway <- function(data, tb, weight, digits) {
 
 
 
+  # Get any existing label for target variable
   lbl <- attr(data[[tb]], "label")
 
   if (is.null(lbl))
     lbl <- tb
 
-
+  # Apply default labels
   labels(result) <- c(Category = lbl,
                       Cum_Freq = "Cumulative Frequency",
                       Cum_Pct = "Cumulative Percentage")
 
-  fmt <- paste0("%.", digits, "f")
+  # Apply default formats
+  formats(result) <- list(Cum_Pct = "%.2f",
+                          Percentage = "%.2f")
 
-  formats(result) <- list(Cum_Pct = fmt,
-                          Percentage = fmt)
+ # browser()
+
+  # Kill freq if requested
+  if ((!option_true(options, "freq", TRUE))) {
+
+    result[["Frequency"]] <- NULL
+  }
+
+  # Kill pct if requested
+  if ((!option_true(options, "pct", TRUE))) {
+
+    result[["Percentage"]] <- NULL
+  }
+
+  # Kill cum freq if requested
+  if ((out == FALSE & !option_true(options, "cumsum", TRUE)) |
+      (out == TRUE & !option_true(options, "outcum", TRUE))) {
+
+    result[["Cum_Freq"]] <- NULL
+  }
+
+  # Kill cum pct if requested
+  if ((out == FALSE & !option_true(options, "cumpct", TRUE)) |
+      (out == TRUE & !option_true(options, "outcum", TRUE))) {
+
+    result[["Cum_Pct"]] <- NULL
+  }
 
 
   return(result)
@@ -185,18 +228,26 @@ freq_oneway <- function(data, tb, weight, digits) {
 
 #' @import fmtr
 #' @noRd
-freq_twoway <- function(data, tb1, tb2, weight, digits) {
+freq_twoway <- function(data, tb1, tb2, weight, options, out = FALSE) {
 
-
+  # Assign 1 to count column
   data[["__cnt"]] <- 1
+
+  # Get target variables into vectors
   v1 <- data[[tb1]]
   v2 <- data[[tb2]]
 
+  # Get unique values of variables
   t1 <- names(sort(table(v1)))
   t2 <- names(sort(table(v2)))
+
+  # Get unique combinations of variable values for zero-fill
   ex <- expand.grid(tb1 = t1, tb2 = t2, stringsAsFactors = FALSE)
+
+  # Assign zero fill value
   ex[["__cnt"]] <- 0
 
+  # Use weight variable if requested
   if (is.null(weight)) {
 
     c1 <- data[["__cnt"]]
@@ -207,28 +258,35 @@ freq_twoway <- function(data, tb1, tb2, weight, digits) {
 
   }
 
-  c1 <- append(c1, ex[["__cnt"]])
-  v1 <- append(v1, ex[["tb1"]])
-  v2 <- append(v2, ex[["tb2"]])
+  # Append zero fills
+  if (option_true(options, "sparse", TRUE)) {
+    c1 <- append(c1, ex[["__cnt"]])
+    v1 <- append(v1, ex[["tb1"]])
+    v2 <- append(v2, ex[["tb2"]])
+  }
 
+  # Get frequencies
   cnts <- aggregate(c1, list(v1, v2), FUN = sum)
   categories1 <- cnts$Group.1
   categories2 <- cnts$Group.2
   frequencies <- cnts$x
 
+  # Perform calculations
   n <- sum(frequencies)
   percentages <- frequencies / n * 100
 
 
+  # Create result data frame
   result <- data.frame("Category1" = categories1,
                        "Category2" = categories2,
                        "Frequency" = frequencies,
                        "Percentage" = percentages,
                        stringsAsFactors = FALSE)
 
-
+  # Sort result data frame
   result <- result[order(result$Category1, result$Category2), ]
 
+  # Get labels on target variables if they exist
   lbl1 <- attr(data[[tb1]], "label")
   lbl2 <- attr(data[[tb2]], "label")
 
@@ -237,13 +295,41 @@ freq_twoway <- function(data, tb1, tb2, weight, digits) {
   if (is.null(lbl2))
     lbl2 <- tb2
 
+  # Assign labels
   labels(result) <- c(Category1 = lbl1,
                       Category2 = lbl2)
 
-  formats(result) <- list(Percentage = paste0("%.", digits, "f"))
+  # Assign default formats
+  formats(result) <- list(Percentage = paste0("%.2f"))
 
+  # Kill freq if requested
+  if ((!option_true(options, "freq", TRUE))) {
+
+    result[["Frequency"]] <- NULL
+  }
+
+  # Kill pct if requested
+  if ((!option_true(options, "pct", TRUE))) {
+
+    result[["Percentage"]] <- NULL
+  }
+
+  # Kill cum freq if requested
+  if ((out == FALSE & !option_true(options, "cumsum", TRUE)) |
+      (out == TRUE & !option_true(options, "outcum", TRUE))) {
+
+    result[["Cum_Freq"]] <- NULL
+  }
+
+  # Kill cum pct if requested
+  if ((out == FALSE & !option_true(options, "cumpct", TRUE)) |
+      (out == TRUE & !option_true(options, "outcum", TRUE))) {
+
+    result[["Cum_Pct"]] <- NULL
+  }
 
   return(result)
 
 }
+
 

@@ -352,7 +352,132 @@ test_that("freq12: One way and two way proc_freq works.", {
 })
 
 
-# test_that("freq13: Transpose", {
+
+
+test_that("freq13: Cumsum and Cumpct options work as expected.", {
+
+
+  res <- proc_freq(dat, tables = c("Eyes"),
+                   table_options = list(cumsum = FALSE,
+                                        cumpct = FALSE),
+                   titles = "Eye and Hair Color of European Children")
+
+  res
+
+  d <- names(res[[1]])
+
+
+  expect_equal("Cum_Sum" %in% d, FALSE)
+  expect_equal("Cum_Pct" %in% d, FALSE)
+
+
+})
+
+
+test_that("freq14: Out = options on table.", {
+
+
+  res <- proc_freq(dat, tables = c("Eyes", "Eyes * Hair"),
+                   table_options = list(out = "FreqCount"),
+                   titles = "Eye and Hair Color of European Children")
+
+  res
+
+  d <- names(res)
+
+
+  expect_equal(d[1], "Eyes")
+  expect_equal(d[2], "FreqCount")
+
+
+})
+
+
+test_that("freq15: Outcum option works as expected.", {
+
+
+  res <- proc_freq(dat, tables = c("Eyes"),
+                   table_options = list(out = "fork",
+                                        outcum = FALSE),
+                   titles = "Eye and Hair Color of European Children")
+
+  res
+
+  d <- names(res[["fork"]])
+
+
+  expect_equal("Cum_Freq" %in% d, FALSE)
+  expect_equal("Cum_Pct" %in% d, FALSE)
+
+  res <- proc_freq(dat, tables = c("Eyes"),
+                   table_options = list(outcum = FALSE),
+                   titles = "Eye and Hair Color of European Children")
+
+  res
+
+  d <- names(res[["Eyes"]])
+
+
+  expect_equal("Cum_Freq" %in% d, TRUE)
+  expect_equal("Cum_Pct" %in% d, TRUE)
+
+
+
+})
+
+
+test_that("freq16: Freq and Pct options works as expected.", {
+
+
+  res <- proc_freq(dat, tables = c("Eyes"),
+                   table_options = list(freq = FALSE,
+                                        pct = TRUE),
+                   titles = "Eye and Hair Color of European Children")
+
+  res
+
+  d <- names(res[["Eyes"]])
+
+
+  expect_equal("Frequency" %in% d, FALSE)
+  expect_equal("Percentage" %in% d, TRUE)
+
+  res <- proc_freq(dat, tables = c("Eyes"),
+                   table_options = list(freq = TRUE,
+                                        pct = FALSE),
+                   titles = "Eye and Hair Color of European Children")
+
+  res
+
+  d <- names(res[["Eyes"]])
+
+
+  expect_equal("Frequency" %in% d, TRUE)
+  expect_equal("Percentage" %in% d, FALSE)
+
+
+
+})
+
+
+
+test_that("freq17: Sparse option works as expected.", {
+
+
+  res <- proc_freq(dat, tables = c("Eyes * Hair"),
+                   table_options = list(sparse = FALSE),
+                   titles = "Eye and Hair Color of European Children")
+
+  res
+
+
+  expect_equal(nrow(res[[1]]), 14)
+  expect_equal(ncol(res[[1]]), 4)
+
+})
+
+#
+# test_that("freq15: Crosstab table.", {
 #
 #   df <- as.data.frame(HairEyeColor, stringsAsFactors = FALSE)
 #
@@ -366,5 +491,21 @@ test_that("freq12: One way and two way proc_freq works.", {
 #
 #   reshape(data = ds, idvar = "Category2", timevar = "Category1",
 #           direction = "wide", v.names = c("Frequency", "Percentage"))
+#
+# })
+#
+#
+# test_that("freq16: Format options on table.", {
+#
+#   res <- proc_freq(dat, tables = c("Eyes"),
+#                    table_options = list(format = c(Percentage = "%.2f",
+#                                                    Cum_Pct = "%.3f")),
+#                    titles = "Eye and Hair Color of European Children")
+#
+#   res
+#
+#
+#   expect_equal(attr(res[[1]]$Percentage, "format"), "%.4f")
+#   expect_equal(attr(res[[1]]$Cum_Pct, "format"), "%.3f")
 #
 # })
