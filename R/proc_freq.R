@@ -67,7 +67,7 @@ proc_freq <- function(data,
 
       result <- freq_twoway(data, splt[1], splt[2], weight, table_options, out)
 
-      crstab <- cross_tab(result)
+      crstab <- cross_tab(result, table_options)
 
     } else {
 
@@ -185,7 +185,7 @@ freq_oneway <- function(data, tb, weight, options, out = FALSE) {
     lbl <- tb
 
   # Apply default labels
-  labels(result) <- c(Category = lbl,
+  labels(result) <- c(Category = tb,
                       Cum_Freq = "Cumulative Frequency",
                       Cum_Pct = "Cumulative Percentage")
 
@@ -220,6 +220,11 @@ freq_oneway <- function(data, tb, weight, options, out = FALSE) {
 
     result[["Cum_Pct"]] <- NULL
   }
+
+
+  # Add spanning headers
+  spn <- span_spec(label = lbl, 1, ncol(result), 1)
+  attr(result, "spans") <- list(spn)
 
 
   return(result)
@@ -328,10 +333,12 @@ freq_twoway <- function(data, tb1, tb2, weight, options, out = FALSE) {
     result[["Cum_Pct"]] <- NULL
   }
 
+
   return(result)
 
 }
 
+#' @import fmtr
 #' @noRd
 cross_tab <- function(freqdata, options) {
 
@@ -356,8 +363,9 @@ cross_tab <- function(freqdata, options) {
   dt$colcnt <- lkp2[dt$Category2]
 
   # Create percentages for both dimensions
-  dt$rowpct <- dt$Frequency / dt$rowcnt
-  dt$colpct <- dt$Frequency / dt$colcnt
+  dt$Percentage <- dt$Percentage
+  dt$rowpct <- dt$Frequency / dt$rowcnt * 100
+  dt$colpct <- dt$Frequency / dt$colcnt * 100
 
   dt1 <- reshape(dt, timevar = "Category2", idvar = "Category1",
                  v.names = "Frequency", direction = "wide",
@@ -391,10 +399,29 @@ cross_tab <- function(freqdata, options) {
                make.row.names = FALSE,
                stringsAsFactors = FALSE)
 
+  # Get all value column names
   nnms <- names(ret)[!names(ret) %in% c("Category1", "Order", "Label")]
 
-
+  # Sort data frame by category and order
   ret <- ret[order(ret$Category1, ret$Order), c("Category1", "Label", nnms) ]
+
+  # Get format
+  fmt <- get_option(options, "format", "%.2f")
+
+  # Create formatting list
+  lst <- list(Frequency = "%d", Percentage = fmt,
+              'Row Pct' = fmt, 'Col Pct' = fmt)
+  fl <- as.flist(lst, type = "row", lookup = ret$Label)
+
+  # Assign flist to data columns
+  fmts <- list()
+  for (nm in nnms) {
+    fmts[[nm]] <- fl
+  }
+  formats(ret) <- fmts
+
+  # Assign label to Category1
+  attr(ret$Category1, "label") <- attr(freqdata$Category1, "label")
 
   return(ret)
 }

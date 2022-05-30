@@ -28,11 +28,32 @@ output_report <- function(lst, proc_type,
 
 
   for (i in seq_len(length(lst))) {
+    dt <- lst[[i]]
 
-    tbl <- create_table(lst[[i]], borders = c("top", "bottom"))
+    # Create tabel
+    tbl <- create_table(dt, borders = c("top", "bottom"))
+
+    # Add titles
     if (!is.null(titles) & i == 1) {
       tbl <- titles(tbl, titles)
     }
+
+    #browser()
+    # Add spanning headers if requested
+    spns <- attr(dt, "spans")
+    if (!is.null(spns)) {
+
+      for (i in seq_len(length(spns))) {
+        spn <- spns[[i]]
+        tbl <- spanning_header(tbl, label = spn$label, from = as.character(spn$start),
+                               to = as.character(spn$end), level = spn$level,
+                               standard_eval = TRUE)
+
+      }
+
+    }
+
+    # Append table to report
     rpt <- add_content(rpt, tbl, align = 'center', page_break = FALSE)
 
 
@@ -161,3 +182,33 @@ has_option <- function(options, name) {
   return(ret)
 
 }
+
+
+get_option <- function(options, name, default = NULL) {
+
+
+  ret <- default
+
+  if (!is.null(options)) {
+    vl <- options[[name]]
+    if (!is.null(vl)) {
+      ret <- vl
+    }
+  }
+
+  return(ret)
+
+}
+
+span_spec <- function(label, start, end, level) {
+
+  # Create new structure of class "fmt"
+  x <- structure(list(), class = c("span_spec", "list"))
+  x$label = label
+  x$start = start
+  x$end = end
+  x$level = level
+
+  return(x)
+}
+
