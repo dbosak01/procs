@@ -199,16 +199,3 @@ get_option <- function(options, name, default = NULL) {
   return(ret)
 
 }
-
-span_spec <- function(label, start, end, level) {
-
-  # Create new structure of class "fmt"
-  x <- structure(list(), class = c("span_spec", "list"))
-  x$label = label
-  x$start = start
-  x$end = end
-  x$level = level
-
-  return(x)
-}
-

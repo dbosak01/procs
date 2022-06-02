@@ -63,6 +63,7 @@ proc_freq <- function(data,
     if (length(splt) == 1) {
 
       result <- freq_oneway(data, tb, weight, table_options, out)
+
     } else if (length(splt) == 2) {
 
       result <- freq_twoway(data, splt[1], splt[2], weight, table_options, out)
