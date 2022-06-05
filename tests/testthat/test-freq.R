@@ -521,6 +521,8 @@ test_that("freq16: Format options on table.", {
 
   expect_equal(1, 1)
 
+
+
 })
 
 

@@ -143,6 +143,7 @@ proc_freq <- function(data,
 
 
 #' @import fmtr
+#' @import stats
 #' @noRd
 freq_oneway <- function(data, tb, weight, options, out = FALSE) {
 
@@ -233,6 +234,7 @@ freq_oneway <- function(data, tb, weight, options, out = FALSE) {
 
 
 #' @import fmtr
+#' @import stats
 #' @noRd
 freq_twoway <- function(data, tb1, tb2, weight, options, out = FALSE) {
 
@@ -340,6 +342,7 @@ freq_twoway <- function(data, tb1, tb2, weight, options, out = FALSE) {
 }
 
 #' @import fmtr
+#' @import stats
 #' @noRd
 cross_tab <- function(freqdata, options) {
 

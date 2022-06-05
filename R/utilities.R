@@ -75,6 +75,9 @@ output_report <- function(lst, proc_type,
 
   }
 
+
+  sm <- reporter:::create_style(title_font_bold = TRUE)
+
   return(ret)
 }
 
