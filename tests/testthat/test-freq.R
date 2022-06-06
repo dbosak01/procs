@@ -440,7 +440,7 @@ test_that("freq16: Freq and Pct options works as expected.", {
 
 
   expect_equal("Frequency" %in% d, FALSE)
-  expect_equal("Percentage" %in% d, TRUE)
+  expect_equal("Percent" %in% d, TRUE)
 
   res <- proc_freq(dat, tables = c("Eyes"),
                    table_options = list(freq = TRUE,
@@ -453,7 +453,7 @@ test_that("freq16: Freq and Pct options works as expected.", {
 
 
   expect_equal("Frequency" %in% d, TRUE)
-  expect_equal("Percentage" %in% d, FALSE)
+  expect_equal("Percent" %in% d, FALSE)
 
 
 
@@ -502,7 +502,7 @@ test_that("freq18: Crosstab works.", {
 })
 
 
-test_that("freq16: Format options on table.", {
+test_that("freq19: Format options on table.", {
 
   library(fmtr)
 
@@ -522,6 +522,26 @@ test_that("freq16: Format options on table.", {
   expect_equal(1, 1)
 
 
+
+})
+
+test_that("freq20: SAS replication of one way tables works.", {
+
+  library(fmtr)
+
+  labels(dat) <- list(Eyes = "Eye Color",
+                      Hair = "Hair Color",
+                      Region = "Geographic Region")
+
+  res <- proc_freq(dat, tables = c("Eyes", "Hair"),
+                   titles = "Eye and Hair Color of European Children",
+                   weight = "Count",
+                   view = TRUE)
+
+  res
+
+  expect_equal(nrow(res[[1]]), 3)
+  expect_equal(ncol(res[[1]]), 5)
 
 })
 

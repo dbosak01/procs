@@ -4,7 +4,7 @@
 #' @noRd
 output_report <- function(lst, proc_type,
                           dir_name, file_name, out_type = 'HTML',
-                          titles = NULL, margins = 1) {
+                          titles = NULL, margins = 1, viewer = FALSE) {
 
 
   if (is.null(dir_name)) {
@@ -27,11 +27,40 @@ output_report <- function(lst, proc_type,
 
 
 
+  if (viewer == TRUE) {
+
+    rpt <- reporter:::add_style(rpt, theme = "basic1")
+  }
+
+
   for (i in seq_len(length(lst))) {
     dt <- lst[[i]]
 
-    # Create tabel
-    tbl <- create_table(dt, borders = c("top", "bottom"))
+
+    if (viewer == TRUE) {
+
+      if ("Category" %in% names(dt)) {
+        lbl <-  attr(dt$Category, "label")
+        nms <- names(dt)
+        names(dt) <- gsub("Category", "stub", nms, fixed = TRUE)
+      }
+
+      # Create table
+      tbl <- create_table(dt, borders = c("all"))
+
+      # Dedupe stub column if it exists
+      if ("stub" %in% names(dt)) {
+        tbl <- define(tbl, stub, dedupe = TRUE, label =lbl)
+
+      }
+
+    } else {
+
+      # Create table
+      tbl <- create_table(dt, borders = c("top", "bottom"))
+    }
+
+    #
 
     # Add titles
     if (!is.null(titles) & i == 1) {
@@ -55,6 +84,7 @@ output_report <- function(lst, proc_type,
 
     # Append table to report
     rpt <- add_content(rpt, tbl, align = 'center', page_break = FALSE)
+
 
 
 

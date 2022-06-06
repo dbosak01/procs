@@ -132,7 +132,7 @@ proc_freq <- function(data,
 
     out <- output_report(res, proc_type = 'freq', dir_name = dirname(vrfl),
                          file_name = basename(vrfl), out_type = "HTML",
-                         titles = titles, margins = .5)
+                         titles = titles, margins = .5, viewer = TRUE)
 
     show_viewer(out)
   }
@@ -173,7 +173,7 @@ freq_oneway <- function(data, tb, weight, options, out = FALSE) {
   # Create result data frame
   result <- data.frame("Category" = categories,
                        "Frequency" = frequencies,
-                       "Percentage" = percentages,
+                       "Percent" = percentages,
                        "Cum_Freq" = cum_frequencies,
                        "Cum_Pct" = cum_percentages,
                        stringsAsFactors = FALSE)
@@ -189,11 +189,11 @@ freq_oneway <- function(data, tb, weight, options, out = FALSE) {
   # Apply default labels
   labels(result) <- c(Category = tb,
                       Cum_Freq = "Cumulative Frequency",
-                      Cum_Pct = "Cumulative Percentage")
+                      Cum_Pct = "Cumulative Percent")
 
   # Apply default formats
   formats(result) <- list(Cum_Pct = "%.2f",
-                          Percentage = "%.2f")
+                          Percent = "%.2f")
 
  # browser()
 
@@ -206,7 +206,7 @@ freq_oneway <- function(data, tb, weight, options, out = FALSE) {
   # Kill pct if requested
   if ((!option_true(options, "pct", TRUE))) {
 
-    result[["Percentage"]] <- NULL
+    result[["Percent"]] <- NULL
   }
 
   # Kill cum freq if requested
@@ -288,7 +288,7 @@ freq_twoway <- function(data, tb1, tb2, weight, options, out = FALSE) {
   result <- data.frame("Category1" = categories1,
                        "Category2" = categories2,
                        "Frequency" = frequencies,
-                       "Percentage" = percentages,
+                       "Percent" = percentages,
                        stringsAsFactors = FALSE)
 
   # Sort result data frame
@@ -319,7 +319,7 @@ freq_twoway <- function(data, tb1, tb2, weight, options, out = FALSE) {
   # Kill pct if requested
   if ((!option_true(options, "pct", TRUE))) {
 
-    result[["Percentage"]] <- NULL
+    result[["Percent"]] <- NULL
   }
 
   # Kill cum freq if requested
@@ -346,6 +346,8 @@ freq_twoway <- function(data, tb1, tb2, weight, options, out = FALSE) {
 #' @noRd
 cross_tab <- function(freqdata, options) {
 
+  lbl1 <- attr(freqdata$Category1, "label")
+  lbl2 <- attr(freqdata$Category2, "label")
 
   # Group by both dimensions
   cat1grp <- aggregate(freqdata$Frequency, list(freqdata$Category1), FUN=sum)
@@ -373,28 +375,28 @@ cross_tab <- function(freqdata, options) {
 
   dt1 <- reshape(dt, timevar = "Category2", idvar = "Category1",
                  v.names = "Frequency", direction = "wide",
-                 drop = c("Percentage", "rowcnt", "colcnt", "rowpct", "colpct"))
+                 drop = c("Percent", "rowcnt", "colcnt", "rowpct", "colpct"))
   dt1$Order <- 1
   dt1$Label <- "Frequency"
   names(dt1) <- gsub("Frequency.",  "", names(dt1), fixed = TRUE)
 
   dt2 <- reshape(dt, timevar = "Category2", idvar = "Category1",
-                 v.names = "Percentage", direction = "wide",
+                 v.names = "Percent", direction = "wide",
                  drop = c("Frequency", "rowcnt", "colcnt", "rowpct", "colpct"))
   dt2$Order <- 2
-  dt2$Label <- "Percentage"
-  names(dt2) <- gsub("Percentage.",  "", names(dt2), fixed = TRUE)
+  dt2$Label <- "Percent"
+  names(dt2) <- gsub("Percent.",  "", names(dt2), fixed = TRUE)
 
   dt3 <- reshape(dt, timevar = "Category2", idvar = "Category1",
                  v.names = "rowpct", direction = "wide",
-                 drop = c("Percentage", "rowcnt", "colcnt", "Frequency", "colpct"))
+                 drop = c("Percent", "rowcnt", "colcnt", "Frequency", "colpct"))
   dt3$Order <- 3
   dt3$Label <- "Row Pct"
   names(dt3) <- gsub("rowpct.",  "", names(dt3), fixed = TRUE)
 
   dt4 <- reshape(dt, timevar = "Category2", idvar = "Category1",
                  v.names = "colpct", direction = "wide",
-                 drop = c("Percentage", "rowcnt", "colcnt", "Frequency", "rowpct"))
+                 drop = c("Percent", "rowcnt", "colcnt", "Frequency", "rowpct"))
   dt4$Order <- 4
   dt4$Label <- "Col Pct"
   names(dt4) <- gsub("colpct.",  "", names(dt4), fixed = TRUE)
@@ -409,11 +411,14 @@ cross_tab <- function(freqdata, options) {
   # Sort data frame by category and order
   ret <- ret[order(ret$Category1, ret$Order), c("Category1", "Label", nnms) ]
 
+  # Rename to Category so output_report() will recognize as a stub
+  names(ret)[1] <- "Category"
+
   # Get format
   fmt <- get_option(options, "format", "%.2f")
 
   # Create formatting list
-  lst <- list(Frequency = "%d", Percentage = fmt,
+  lst <- list(Frequency = "%d", Percent = fmt,
               'Row Pct' = fmt, 'Col Pct' = fmt)
   fl <- as.flist(lst, type = "row", lookup = ret$Label)
 
@@ -424,8 +429,8 @@ cross_tab <- function(freqdata, options) {
   }
   formats(ret) <- fmts
 
-  # Assign label to Category1
-  attr(ret$Category1, "label") <- attr(freqdata$Category1, "label")
+  # Assign label to Category
+  attr(ret$Category, "label") <- lbl1
 
   return(ret)
 }
