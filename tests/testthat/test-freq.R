@@ -62,10 +62,6 @@ test_that("freq2: Simple proc_freq test with report_type html works.", {
   fl <- file.path(base_path, "freq/freq2.html")
 
 
-  labels(dat) <- list(Eyes = "Eye Color",
-                      Hair = "Hair Color",
-                      Region = "Geographic Region")
-
   res <- proc_freq(dat, tables = c("Eyes"),
                    titles = "My first Frequency Table",
                    report_type = "HTML",
@@ -93,7 +89,7 @@ test_that("freq3: Two table proc_freq test with report_type html works.", {
   res <- proc_freq(dat, tables = c("Eyes", HairCount = "Hair"),
                    titles = "My first Frequency Table",
                    report_type = "HTML",
-                   report_location = fl)
+                   report_location = fl, view = TRUE)
 
   res
 
@@ -288,8 +284,8 @@ test_that("freq10: Two way proc_freq works.", {
   ex <- file.exists(fl)
 
 
-  expect_equal(nrow(res[[1]]), 15)
-  expect_equal(ncol(res[[1]]), 4)
+  expect_equal(nrow(res[[1]]), 12)
+  expect_equal(ncol(res[[1]]), 7)
   expect_equal(ex, TRUE)
 
 })
@@ -314,8 +310,8 @@ test_that("freq11: Two way proc_freq no weight works.", {
   ex <- file.exists(fl)
 
 
-  expect_equal(nrow(res[[1]]), 15)
-  expect_equal(ncol(res[[1]]), 4)
+  expect_equal(nrow(res[[1]]), 12)
+  expect_equal(ncol(res[[1]]), 7)
   expect_equal(ex, TRUE)
 
 })
@@ -345,8 +341,8 @@ test_that("freq12: One way and two way proc_freq works.", {
   expect_equal(ncol(res[[1]]), 5)
   expect_equal(nrow(res[[2]]), 5)
   expect_equal(ncol(res[[2]]), 5)
-  expect_equal(nrow(res[[3]]), 15)
-  expect_equal(ncol(res[[3]]), 4)
+  expect_equal(nrow(res[[3]]), 12)
+  expect_equal(ncol(res[[3]]), 7)
   expect_equal(ex, TRUE)
 
 })
@@ -387,7 +383,8 @@ test_that("freq14: Out = options on table.", {
 
 
   expect_equal(d[1], "Eyes")
-  expect_equal(d[2], "FreqCount")
+  expect_equal(d[2], "Eyes * Hair")
+  expect_equal(d[3], "FreqCount")
 
 
 })
@@ -471,8 +468,8 @@ test_that("freq17: Sparse option works as expected.", {
   res
 
 
-  expect_equal(nrow(res[[1]]), 14)
-  expect_equal(ncol(res[[1]]), 4)
+  expect_equal(nrow(res[[1]]), 12)
+  expect_equal(ncol(res[[1]]), 7)
 
 })
 
@@ -495,8 +492,8 @@ test_that("freq18: Crosstab works.", {
 
 
 
-  # expect_equal(nrow(res[[2]]), 14)
-  # expect_equal(ncol(res[[2]]), 8)
+  expect_equal(nrow(res[[1]]), 12)
+  expect_equal(ncol(res[[1]]), 7)
   expect_equal(1, 1)
 
 })
@@ -516,10 +513,11 @@ test_that("freq19: Format options on table.", {
                    weight = "Count",
                    titles = "Eye and Hair Color of European Children")
 
-  res
+  crs <- res[[1]]$dark
 
+  fmt <- attr(crs, "format")
 
-  expect_equal(1, 1)
+  expect_equal("fmt_lst" %in% class(fmt), TRUE)
 
 
 
@@ -544,6 +542,7 @@ test_that("freq20: SAS replication of one way tables works.", {
   expect_equal(ncol(res[[1]]), 5)
 
 })
+
 
 
 #

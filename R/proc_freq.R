@@ -45,6 +45,7 @@ proc_freq <- function(data,
   res <- list()
   # print("Orig print_location")
   # print(print_location)
+  #browser()
 
   # Loop through tabel requests
   for (i in seq_len(length(tables))) {
@@ -68,33 +69,38 @@ proc_freq <- function(data,
 
       result <- freq_twoway(data, splt[1], splt[2], weight, table_options, out)
 
-      crstab <- cross_tab(result, table_options)
+      crstab <- cross_tab(result, table_options, splt[1], splt[2])
 
     } else {
 
       stop("Procedure does not yet support n-way frequencies.")
     }
 
+    # If a cross tab was produced, add it to result
+    if (!is.null(crstab)) {
 
-    # Assign best name to list item
-    if ("out" %in% names(table_options) & i == length(tables))
-      res[[table_options[["out"]]]] <- result
-    else {
+      if (is.null(nm))
+        res[[tb]] <- crstab
+      else if (nchar(nm) == 0)
+        res[[tb]] <- crstab
+      else
+        res[[nm]] <- crstab
+
+      if ("out" %in% names(table_options) & i == length(tables)) {
+
+        res[[table_options[["out"]]]] <- result
+      }
+
+    } else { # Otherwise add one-way to result
+
       if (is.null(nm))
         res[[tb]] <- result
       else if (nchar(nm) == 0)
         res[[tb]] <- result
       else
         res[[nm]] <- result
+
     }
-
-    # If a cross tab was produced, add it to result
-    if (!is.null(crstab)) {
-
-      res[[length(res) + 1]] <- crstab
-    }
-
-
   }
 
   # if (!is.null(output)) {
@@ -185,6 +191,9 @@ freq_oneway <- function(data, tb, weight, options, out = FALSE) {
 
   if (is.null(lbl))
     lbl <- tb
+
+  # Clear out any names
+  names(tb) <- NULL
 
   # Apply default labels
   labels(result) <- c(Category = tb,
@@ -308,7 +317,7 @@ freq_twoway <- function(data, tb1, tb2, weight, options, out = FALSE) {
                       Category2 = lbl2)
 
   # Assign default formats
-  formats(result) <- list(Percentage = paste0("%.2f"))
+  formats(result) <- list(Percent = paste0("%.4f"))
 
   # Kill freq if requested
   if ((!option_true(options, "freq", TRUE))) {
@@ -344,7 +353,7 @@ freq_twoway <- function(data, tb1, tb2, weight, options, out = FALSE) {
 #' @import fmtr
 #' @import stats
 #' @noRd
-cross_tab <- function(freqdata, options) {
+cross_tab <- function(freqdata, options, var1, var2) {
 
   lbl1 <- attr(freqdata$Category1, "label")
   lbl2 <- attr(freqdata$Category2, "label")
@@ -377,28 +386,28 @@ cross_tab <- function(freqdata, options) {
                  v.names = "Frequency", direction = "wide",
                  drop = c("Percent", "rowcnt", "colcnt", "rowpct", "colpct"))
   dt1$Order <- 1
-  dt1$Label <- "Frequency"
+  dt1$Statistic <- "Frequency"
   names(dt1) <- gsub("Frequency.",  "", names(dt1), fixed = TRUE)
 
   dt2 <- reshape(dt, timevar = "Category2", idvar = "Category1",
                  v.names = "Percent", direction = "wide",
                  drop = c("Frequency", "rowcnt", "colcnt", "rowpct", "colpct"))
   dt2$Order <- 2
-  dt2$Label <- "Percent"
+  dt2$Statistic <- "Percent"
   names(dt2) <- gsub("Percent.",  "", names(dt2), fixed = TRUE)
 
   dt3 <- reshape(dt, timevar = "Category2", idvar = "Category1",
                  v.names = "rowpct", direction = "wide",
                  drop = c("Percent", "rowcnt", "colcnt", "Frequency", "colpct"))
   dt3$Order <- 3
-  dt3$Label <- "Row Pct"
+  dt3$Statistic <- "Row Pct"
   names(dt3) <- gsub("rowpct.",  "", names(dt3), fixed = TRUE)
 
   dt4 <- reshape(dt, timevar = "Category2", idvar = "Category1",
                  v.names = "colpct", direction = "wide",
                  drop = c("Percent", "rowcnt", "colcnt", "Frequency", "rowpct"))
   dt4$Order <- 4
-  dt4$Label <- "Col Pct"
+  dt4$Statistic <- "Col Pct"
   names(dt4) <- gsub("colpct.",  "", names(dt4), fixed = TRUE)
 
   ret <- rbind(dt1, dt2, dt3, dt4,
@@ -406,10 +415,10 @@ cross_tab <- function(freqdata, options) {
                stringsAsFactors = FALSE)
 
   # Get all value column names
-  nnms <- names(ret)[!names(ret) %in% c("Category1", "Order", "Label")]
+  nnms <- names(ret)[!names(ret) %in% c("Category1", "Order", "Statistic")]
 
   # Sort data frame by category and order
-  ret <- ret[order(ret$Category1, ret$Order), c("Category1", "Label", nnms) ]
+  ret <- ret[order(ret$Category1, ret$Order), c("Category1", "Statistic", nnms) ]
 
   # Rename to Category so output_report() will recognize as a stub
   names(ret)[1] <- "Category"
@@ -431,6 +440,12 @@ cross_tab <- function(freqdata, options) {
 
   # Assign label to Category
   attr(ret$Category, "label") <- lbl1
+
+  # Add spanning headers
+  lbl <- paste0("Table of ", var1, " by ", var2)
+  spn2 <- span_spec(label = lbl, 1, ncol(ret), 2)
+  spn1 <- span_spec(label = lbl2, 3, ncol(ret), 1)
+  attr(ret, "spans") <- list(spn1, spn2)
 
   return(ret)
 }

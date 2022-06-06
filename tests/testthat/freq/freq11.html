@@ -13,10 +13,13 @@ margin-bottom: 0.5in;
 margin-left: 1in;
 margin-right: 1in;
 }
-.thdr {font-weight: normal;border-bottom: thin solid;}
+.thdr {border-bottom: thin solid;font-weight: normal;}
+.shdr {font-weight: normal;}
 .tdc {text-align:center;}
 .tdl {text-align:left;}
 .tdr {text-align:right;}
+.tc {}
+.ts {}
 table {border-spacing: 0;border-collapse: collapse;}
 td {padding:0px 2px 0px 2px;}
 </style>
@@ -24,42 +27,53 @@ td {padding:0px 2px 0px 2px;}
 <body>
 
 <div align="center" >
-<table style="width:2.625in;text-align: center;">
+<table style="width:3.622in;text-align: center;">
 <tr><td>Eye&nbsp;and&nbsp;Hair&nbsp;Color&nbsp;of&nbsp;European&nbsp;Children</td></tr>
 <tr><td>&nbsp;</td></tr>
 </table>
-<table style="width:2.625in;">
+<table style="width:3.622in;">
 <colgroup>
 <col style="width:0.48in;">
-<col style="width:0.6in;">
-<col style="width:0.749708333333333in;">
-<col style="width:0.79575in;">
+<col style="width:0.75in;">
+<col style="width:0.45in;">
+<col style="width:0.45in;">
+<col style="width:0.45in;">
+<col style="width:0.591541666666667in;">
+<col style="width:0.45in;">
 </colgroup>
 <thead>
 <tr>
-<td class="thdr tdl" style="border-top:thin solid;">Eye<br>Color</td>
-<td class="thdr tdl" style="border-top:thin solid;">Hair<br>Color</td>
-<td class="thdr tdr" style="border-top:thin solid;">Frequency</td>
-<td class="thdr tdr" style="border-top:thin solid;">Percentage</td>
+<td class="shdr" colspan="7" style="vertical-align:bottom;text-align:center;border-top:thin solid ;border-bottom:thin solid">Table&nbsp;of&nbsp;Eyes&nbsp;by&nbsp;Hair</td>
+</tr>
+<tr>
+<td class="shdr" colspan="1" style="vertical-align:bottom;text-align:left;">&nbsp;</td>
+<td class="shdr" colspan="1" style="vertical-align:bottom;text-align:left;">&nbsp;</td>
+<td class="shdr" colspan="5" style="vertical-align:bottom;text-align:center;border-bottom:thin solid">Hair&nbsp;Color</td>
+</tr>
+<tr>
+<td class="thdr tdl">Eye<br>Color</td>
+<td class="thdr tdl">Statistic</td>
+<td class="thdr tdr">black</td>
+<td class="thdr tdr">dark</td>
+<td class="thdr tdr">fair</td>
+<td class="thdr tdr">medium</td>
+<td class="thdr tdr">red</td>
 </tr>
 </thead>
 
 <tbody>
-<tr><td class="tdl" style="border-top:thin solid;">blue</td><td class="tdl" style="border-top:thin solid;">black</td><td class="tdr" style="border-top:thin solid;">1</td><td class="tdr" style="border-top:thin solid;">3.7037</td></tr>
-<tr><td class="tdl">blue</td><td class="tdl">dark</td><td class="tdr">2</td><td class="tdr">7.4074</td></tr>
-<tr><td class="tdl">blue</td><td class="tdl">fair</td><td class="tdr">2</td><td class="tdr">7.4074</td></tr>
-<tr><td class="tdl">blue</td><td class="tdl">medium</td><td class="tdr">2</td><td class="tdr">7.4074</td></tr>
-<tr><td class="tdl">blue</td><td class="tdl">red</td><td class="tdr">2</td><td class="tdr">7.4074</td></tr>
-<tr><td class="tdl">brown</td><td class="tdl">black</td><td class="tdr">2</td><td class="tdr">7.4074</td></tr>
-<tr><td class="tdl">brown</td><td class="tdl">dark</td><td class="tdr">2</td><td class="tdr">7.4074</td></tr>
-<tr><td class="tdl">brown</td><td class="tdl">fair</td><td class="tdr">2</td><td class="tdr">7.4074</td></tr>
-<tr><td class="tdl">brown</td><td class="tdl">medium</td><td class="tdr">2</td><td class="tdr">7.4074</td></tr>
-<tr><td class="tdl">brown</td><td class="tdl">red</td><td class="tdr">2</td><td class="tdr">7.4074</td></tr>
-<tr><td class="tdl">green</td><td class="tdl">black</td><td class="tdr">0</td><td class="tdr">0</td></tr>
-<tr><td class="tdl">green</td><td class="tdl">dark</td><td class="tdr">2</td><td class="tdr">7.4074</td></tr>
-<tr><td class="tdl">green</td><td class="tdl">fair</td><td class="tdr">2</td><td class="tdr">7.4074</td></tr>
-<tr><td class="tdl">green</td><td class="tdl">medium</td><td class="tdr">2</td><td class="tdr">7.4074</td></tr>
-<tr><td class="tdl" style="border-bottom:thin solid;">green</td><td class="tdl" style="border-bottom:thin solid;">red</td><td class="tdr" style="border-bottom:thin solid;">2</td><td class="tdr" style="border-bottom:thin solid;">7.4074</td></tr>
+<tr><td class="tc tdl" style="border-top:thin solid ;">blue</td><td class="tc tdl" style="border-top:thin solid ;">Frequency</td><td class="tc tdr" style="border-top:thin solid ;">1</td><td class="tc tdr" style="border-top:thin solid ;">2</td><td class="tc tdr" style="border-top:thin solid ;">2</td><td class="tc tdr" style="border-top:thin solid ;">2</td><td class="tc tdr" style="border-top:thin solid ;">2</td></tr>
+<tr><td class="tc tdl">blue</td><td class="tc tdl">Percent</td><td class="tc tdr">3.70</td><td class="tc tdr">7.41</td><td class="tc tdr">7.41</td><td class="tc tdr">7.41</td><td class="tc tdr">7.41</td></tr>
+<tr><td class="tc tdl">blue</td><td class="tc tdl">Row&nbsp;Pct</td><td class="tc tdr">11.11</td><td class="tc tdr">22.22</td><td class="tc tdr">22.22</td><td class="tc tdr">22.22</td><td class="tc tdr">22.22</td></tr>
+<tr><td class="tc tdl">blue</td><td class="tc tdl">Col&nbsp;Pct</td><td class="tc tdr">33.33</td><td class="tc tdr">33.33</td><td class="tc tdr">33.33</td><td class="tc tdr">33.33</td><td class="tc tdr">33.33</td></tr>
+<tr><td class="tc tdl">brown</td><td class="tc tdl">Frequency</td><td class="tc tdr">2</td><td class="tc tdr">2</td><td class="tc tdr">2</td><td class="tc tdr">2</td><td class="tc tdr">2</td></tr>
+<tr><td class="tc tdl">brown</td><td class="tc tdl">Percent</td><td class="tc tdr">7.41</td><td class="tc tdr">7.41</td><td class="tc tdr">7.41</td><td class="tc tdr">7.41</td><td class="tc tdr">7.41</td></tr>
+<tr><td class="tc tdl">brown</td><td class="tc tdl">Row&nbsp;Pct</td><td class="tc tdr">20.00</td><td class="tc tdr">20.00</td><td class="tc tdr">20.00</td><td class="tc tdr">20.00</td><td class="tc tdr">20.00</td></tr>
+<tr><td class="tc tdl">brown</td><td class="tc tdl">Col&nbsp;Pct</td><td class="tc tdr">66.67</td><td class="tc tdr">33.33</td><td class="tc tdr">33.33</td><td class="tc tdr">33.33</td><td class="tc tdr">33.33</td></tr>
+<tr><td class="tc tdl">green</td><td class="tc tdl">Frequency</td><td class="tc tdr">0</td><td class="tc tdr">2</td><td class="tc tdr">2</td><td class="tc tdr">2</td><td class="tc tdr">2</td></tr>
+<tr><td class="tc tdl">green</td><td class="tc tdl">Percent</td><td class="tc tdr">0.00</td><td class="tc tdr">7.41</td><td class="tc tdr">7.41</td><td class="tc tdr">7.41</td><td class="tc tdr">7.41</td></tr>
+<tr><td class="tc tdl">green</td><td class="tc tdl">Row&nbsp;Pct</td><td class="tc tdr">0.00</td><td class="tc tdr">25.00</td><td class="tc tdr">25.00</td><td class="tc tdr">25.00</td><td class="tc tdr">25.00</td></tr>
+<tr><td class="tc tdl" style="border-bottom:thin solid ;">green</td><td class="tc tdl" style="border-bottom:thin solid ;">Col&nbsp;Pct</td><td class="tc tdr" style="border-bottom:thin solid ;">0.00</td><td class="tc tdr" style="border-bottom:thin solid ;">33.33</td><td class="tc tdr" style="border-bottom:thin solid ;">33.33</td><td class="tc tdr" style="border-bottom:thin solid ;">33.33</td><td class="tc tdr" style="border-bottom:thin solid ;">33.33</td></tr>
 </tbody>
 </table>
 <br>

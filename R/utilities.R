@@ -41,6 +41,8 @@ output_report <- function(lst, proc_type,
 
       if ("Category" %in% names(dt)) {
         lbl <-  attr(dt$Category, "label")
+        if (is.null(lbl))
+          lbl <- "Category"
         nms <- names(dt)
         names(dt) <- gsub("Category", "stub", nms, fixed = TRUE)
       }
@@ -50,7 +52,10 @@ output_report <- function(lst, proc_type,
 
       # Dedupe stub column if it exists
       if ("stub" %in% names(dt)) {
-        tbl <- define(tbl, stub, dedupe = TRUE, label =lbl)
+
+        wth <- rpt$char_width * nchar(lbl)
+        tbl <- define(tbl, "stub", dedupe = TRUE, label =lbl, width = wth,
+                      standard_eval = "true")
 
       }
 
