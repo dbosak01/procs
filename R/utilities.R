@@ -29,7 +29,8 @@ output_report <- function(lst, proc_type,
 
   if (viewer == TRUE) {
 
-    rpt <- reporter:::add_style(rpt, theme = "basic1")
+    rpt <- add_style(rpt, theme = "SASDefault")
+
   }
 
 
@@ -91,8 +92,6 @@ output_report <- function(lst, proc_type,
     rpt <- add_content(rpt, tbl, align = 'center', page_break = FALSE)
 
 
-
-
   }
 
 
@@ -110,8 +109,6 @@ output_report <- function(lst, proc_type,
 
   }
 
-
-  sm <- reporter:::create_style(title_font_bold = TRUE)
 
   return(ret)
 }

@@ -396,19 +396,26 @@ cross_tab <- function(freqdata, options, var1, var2) {
   dt2$Statistic <- "Percent"
   names(dt2) <- gsub("Percent.",  "", names(dt2), fixed = TRUE)
 
-  dt3 <- reshape(dt, timevar = "Category2", idvar = "Category1",
-                 v.names = "rowpct", direction = "wide",
-                 drop = c("Percent", "rowcnt", "colcnt", "Frequency", "colpct"))
-  dt3$Order <- 3
-  dt3$Statistic <- "Row Pct"
-  names(dt3) <- gsub("rowpct.",  "", names(dt3), fixed = TRUE)
 
-  dt4 <- reshape(dt, timevar = "Category2", idvar = "Category1",
-                 v.names = "colpct", direction = "wide",
-                 drop = c("Percent", "rowcnt", "colcnt", "Frequency", "rowpct"))
-  dt4$Order <- 4
-  dt4$Statistic <- "Col Pct"
-  names(dt4) <- gsub("colpct.",  "", names(dt4), fixed = TRUE)
+  dt3 <- NULL
+  if (get_option(options, "rowpct", TRUE) == TRUE) {
+    dt3 <- reshape(dt, timevar = "Category2", idvar = "Category1",
+                   v.names = "rowpct", direction = "wide",
+                   drop = c("Percent", "rowcnt", "colcnt", "Frequency", "colpct"))
+    dt3$Order <- 3
+    dt3$Statistic <- "Row Pct"
+    names(dt3) <- gsub("rowpct.",  "", names(dt3), fixed = TRUE)
+  }
+
+  dt4 <- NULL
+  if (get_option(options, "colpct", TRUE) == TRUE) {
+    dt4 <- reshape(dt, timevar = "Category2", idvar = "Category1",
+                   v.names = "colpct", direction = "wide",
+                   drop = c("Percent", "rowcnt", "colcnt", "Frequency", "rowpct"))
+    dt4$Order <- 4
+    dt4$Statistic <- "Col Pct"
+    names(dt4) <- gsub("colpct.",  "", names(dt4), fixed = TRUE)
+  }
 
   ret <- rbind(dt1, dt2, dt3, dt4,
                make.row.names = FALSE,

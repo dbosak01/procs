@@ -543,6 +543,30 @@ test_that("freq20: SAS replication of one way tables works.", {
 
 })
 
+test_that("freq21: Rowpct and Colpct options on table work.", {
+
+  library(fmtr)
+
+
+  labels(dat) <- list(Eyes = "Eye Color",
+                      Hair = "Hair Color",
+                      Region = "Geographic Region")
+
+  res <- proc_freq(dat, tables = c("Eyes * Hair"),
+                   table_options = list(rowpct = FALSE, colpct = FALSE),
+                   weight = "Count",
+                   titles = "Eye and Hair Color of European Children")
+
+  crs <- res[[1]]$dark
+
+  fmt <- attr(crs, "format")
+
+  expect_equal("fmt_lst" %in% class(fmt), TRUE)
+
+
+
+})
+
 
 
 #
