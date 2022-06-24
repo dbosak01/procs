@@ -557,11 +557,9 @@ test_that("freq21: Rowpct and Colpct options on table work.", {
                    weight = "Count",
                    titles = "Eye and Hair Color of European Children")
 
-  crs <- res[[1]]$dark
 
-  fmt <- attr(crs, "format")
 
-  expect_equal("fmt_lst" %in% class(fmt), TRUE)
+  expect_equal(nrow(res[[1]]), 6)
 
 
 

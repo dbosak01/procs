@@ -103,22 +103,6 @@ proc_freq <- function(data,
     }
   }
 
-  # if (!is.null(output)) {
-  #
-  #   if (all(class(output) == "character")) {
-  #
-  #
-  #   } else if (class(output) %in% c("lib")) {
-  #
-  #     for (dt in names(res)) {
-  #
-  #       #lib_add(output
-  #     }
-  #
-  #   }
-  #
-  # }
-
   # Create output reports if requested
   if (!is.null(report_type)) {
 

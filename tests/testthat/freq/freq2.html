@@ -13,13 +13,16 @@ margin-bottom: 0.5in;
 margin-left: 1in;
 margin-right: 1in;
 }
-.thdr {border-bottom: thin solid;font-weight: normal;}
+.thdr {border-bottom: thin solid black;font-weight: normal;}
 .shdr {font-weight: normal;}
 .tdc {text-align:center;}
 .tdl {text-align:left;}
 .tdr {text-align:right;}
 .tc {}
+.tbs {}
+.tbstr {}
 .ts {}
+.tlr {}
 table {border-spacing: 0;border-collapse: collapse;}
 td {padding:0px 2px 0px 2px;}
 </style>
@@ -31,7 +34,7 @@ td {padding:0px 2px 0px 2px;}
 <tr><td>My&nbsp;first&nbsp;Frequency&nbsp;Table</td></tr>
 <tr><td>&nbsp;</td></tr>
 </table>
-<table style="width:3.365in;">
+<table class="tbs" style="width:3.365in;">
 <colgroup>
 <col style="width:0.48in;">
 <col style="width:0.749708333333333in;">
@@ -41,7 +44,7 @@ td {padding:0px 2px 0px 2px;}
 </colgroup>
 <thead>
 <tr>
-<td class="shdr" colspan="5" style="vertical-align:bottom;text-align:center;border-top:thin solid ;border-bottom:thin solid">Eye&nbsp;Color</td>
+<td class="shdr" colspan="5" style="vertical-align:bottom;text-align:center;border-top:thin solid black;border-bottom:thin solid black">Eyes</td>
 </tr>
 <tr>
 <td class="thdr tdl">Eyes</td>
@@ -53,9 +56,9 @@ td {padding:0px 2px 0px 2px;}
 </thead>
 
 <tbody>
-<tr><td class="tc tdl" style="border-top:thin solid ;">green</td><td class="tc tdr" style="border-top:thin solid ;">8</td><td class="tc tdr" style="border-top:thin solid ;">29.63</td><td class="tc tdr" style="border-top:thin solid ;">8</td><td class="tc tdr" style="border-top:thin solid ;">29.63</td></tr>
-<tr><td class="tc tdl">blue</td><td class="tc tdr">9</td><td class="tc tdr">33.33</td><td class="tc tdr">17</td><td class="tc tdr">62.96</td></tr>
-<tr><td class="tc tdl" style="border-bottom:thin solid ;">brown</td><td class="tc tdr" style="border-bottom:thin solid ;">10</td><td class="tc tdr" style="border-bottom:thin solid ;">37.04</td><td class="tc tdr" style="border-bottom:thin solid ;">27</td><td class="tc tdr" style="border-bottom:thin solid ;">100.00</td></tr>
+<tr><td class="tc tdl ">green</td><td class="tc tdr ">8</td><td class="tc tdr ">29.63</td><td class="tc tdr ">8</td><td class="tc tdr ">29.63</td></tr>
+<tr><td class="tc tdl tbstr ">blue</td><td class="tc tdr tbstr ">9</td><td class="tc tdr tbstr ">33.33</td><td class="tc tdr tbstr ">17</td><td class="tc tdr tbstr ">62.96</td></tr>
+<tr><td class="tc tdl " style="border-bottom:thin solid black;">brown</td><td class="tc tdr " style="border-bottom:thin solid black;">10</td><td class="tc tdr " style="border-bottom:thin solid black;">37.04</td><td class="tc tdr " style="border-bottom:thin solid black;">27</td><td class="tc tdr " style="border-bottom:thin solid black;">100.00</td></tr>
 </tbody>
 </table>
 <br>
