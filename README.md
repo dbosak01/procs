@@ -22,8 +22,9 @@ and complete statistical reports.
 
 The purpose of the **procs** package is to recreate some SAS statistical
 procedures in R.  The first version of the package will attempt to recreate
-SAS 'proc freq'.  Subsequent versions of the package will add additional,
-commonly used procedures like 'proc means' and 'proc tabulate'.
+SAS 'proc freq', 'proc means', and 'proc transpose'.  
+Subsequent versions of the package will add additional statistics and options
+to these two procedures, and possibly some other procedures like 'proc tabulate'.
 
 ### Installation
 

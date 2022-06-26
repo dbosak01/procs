@@ -284,8 +284,8 @@ test_that("freq10: Two way proc_freq works.", {
   ex <- file.exists(fl)
 
 
-  expect_equal(nrow(res[[1]]), 12)
-  expect_equal(ncol(res[[1]]), 7)
+  expect_equal(nrow(res[[1]]), 14)
+  expect_equal(ncol(res[[1]]), 8)
   expect_equal(ex, TRUE)
 
 })
@@ -310,8 +310,8 @@ test_that("freq11: Two way proc_freq no weight works.", {
   ex <- file.exists(fl)
 
 
-  expect_equal(nrow(res[[1]]), 12)
-  expect_equal(ncol(res[[1]]), 7)
+  expect_equal(nrow(res[[1]]), 14)
+  expect_equal(ncol(res[[1]]), 8)
   expect_equal(ex, TRUE)
 
 })
@@ -341,8 +341,8 @@ test_that("freq12: One way and two way proc_freq works.", {
   expect_equal(ncol(res[[1]]), 5)
   expect_equal(nrow(res[[2]]), 5)
   expect_equal(ncol(res[[2]]), 5)
-  expect_equal(nrow(res[[3]]), 12)
-  expect_equal(ncol(res[[3]]), 7)
+  expect_equal(nrow(res[[3]]), 14)
+  expect_equal(ncol(res[[3]]), 8)
   expect_equal(ex, TRUE)
 
 })
@@ -462,14 +462,14 @@ test_that("freq17: Sparse option works as expected.", {
 
 
   res <- proc_freq(dat, tables = c("Eyes * Hair"),
-                   table_options = list(sparse = FALSE),
+                   table_options = list(out = "freqtbl", sparse = FALSE),
                    titles = "Eye and Hair Color of European Children")
 
   res
 
 
-  expect_equal(nrow(res[[1]]), 12)
-  expect_equal(ncol(res[[1]]), 7)
+  expect_equal(nrow(res[[2]]), 14)
+  expect_equal(ncol(res[[2]]), 4)
 
 })
 
@@ -492,9 +492,8 @@ test_that("freq18: Crosstab works.", {
 
 
 
-  expect_equal(nrow(res[[1]]), 12)
-  expect_equal(ncol(res[[1]]), 7)
-  expect_equal(1, 1)
+  expect_equal(nrow(res[[1]]), 14)
+  expect_equal(ncol(res[[1]]), 8)
 
 })
 
@@ -540,6 +539,8 @@ test_that("freq20: SAS replication of one way tables works.", {
 
   expect_equal(nrow(res[[1]]), 3)
   expect_equal(ncol(res[[1]]), 5)
+  expect_equal(nrow(res[[2]]), 5)
+  expect_equal(ncol(res[[2]]), 5)
 
 })
 
@@ -557,15 +558,34 @@ test_that("freq21: Rowpct and Colpct options on table work.", {
                    weight = "Count",
                    titles = "Eye and Hair Color of European Children")
 
+  res
 
-
-  expect_equal(nrow(res[[1]]), 6)
-
+  expect_equal(nrow(res[[1]]), 8)
+  expect_equal(ncol(res[[1]]), 8)
 
 
 })
 
+test_that("freq22: Crosstab option to turn off totals works.", {
 
+  library(fmtr)
+
+
+  labels(dat) <- list(Eyes = "Eye Color",
+                      Hair = "Hair Color",
+                      Region = "Geographic Region")
+
+  res <- proc_freq(dat, tables = c("Eyes", "Hair", "Eyes * Hair"),
+                   table_options = list(totcol = FALSE, totrow = FALSE),
+                   weight = "Count",
+                   titles = "Eye and Hair Color of European Children")
+
+  res
+
+  expect_equal(nrow(res[[3]]), 12)
+  expect_equal(ncol(res[[3]]), 7)
+
+})
 
 #
 # test_that("freq15: Crosstab table.", {
