@@ -6,11 +6,11 @@
 [![procs total downloads](https://cranlogs.r-pkg.org/badges/grand-total/procs)](https://cran.r-project.org/package=procs)
 <!--[![R-CMD-check](https://github.com/dbosak01/procs/workflows/R-CMD-check/badge.svg)](https://github.com/dbosak01/procs/actions)-->
 [![Codecov test coverage](https://codecov.io/gh/dbosak01/procs/branch/master/graph/badge.svg)](https://app.codecov.io/gh/dbosak01/procs?branch=master)
-
+[![R-CMD-check](https://github.com/dbosak01/procs/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/dbosak01/procs/actions/workflows/R-CMD-check.yaml)
 <!-- badges: end -->
 
 # Introduction to **procs**
-<!-- <img src='man/images/procs.png' align="left" height="138" style="margin-right:10px"/>-->
+<img src='man/images/procs.png' align="left" height="138" style="margin-right:10px"/>
 
 R provides a wide range of statistical packages and functions.  However,
 these statistical functions frequently return a fragmented output.  The user
@@ -22,7 +22,7 @@ and complete statistical reports.
 
 The purpose of the **procs** package is to recreate some SAS statistical
 procedures in R.  The first version of the package will attempt to recreate
-SAS 'proc freq', 'proc means', and 'proc transpose'.  
+SAS 'proc freq', 'proc means', and 'proc transpose'. 
 Subsequent versions of the package will add additional statistics and options
 to these two procedures, and possibly some other procedures like 'proc tabulate'.
 

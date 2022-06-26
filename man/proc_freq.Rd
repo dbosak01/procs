@@ -39,7 +39,7 @@ are TRUE and FALSE.  Default is TRUE.}
 the \code{proc_freq} function.}
 
 \item{report_type}{The output type for any report output.  Valid values are
-'HTML', 'TXT', 'PDF', 'RTF', 'DOCX'.  Multiple outputs can be
+'HTML', 'TXT', 'PDF', 'RTF', and 'DOCX'.  Multiple outputs can be
 requested by passing a vector of output types.  If the report_location parameter
 is specified, the outputs will be written to that location.  Otherwise,
 they will be written to a temp directory.  The default value is NULL.}

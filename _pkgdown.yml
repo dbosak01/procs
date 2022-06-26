@@ -1,0 +1,31 @@
+url: https://procs.r-sassy.org
+
+articles:
+- title: Examples
+  navbar: ~
+  contents:
+  - procs-freq
+  - procs-means
+  - procs-transpose
+  - procs-example1
+
+reference:
+- title: Procedures
+  desc: Functions that mimic SAS® procedures.
+  contents:
+  - proc_freq
+  - proc_means
+  - proc_transpose
+- title: Other Functions
+  desc: Other useful functions in the procs package.
+  contents:
+  - print_proc
+
+navbar:
+  type: inverse
+  structure:
+    right: [home, intro, articles, reference, faq, news, github]
+  components:
+    faq:
+      text: FAQ
+      href: ./articles/procs-faq.html

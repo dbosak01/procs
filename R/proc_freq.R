@@ -1,4 +1,7 @@
 
+# Proc Freq ---------------------------------------------------------------
+
+
 
 #' @title Generates Frequency Statistics
 #' @encoding UTF-8
@@ -16,7 +19,7 @@
 #' @param view Whether to display procedure results in the viewer.  Valid values
 #' are TRUE and FALSE.  Default is TRUE.
 #' @param report_type The output type for any report output.  Valid values are
-#' 'HTML', 'TXT', 'PDF', 'RTF', 'DOCX'.  Multiple outputs can be
+#' 'HTML', 'TXT', 'PDF', 'RTF', and 'DOCX'.  Multiple outputs can be
 #' requested by passing a vector of output types.  If the report_location parameter
 #' is specified, the outputs will be written to that location.  Otherwise,
 #' they will be written to a temp directory.  The default value is NULL.
@@ -47,7 +50,7 @@ proc_freq <- function(data,
   # print(print_location)
   #browser()
 
-  # Loop through tabel requests
+  # Loop through table requests
   for (i in seq_len(length(tables))) {
 
     nm <- names(tables)[i]
@@ -130,6 +133,10 @@ proc_freq <- function(data,
   return(res)
 
 }
+
+
+# Sub Procedures ----------------------------------------------------------
+
 
 
 #' @import fmtr
@@ -470,146 +477,6 @@ cross_tab <- function(freqdata, options, var1, var2) {
 
     ret$Total <- NULL
   }
-
-  # Assign label to Category
-  attr(ret$Category, "label") <- lbl1
-
-  # Add spanning headers
-  lbl <- paste0("Table of ", var1, " by ", var2)
-  spn2 <- span_spec(label = lbl, 1, ncol(ret), 2)
-  spn1 <- span_spec(label = lbl2, 3, ncol(ret), 1)
-  attr(ret, "spans") <- list(spn1, spn2)
-
-  return(ret)
-}
-
-
-
-#' @import fmtr
-#' @import stats
-#' @noRd
-cross_tab2 <- function(freqdata, options, var1, var2) {
-
-  lbl1 <- attr(freqdata$Category1, "label")
-  lbl2 <- attr(freqdata$Category2, "label")
-
-  #browser()
-
-  # Group by both dimensions
-  cat1grp <- aggregate(freqdata$Frequency, list(freqdata$Category1), FUN=sum)
-  cat2grp <- aggregate(freqdata$Frequency, list(freqdata$Category2), FUN=sum)
-
-  # Create lookup from cat1 group (rows)
-  lkp1 <- cat1grp$x
-  names(lkp1) <- cat1grp$Group.1
-
-  # Create lookup from cat2 group (columns)
-  lkp2 <- cat2grp$x
-  names(lkp2) <- cat2grp$Group.1
-
-  # Assign data to new variable
-  dt <- freqdata
-
-  # Create freq columns for both dimensions
-  dt$rowcnt <- lkp1[dt$Category1]
-  dt$colcnt <- lkp2[dt$Category2]
-
-  # Create percentages for both dimensions
-  dt$Percentage <- dt$Percentage
-  dt$rowpct <- dt$Frequency / dt$rowcnt * 100
-  dt$colpct <- dt$Frequency / dt$colcnt * 100
-
-  # Transpose Frequency statistics
-  dt1 <- reshape(dt, timevar = "Category2", idvar = "Category1",
-                 v.names = "Frequency", direction = "wide",
-                 drop = c("Percent", "rowcnt", "colcnt", "rowpct", "colpct"))
-  dt1$Total <- lkp1[dt1$Category1]
-  dt1$Order <- 1
-  dt1$Statistic <- "Frequency"
-  names(dt1) <- gsub("Frequency.",  "", names(dt1), fixed = TRUE)
-
-  # Transpose Percents
-  dt2 <- reshape(dt, timevar = "Category2", idvar = "Category1",
-                 v.names = "Percent", direction = "wide",
-                 drop = c("Frequency", "rowcnt", "colcnt", "rowpct", "colpct"))
-  dt2$Total <- lkp1[dt1$Category1] / sum(lkp1, na.rm = TRUE) * 100
-  dt2$Order <- 2
-  dt2$Statistic <- "Percent"
-  names(dt2) <- gsub("Percent.",  "", names(dt2), fixed = TRUE)
-
-
-  # Transpose Row Percents
-  dt3 <- NULL
-  if (get_option(options, "rowpct", TRUE) == TRUE) {
-    dt3 <- reshape(dt, timevar = "Category2", idvar = "Category1",
-                   v.names = "rowpct", direction = "wide",
-                   drop = c("Percent", "rowcnt", "colcnt", "Frequency", "colpct"))
-    dt3$Total <- NA
-    dt3$Order <- 3
-    dt3$Statistic <- "Row Pct"
-    names(dt3) <- gsub("rowpct.",  "", names(dt3), fixed = TRUE)
-  }
-
-  # Transpose Col Percents
-  dt4 <- NULL
-  if (get_option(options, "colpct", TRUE) == TRUE) {
-    dt4 <- reshape(dt, timevar = "Category2", idvar = "Category1",
-                   v.names = "colpct", direction = "wide",
-                   drop = c("Percent", "rowcnt", "colcnt", "Frequency", "rowpct"))
-    dt4$Total <- NA
-    dt4$Order <- 4
-    dt4$Statistic <- "Col Pct"
-    names(dt4) <- gsub("colpct.",  "", names(dt4), fixed = TRUE)
-  }
-
-  #browser()
-  dt5 <- NULL
-  dt5 <- data.frame(Category1 = "Total")
-  for (nm in names(lkp2)) {
-    dt5[[nm]] <- lkp2[[nm]]
-  }
-  dt5$Total = sum(lkp2, na.rm = TRUE)
-  dt5$Order = 1
-  dt5$Statistic = "Frequency"
-
-  dt6 <- NULL
-  dt6 <- data.frame(Category1 = "Total")
-  for (nm in names(lkp2)) {
-    dt6[[nm]] <- lkp2[[nm]] / sum(lkp2, na.rm = TRUE) * 100
-  }
-  dt6$Total = 100
-  dt6$Order = 2
-  dt6$Statistic = "Percent"
-
-
-  # Combine everthing
-  ret <- rbind(dt1, dt2, dt3, dt4, dt5, dt6,
-               make.row.names = FALSE,
-               stringsAsFactors = FALSE)
-
-  # Get all value column names
-  nnms <- names(ret)[!names(ret) %in% c("Category1", "Order", "Statistic")]
-
-  # Sort data frame by category and order
-  ret <- ret[order(ret$Category1, ret$Order), c("Category1", "Statistic", nnms) ]
-
-  # Rename to Category so output_report() will recognize as a stub
-  names(ret)[1] <- "Category"
-
-  # Get format
-  fmt <- get_option(options, "format", "%.2f")
-
-  # Create formatting list
-  lst <- list(Frequency = "%d", Percent = fmt,
-              'Row Pct' = fmt, 'Col Pct' = fmt)
-  fl <- as.flist(lst, type = "row", lookup = ret$Statistic)
-
-  # Assign flist to data columns
-  fmts <- list()
-  for (nm in nnms) {
-    fmts[[nm]] <- fl
-  }
-  formats(ret) <- fmts
 
   # Assign label to Category
   attr(ret$Category, "label") <- lbl1

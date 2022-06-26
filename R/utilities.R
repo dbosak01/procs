@@ -234,3 +234,12 @@ get_option <- function(options, name, default = NULL) {
   return(ret)
 
 }
+
+#' @title A procedure to print something
+#' @description Here is a description.
+#' @export
+print_proc <- function() {
+
+
+
+}

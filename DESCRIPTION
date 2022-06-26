@@ -8,11 +8,11 @@ Authors@R: c(
            role = c("aut", "cre"),
            email = "dbosak01@gmail.com"))
 Maintainer: <dbosak01@gmail.com>
-Description: Contains function to simulate the most commonly used 
-    SAS statistical procedures.  Specifically, the package aims to 
-    simulate the functionality of SAS 'proc_freq' and 'proc_means'.
-    The simulation will include recreating all datasets and reports
-    with the highest fidelity possible. 
+Description: Contains functions to simulate the most commonly used 
+    SAS® statistical procedures.  Specifically, the package aims to 
+    simulate the functionality of SAS® 'proc freq', 'proc means',
+    and 'proc transpose'. The simulation will include recreating 
+    all datasets and reports with the highest fidelity possible. 
 License: CC0
 Encoding: UTF-8
 URL: https://procs.r-sassy.org

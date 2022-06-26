@@ -1,0 +1,108 @@
+---
+title: "Frequently Asked Questions"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{FAQ}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+
+options(rmarkdown.html_vignette.check_title = FALSE)
+
+```
+
+Below are some frequently asked questions about the **libr** package. Click
+on the links below to navigate to the full question and answer content.
+
+## Index{#top}
+
+* [How do I create a libname in R?](#libname)
+* [Which data formats does the libname function support?](#formats)
+
+
+
+## Content
+
+### How do I create a libname in R? {#libname}
+
+**Q:** I have a directory full of datasets.  I need to use several of them
+in my analysis.  In SAS®, I would create a libname so I could access all of them.
+Is there a way to do something similar in R?
+
+**A:** With the **libr** package, you can create a libname in R very 
+much the same way you create a libname in SAS®.  
+```{r eval=FALSE, echo=TRUE}
+libname(mylib, "c:/mypath/mydata", "csv")
+
+```
+The above statement will create a libname "mylib" from the directory
+specified on the second parameter.  The libname will use the CSV engine.
+If there are any CSV files in the directory, they will be all loaded 
+into the library.  To work directly with the datasets, you can then do:
+```{r eval=FALSE, echo=TRUE}
+lib_load(mylib)
+```
+This statement will load the datasets into your workspace, where you can begin
+using them.  For instance, you could get summary statistics for a variable like
+this:
+```{r eval=FALSE, echo=TRUE}
+summary(mylib.dat1$var1)
+```
+
+If you made any changes to the data, and want to keep those changes, remember
+to save them with:
+```{r eval=FALSE, echo=TRUE}
+lib_write(mylib)
+```
+When you are done, unload the datasets with:
+```{r eval=FALSE, echo=TRUE}
+lib_unload(mylib)
+```
+
+[top](#top) 
+
+******
+
+### Which data formats does the libname function support? {#formats}
+
+**Q:** I can see from the examples that the **libr** package supports
+CSV and SAS dataset file formats.  What other data formats does the package
+support?
+
+
+**A:** The package supports the following data formats: csv, sas7bdat, 
+rds, Rdata, xls, xlsx, xpt, and dbf.  The `libname()` help page has a full list,
+and a short discussion of some details on each format.
+
+[top](#top) 
+
+******
+
+
+<!-- ### Question 2? {#q2} -->
+
+<!-- **Q:** Question here. -->
+
+<!-- **A:** Answer here. -->
+
+<!-- [top](#top) -->
+
+<!-- ****** -->
+
+<!-- ### Question 1? {#q1} -->
+
+<!-- **Q:** Question here. -->
+
+
+<!-- **A:** Answer here. -->
+
+<!-- [top](#top)  -->
+
+<!-- ****** -->
+
