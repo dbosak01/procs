@@ -1,0 +1,15 @@
+pandoc: 2.17.1.1
+pkgdown: 1.6.1
+pkgdown_sha: ~
+articles:
+  procs-example1: procs-example1.html
+  procs-faq: procs-faq.html
+  procs-freq: procs-freq.html
+  procs-means: procs-means.html
+  procs-transpose: procs-transpose.html
+  procs: procs.html
+last_built: 2022-06-26T03:36Z
+urls:
+  reference: https://procs.r-sassy.org/reference
+  article: https://procs.r-sassy.org/articles
+

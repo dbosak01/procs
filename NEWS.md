@@ -1,3 +1,8 @@
+# procs 0.0.9001
+
+* Create pkgdown site
+* Setup GitHub Actions
+* Add vignette stubs
 
 # procs 0.0.9000
 
