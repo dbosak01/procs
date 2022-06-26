@@ -14,7 +14,7 @@ knitr::opts_chunk$set(
 )
 ```
   
-The **procs** package brings the concepts of data procsaries, data 
+The **procs** package brings the concepts of data procedures, data 
 dictionaries, and data steps to R.  
 
 * A **data procsary** is an object used to define 
