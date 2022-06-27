@@ -508,7 +508,7 @@ test_that("freq19: Format options on table.", {
                       Region = "Geographic Region")
 
   res <- proc_freq(dat, tables = c("Eyes * Hair"),
-                   table_options = list(format = "%.3f"),
+                   table_options = list(format = "%.3f%%"),
                    weight = "Count",
                    titles = "Eye and Hair Color of European Children")
 
@@ -586,6 +586,29 @@ test_that("freq22: Crosstab option to turn off totals works.", {
   expect_equal(ncol(res[[3]]), 7)
 
 })
+
+test_that("freq23: Piped option works as expected.", {
+
+  library(fmtr)
+
+
+  labels(dat) <- list(Eyes = "Eye Color",
+                      Hair = "Hair Color",
+                      Region = "Geographic Region")
+
+  res <- proc_freq(dat, tables = c("Eyes * Hair"),
+                   table_options = list(out = "FreqTbl"),
+                   weight = "Count",
+                   titles = "Eye and Hair Color of European Children",
+                   piped = TRUE)
+
+  res
+
+  expect_equal("data.frame" %in% class(res), TRUE)
+
+
+})
+
 
 #
 # test_that("freq15: Crosstab table.", {

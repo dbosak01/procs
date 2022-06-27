@@ -1,8 +1,8 @@
 ---
-title: "The Transpose Function"
+title: "Package Validation"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{The Transpose Function}
+  %\VignetteIndexEntry{Package Validation}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -13,6 +13,7 @@ knitr::opts_chunk$set(
   comment = "#>"
 )
 ```
-Write up on transpose function..
 
-Next: [Package Validation](procs-validation.html)
+Write up on package validation ...
+
+Next: [Complete Example](procs-example1.html)

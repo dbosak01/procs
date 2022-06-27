@@ -1,4 +1,35 @@
 
+# Exported Utilities ------------------------------------------------------
+
+#' @title Simulates SAS® Rounding
+#' @description A function to simulate the way SAS® performs rounding.
+#' @param x A vector of values to round.
+#' @returns The rounded data vector.
+#' @export
+round_up <- function(x) {
+
+
+
+}
+
+
+#' @title Compare data sets
+#' @description A function to compare two data sets  This function
+#' may be used to compare R and SAS output.  It has a parameters to
+#' control the desired precision and the rounding to be used.
+#' @param ds1 The first dataset to compare.
+#' @param ds2 The second dataset to compare.
+#' @param precision The desired number of decimal places to compare.
+#' @param rounding The rounding function to be used in the comparison.
+#' @returns The results of the comparison.
+#' @export
+compare_ds <- function(ds1, ds2, precision = NULL, rounding = NULL) {
+
+}
+
+
+
+
 
 #' @import reporter
 #' @noRd
@@ -235,11 +266,3 @@ get_option <- function(options, name, default = NULL) {
 
 }
 
-#' @title A procedure to print something
-#' @description Here is a description.
-#' @export
-print_proc <- function() {
-
-
-
-}

@@ -5,45 +5,264 @@
 
 #' @title Generates Frequency Statistics
 #' @encoding UTF-8
-#' @description Here is a sample function.
+#' @description The \code{proc_freq} function generates frequency statistics.
+#' The function can perform one and two-way frequencies.  Two-way
+#' frequencies are produced as a crosstabulation by default.  There
+#' are many options to control the generated tables.  The function will return
+#' requested tables in a named list. Additionally, it can output results
+#' directly to a report, or show them in the viewer.
 #' @details
-#' Some details about the sample function.
+#' The \code{proc_freq} function generates frequency statistics
+#' for one-way and two-way tables.  Data is passed in on the \code{data}
+#' parameter.  The desired frequencies are specified on the \code{tables}
+#' parameter. Function results are returned as a named list of data
+#' frames. Results may also be returned as a report.
+#'
+#' @section Data Frame Output:
+#' By default, frequency results are returned as data frames
+#' in a named list. Data in these data frames is not rounded or formatted
+#' to give you the most accurate statistical results.
+#' The data frame items are named according to the
+#' strings specified on the \code{tables} parameter. You may control
+#' the names of the returned results by using a named vector on the
+#' \code{tables} parameter.
+#'
+#' If you are requesting only a single table, and
+#' do not want it returned in a list, set the \code{piped} parameter to TRUE.
+#' Setting \code{piped} to TRUE will cause the function to return results
+#' as an individual data frame. This option is useful if you are using
+#' the \code{proc_freq} function inside a pipeline.
+#'
+#' @section Report Output:
+#' If the \code{view} option is TRUE, \code{proc_freq} results will
+#' be immediately sent to the viewer as an HTML report.  This functionality
+#' makes it easy to get a quick analysis of your data with very little
+#' effort.
+#'
+#' The function also allows you to easily export this report to the file system
+#' by setting the \code{report_type} and \code{report_location} parameters.
+#' Setting these parameters will cause the function to output your report
+#' in the location specified, and in the desired output type.
+#' You may output the report in TXT, HTML, PDF, RTF, or DOCX file formats.
+#'
+#' The \code{titles} parameter allows you to set one or more titles for your
+#' report.  Pass these titles as a vector of strings.
+#'
+#' If the frequency variables have a label assigned, that label
+#' will be used in the report output. This feature gives you some control
+#' over the column headers in the final report.
+#'
+#' @section Frequency Weight:
+#' Normally the \code{proc_freq} function counts each row in the
+#' input data equally. In some cases, however, each row in the data
+#' can represent multiple observations, and rows should not be treated
+#' equally.  In these cases, use the \code{weight} parameter.  The parameter
+#' accepts a quoted variable/column name to use as the weighted value.  If the
+#' \code{weight} parameter is used, the function will sum the weighted values
+#' instead of counting rows.
+#'
+#' @section Table Options:
+#' The \code{table_options} parameter accepts a named list of options and
+#' their values.  For example, the "sparse" option may be turned off
+#' like this: \code{table_options = list(sparse = FALSE)}.
+#'
+#' Below are all the available table options and a description of each:
+#' \itemize{
+#' \item{\strong{colpct}: This option controls whether or not to include
+#' column percents on crosstab tables. Value values are TRUE and FALSE.
+#' The default is TRUE.
+#' }
+#' \item{\strong{cumsum}: Whether to include a cumulative sum on one-way
+#' tables.  Valid values are TRUE and FALSE.  The default is TRUE.
+#' }
+#' \item{\strong{cumpct}: Whether to include a cumulative precent on
+#' one-way tables.  Valid values are TRUE and FALSE.  The default is TRUE.
+#' }
+#' \item{\strong{freq}: Whether to include the frequency column on one-way
+#' tables. Valid values are TRUE and FALSE.  The default is TRUE.
+#' }
+#' \item{\strong{format}: A format to use for crosstab percentage values.
+#' The format
+#' must be a valid format from the \strong{\link[fmtr]{fmtr}} package.  Typically,
+#' the format is passed as a formatting string.
+#' For example, the formatting string "%.1f%%" indicates that the
+#' data should be rounded to a single decimal place and include a percent sign.
+#' }
+#' \item{\strong{out}: The "out" option tells the procedure to output
+#' a frequency table, and allows you to name it.  This name will be used
+#' as the list item name.  If more than one table is requested, the "out"
+#' option will apply to the last table requested.
+#' }
+#' \item{\strong{outcum}: Whether to include the cumulative frequency and
+#' cumulative percent on the output table specified on the "out" parameter.
+#' Valid values are TRUE and FALSE.  The default is TRUE.
+#' }
+#' \item{\strong{pct}: Whether to include the percent column on one-way
+#' tables. Valid values are TRUE and FALSE.  The default is TRUE.
+#' }
+#' \item{\strong{rowpct}: Whether to include the row percent values on two-way
+#' crosstab tables. Valid values are TRUE and FALSE.  The default is TRUE.
+#' }
+#' \item{\strong{sparse}: Whether to include categories for which there are no
+#' frequency counts.  If the parameter is TRUE, sparse categories will be included.
+#' If the parameter is FALSE, sparse categories will be removed.
+#' The default is TRUE.
+#' }
+#' \item{\strong{totcol}: Whether to include the total column on two-way
+#' crosstab tables. Valid values are TRUE and FALSE.  The default is TRUE.
+#' }
+#' \item{\strong{totrow}: Whether to include the total rows on two-way
+#' crosstab tables. Valid values are TRUE and FALSE.  The default is TRUE.
+#' }
+#' }
 #' @param data The input data frame to perform frequency calculations on.
-#' @param by An optional by group.
+#' Input data as the first parameter makes this function pipe-friendly.
+# @param by An optional by group.
 #' @param tables The variable or variables to perform frequency counts on.
-#' @param table_options The option specifications for the table parameter.
-#' @param weight An optional weight parameter.
-#' @param weight_options The option specifications for the weight parameter.
-#' @param output The directory path or libname to output data generated by
-#' the \code{proc_freq} function.
+#' The table specifications are passed as a vector of quoted strings. If the
+#' strings are named, the name will be used as the list item name on the return
+#' list of tables.  For one-way frequencies, simply pass the variable name.
+#' For two-way tables, pass the desired combination of variables separated by a
+#' star (*) operator.
+#' @param table_options The option specifications for the \code{table} parameter.
+#' Table options are passed to the parameter as a named list.  The name
+#' of each list item should correspond to the option you wish to set.  The
+#' value of the list item should be the value you wish to set the option
+#' to.  The following options are available: "colpct", "cumsum", "cumpct",
+#' "freq", "format", "out", "outcum", "pct", "rowpct", "sparse", "totcol"
+#' and "totrow". See
+#' the \strong{Table Options} section for a description of these options.
+#' @param weight An optional weight parameter.  This parameter is passed
+#' as a quoted variable name to use for the weight.  If a weight variable is
+#' indicated, the weighted value will be summed to calculate the frequency
+#' counts.
+# @param weight_options The option specifications for the weight parameter.
+# @param output The directory path or libname to output data generated by
+# the \code{proc_freq} function.
 #' @param view Whether to display procedure results in the viewer.  Valid values
 #' are TRUE and FALSE.  Default is TRUE.
 #' @param report_type The output type for any report output.  Valid values are
 #' 'HTML', 'TXT', 'PDF', 'RTF', and 'DOCX'.  Multiple outputs can be
-#' requested by passing a vector of output types.  If the report_location parameter
-#' is specified, the outputs will be written to that location.  Otherwise,
-#' they will be written to a temp directory.  The default value is NULL.
+#' requested by passing a vector of output types.  If the \code{report_location}
+#' parameter is specified, the outputs will be written to that location.
+#' Otherwise, they will be written to a temp directory.  The default value is NULL.
 #' @param report_location A path to write any report output requested by
-#' the print parameter. The path may be either a full path with file name,
-#' or a directory name.  If the file name is not specified, the procedure
-#' type will be used.  If no path is specified, files will be
+#' the \code{report_type} parameter. The path may be either a full path with
+#' file name, or a directory name.  If a directory name, the function
+#' will create a default file name based on the report type.
+#' If no path is specified, files will be
 #' written to a temp directory.  Default is NULL.
 #' @param titles A vector of one or more titles to use for the report output.
-#' @return A list of data frames that contain the requested frequency tables.
-#' The list item names are specified in the \code{tables} parameter.
+#' @param piped Whether or not the \code{proc_freq} function is part of a data
+#' pipeline.  Set this parameter to TRUE if you want the function to return
+#' a single dataset instead a list of datasets.  If there is more than one
+#' table requested, the function will return the last requested table.
+#' @return By default the function returns a list of data frames
+#' that contains the requested frequency tables.
+#' The tables are named according to the variable or variables
+#' that were requested, and the output tables are in the same order as requested
+#' in the \code{tables} parameter. If the
+#' \code{proc_freq} function is being used in a data pipeline, you may wish to return
+#' the results as a single dataset instead of a list.  To get a single dataset,
+#' set the \code{piped} parameter to TRUE. This option will return only the last
+#' table requested.
+#' @seealso For summary statistics, see \code{\link{proc_means}}.  To pivot
+#' or transpose the data coming from \code{proc_freq},
+#' see \code{\link{proc_transpose}}.
+#' @examples
+#' library(procs)
+#' library(fmtr)
+#'
+#' # Get temp directory for output
+#' tmp <- tempdir()
+#'
+#' # Create sample data
+#' df <- as.data.frame(HairEyeColor, stringsAsFactors = FALSE)
+#'
+#' # Assign labels
+#' labels(df) <- list(Hair = "Hair Color",
+#'                    Eye = "Eye Color",
+#'                    Sex = "Sex at Birth")
+#'
+#' # Example #1: One way frequencies on Hair and Eye color with weight option.
+#' res <- proc_freq(df, tables = c("Hair", "Eye"), weight = "Freq")
+#'
+#' # View result data
+#' res
+#' #$Hair
+#' #  Category Frequency  Percent Cum_Freq   Cum_Pct
+#' #1    Black       108 18.24324      108  18.24324
+#' #2    Brown       286 48.31081      394  66.55405
+#' #3      Red        71 11.99324      465  78.54730
+#' #4    Blond       127 21.45270      592 100.00000
+#' #
+#' #$Eye
+#' #  Category Frequency  Percent Cum_Freq   Cum_Pct
+#' #1    Brown       220 37.16216      220  37.16216
+#' #2     Blue       215 36.31757      435  73.47973
+#' #3    Hazel        93 15.70946      528  89.18919
+#' #4    Green        64 10.81081      592 100.00000
+#'
+#' # Example #2: Crosstab table
+#' res <- proc_freq(df, tables = "Hair * Eye", weight = "Freq")
+#'
+#' # View result data
+#' res
+#' #$`Hair * Eye`
+#' #   Category Statistic       Blue      Brown      Green     Hazel     Total
+#' #1     Black Frequency  20.000000  68.000000  5.0000000 15.000000 108.00000
+#' #2     Black   Percent   3.378378  11.486486  0.8445946  2.533784  18.24324
+#' #3     Black   Row Pct  18.518519  62.962963  4.6296296 13.888889        NA
+#' #4     Black   Col Pct   9.302326  30.909091  7.8125000 16.129032        NA
+#' #5     Blond Frequency  94.000000   7.000000 16.0000000 10.000000 127.00000
+#' #6     Blond   Percent  15.878378   1.182432  2.7027027  1.689189  21.45270
+#' #7     Blond   Row Pct  74.015748   5.511811 12.5984252  7.874016        NA
+#' #8     Blond   Col Pct  43.720930   3.181818 25.0000000 10.752688        NA
+#' #9     Brown Frequency  84.000000 119.000000 29.0000000 54.000000 286.00000
+#' #10    Brown   Percent  14.189189  20.101351  4.8986486  9.121622  48.31081
+#' #11    Brown   Row Pct  29.370629  41.608392 10.1398601 18.881119        NA
+#' #12    Brown   Col Pct  39.069767  54.090909 45.3125000 58.064516        NA
+#' #13      Red Frequency  17.000000  26.000000 14.0000000 14.000000  71.00000
+#' #14      Red   Percent   2.871622   4.391892  2.3648649  2.364865  11.99324
+#' #15      Red   Row Pct  23.943662  36.619718 19.7183099 19.718310        NA
+#' #16      Red   Col Pct   7.906977  11.818182 21.8750000 15.053763        NA
+#' #17    Total Frequency 215.000000 220.000000 64.0000000 93.000000 592.00000
+#' #18    Total   Percent  36.317568  37.162162 10.8108108 15.709459 100.00000
+#'
+#' #' # Example #3: Crosstab table with totrow, totcol, rowpct, and colpct turned off
+#' res <- proc_freq(df, tables = c(HairByEyes = "Hair * Eye"),
+#'                  table_options = list(totrow = FALSE,
+#'                                       totcol = FALSE,
+#'                                       rowpct = FALSE,
+#'                                       colpct = FALSE),
+#'                  weight = "Freq")
+#'
+#' # View result data
+#' res
+#' #$HairByEyes
+#' #  Category Statistic      Blue      Brown      Green     Hazel
+#' #1    Black Frequency 20.000000  68.000000  5.0000000 15.000000
+#' #2    Black   Percent  3.378378  11.486486  0.8445946  2.533784
+#' #3    Blond Frequency 94.000000   7.000000 16.0000000 10.000000
+#' #4    Blond   Percent 15.878378   1.182432  2.7027027  1.689189
+#' #5    Brown Frequency 84.000000 119.000000 29.0000000 54.000000
+#' #6    Brown   Percent 14.189189  20.101351  4.8986486  9.121622
+#' #7      Red Frequency 17.000000  26.000000 14.0000000 14.000000
+#' #8      Red   Percent  2.871622   4.391892  2.3648649  2.364865
 #' @import fmtr
 #' @export
 proc_freq <- function(data,
-                      by = NULL,
+                   #   by = NULL,
                       tables = NULL,
                       table_options = NULL,
                       weight = NULL,
-                      weight_options = NULL,
+                   #   weight_options = NULL,
                       view = TRUE,
-                      output = NULL,
+                   #   output = NULL,
                       report_type = NULL,
                       report_location = NULL,
-                      titles = NULL) {
+                      titles = NULL,
+                      piped = FALSE) {
 
   res <- list()
   # print("Orig print_location")
@@ -128,6 +347,11 @@ proc_freq <- function(data,
                          titles = titles, margins = .5, viewer = TRUE)
 
     show_viewer(out)
+  }
+
+  if (piped == TRUE) {
+
+    res <- res[[length(res)]]
   }
 
   return(res)
@@ -294,6 +518,9 @@ freq_twoway <- function(data, tb1, tb2, weight, options, out = FALSE) {
   # Sort result data frame
   result <- result[order(result$Category1, result$Category2), ]
 
+  # Kill rownames
+  rownames(result) <- NULL
+
   # Get labels on target variables if they exist
   lbl1 <- attr(data[[tb1]], "label")
   lbl2 <- attr(data[[tb2]], "label")
@@ -453,6 +680,9 @@ cross_tab <- function(freqdata, options, var1, var2) {
 
   # Sort data frame by category and order
   ret <- ret[order(ret$Category1, ret$Order), c("Category1", "Statistic", nnms) ]
+
+  # Kill rownames
+  rownames(ret) <- NULL
 
   # Rename to Category so output_report() will recognize as a stub
   names(ret)[1] <- "Category"

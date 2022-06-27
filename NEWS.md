@@ -1,3 +1,8 @@
+# procs 0.0.9002
+
+* Readme complete
+* Freq documentation complete
+
 # procs 0.0.9001
 
 * Create pkgdown site

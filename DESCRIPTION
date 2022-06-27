@@ -1,7 +1,7 @@
 Package: procs
 Type: Package
-Title: Recreates some SAS statistical procedures in R
-Version: 0.0.9001
+Title: Recreates some SAS® statistical procedures in R
+Version: 0.0.9002
 Authors@R: c(
     person(given = "David",
            family = "Bosak",
