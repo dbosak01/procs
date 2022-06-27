@@ -30,11 +30,15 @@ compare_ds <- function(ds1, ds2, precision = NULL, rounding = NULL) {
 
 
 
+# Internal Utilities ------------------------------------------------------
+
+
 
 #' @import reporter
 #' @noRd
 output_report <- function(lst, proc_type,
                           dir_name, file_name, out_type = 'HTML',
+                          style = NULL,
                           titles = NULL, margins = 1, viewer = FALSE) {
 
 
@@ -58,7 +62,22 @@ output_report <- function(lst, proc_type,
 
 
 
-  if (viewer == TRUE) {
+  if (!is.null(style)) {
+
+    if (any(class(style) %in% "style_spec")) {
+
+      rpt <- add_style(rpt, style = style)
+
+    } else if (all(class(style) %in% "character")) {
+
+      rpt <- add_style(rpt, theme = style)
+
+    } else {
+
+      stop("Report style parameter value is invalid.")
+    }
+
+  } else {
 
     rpt <- add_style(rpt, theme = "SASDefault")
 

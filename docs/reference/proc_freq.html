@@ -174,6 +174,7 @@ directly to a report, or show them in the viewer.</p>
 <span>  view <span class='op'>=</span> <span class='cn'>TRUE</span>,</span>
 <span>  report_type <span class='op'>=</span> <span class='cn'>NULL</span>,</span>
 <span>  report_location <span class='op'>=</span> <span class='cn'>NULL</span>,</span>
+<span>  report_style <span class='op'>=</span> <span class='cn'>NULL</span>,</span>
 <span>  titles <span class='op'>=</span> <span class='cn'>NULL</span>,</span>
 <span>  piped <span class='op'>=</span> <span class='cn'>FALSE</span></span>
 <span><span class='op'>)</span></span></pre>
@@ -234,6 +235,12 @@ file name, or a directory name.  If a directory name, the function
 will create a default file name based on the report type.
 If no path is specified, files will be
 written to a temp directory.  Default is NULL.</p></td>
+    </tr>
+    <tr>
+      <th>report_style</th>
+      <td><p>A theme name or style object to use on the report output.
+See the <code><a href='https://reporter.r-sassy.org/reference/create_style.html'>create_style</a></code> in the <strong>reporter</strong>
+package for additional information on styles.</p></td>
     </tr>
     <tr>
       <th>titles</th>

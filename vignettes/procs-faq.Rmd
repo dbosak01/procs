@@ -22,7 +22,9 @@ on the links below to navigate to the full question and answer content.
 
 ## Index{#top}
 
-* [How can I generate a frequency table?](#basics)
+* [How can I generate a frequency table?](#freq)
+* [How can I generate summary statistics?](#means)
+* [How can I pivot my statistical results?](#transpose)
 * [How can I generate a crosstabulation table?](#crosstab)
 * [How can I write a frequency report?](#report)
 * [Why are you trying to simulate SAS® procedures?](#motivation)
@@ -36,7 +38,27 @@ on the links below to navigate to the full question and answer content.
 
 ## Content
 
-### Question? {#basics}
+### Question? {#freq}
+
+**Q:** A question.
+
+**A:** An answer.  
+
+[top](#top) 
+
+******
+
+### Question? {#means}
+
+**Q:** A question.
+
+**A:** An answer.  
+
+[top](#top) 
+
+******
+
+### Question? {#transpose}
 
 **Q:** A question.
 

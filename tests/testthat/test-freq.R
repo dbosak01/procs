@@ -610,6 +610,30 @@ test_that("freq23: Piped option works as expected.", {
 })
 
 
+test_that("freq24: report_style parameter works as expected.", {
+
+  library(fmtr)
+
+
+  labels(dat) <- list(Eyes = "Eye Color",
+                      Hair = "Hair Color",
+                      Region = "Geographic Region")
+
+  res <- proc_freq(dat, tables = c("Eyes * Hair"),
+                   table_options = list(out = "FreqTbl"),
+                   weight = "Count",
+                   titles = "Eye and Hair Color of European Children",
+                   report_style = "MidnightBlue")
+
+  res
+
+  expect_equal(length(res), 2)
+
+
+})
+
+
+
 #
 # test_that("freq15: Crosstab table.", {
 #

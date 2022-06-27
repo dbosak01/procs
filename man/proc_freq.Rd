@@ -13,6 +13,7 @@ proc_freq(
   view = TRUE,
   report_type = NULL,
   report_location = NULL,
+  report_style = NULL,
   titles = NULL,
   piped = FALSE
 )
@@ -57,6 +58,10 @@ file name, or a directory name.  If a directory name, the function
 will create a default file name based on the report type.
 If no path is specified, files will be
 written to a temp directory.  Default is NULL.}
+
+\item{report_style}{A theme name or style object to use on the report output.
+See the \code{\link[reporter]{create_style}} in the \strong{reporter}
+package for additional information on styles.}
 
 \item{titles}{A vector of one or more titles to use for the report output.}
 

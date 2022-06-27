@@ -152,6 +152,9 @@
 #' will create a default file name based on the report type.
 #' If no path is specified, files will be
 #' written to a temp directory.  Default is NULL.
+#' @param report_style A theme name or style object to use on the report output.
+#' See the \code{\link[reporter]{create_style}} in the \strong{reporter}
+#' package for additional information on styles.
 #' @param titles A vector of one or more titles to use for the report output.
 #' @param piped Whether or not the \code{proc_freq} function is part of a data
 #' pipeline.  Set this parameter to TRUE if you want the function to return
@@ -261,6 +264,7 @@ proc_freq <- function(data,
                    #   output = NULL,
                       report_type = NULL,
                       report_location = NULL,
+                      report_style = NULL,
                       titles = NULL,
                       piped = FALSE) {
 
@@ -331,6 +335,7 @@ proc_freq <- function(data,
     loc <- get_location("freq", report_location)
     out <- output_report(res, proc_type = 'freq', dir_name = loc["dir_name"],
                          file_name = loc["file_name"], out_type = report_type,
+                         style = report_style,
                          titles = titles, margins = 1)
 
 
@@ -344,6 +349,7 @@ proc_freq <- function(data,
 
     out <- output_report(res, proc_type = 'freq', dir_name = dirname(vrfl),
                          file_name = basename(vrfl), out_type = "HTML",
+                         style = report_style,
                          titles = titles, margins = .5, viewer = TRUE)
 
     show_viewer(out)
