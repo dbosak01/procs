@@ -6,11 +6,88 @@ data_dir <- "."
 
 dev <- FALSE
 
+datm <- read.table(header = TRUE, text = '
+LastName  Age PresentScore TasteScore Flavor Layers
+Orlando     27 93 80  Vanilla    1
+Ramey       32 84 72  Rum        2
+Goldston    46 68 75  Vanilla    1
+Roe         38 79 73  Vanilla    2
+Larsen      23 77 84  Chocolate  NA
+Davis       51 86 91  Spice      3
+Strickland  19 82 79  Chocolate  1
+Nguyen      57 77 84  Vanilla    NA
+Hildenbrand 33 81 83  Chocolate  1
+Byron       62 72 87  Vanilla    2
+Sanders     26 56 79  Chocolate  1
+Jaeger      43 66 74  NA         1
+Davis       28 69 75  Chocolate  2
+Conrad      69 85 94  Vanilla    1
+Walters     55 67 72  Chocolate  2
+Rossburger  28 78 81  Spice      2
+Matthew     42 81 92  Chocolate  2
+Becker      36 62 83  Spice      2
+Anderson    27 87 85  Chocolate  1
+Merritt     62 73 84  Chocolate  1
+')
+
+test_that("means0: get_summaries works as expected for 1 variable.", {
 
 
-test_that("means0: proc_means works as expected with local path.", {
+  res <- get_summaries(datm, var = "PresentScore",
+                       stats = c("n", "mean", "min", "max", "range", "median"))
+
+  res
 
 
-  expect_equal(1, 1)
+  expect_equal(res[1, "N"], 20)
+  expect_equal(res[1, "Mean"], 76.15)
+  expect_equal(res[1, "Minimum"], 56)
+  expect_equal(res[1, "Maximum"], 93)
+  expect_equal(res[1, "Range"], 37)
+  expect_equal(res[1, "Median"], 77.5)
+
+})
+
+test_that("means1: get_summaries works as expected for two variables.", {
+
+
+  res <- get_summaries(datm, var = c("PresentScore", "TasteScore"),
+                       stats = c("n", "mean", "min", "max", "range", "median"))
+
+  res
+
+
+  expect_equal(res[2, "N"], 20)
+  expect_equal(res[2, "Mean"], 81.35)
+  expect_equal(res[2, "Minimum"], 72)
+  expect_equal(res[2, "Maximum"], 94)
+  expect_equal(res[2, "Range"], 22)
+  expect_equal(res[2, "Median"], 82)
+
+})
+
+
+
+test_that("means2: proc_means works as expected with two variables.", {
+
+  res <- proc_means(datm, var = c("PresentScore", "TasteScore"),
+                    stats = c("n", "mean", "max", "min",
+                              "range", "median", "std"),
+                    titles = "My first title for Means")
+
+  res
+
+  expect_equal(length(res), 1)
+  expect_equal(nrow(res[[1]]), 2)
+  expect_equal(ncol(res[[1]]), 8)
+
+  res <- res[[1]]
+  expect_equal(res[2, "N"], 20)
+  expect_equal(res[2, "Mean"], 81.35)
+  expect_equal(res[2, "Minimum"], 72)
+  expect_equal(res[2, "Maximum"], 94)
+  expect_equal(res[2, "Range"], 22)
+  expect_equal(res[2, "Median"], 82)
+
 
 })

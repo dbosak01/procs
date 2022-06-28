@@ -158,7 +158,7 @@
 #' @param titles A vector of one or more titles to use for the report output.
 #' @param piped Whether or not the \code{proc_freq} function is part of a data
 #' pipeline.  Set this parameter to TRUE if you want the function to return
-#' a single dataset instead a list of datasets.  If there is more than one
+#' a single dataset instead of a list of datasets.  If there is more than one
 #' table requested, the function will return the last requested table.
 #' @return By default the function returns a list of data frames
 #' that contains the requested frequency tables.

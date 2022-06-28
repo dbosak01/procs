@@ -147,6 +147,7 @@ output_report <- function(lst, proc_type,
 
   ret <- c()
 
+  # Deal with multiple output types
   for (ot in out_type) {
 
     fl <- paste0(flnm, ".", tolower(ot))

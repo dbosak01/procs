@@ -67,7 +67,7 @@ package for additional information on styles.}
 
 \item{piped}{Whether or not the \code{proc_freq} function is part of a data
 pipeline.  Set this parameter to TRUE if you want the function to return
-a single dataset instead a list of datasets.  If there is more than one
+a single dataset instead of a list of datasets.  If there is more than one
 table requested, the function will return the last requested table.}
 }
 \value{
