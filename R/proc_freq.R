@@ -7,7 +7,7 @@
 #' @encoding UTF-8
 #' @description The \code{proc_freq} function generates frequency statistics.
 #' The function can perform one and two-way frequencies.  Two-way
-#' frequencies are produced as a crosstabulation by default.  There
+#' frequencies are produced as a cross-tabulation by default.  There
 #' are many options to control the generated tables.  The function will return
 #' requested tables in a named list. Additionally, it can output results
 #' directly to a report, or show them in the viewer.
@@ -19,10 +19,10 @@
 #' frames. Results may also be returned as a report.
 #'
 #' @section Data Frame Output:
-#' By default, frequency results are returned as data frames
-#' in a named list. Data in these data frames is not rounded or formatted
+#' By default, frequency results are returned as tibbles
+#' in a named list. Data in these tibbles is not rounded or formatted
 #' to give you the most accurate statistical results.
-#' The data frame items are named according to the
+#' The list items are named according to the
 #' strings specified on the \code{tables} parameter. You may control
 #' the names of the returned results by using a named vector on the
 #' \code{tables} parameter.
@@ -160,7 +160,7 @@
 #' pipeline.  Set this parameter to TRUE if you want the function to return
 #' a single dataset instead of a list of datasets.  If there is more than one
 #' table requested, the function will return the last requested table.
-#' @return By default the function returns a list of data frames
+#' @return By default the function returns a list of tibbles
 #' that contains the requested frequency tables.
 #' The tables are named according to the variable or variables
 #' that were requested, and the output tables are in the same order as requested
@@ -253,6 +253,7 @@
 #' #7      Red Frequency 17.000000  26.000000 14.0000000 14.000000
 #' #8      Red   Percent  2.871622   4.391892  2.3648649  2.364865
 #' @import fmtr
+#' @import tibble
 #' @export
 proc_freq <- function(data,
                    #   by = NULL,
@@ -306,11 +307,11 @@ proc_freq <- function(data,
     if (!is.null(crstab)) {
 
       if (is.null(nm))
-        res[[tb]] <- crstab
+        res[[tb]] <- as_tibble(crstab)
       else if (nchar(nm) == 0)
-        res[[tb]] <- crstab
+        res[[tb]] <- as_tibble(crstab)
       else
-        res[[nm]] <- crstab
+        res[[nm]] <- as_tibble(crstab)
 
       if ("out" %in% names(table_options) & i == length(tables)) {
 
@@ -320,11 +321,11 @@ proc_freq <- function(data,
     } else { # Otherwise add one-way to result
 
       if (is.null(nm))
-        res[[tb]] <- result
+        res[[tb]] <- as_tibble(result)
       else if (nchar(nm) == 0)
-        res[[tb]] <- result
+        res[[tb]] <- as_tibble(result)
       else
-        res[[nm]] <- result
+        res[[nm]] <- as_tibble(result)
 
     }
   }

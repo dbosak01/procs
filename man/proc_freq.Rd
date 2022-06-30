@@ -71,7 +71,7 @@ a single dataset instead of a list of datasets.  If there is more than one
 table requested, the function will return the last requested table.}
 }
 \value{
-By default the function returns a list of data frames
+By default the function returns a list of tibbles
 that contains the requested frequency tables.
 The tables are named according to the variable or variables
 that were requested, and the output tables are in the same order as requested
@@ -84,7 +84,7 @@ table requested.
 \description{
 The \code{proc_freq} function generates frequency statistics.
 The function can perform one and two-way frequencies.  Two-way
-frequencies are produced as a crosstabulation by default.  There
+frequencies are produced as a cross-tabulation by default.  There
 are many options to control the generated tables.  The function will return
 requested tables in a named list. Additionally, it can output results
 directly to a report, or show them in the viewer.
@@ -98,10 +98,10 @@ frames. Results may also be returned as a report.
 }
 \section{Data Frame Output}{
 
-By default, frequency results are returned as data frames
-in a named list. Data in these data frames is not rounded or formatted
+By default, frequency results are returned as tibbles
+in a named list. Data in these tibbles is not rounded or formatted
 to give you the most accurate statistical results.
-The data frame items are named according to the
+The list items are named according to the
 strings specified on the \code{tables} parameter. You may control
 the names of the returned results by using a named vector on the
 \code{tables} parameter.

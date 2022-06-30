@@ -22,8 +22,9 @@ proc_means(
 
 \item{var}{The variable(s) to calculate summary statistics for.}
 
-\item{stats}{The a quoted vector of summary statistics keywords.  Valid
-keywords are: "n", "means", "median", "std", "min", "max", and "range".}
+\item{stats}{A quoted vector of summary statistics keywords.  Valid
+keywords are: "css", "cv", "n", "means", "median", "std", "min", "max",
+"nmiss", "nobs", "range", "sum", "var".}
 
 \item{view}{Whether to display the report in the interactive viewer.  Valid
 values are TRUE and FALSE.  Default is TRUE.}
@@ -52,11 +53,43 @@ a single dataset instead of a list of datasets.  If there is more than one
 table requested, the function will return the last requested table.}
 }
 \value{
-A list of data frames that contain the requested frequency tables.
+A list of tibbles that contain the requested summary statistics.
+If the function is being used in a pipeline, set the
+\code{piped} parameter to TRUE, which will return only the last table.
 }
 \description{
-Here is a sample function.
+The \code{proc_means} function generates summary statistics
+for selected variable on the input dataset.  The variables are identified
+on the \code{var} parameter.  The statistics to perform are identified
+on the \code{stats} parameter.  By default, results are returned as a list,
+of tibbles.
 }
 \details{
 Some details about the sample function.
+
+All statistics remove missing values by default.  Should there be an
+option to include them?
 }
+\section{Statistics Options}{
+
+\itemize{
+\item{\strong{CSS}: Corrected Sum of Squares.
+
+}
+\item{\strong{CV}: Coefficient of Variation.
+
+}
+}
+}
+
+\section{Using Weights}{
+
+Need a section explaining how to use weights.
+}
+
+\section{Data Constraints}{
+
+Explain limits of data for each stat option.  Number of non-missing
+values, etc.
+}
+

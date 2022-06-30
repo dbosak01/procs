@@ -7,26 +7,42 @@
 \usage{
 proc_transpose(
   data,
-  by = NULL,
   var = NULL,
   id = NULL,
   idlabel = NULL,
-  copy = NULL
+  copy = NULL,
+  name = "NAME",
+  namelabel = NULL,
+  prefix = NULL,
+  delimiter = ".",
+  suffix = NULL
 )
 }
 \arguments{
 \item{data}{The input data frame for which calculate summary statistics.}
 
-\item{by}{An optional by group.}
-
 \item{var}{The variable or variables to transpose.}
 
-\item{id}{The option specifications for the table parameter.}
+\item{id}{The variable or variables to use for the transposed column names.}
 
-\item{idlabel}{The variable(s) to calculate summary statistics for.}
+\item{idlabel}{The variable to use for the transposed column labels.}
 
-\item{copy}{A vector of variable to retain in the output data frame
+\item{copy}{A vector of variables to retain in the output data
 without transposition.}
+
+\item{name}{Specifies the name of the variable to be used for the
+var values.}
+
+\item{namelabel}{The label to use for the name variable.}
+
+\item{prefix}{Contains a prefix to be used in the construction of
+column names.}
+
+\item{delimiter}{Specifies a delimiter to be used in the construction
+of column names.}
+
+\item{suffix}{Contains a suffix to be used in the construction of
+column names.}
 }
 \value{
 A data frames that contains the transposed data.
