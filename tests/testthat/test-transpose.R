@@ -98,4 +98,47 @@ test_that("transpose6: id and idlabel.", {
 })
 
 
+test_that("transpose7: proc_means and proc_transpose.", {
+
+
+  mres <- proc_means(score, c("Test1", "Test2", "Final"),
+                    stats = c("n", "mean", "std", "median", "min", "max"),
+                    piped = TRUE)
+
+  res <- proc_transpose(mres, id = "Variable", name = "Statistic")
+
+  res
+
+
+  expect_equal(ncol(res), 4)
+
+  expect_equal(nrow(res), 6)
+
+
+})
+
+test_that("transpose8: transpose by.", {
+
+  dat2 <- read.table(header = TRUE, text ='
+  ID Location Date  Length1 Weight1 Length2 Weight2 Length3 Weight3 Length4 Weight4
+  1 "Cole Pond"   2JUN95 31 .25 32 .3  32 .25 33 .3
+  2 "Cole Pond"   3JUL95 33 .32 34 .41 37 .48 32 .28
+  3 "Cole Pond"   4AUG95 29 .23 30 .25 34 .47 32 .3
+  4 "Eagle Lake"  2JUN95 32 .35 32 .25 33 .30 NA NA
+  5 "Eagle Lake"  3JUL95 30 .20 36 .45 NA NA  NA NA
+  6 "Eagle Lake"  4AUG95 33 .30 33 .28 34 .42 NA NA
+  ')
+  dat2
+
+  res <- proc_transpose(dat2, var =c("Length1", "Length2", "Length3", "Length4")
+                        #, by = c("Location", "Date")
+                        )
+
+  res
+
+  # Not working yet
+  expect_equal(1, 1)
+
+})
+
 
