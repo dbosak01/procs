@@ -311,15 +311,6 @@ proc_freq <- function(data,
     # Get table for this by group
     dt <- dtlst[[j]]
 
-    bygrp <- NULL
-    byval <- NULL
-
-    # Set group name and value
-    if (!is.null(by)) {
-      bygrp  <- by[j]
-      byval <- names(dtlst)[j]
-    }
-
     # Loop through table requests
     for (i in seq_len(length(tables))) {
 
@@ -327,14 +318,6 @@ proc_freq <- function(data,
       tb <- tables[i]
       #browser()
       out <- i == length(tables) & has_option(table_options, "out")
-
-      # Assign new label if there are by groups
-      if (length(bylbls[j]) > 0) {
-        if (!is.null(attr(data[[tb]], "label")))
-          attr(dt[[tb]], "label") <- paste0(bylbls[j], attr(data[[tb]], "label"))
-        else
-          attr(dt[[tb]], "label") <- paste0(bylbls[j], tb)
-      }
 
       crstab <- NULL
 
@@ -344,13 +327,29 @@ proc_freq <- function(data,
       # Perform either one-way or two-way frequency count
       if (length(splt) == 1) {
 
+        # Assign new label if there are by groups
+        if (length(bylbls[j]) > 0) {
+          if (!is.null(attr(data[[tb]], "label")))
+            attr(dt[[tb]], "label") <- paste0(bylbls[j], attr(data[[tb]], "label"))
+          else
+            attr(dt[[tb]], "label") <- paste0(bylbls[j], tb)
+        }
+
+        # Perform one-way frequency
         result <- freq_oneway(dt, tb, weight, table_options, out)
 
       } else if (length(splt) == 2) {
 
+        bylbl <- NULL
+        if (length(bylbls[j]) > 0) {
+          bylbl <- bylbls[j]
+        }
+
+        # Perform two-way frequency
         result <- freq_twoway(dt, splt[1], splt[2], weight, table_options, out)
 
-        crstab <- cross_tab(result, table_options, splt[1], splt[2])
+        # Perform cross tab by default
+        crstab <- cross_tab(result, table_options, splt[1], splt[2], bylbl)
 
       } else {
 
@@ -374,7 +373,7 @@ proc_freq <- function(data,
 
         if ("out" %in% names(table_options) & i == length(tables)) {
 
-          res[[table_options[["out"]]]] <- result
+          res[[get_name(table_options[["out"]], "", bylbls[j])]] <- result
         }
 
       } else { # Otherwise add one-way to result
@@ -747,7 +746,7 @@ freq_twoway <- function(data, tb1, tb2, weight, options, out = FALSE) {
 #' @import fmtr
 #' @import stats
 #' @noRd
-cross_tab <- function(freqdata, options, var1, var2) {
+cross_tab <- function(freqdata, options, var1, var2, bylbl = NULL) {
 
   lbl1 <- attr(freqdata$Category1, "label")
   lbl2 <- attr(freqdata$Category2, "label")
@@ -888,7 +887,11 @@ cross_tab <- function(freqdata, options, var1, var2) {
   attr(ret$Category, "label") <- lbl1
 
   # Add spanning headers
-  lbl <- paste0("Table of ", var1, " by ", var2)
+  if (!is.null(bylbl)) {
+    lbl <- paste0(bylbl, "Table of ", var1, " by ", var2)
+  } else {
+    lbl <- paste0("Table of ", var1, " by ", var2)
+  }
   spn2 <- span_spec(label = lbl, 1, ncol(ret), 2)
   spn1 <- span_spec(label = lbl2, 3, ncol(ret), 1)
   attr(ret, "spans") <- list(spn1, spn2)

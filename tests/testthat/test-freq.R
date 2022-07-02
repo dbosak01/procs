@@ -665,7 +665,7 @@ test_that("freq25: Single by group on single table works.", {
 
 })
 
-test_that("freq25: Single by group on double table works.", {
+test_that("freq26: Single by group on double table works.", {
 
   library(fmtr)
 
@@ -688,7 +688,7 @@ test_that("freq25: Single by group on double table works.", {
 })
 
 
-test_that("freq25: Double by group on double table works.", {
+test_that("freq27: Double by group on double table works.", {
 
   library(fmtr)
 
@@ -709,27 +709,117 @@ test_that("freq25: Double by group on double table works.", {
 
   expect_equal(length(res), 8)
   expect_equal(nrow(res[[1]]), 3)
+  expect_equal(names(res)[1], "Sex=F, Region=1, Eyes")
 
 
 })
 
-#
-# test_that("freq15: Crosstab table.", {
-#
-#   df <- as.data.frame(HairEyeColor, stringsAsFactors = FALSE)
-#
-#
-#   res <- proc_freq(df,
-#             tables = c("Eye", "Hair", FreqCount = "Eye * Hair"),
-#             weight = "Freq")
-#
-#   ds <- res[["FreqCount"]]
-#
-#
-#   reshape(data = ds, idvar = "Category2", timevar = "Category1",
-#           direction = "wide", v.names = c("Frequency", "Percentage"))
-#
-# })
+test_that("freq28: Double by group on double table with table names works.", {
 
+  library(fmtr)
+
+  spdat <- dat
+
+  spdat$Sex <- c(rep("M", 13), rep("F", 14))
+
+  labels(spdat) <- list(Eyes = "Eye Color",
+                        Hair = "Hair Color",
+                        Region = "Geographic Region")
+
+
+  res <- proc_freq(spdat, tables = c(EyeTbl = "Eyes", HairTbl ="Hair"), by = c("Sex", "Region"),
+                   weight = "Count",
+                   titles = "Eye and Hair Color of European Children")
+
+  res
+
+  expect_equal(length(res), 8)
+  expect_equal(nrow(res[[1]]), 3)
+  expect_equal(names(res)[1], "Sex=F, Region=1, EyeTbl")
+  expect_equal(names(res)[2], "Sex=F, Region=1, HairTbl")
+
+
+})
+
+
+test_that("freq29: Double by group on double table no labels works.", {
+
+  library(fmtr)
+
+  spdat <- dat
+
+  spdat$Sex <- c(rep("M", 13), rep("F", 14))
+
+  labels(spdat) <- NULL
+
+  res <- proc_freq(spdat, tables = c(EyeTbl = "Eyes", HairTbl ="Hair"), by = c("Sex", "Region"),
+                   weight = "Count",
+                   titles = "Eye and Hair Color of European Children")
+
+  res
+
+  expect_equal(length(res), 8)
+  expect_equal(nrow(res[[1]]), 3)
+  expect_equal(names(res)[1], "Sex=F, Region=1, EyeTbl")
+  expect_equal(names(res)[2], "Sex=F, Region=1, HairTbl")
+
+
+})
+
+test_that("freq30: Crosstab with by works.", {
+
+  library(fmtr)
+
+  spdat <- dat
+
+  spdat$Sex <- c(rep("M", 13), rep("F", 14))
+
+  labels(spdat) <- list(Eyes = "Eye Color",
+                        Hair = "Hair Color",
+                        Region = "Geographic Region")
+
+  res <- proc_freq(spdat, tables = c("Eyes * Hair"),
+                 #  table_options = list(out = "FreqTable"),
+                   by = c("Sex"),
+                   weight = "Count",
+                   titles = "Eye and Hair Color of European Children")
+
+  res
+
+  expect_equal(length(res), 2)
+  expect_equal(nrow(res[[1]]), 14)
+  expect_equal(names(res)[1], "Sex=F, Eyes * Hair")
+  expect_equal(names(res)[2], "Sex=M, Eyes * Hair")
+
+
+})
+
+test_that("freq30: Crosstab with by and out works.", {
+
+  library(fmtr)
+
+  spdat <- dat
+
+  spdat$Sex <- c(rep("M", 13), rep("F", 14))
+
+  labels(spdat) <- list(Eyes = "Eye Color",
+                        Hair = "Hair Color",
+                        Region = "Geographic Region")
+
+  res <- proc_freq(spdat, tables = c("Eyes * Hair"),
+                    table_options = list(out = "FreqTable"),
+                   by = c("Sex"),
+                   weight = "Count",
+                   titles = "Eye and Hair Color of European Children")
+
+  res
+
+  expect_equal(length(res), 4)
+  expect_equal(nrow(res[[1]]), 14)
+  expect_equal(names(res)[1], "Sex=F, Eyes * Hair")
+  expect_equal(names(res)[2], "Sex=F, FreqTable")
+
+
+})
 
 

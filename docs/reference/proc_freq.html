@@ -168,6 +168,7 @@ directly to a report, or show them in the viewer.</p>
 
     <pre class="usage"><span><span class='fu'>proc_freq</span><span class='op'>(</span></span>
 <span>  <span class='va'>data</span>,</span>
+<span>  by <span class='op'>=</span> <span class='cn'>NULL</span>,</span>
 <span>  tables <span class='op'>=</span> <span class='cn'>NULL</span>,</span>
 <span>  table_options <span class='op'>=</span> <span class='cn'>NULL</span>,</span>
 <span>  weight <span class='op'>=</span> <span class='cn'>NULL</span>,</span>
@@ -186,6 +187,13 @@ directly to a report, or show them in the viewer.</p>
       <th>data</th>
       <td><p>The input data frame to perform frequency calculations on.
 Input data as the first parameter makes this function pipe-friendly.</p></td>
+    </tr>
+    <tr>
+      <th>by</th>
+      <td><p>An optional by group. Parameter accepts a vector of one or more
+quoted variable names. When this parameter is set, data
+will be subset for each by group, and tables will be generated for
+each subset.</p></td>
     </tr>
     <tr>
       <th>tables</th>
