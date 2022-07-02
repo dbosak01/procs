@@ -47,7 +47,11 @@
 
 
 <meta property="og:title" content="Transposes a Data Frame — proc_transpose" />
-<meta property="og:description" content="Here is a sample function." />
+<meta property="og:description" content="A function to pivot or transpose a data frame. In the default
+usage, the variables identified by the parameter var are transposed
+to become rows. The variable values in the parameter id become
+the new column names.  The function has several more parameters to control
+how variables are named in the transposed data set." />
 <meta property="og:image" content="https://procs.r-sassy.org/logo.png" />
 
 
@@ -80,7 +84,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">procs</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.9002</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.9003</span>
       </span>
     </div>
 
@@ -153,16 +157,24 @@
     </div>
 
     <div class="ref-description">
-    <p>Here is a sample function.</p>
+    <p>A function to pivot or transpose a data frame. In the default
+usage, the variables identified by the parameter <code>var</code> are transposed
+to become rows. The variable values in the parameter <code>id</code> become
+the new column names.  The function has several more parameters to control
+how variables are named in the transposed data set.</p>
     </div>
 
     <pre class="usage"><span><span class='fu'>proc_transpose</span><span class='op'>(</span></span>
 <span>  <span class='va'>data</span>,</span>
-<span>  by <span class='op'>=</span> <span class='cn'>NULL</span>,</span>
 <span>  var <span class='op'>=</span> <span class='cn'>NULL</span>,</span>
 <span>  id <span class='op'>=</span> <span class='cn'>NULL</span>,</span>
 <span>  idlabel <span class='op'>=</span> <span class='cn'>NULL</span>,</span>
-<span>  copy <span class='op'>=</span> <span class='cn'>NULL</span></span>
+<span>  copy <span class='op'>=</span> <span class='cn'>NULL</span>,</span>
+<span>  name <span class='op'>=</span> <span class='st'>"NAME"</span>,</span>
+<span>  namelabel <span class='op'>=</span> <span class='cn'>NULL</span>,</span>
+<span>  prefix <span class='op'>=</span> <span class='cn'>NULL</span>,</span>
+<span>  delimiter <span class='op'>=</span> <span class='st'>"."</span>,</span>
+<span>  suffix <span class='op'>=</span> <span class='cn'>NULL</span></span>
 <span><span class='op'>)</span></span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
@@ -173,35 +185,71 @@
       <td><p>The input data frame for which calculate summary statistics.</p></td>
     </tr>
     <tr>
-      <th>by</th>
-      <td><p>An optional by group.</p></td>
-    </tr>
-    <tr>
       <th>var</th>
       <td><p>The variable or variables to transpose.</p></td>
     </tr>
     <tr>
       <th>id</th>
-      <td><p>The option specifications for the table parameter.</p></td>
+      <td><p>The variable or variables to use for the transposed column names.</p></td>
     </tr>
     <tr>
       <th>idlabel</th>
-      <td><p>The variable(s) to calculate summary statistics for.</p></td>
+      <td><p>The variable to use for the transposed column labels.</p></td>
     </tr>
     <tr>
       <th>copy</th>
-      <td><p>A vector of variable to retain in the output data frame
+      <td><p>A vector of variables to retain in the output data
 without transposition.</p></td>
+    </tr>
+    <tr>
+      <th>name</th>
+      <td><p>Specifies the name of the variable to be used for the
+var values.</p></td>
+    </tr>
+    <tr>
+      <th>namelabel</th>
+      <td><p>The label to use for the name variable.</p></td>
+    </tr>
+    <tr>
+      <th>prefix</th>
+      <td><p>Contains a prefix to be used in the construction of
+column names.</p></td>
+    </tr>
+    <tr>
+      <th>delimiter</th>
+      <td><p>Specifies a delimiter to be used in the construction
+of column names.</p></td>
+    </tr>
+    <tr>
+      <th>suffix</th>
+      <td><p>Contains a suffix to be used in the construction of
+column names.</p></td>
     </tr>
     </table>
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>A data frames that contains the transposed data.</p>
+    <p>A data frames that contains the transposed data. If a data frame
+is input, a data frame will be output.  If a tibble is input, a tibble
+will be output.</p>
     <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
 
     <p>Some details about the sample function.</p>
 
+    <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
+    <pre class="examples"><span><span class='co'># Create data</span></span>
+<span><span class='va'>dt</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/data.frame.html'>data.frame</a></span><span class='op'>(</span>names <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/colnames.html'>rownames</a></span><span class='op'>(</span><span class='va'>mtcars</span><span class='op'>)</span>, <span class='va'>mtcars</span>, stringsAsFactors <span class='op'>=</span> <span class='cn'>FALSE</span><span class='op'>)</span><span class='op'>[</span><span class='fl'>1</span><span class='op'>:</span><span class='fl'>5</span>,<span class='op'>]</span></span>
+<span></span>
+<span><span class='co'># Transpose data</span></span>
+<span><span class='va'>tdt</span> <span class='op'>&lt;-</span> <span class='fu'>proc_transpose</span><span class='op'>(</span><span class='va'>dt</span>, var <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"mpg"</span>, <span class='st'>"cyl"</span>, <span class='st'>"disp"</span><span class='op'>)</span>,</span>
+<span>                          id <span class='op'>=</span> <span class='st'>"names"</span>, name <span class='op'>=</span> <span class='st'>"Variable"</span><span class='op'>)</span></span>
+<span></span>
+<span><span class='co'># View transposed data</span></span>
+<span><span class='va'>tdt</span></span>
+<span><span class='co'>#   Variable Mazda RX4 Mazda RX4 Wag Datsun 710 Hornet 4 Drive Hornet Sportabout</span></span>
+<span><span class='co'># 1      mpg        21            21       22.8           21.4              18.7</span></span>
+<span><span class='co'># 2      cyl         6             6        4.0            6.0               8.0</span></span>
+<span><span class='co'># 3     disp       160           160      108.0          258.0             360.0</span></span></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">

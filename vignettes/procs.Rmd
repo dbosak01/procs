@@ -43,19 +43,51 @@ similar to SAS® PROC FREQ.
 
 ```{r eval=FALSE, echo=TRUE} 
 library(procs)
+library(fmtr)
 
+dt <- as.data.frame(HairEyeColor, stringsAsFactors = FALSE)
+
+labels(dt) <- list(Hair = "Hair Color",
+                   Eye = "Eye Color")
+
+res <- proc_freq(dt, tables = c("Hair", "Eye", "Hair * Eye"),
+                 weight = "Freq",
+                 titles = "Hair and Eye Frequency Statistics")
 
 ```
+By default, the following report will be shown in the viewer:
+<img src="../man/images/freq1.png"/>
+
+Also note that the `proc_freq()` function returned a list of data frames
+in the variable 'res'.  This variable contains the 
+results of the analysis, and the data values within these data frames are
+un-rounded.  This data can be used in additional analysis or for custom reporting.
 
 #### The `proc_means()` Function
 
 The `proc_means()` function attempts to provide similar functionality to 
 the SAS® PROC MEANS procedure.
 
+The below example takes the Hair frequencies calculated above and performs
+some summary statistics on the frequencies using `proc_means()`:
+
 ```{r eval=FALSE, echo=TRUE} 
 library(procs)
 
+# Get Hair frequencies
+dt <- res$Hair
 
+# Perform calculations
+res2 <- proc_means(dt, var = "Frequency", 
+                   stats = c("n", "mean", "std", "min", "max"))
+
+# View the summary statistics
+res2
+# [[1]]
+# # A tibble: 1 × 6
+#   Variable      N  Mean Std_Dev Minimum Maximum
+#   <chr>     <int> <dbl>   <dbl>   <dbl>   <dbl>
+# 1 Frequency     4   148    94.9      71     286
 ```
 
 #### The `proc_transpose()` Function
@@ -67,10 +99,37 @@ data manipulation functions, the TRANSPOSE procedure from SAS® provides a
 somewhat different conceptual model that SAS® programmers like.  The aim
 of the `proc_transpose()` function is to offer a similar model in R.
 
+The following example takes the "Hair" frequencies from the `proc_freq()`
+example above, and transposes the rows and columns:
+
 ```{r eval=FALSE, echo=TRUE} 
 library(procs)
 
+# Get Hair frequencies
+dt <- res$Hair
 
+# View Hair frequencies
+dt
+# # A tibble: 4 × 5
+#   Category Frequency Percent Cum_Freq Cum_Pct
+#   <chr>        <dbl>   <dbl>    <dbl>   <dbl>
+# 1 Black          108    18.2      108    18.2
+# 2 Blond          127    21.5      235    39.7
+# 3 Brown          286    48.3      521    88.0
+# 4 Red             71    12.0      592   100 
+
+res3 <- proc_transpose(dt, var = c("Frequency", "Percent", "Cum_Freq", "Cum_Pct"),
+                       id = "Category", name = "Statistic")
+
+# View transformed data
+res3
+# # A tibble: 4 × 5
+#   Statistic Black Blond Brown   Red
+#   <chr>     <dbl> <dbl> <dbl> <dbl>
+# 1 Frequency 108   127   286    71  
+# 2 Percent    18.2  21.5  48.3  12.0
+# 3 Cum_Freq  108   235   521   592  
+# 4 Cum_Pct    18.2  39.7  88.0 100  
 ```
 
 ### Next Steps

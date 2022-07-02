@@ -1,7 +1,11 @@
 
 #' @title Transposes a Data Frame
 #' @encoding UTF-8
-#' @description Here is a sample function.
+#' @description A function to pivot or transpose a data frame. In the default
+#' usage, the variables identified by the parameter \code{var} are transposed
+#' to become rows. The variable values in the parameter \code{id} become
+#' the new column names.  The function has several more parameters to control
+#' how variables are named in the transposed data set.
 #' @details
 #' Some details about the sample function.
 #' @param data The input data frame for which calculate summary statistics.
@@ -20,8 +24,24 @@
 #' of column names.
 #' @param suffix Contains a suffix to be used in the construction of
 #' column names.
-#' @return A data frames that contains the transposed data.
+#' @return A data frames that contains the transposed data. If a data frame
+#' is input, a data frame will be output.  If a tibble is input, a tibble
+#' will be output.
 # @import stats
+#' @examples
+#' # Create data
+#' dt <- data.frame(names = rownames(mtcars), mtcars, stringsAsFactors = FALSE)[1:5,]
+#'
+#' # Transpose data
+#' tdt <- proc_transpose(dt, var = c("mpg", "cyl", "disp"),
+#'                           id = "names", name = "Variable")
+#'
+#' # View transposed data
+#' tdt
+#' #   Variable Mazda RX4 Mazda RX4 Wag Datsun 710 Hornet 4 Drive Hornet Sportabout
+#' # 1      mpg        21            21       22.8           21.4              18.7
+#' # 2      cyl         6             6        4.0            6.0               8.0
+#' # 3     disp       160           160      108.0          258.0             360.0
 #' @import tibble
 #' @import fmtr
 #' @export
@@ -37,6 +57,11 @@ proc_transpose <- function(data,
                            delimiter = ".",
                            suffix = NULL
                            ) {
+
+  if (!"data.frame" %in% class(data)) {
+
+   stop("Input data must be inherited from a data frame.")
+  }
 
    ret <- NULL
 
