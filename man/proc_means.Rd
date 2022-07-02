@@ -7,6 +7,7 @@
 \usage{
 proc_means(
   data,
+  by = NULL,
   var = NULL,
   stats = NULL,
   view = TRUE,
@@ -19,6 +20,8 @@ proc_means(
 }
 \arguments{
 \item{data}{The input data frame for which calculate summary statistics.}
+
+\item{by}{An optional by group.}
 
 \item{var}{The variable(s) to calculate summary statistics for.}
 

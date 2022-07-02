@@ -12,10 +12,10 @@ Orlando     27 93 80  Vanilla    1
 Ramey       32 84 72  Rum        2
 Goldston    46 68 75  Vanilla    1
 Roe         38 79 73  Vanilla    2
-Larsen      23 77 84  Chocolate  NA
+Larsen      23 77 84  Chocolate  3
 Davis       51 86 91  Spice      3
 Strickland  19 82 79  Chocolate  1
-Nguyen      57 77 84  Vanilla    NA
+Nguyen      57 77 84  Vanilla    3
 Hildenbrand 33 81 83  Chocolate  1
 Byron       62 72 87  Vanilla    2
 Sanders     26 56 79  Chocolate  1
@@ -109,5 +109,39 @@ test_that("means3: check more stats options and piped parameter.", {
   expect_equal(res[2, "NMiss"], 0)
   expect_equal(res[2, "CSS"], 830.55)
   expect_equal(res[2, "CV"] > 8, TRUE)
+
+})
+
+test_that("means4: proc_means with two variables and by group.", {
+
+  res <- proc_means(datm, var = c("PresentScore", "TasteScore"),
+                    by = "Layers",
+                    stats = c("n", "mean", "max", "min",
+                              "range", "median", "std"),
+                    titles = "My first title for Means")
+
+  res
+
+  expect_equal(length(res), 3)
+  expect_equal(nrow(res[[1]]), 2)
+  expect_equal(ncol(res[[1]]), 8)
+
+
+
+})
+
+test_that("means5: proc_means with two variables and two by groups.", {
+
+  res <- proc_means(datm, var = c("PresentScore", "TasteScore"),
+                    by = c("Flavor", "Layers"),
+                    stats = c("n", "mean", "max", "min",
+                              "range", "median", "std"),
+                    titles = "My first title for Means")
+
+  res
+
+  expect_equal(length(res), 12)
+  expect_equal(nrow(res[[1]]), 2)
+  expect_equal(ncol(res[[1]]), 8)
 
 })

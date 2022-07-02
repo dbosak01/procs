@@ -32,7 +32,7 @@
 #'
 #'
 #' @param data The input data frame for which calculate summary statistics.
-# @param by An optional by group.
+#' @param by An optional by group.
 # @param class The variable or variables to perform frequency counts on.
 # @param class_options The option specifications for the table parameter.
 #' @param var The variable(s) to calculate summary statistics for.
@@ -70,7 +70,7 @@
 #' @import tibble
 #' @export
 proc_means <- function(data,
-              #         by = NULL,
+                       by = NULL,
               #         class = NULL,
               #         class_options = NULL,
                        var = NULL,
@@ -88,12 +88,73 @@ proc_means <- function(data,
 
   res <- list()
 
-  smtbl <- get_summaries(data, var, stats)
+  #browser()
 
-  if ("tbl_df" %in% class(data))
-    res[[length(res) + 1]] <- as_tibble(smtbl)
-  else
-    res[[length(res) + 1]] <- smtbl
+  bylbls <- c()
+  if (!is.null(by)) {
+
+    lst <- unclass(data)[by]
+    for (nm in names(lst))
+      lst[[nm]] <- as.factor(lst[[nm]])
+    dtlst <- split(data, lst, sep = "|")
+
+    snms <- strsplit(names(dtlst), "|", fixed = TRUE)
+
+    for (k in seq_len(length(snms))) {
+      for (l in seq_len(length(by))) {
+        lv <- ""
+        if (!is.null(bylbls[k])) {
+          if (!is.na(bylbls[k])) {
+            lv <- bylbls[k]
+          }
+        }
+
+        if (l == length(by))
+          cma <- ""
+        else
+          cma <- ", "
+
+        bylbls[k] <- paste0(lv, by[l], "=", snms[[k]][l], cma)
+      }
+    }
+
+  } else {
+
+    dtlst <- list(data)
+  }
+
+  # Loop through by groups
+  for (j in seq_len(length(dtlst))) {
+
+    # Get table for this by group
+    dt <- dtlst[[j]]
+
+    # Calculate summary statistics
+    smtbl <- get_summaries(dt, var, stats)
+
+
+    nm <- length(res) + 1
+
+    # Add spanning headers if there are by groups
+    if (!is.null(by)) {
+
+      #browser()
+
+      # Add spanning headers
+      spn <- span_spec(label = bylbls[j], 1, ncol(smtbl), 1)
+      attr(smtbl, "spans") <- list(spn)
+
+      nm <-  bylbls[j]
+    }
+
+    # Convert to tibble if incoming data is a tibble
+    if ("tbl_df" %in% class(data))
+      res[[nm]] <- as_tibble(smtbl)
+    else
+      res[[nm]] <- smtbl
+
+
+  }
 
 
   # Create output reports if requested
@@ -159,32 +220,49 @@ get_summaries <- function(data, var, stats) {
 
         if (st == "css") {
 
-          rw[["CSS"]] <- sum((var - mean(var, na.rm = TRUE))^2, na.rm = TRUE)
+          if (all(is.na(var)))
+            rw[["CSS"]] <- NA
+          else
+            rw[["CSS"]] <- sum((var - mean(var, na.rm = TRUE))^2, na.rm = TRUE)
         }
 
         if (st == "cv") {
 
-          rw[["CV"]] <- sd(var, na.rm = TRUE) / mean(var, na.rm = TRUE) * 100
+          if (all(is.na(var)))
+            rw[["CV"]] <- NA
+          else
+            rw[["CV"]] <- sd(var, na.rm = TRUE) / mean(var, na.rm = TRUE) * 100
         }
 
         if (st == "mean") {
 
-          rw[["Mean"]] <- mean(var, na.rm = TRUE)
+          if (all(is.na(var)))
+            rw[["Mean"]] <- NA
+          else
+            rw[["Mean"]] <- mean(var, na.rm = TRUE)
         }
 
         if (st == "max") {
-
-          rw[["Maximum"]] <- max(var, na.rm = TRUE)
+          if (all(is.na(var)))
+            rw[["Maximum"]] <- NA
+          else
+            rw[["Maximum"]] <- max(var, na.rm = TRUE)
         }
 
         if (st == "min") {
 
-          rw[["Minimum"]] <- min(var, na.rm = TRUE)
+          if (all(is.na(var)))
+            rw[["Minimum"]] <- NA
+          else
+            rw[["Minimum"]] <- min(var, na.rm = TRUE)
         }
 
         if (st == "median") {
 
-          rw[["Median"]] <- median(var, na.rm = TRUE)
+          if (all(is.na(var)))
+            rw[["Median"]] <- NA
+          else
+            rw[["Median"]] <- median(var, na.rm = TRUE)
         }
 
         if (st == "nobs") {
@@ -199,21 +277,31 @@ get_summaries <- function(data, var, stats) {
 
         if (st == "std") {
 
-          rw[["Std_Dev"]] <- sd(var, na.rm = TRUE)
+          if (all(is.na(var)))
+            rw[["Std_Dev"]] <- NA
+          else
+            rw[["Std_Dev"]] <- sd(var, na.rm = TRUE)
         }
 
         if (st == "sum") {
 
-          rw[["Sum"]] <- sum(var, na.rm = TRUE)
+          if (all(is.na(var)))
+            rw[["Sum"]] <- NA
+          else
+            rw[["Sum"]] <- sum(var, na.rm = TRUE)
         }
 
         if (st == "range") {
 
-          rng <- range(var, na.rm = TRUE)
-          if (!is.null(rng) & length(rng) == 2)
-            rw[["Range"]] <- rng[2] - rng[1]
-          else
+          if (all(is.na(var))) {
             rw[["Range"]] <- NA
+          } else {
+          rng <- range(var, na.rm = TRUE)
+            if (!is.null(rng) & length(rng) == 2)
+              rw[["Range"]] <- rng[2] - rng[1]
+            else
+              rw[["Range"]] <- NA
+          }
         }
 
         if (st == "var") {

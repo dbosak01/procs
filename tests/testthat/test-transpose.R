@@ -101,7 +101,7 @@ test_that("transpose6: id and idlabel.", {
 test_that("transpose7: proc_means and proc_transpose.", {
 
 
-  mres <- proc_means(score, c("Test1", "Test2", "Final"),
+  mres <- proc_means(score, var = c("Test1", "Test2", "Final"),
                     stats = c("n", "mean", "std", "median", "min", "max"),
                     piped = TRUE)
 

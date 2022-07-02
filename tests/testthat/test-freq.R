@@ -752,7 +752,8 @@ test_that("freq29: Double by group on double table no labels works.", {
 
   labels(spdat) <- NULL
 
-  res <- proc_freq(spdat, tables = c(EyeTbl = "Eyes", HairTbl ="Hair"), by = c("Sex", "Region"),
+  res <- proc_freq(spdat, tables = c(EyeTbl = "Eyes", HairTbl ="Hair"),
+                   by = c("Sex", "Region"),
                    weight = "Count",
                    titles = "Eye and Hair Color of European Children")
 
