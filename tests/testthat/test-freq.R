@@ -632,7 +632,86 @@ test_that("freq24: report_style parameter works as expected.", {
 
 })
 
+#
+# lst <- unclass(mtcars)[c("mpg", "cyl")]
+#
+# f1 <- as.factor(mtcars$vs)
+# f2 <- as.factor(mtcars$am)
+#
+# flst <- list(vs = f1, am = f2)
+# dtlst <- split(mtcars, flst, sep = " by ")
+#
+# dtlst
 
+test_that("freq25: Single by group on single table works.", {
+
+  library(fmtr)
+
+
+  labels(dat) <- list(Eyes = "Eye Color",
+                      Hair = "Hair Color",
+                      Region = "Geographic Region")
+
+
+  res <- proc_freq(dat, tables = c("Eyes"), by = "Region",
+                   weight = "Count",
+                   titles = "Eye and Hair Color of European Children")
+
+  res
+
+  expect_equal(length(res), 2)
+  expect_equal(nrow(res[[1]]), 3)
+
+
+})
+
+test_that("freq25: Single by group on double table works.", {
+
+  library(fmtr)
+
+
+  labels(dat) <- list(Eyes = "Eye Color",
+                      Hair = "Hair Color",
+                      Region = "Geographic Region")
+
+
+  res <- proc_freq(dat, tables = c("Eyes", "Hair"), by = c("Region"),
+                   weight = "Count",
+                   titles = "Eye and Hair Color of European Children")
+
+  res
+
+  expect_equal(length(res), 4)
+  expect_equal(nrow(res[[1]]), 3)
+  expect_equal(nrow(res[[2]]), 5)
+
+})
+
+
+test_that("freq25: Double by group on double table works.", {
+
+  library(fmtr)
+
+  spdat <- dat
+
+  spdat$Sex <- c(rep("M", 13), rep("F", 14))
+
+  labels(spdat) <- list(Eyes = "Eye Color",
+                      Hair = "Hair Color",
+                      Region = "Geographic Region")
+
+
+  res <- proc_freq(spdat, tables = c("Eyes", "Hair"), by = c("Sex", "Region"),
+                   weight = "Count",
+                   titles = "Eye and Hair Color of European Children")
+
+  res
+
+  expect_equal(length(res), 8)
+  expect_equal(nrow(res[[1]]), 3)
+
+
+})
 
 #
 # test_that("freq15: Crosstab table.", {

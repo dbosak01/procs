@@ -150,3 +150,14 @@ test_that("utils4: option_true() works as expected.", {
 
 })
 
+test_that("utils5: get_name() works as expected.", {
+
+
+  expect_equal(get_name(NULL, "myvar", NULL), "myvar")
+  expect_equal(get_name("myname", "myvar", NULL), "myname")
+  expect_equal(get_name("myname", "myvar", "Grp=1, "), "Grp=1, myname")
+  expect_equal(get_name(NULL, "myvar", "Grp=1, "), "Grp=1, myvar")
+
+
+})
+

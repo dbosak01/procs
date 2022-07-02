@@ -117,7 +117,10 @@
 #' }
 #' @param data The input data frame to perform frequency calculations on.
 #' Input data as the first parameter makes this function pipe-friendly.
-# @param by An optional by group.
+#' @param by An optional by group. Parameter accepts a vector of one or more
+#' quoted variable names. When this parameter is set, data
+#' will be subset for each by group, and tables will be generated for
+#' each subset.
 #' @param tables The variable or variables to perform frequency counts on.
 #' The table specifications are passed as a vector of quoted strings. If the
 #' strings are named, the name will be used as the list item name on the return
@@ -256,7 +259,7 @@
 #' @import tibble
 #' @export
 proc_freq <- function(data,
-                   #   by = NULL,
+                      by = NULL,
                       tables = NULL,
                       table_options = NULL,
                       weight = NULL,
@@ -272,7 +275,174 @@ proc_freq <- function(data,
   res <- list()
   # print("Orig print_location")
   # print(print_location)
+  # browser()
+
+  bylbls <- c()
+  if (!is.null(by)) {
+
+    lst <- unclass(data)[by]
+    for (nm in names(lst))
+      lst[[nm]] <- as.factor(lst[[nm]])
+    dtlst <- split(data, lst, sep = "|")
+
+    snms <- strsplit(names(dtlst), "|", fixed = TRUE)
+
+    for (k in seq_len(length(snms))) {
+      for (l in seq_len(length(by))) {
+        lv <- ""
+        if (!is.null(bylbls[k])) {
+          if (!is.na(bylbls[k])) {
+            lv <- bylbls[k]
+          }
+        }
+
+        bylbls[k] <- paste0(lv, by[l], "=", snms[[k]][l], ", ")
+      }
+    }
+
+  } else {
+
+    dtlst <- list(data)
+  }
+
+  # Loop through by groups
+  for (j in seq_len(length(dtlst))) {
+
+    # Get table for this by group
+    dt <- dtlst[[j]]
+
+    bygrp <- NULL
+    byval <- NULL
+
+    # Set group name and value
+    if (!is.null(by)) {
+      bygrp  <- by[j]
+      byval <- names(dtlst)[j]
+    }
+
+    # Loop through table requests
+    for (i in seq_len(length(tables))) {
+
+      nm <- names(tables)[i]
+      tb <- tables[i]
+      #browser()
+      out <- i == length(tables) & has_option(table_options, "out")
+
+      # Assign new label if there are by groups
+      if (length(bylbls[j]) > 0) {
+        if (!is.null(attr(data[[tb]], "label")))
+          attr(dt[[tb]], "label") <- paste0(bylbls[j], attr(data[[tb]], "label"))
+        else
+          attr(dt[[tb]], "label") <- paste0(bylbls[j], tb)
+      }
+
+      crstab <- NULL
+
+      # Split cross variables
+      splt <- trimws(strsplit(tb, "*", fixed = TRUE)[[1]])
+
+      # Perform either one-way or two-way frequency count
+      if (length(splt) == 1) {
+
+        result <- freq_oneway(dt, tb, weight, table_options, out)
+
+      } else if (length(splt) == 2) {
+
+        result <- freq_twoway(dt, splt[1], splt[2], weight, table_options, out)
+
+        crstab <- cross_tab(result, table_options, splt[1], splt[2])
+
+      } else {
+
+        stop("Procedure does not yet support n-way frequencies.")
+      }
+
+      # Cast to tibble if incoming data was a tibble
+      if ("tbl_df" %in% class(data)) {
+        if (!is.null(crstab))
+          crstab <- as_tibble(crstab)
+
+        if (!is.null(result))
+          result <- as_tibble(result)
+
+      }
+
+      # If a cross tab was produced, add it to result
+      if (!is.null(crstab)) {
+
+          res[[get_name(nm, tb, bylbls[j])]] <- crstab
+
+        if ("out" %in% names(table_options) & i == length(tables)) {
+
+          res[[table_options[["out"]]]] <- result
+        }
+
+      } else { # Otherwise add one-way to result
+
+          res[[get_name(nm, tb, bylbls[j])]] <- result
+
+      }
+    }
+
+  }
+
+  # Create output reports if requested
+  if (!is.null(report_type)) {
+
+    loc <- get_location("freq", report_location)
+    out <- output_report(res, proc_type = 'freq', dir_name = loc["dir_name"],
+                         file_name = loc["file_name"], out_type = report_type,
+                         style = report_style,
+                         titles = titles, margins = 1)
+
+
+  }
+
+  # Create viewer report if requested
+  if (view == TRUE) {
+
+
+    vrfl <- tempfile()
+
+    out <- output_report(res, proc_type = 'freq', dir_name = dirname(vrfl),
+                         file_name = basename(vrfl), out_type = "HTML",
+                         style = report_style,
+                         titles = titles, margins = .5, viewer = TRUE)
+
+    show_viewer(out)
+  }
+
+  if (piped == TRUE) {
+
+    res <- res[[length(res)]]
+  }
+
+  return(res)
+
+}
+
+proc_freq2 <- function(data,
+                      by = NULL,
+                      tables = NULL,
+                      table_options = NULL,
+                      weight = NULL,
+                      #   weight_options = NULL,
+                      view = TRUE,
+                      #   output = NULL,
+                      report_type = NULL,
+                      report_location = NULL,
+                      report_style = NULL,
+                      titles = NULL,
+                      piped = FALSE) {
+
+  res <- list()
+  # print("Orig print_location")
+  # print(print_location)
   #browser()
+
+
+
+
 
   # Loop through table requests
   for (i in seq_len(length(tables))) {
@@ -364,7 +534,6 @@ proc_freq <- function(data,
   return(res)
 
 }
-
 
 # Sub Procedures ----------------------------------------------------------
 

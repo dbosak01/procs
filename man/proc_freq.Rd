@@ -7,6 +7,7 @@
 \usage{
 proc_freq(
   data,
+  by = NULL,
   tables = NULL,
   table_options = NULL,
   weight = NULL,
@@ -21,6 +22,11 @@ proc_freq(
 \arguments{
 \item{data}{The input data frame to perform frequency calculations on.
 Input data as the first parameter makes this function pipe-friendly.}
+
+\item{by}{An optional by group. Parameter accepts a vector of one or more
+quoted variable names. When this parameter is set, data
+will be subset for each by group, and tables will be generated for
+each subset.}
 
 \item{tables}{The variable or variables to perform frequency counts on.
 The table specifications are passed as a vector of quoted strings. If the

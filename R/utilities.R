@@ -286,3 +286,27 @@ get_option <- function(options, name, default = NULL) {
 
 }
 
+get_name <- function(nm = NULL, var = NULL, bylbl = NULL) {
+
+  vnm <- ""
+
+  if (is.null(nm))
+    vnm <- var
+  else if (nchar(nm) == 0)
+    vnm <- var
+  else
+    vnm <- nm
+
+  if (length(bylbl) == 0) {
+
+    ret <- vnm
+  } else {
+
+    ret <- paste0(bylbl, vnm)
+
+  }
+
+
+  return(ret)
+}
+
