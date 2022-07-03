@@ -19,6 +19,40 @@ Lundsford "4860" "1"  92 40 86
 McBane    "0674" "1"  75 78 72
 ')
 
+dat2 <- read.table(header = TRUE, text ='
+  ID Location Date  Length1 Weight1 Length2 Weight2 Length3 Weight3 Length4 Weight4
+  1 "Cole Pond"   2JUN95 31 .25 32 .3  32 .25 33 .3
+  2 "Cole Pond"   3JUL95 33 .32 34 .41 37 .48 32 .28
+  3 "Cole Pond"   4AUG95 29 .23 30 .25 34 .47 32 .3
+  4 "Eagle Lake"  2JUN95 32 .35 32 .25 33 .30 NA NA
+  5 "Eagle Lake"  3JUL95 30 .20 36 .45 NA NA  NA NA
+  6 "Eagle Lake"  4AUG95 33 .30 33 .28 34 .42 NA NA
+  ')
+
+datm <- read.table(header = TRUE, text = '
+LastName  Age PresentScore TasteScore Flavor Layers
+Orlando     27 93 80  Vanilla    1
+Ramey       32 84 72  Rum        2
+Goldston    46 68 75  Vanilla    1
+Roe         38 79 73  Vanilla    2
+Larsen      23 77 84  Chocolate  3
+Davis       51 86 91  Spice      3
+Strickland  19 82 79  Chocolate  1
+Nguyen      57 77 84  Vanilla    3
+Hildenbrand 33 81 83  Chocolate  1
+Byron       62 72 87  Vanilla    2
+Sanders     26 56 79  Chocolate  1
+Jaeger      43 66 74  Rum        1
+Davis       28 69 75  Chocolate  2
+Conrad      69 85 94  Vanilla    1
+Walters     55 67 72  Chocolate  2
+Rossburger  28 78 81  Spice      2
+Matthew     42 81 92  Chocolate  2
+Becker      36 62 83  Spice      2
+Anderson    27 87 85  Chocolate  1
+Merritt     62 73 84  Chocolate  1
+')
+
 
 test_that("transpose1: basic var works without error.", {
 
@@ -27,8 +61,8 @@ test_that("transpose1: basic var works without error.", {
 
   res
 
-  expect_equal(nrow(res), 3)
-  expect_equal(ncol(res), 8)
+  expect_equal(nrow(res[[1]]), 3)
+  expect_equal(ncol(res[[1]]), 8)
 
 
 })
@@ -39,8 +73,8 @@ test_that("transpose2: no var works without error.", {
 
   res
 
-  expect_equal(nrow(res), 3)
-  expect_equal(ncol(res), 8)
+  expect_equal(nrow(res[[1]]), 3)
+  expect_equal(ncol(res[[1]]), 8)
 
 
 })
@@ -51,7 +85,7 @@ test_that("transpose3: name parameter works as expected.", {
 
   res
 
-  expect_equal(names(res[1]), "Test")
+  expect_equal(names(res[[1]][1]), "Test")
 
 })
 
@@ -63,8 +97,8 @@ test_that("transpose4: name_label works.", {
   res
 
 
-  expect_equal(names(res[1]), "NAME")
-  expect_equal(attr(res[[1]], "label"), "Test")
+  expect_equal(names(res[[1]][1]), "NAME")
+  expect_equal(attr(res[[1]][[1]], "label"), "Test")
 
 
 })
@@ -78,7 +112,7 @@ test_that("transpose5: id, prefix, and suffix works.", {
   res
 
 
-  expect_equal(names(res[2]), "sn0545x")
+  expect_equal(names(res[[1]][2]), "sn0545x")
 
 
 })
@@ -90,9 +124,9 @@ test_that("transpose6: id and idlabel.", {
   res
 
 
-  expect_equal(names(res[1]), "NAME")
+  expect_equal(names(res[[1]][1]), "NAME")
 
-  expect_equal(attr(res[[2]], "label"), "Capalleti")
+  expect_equal(attr(res[[1]][[2]], "label"), "Capalleti")
 
 
 })
@@ -110,34 +144,44 @@ test_that("transpose7: proc_means and proc_transpose.", {
   res
 
 
-  expect_equal(ncol(res), 4)
+  expect_equal(ncol(res[[1]]), 4)
 
-  expect_equal(nrow(res), 6)
+  expect_equal(nrow(res[[1]]), 6)
 
 
 })
 
-test_that("transpose8: transpose by.", {
+test_that("transpose8: transpose by with one variable.", {
 
-  dat2 <- read.table(header = TRUE, text ='
-  ID Location Date  Length1 Weight1 Length2 Weight2 Length3 Weight3 Length4 Weight4
-  1 "Cole Pond"   2JUN95 31 .25 32 .3  32 .25 33 .3
-  2 "Cole Pond"   3JUL95 33 .32 34 .41 37 .48 32 .28
-  3 "Cole Pond"   4AUG95 29 .23 30 .25 34 .47 32 .3
-  4 "Eagle Lake"  2JUN95 32 .35 32 .25 33 .30 NA NA
-  5 "Eagle Lake"  3JUL95 30 .20 36 .45 NA NA  NA NA
-  6 "Eagle Lake"  4AUG95 33 .30 33 .28 34 .42 NA NA
-  ')
-  dat2
 
   res <- proc_transpose(dat2, var =c("Length1", "Length2", "Length3", "Length4")
-                        #, by = c("Location", "Date")
+                        , by = c("Location"),
+                        name = "Measure"
                         )
 
   res
 
   # Not working yet
-  expect_equal(1, 1)
+  expect_equal(length(res), 2)
+  expect_equal(nrow(res[[1]]), 4)
+  expect_equal(ncol(res[[1]]), 4)
+
+})
+
+test_that("transpose8: transpose by with two variables.", {
+
+
+  res <- proc_transpose(datm, var =c("PresentScore", "TasteScore")
+                        , by = c("Layers", "Flavor"),
+                        id = "LastName")
+
+
+  res
+
+  # Not working yet
+  expect_equal(length(res), 12)
+  expect_equal(nrow(res[[1]]), 2)
+  expect_equal(ncol(res[[1]]), 6)
 
 })
 

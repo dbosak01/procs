@@ -7,10 +7,22 @@
 #' the new column names.  The function has several more parameters to control
 #' how variables are named in the transposed data set.
 #' @details
-#' Some details about the sample function.
-#' @param data The input data frame for which calculate summary statistics.
-# @param by An optional by group.
-#' @param var The variable or variables to transpose.
+#' The \code{proc_tranpose} function takes an input data frame or tibble
+#' and transposes the columns and rows.  Depending on the options requested,
+#' the function can return more than one result.  Therefore, the return
+#' object is a list of datasets.  If you want to return a single dataset,
+#' set the \code{piped} parameter to TRUE.
+#'
+#'
+#'
+#'
+#' @param data The input data frame for which will be transposed.
+#' @param by An optional by group.  Parameter accepts a vector of one or more
+#' quoted variable names. If the by group is requested, the data will be subset
+#' by that variable and the transpose function will return separate tables
+#' for each subset.
+#' @param var The variable or variables to transpose.  Parameter accepts a vector
+#' of quoted variable names.
 #' @param id The variable or variables to use for the transposed column names.
 #' @param idlabel The variable to use for the transposed column labels.
 #' @param copy A vector of variables to retain in the output data
@@ -24,8 +36,11 @@
 #' of column names.
 #' @param suffix Contains a suffix to be used in the construction of
 #' column names.
-#' @return A data frames that contains the transposed data. If a data frame
-#' is input, a data frame will be output.  If a tibble is input, a tibble
+#' @param piped Whether or not the function is part of a data pipeline.  If
+#' this parameter is TRUE, the function will return a single dataset instead
+#' of a list.  Default is FALSE.
+#' @return A list of data frames that contain the transposed data. If a data frame
+#' is input, data frames will be output.  If a tibble is input, tibbles
 #' will be output.
 # @import stats
 #' @examples
@@ -46,7 +61,7 @@
 #' @import fmtr
 #' @export
 proc_transpose <- function(data,
-                       #   by = NULL,
+                           by = NULL,
                            var = NULL,
                            id = NULL,
                            idlabel = NULL,
@@ -55,7 +70,8 @@ proc_transpose <- function(data,
                            namelabel = NULL,
                            prefix = NULL,
                            delimiter = ".",
-                           suffix = NULL
+                           suffix = NULL,
+                           piped = FALSE
                            ) {
 
   if (!"data.frame" %in% class(data)) {
@@ -64,6 +80,7 @@ proc_transpose <- function(data,
   }
 
    ret <- NULL
+   retlst <- list()
 
    #browser()
 
@@ -84,63 +101,116 @@ proc_transpose <- function(data,
 
    }
 
-   #browser()
-   # Select desired column names
-   tpd <- data[, nms]
+   bylbls <- c()
+   if (!is.null(by)) {
 
-   # Create ID column
-   ret1 <- data.frame(name = nms, stringsAsFactors = FALSE)
+     lst <- unclass(data)[by]
+     for (nm in names(lst))
+       lst[[nm]] <- as.factor(lst[[nm]])
+     dtlst <- split(data, lst, sep = "|")
 
-   if (!is.null(name))
-     names(ret1) <- name
+     snms <- strsplit(names(dtlst), "|", fixed = TRUE)
 
-   # Transpose data
-   ret2 <- as.data.frame(t(tpd), stringsAsFactors = FALSE)
+     for (k in seq_len(length(snms))) {
+       for (l in seq_len(length(by))) {
+         lv <- ""
+         if (!is.null(bylbls[k])) {
+           if (!is.na(bylbls[k])) {
+             lv <- bylbls[k]
+           }
+         }
 
-   # Combine ID column and transposed columns
-   ret <- cbind(ret1, ret2)
+         if (l == length(by))
+           cma <- ""
+         else
+           cma <- ", "
 
-   rownames(ret) <- NULL
-
-   # Convert to tibble
-   if ("tbl_df" %in% class(data)) {
-     ret <- as_tibble(ret)
-
-   }
-
-
-
-   nms_new <- c()
-
-   # Assign column names
-   if (!is.null(id)) {
-
-     nms_new <- paste0(prefix, data[[id]], suffix)
-
-     names(ret) <- c(name,  nms_new)
+         bylbls[k] <- paste0(lv, by[l], "=", snms[[k]][l], cma)
+       }
+     }
 
    } else {
 
-     nms_new <- paste0("COL", seq(1, nrow(data)))
-     names(ret) <- c(name,  nms_new)
-
+     dtlst <- list(data)
    }
 
-   # Assign name label
-   if (!is.null(namelabel)) {
+   for (j in seq_len(length(dtlst))) {
 
-     attr(ret[[name]], "label") <-  namelabel
+     # Get table for this by group
+     dt <- dtlst[[j]]
+
+     #browser()
+     # Select desired column names
+     tpd <- dt[, nms]
+
+     # Create ID column
+     ret1 <- data.frame(name = nms, stringsAsFactors = FALSE)
+
+     if (!is.null(name))
+       names(ret1) <- name
+
+     # Transpose data
+     ret2 <- as.data.frame(t(tpd), stringsAsFactors = FALSE)
+
+     # Combine ID column and transposed columns
+     ret <- cbind(ret1, ret2)
+
+     rownames(ret) <- NULL
+
+     # Convert to tibble
+     if ("tbl_df" %in% class(data)) {
+       ret <- as_tibble(ret)
+
+     }
+
+     nms_new <- c()
+
+     # Assign column names
+     if (!is.null(id)) {
+
+       nms_new <- paste0(prefix, dt[[id]], suffix)
+
+       names(ret) <- c(name,  nms_new)
+
+     } else {
+
+       if (nrow(dt) > 0) {
+         nms_new <- paste0("COL", seq(1, nrow(dt)))
+         names(ret) <- c(name,  nms_new)
+       } else {
+         names(ret) <- name
+       }
+
+     }
+
+     # Assign name label
+     if (!is.null(namelabel)) {
+
+       attr(ret[[name]], "label") <-  namelabel
+     }
+
+     # Assign ID labels
+     if (!is.null(idlabel)) {
+
+       lbls <- dt[[idlabel]]
+       names(lbls) <- nms_new
+       labels(ret) <- lbls
+
+     }
+
+     dnm <- length(retlst) + 1
+     if (!is.null(by)) {
+       dnm <- bylbls[j]
+
+     }
+
+     retlst[[dnm]] <- ret
    }
 
-   # Assign ID labels
-   if (!is.null(idlabel)) {
-
-     lbls <- data[[idlabel]]
-     names(lbls) <- nms_new
-     labels(ret) <- lbls
-
+   if (piped) {
+     retlst <- retlst[[length(retlst)]]
    }
 
- return(ret)
+ return(retlst)
 
 }

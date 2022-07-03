@@ -7,6 +7,7 @@
 \usage{
 proc_transpose(
   data,
+  by = NULL,
   var = NULL,
   id = NULL,
   idlabel = NULL,
@@ -15,13 +16,20 @@ proc_transpose(
   namelabel = NULL,
   prefix = NULL,
   delimiter = ".",
-  suffix = NULL
+  suffix = NULL,
+  piped = FALSE
 )
 }
 \arguments{
-\item{data}{The input data frame for which calculate summary statistics.}
+\item{data}{The input data frame for which will be transposed.}
 
-\item{var}{The variable or variables to transpose.}
+\item{by}{An optional by group.  Parameter accepts a vector of one or more
+quoted variable names. If the by group is requested, the data will be subset
+by that variable and the transpose function will return separate tables
+for each subset.}
+
+\item{var}{The variable or variables to transpose.  Parameter accepts a vector
+of quoted variable names.}
 
 \item{id}{The variable or variables to use for the transposed column names.}
 
@@ -43,10 +51,14 @@ of column names.}
 
 \item{suffix}{Contains a suffix to be used in the construction of
 column names.}
+
+\item{piped}{Whether or not the function is part of a data pipeline.  If
+this parameter is TRUE, the function will return a single dataset instead
+of a list.  Default is FALSE.}
 }
 \value{
-A data frames that contains the transposed data. If a data frame
-is input, a data frame will be output.  If a tibble is input, a tibble
+A list of data frames that contain the transposed data. If a data frame
+is input, data frames will be output.  If a tibble is input, tibbles
 will be output.
 }
 \description{
@@ -57,7 +69,11 @@ the new column names.  The function has several more parameters to control
 how variables are named in the transposed data set.
 }
 \details{
-Some details about the sample function.
+The \code{proc_tranpose} function takes an input data frame or tibble
+and transposes the columns and rows.  Depending on the options requested,
+the function can return more than one result.  Therefore, the return
+object is a list of datasets.  If you want to return a single dataset,
+set the \code{piped} parameter to TRUE.
 }
 \examples{
 # Create data

@@ -138,13 +138,21 @@ proc_means <- function(data,
     # Add spanning headers if there are by groups
     if (!is.null(by)) {
 
-      #browser()
-
       # Add spanning headers
       spn <- span_spec(label = bylbls[j], 1, ncol(smtbl), 1)
       attr(smtbl, "spans") <- list(spn)
 
       nm <-  bylbls[j]
+    }
+
+    # Add default formats
+    for (cnm in names(smtbl)) {
+
+      if (typeof(smtbl[[cnm]]) %in% c("double")) {
+
+        attr(smtbl[[cnm]], "format") <- "%.4f"
+      }
+
     }
 
     # Convert to tibble if incoming data is a tibble
