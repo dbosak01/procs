@@ -61,8 +61,8 @@ test_that("transpose1: basic var works without error.", {
 
   res
 
-  expect_equal(nrow(res[[1]]), 3)
-  expect_equal(ncol(res[[1]]), 8)
+  expect_equal(nrow(res), 3)
+  expect_equal(ncol(res), 8)
 
 
 })
@@ -73,8 +73,8 @@ test_that("transpose2: no var works without error.", {
 
   res
 
-  expect_equal(nrow(res[[1]]), 3)
-  expect_equal(ncol(res[[1]]), 8)
+  expect_equal(nrow(res), 3)
+  expect_equal(ncol(res), 8)
 
 
 })
@@ -85,7 +85,7 @@ test_that("transpose3: name parameter works as expected.", {
 
   res
 
-  expect_equal(names(res[[1]][1]), "Test")
+  expect_equal(names(res[1]), "Test")
 
 })
 
@@ -97,8 +97,8 @@ test_that("transpose4: name_label works.", {
   res
 
 
-  expect_equal(names(res[[1]][1]), "NAME")
-  expect_equal(attr(res[[1]][[1]], "label"), "Test")
+  expect_equal(names(res[1]), "NAME")
+  expect_equal(attr(res[[1]], "label"), "Test")
 
 
 })
@@ -112,7 +112,7 @@ test_that("transpose5: id, prefix, and suffix works.", {
   res
 
 
-  expect_equal(names(res[[1]][2]), "sn0545x")
+  expect_equal(names(res[2]), "sn0545x")
 
 
 })
@@ -124,9 +124,9 @@ test_that("transpose6: id and idlabel.", {
   res
 
 
-  expect_equal(names(res[[1]][1]), "NAME")
+  expect_equal(names(res[1]), "NAME")
 
-  expect_equal(attr(res[[1]][[2]], "label"), "Capalleti")
+  expect_equal(attr(res[[2]], "label"), "Capalleti")
 
 
 })
@@ -144,9 +144,9 @@ test_that("transpose7: proc_means and proc_transpose.", {
   res
 
 
-  expect_equal(ncol(res[[1]]), 4)
+  expect_equal(ncol(res), 4)
 
-  expect_equal(nrow(res[[1]]), 6)
+  expect_equal(nrow(res), 6)
 
 
 })
@@ -154,35 +154,50 @@ test_that("transpose7: proc_means and proc_transpose.", {
 test_that("transpose8: transpose by with one variable.", {
 
 
+
   res <- proc_transpose(dat2, var =c("Length1", "Length2", "Length3", "Length4")
-                        , by = c("Location"),
-                        name = "Measure"
-                        )
+                        , by = "Location",
+                        name = "Measure", id = "Date")
 
   res
 
-  # Not working yet
-  expect_equal(length(res), 2)
-  expect_equal(nrow(res[[1]]), 4)
-  expect_equal(ncol(res[[1]]), 4)
+
+  expect_equal(ncol(res), 5)
+  expect_equal(nrow(res), 8)
 
 })
 
-test_that("transpose8: transpose by with two variables.", {
+test_that("transpose9: transpose by with two variables.", {
 
 
-  res <- proc_transpose(datm, var =c("PresentScore", "TasteScore")
-                        , by = c("Layers", "Flavor"),
-                        id = "LastName")
+  res <- proc_transpose(dat2, var =c("Length1", "Length2", "Length3", "Length4")
+                        , by = c("Location", "Date"),
+                        name = "Measure")
 
 
   res
 
-  # Not working yet
-  expect_equal(length(res), 12)
-  expect_equal(nrow(res[[1]]), 2)
-  expect_equal(ncol(res[[1]]), 6)
+  expect_equal(nrow(res), 24)
+  expect_equal(ncol(res), 4)
 
 })
+
+#
+# test_that("transpose9: transpose by with two variables.", {
+#
+#
+#   res <- proc_transpose(datm, var =c("PresentScore", "TasteScore")
+#                         , by = c("Layers", "Flavor"),
+#                         id = "LastName")
+#
+#
+#   res
+#
+#   expect_equal(length(res), 12)
+#   expect_equal(nrow(res[[1]]), 2)
+#   expect_equal(ncol(res[[1]]), 6)
+#
+# })
+
 
 

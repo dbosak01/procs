@@ -93,6 +93,8 @@ test_that("freq3: Two table proc_freq test with report_type html works.", {
 
   res
 
+  res$Eyes
+
   ex <- file.exists(fl)
 
   expect_equal(nrow(res[[1]]), 3)
@@ -275,6 +277,7 @@ test_that("freq10: Two way proc_freq works.", {
                       Region = "Geographic Region")
 
   res <- proc_freq(dat, tables = c(FreqCount = "Eyes * Hair"),
+                   table_options = list(out = "MyFreq"),
                    weight = "Count",
                    titles = "Eye and Hair Color of European Children",
                    report_type = "HTML",

@@ -16,8 +16,7 @@ proc_transpose(
   namelabel = NULL,
   prefix = NULL,
   delimiter = ".",
-  suffix = NULL,
-  piped = FALSE
+  suffix = NULL
 )
 }
 \arguments{
@@ -25,8 +24,8 @@ proc_transpose(
 
 \item{by}{An optional by group.  Parameter accepts a vector of one or more
 quoted variable names. If the by group is requested, the data will be subset
-by that variable and the transpose function will return separate tables
-for each subset.}
+by that variable and the transpose function will
+transpose each group and stack them together in a single table.}
 
 \item{var}{The variable or variables to transpose.  Parameter accepts a vector
 of quoted variable names.}
@@ -51,14 +50,10 @@ of column names.}
 
 \item{suffix}{Contains a suffix to be used in the construction of
 column names.}
-
-\item{piped}{Whether or not the function is part of a data pipeline.  If
-this parameter is TRUE, the function will return a single dataset instead
-of a list.  Default is FALSE.}
 }
 \value{
-A list of data frames that contain the transposed data. If a data frame
-is input, data frames will be output.  If a tibble is input, tibbles
+A data frame that contains the transposed data. If a data frame
+is input, a data frame will be output.  If a tibble is input, a tibble
 will be output.
 }
 \description{
@@ -70,10 +65,7 @@ how variables are named in the transposed data set.
 }
 \details{
 The \code{proc_tranpose} function takes an input data frame or tibble
-and transposes the columns and rows.  Depending on the options requested,
-the function can return more than one result.  Therefore, the return
-object is a list of datasets.  If you want to return a single dataset,
-set the \code{piped} parameter to TRUE.
+and transposes the columns and rows.
 }
 \examples{
 # Create data

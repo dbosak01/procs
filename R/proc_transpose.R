@@ -8,19 +8,13 @@
 #' how variables are named in the transposed data set.
 #' @details
 #' The \code{proc_tranpose} function takes an input data frame or tibble
-#' and transposes the columns and rows.  Depending on the options requested,
-#' the function can return more than one result.  Therefore, the return
-#' object is a list of datasets.  If you want to return a single dataset,
-#' set the \code{piped} parameter to TRUE.
-#'
-#'
-#'
+#' and transposes the columns and rows.
 #'
 #' @param data The input data frame for which will be transposed.
 #' @param by An optional by group.  Parameter accepts a vector of one or more
 #' quoted variable names. If the by group is requested, the data will be subset
-#' by that variable and the transpose function will return separate tables
-#' for each subset.
+#' by that variable and the transpose function will
+#' transpose each group and stack them together in a single table.
 #' @param var The variable or variables to transpose.  Parameter accepts a vector
 #' of quoted variable names.
 #' @param id The variable or variables to use for the transposed column names.
@@ -36,11 +30,8 @@
 #' of column names.
 #' @param suffix Contains a suffix to be used in the construction of
 #' column names.
-#' @param piped Whether or not the function is part of a data pipeline.  If
-#' this parameter is TRUE, the function will return a single dataset instead
-#' of a list.  Default is FALSE.
-#' @return A list of data frames that contain the transposed data. If a data frame
-#' is input, data frames will be output.  If a tibble is input, tibbles
+#' @return A data frame that contains the transposed data. If a data frame
+#' is input, a data frame will be output.  If a tibble is input, a tibble
 #' will be output.
 # @import stats
 #' @examples
@@ -70,8 +61,7 @@ proc_transpose <- function(data,
                            namelabel = NULL,
                            prefix = NULL,
                            delimiter = ".",
-                           suffix = NULL,
-                           piped = FALSE
+                           suffix = NULL
                            ) {
 
   if (!"data.frame" %in% class(data)) {
@@ -101,7 +91,7 @@ proc_transpose <- function(data,
 
    }
 
-   bylbls <- c()
+   bylbls <- list()
    if (!is.null(by)) {
 
      lst <- unclass(data)[by]
@@ -109,24 +99,11 @@ proc_transpose <- function(data,
        lst[[nm]] <- as.factor(lst[[nm]])
      dtlst <- split(data, lst, sep = "|")
 
-     snms <- strsplit(names(dtlst), "|", fixed = TRUE)
+     bylbls <- strsplit(names(dtlst), "|", fixed = TRUE)
 
-     for (k in seq_len(length(snms))) {
-       for (l in seq_len(length(by))) {
-         lv <- ""
-         if (!is.null(bylbls[k])) {
-           if (!is.na(bylbls[k])) {
-             lv <- bylbls[k]
-           }
-         }
+     for (k in seq_len(length(bylbls))) {
 
-         if (l == length(by))
-           cma <- ""
-         else
-           cma <- ", "
-
-         bylbls[k] <- paste0(lv, by[l], "=", snms[[k]][l], cma)
-       }
+         names(bylbls[[k]]) <- by
      }
 
    } else {
@@ -152,8 +129,26 @@ proc_transpose <- function(data,
      # Transpose data
      ret2 <- as.data.frame(t(tpd), stringsAsFactors = FALSE)
 
+     #browser()
+
+     bygrps <- NULL
+     if (!is.null(by)) {
+
+       bygrps <- list()
+       for (grp in seq_len(length(by))) {
+
+        bygrps[[by[[grp]]]] <- bylbls[[j]][[grp]]
+       }
+
+       bygrps <- as.data.frame(bygrps, stringsAsFactors = FALSE)
+
+     }
+
      # Combine ID column and transposed columns
-     ret <- cbind(ret1, ret2)
+     if (!is.null(by))
+       ret <- cbind(bygrps, ret1, ret2)
+     else
+       ret <- cbind(ret1, ret2)
 
      rownames(ret) <- NULL
 
@@ -170,13 +165,13 @@ proc_transpose <- function(data,
 
        nms_new <- paste0(prefix, dt[[id]], suffix)
 
-       names(ret) <- c(name,  nms_new)
+       names(ret) <- c(by, name,  nms_new)
 
      } else {
 
        if (nrow(dt) > 0) {
          nms_new <- paste0("COL", seq(1, nrow(dt)))
-         names(ret) <- c(name,  nms_new)
+         names(ret) <- c(by, name,  nms_new)
        } else {
          names(ret) <- name
        }
@@ -198,19 +193,20 @@ proc_transpose <- function(data,
 
      }
 
-     dnm <- length(retlst) + 1
-     if (!is.null(by)) {
-       dnm <- bylbls[j]
-
-     }
-
-     retlst[[dnm]] <- ret
+     retlst[[length(retlst) + 1]] <- ret
    }
 
-   if (piped) {
-     retlst <- retlst[[length(retlst)]]
+
+   # Always at least one result
+   res <- retlst[[1]]
+
+   # Append by groups if necessary
+   if (!is.null(by)) {
+    for (p in seq(2, length(retlst))) {
+      res <- rbind(res, retlst[[p]])
+    }
    }
 
- return(retlst)
+ return(res)
 
 }
