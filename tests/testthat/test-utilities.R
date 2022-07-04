@@ -161,3 +161,36 @@ test_that("utils5: get_name() works as expected.", {
 
 })
 
+
+test_that("utils6: v() function works", {
+
+  res <- v(a, b, c)
+
+
+  expect_equal(res, c("a", "b", "c"))
+
+})
+
+test_that("utils6: v() function works with interaction", {
+
+  res <- v(a, b, c * d)
+
+  res
+
+  expect_equal(res, c("a", "b", "c * d"))
+
+})
+
+test_that("utils7: round_up() function works as expected.", {
+
+  x <- seq(0.5,9.5,by=1)
+
+  res <- round_up(x, 0)
+
+  res
+
+
+  expect_equal(res, c(1, 2, 3, 4, 5, 6, 7, 8, 9, 10))
+
+})
+

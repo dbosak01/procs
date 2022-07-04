@@ -2,16 +2,32 @@
 % Please edit documentation in R/utilities.R
 \name{round_up}
 \alias{round_up}
-\title{Simulates SAS® Rounding}
+\title{Rounds numbers up}
 \usage{
-round_up(x)
+round_up(x, digits = 0)
 }
 \arguments{
 \item{x}{A vector of values to round.}
+
+\item{digits}{A number of decimal places to round to. Default is zero.}
 }
 \value{
 The rounded data vector.
 }
 \description{
-A function to simulate the way SAS® performs rounding.
+A function to round numbers up where the last digit is
+5 or above.  The function contains a parameter to control the number
+decimals to round to.
+}
+\examples{
+# Round to even
+round(2.4)  # 2
+round(2.5)  # 2
+round(2.6)  # 3
+
+# Round up
+round_up(2.4) # 2
+round_up(2.5) # 3
+round_up(2.6) # 3
+
 }

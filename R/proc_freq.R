@@ -272,6 +272,38 @@ proc_freq <- function(data,
                       titles = NULL,
                       piped = FALSE) {
 
+
+  # Deal with single value unquoted parameter values
+  oby <- deparse(substitute(by, env = environment()))
+  by <- tryCatch({if (typeof(by) %in% c("character", "NULL")) by else oby},
+                 error = function(cond) {oby})
+
+  otables <- deparse(substitute(tables, env = environment()))
+  tables <- tryCatch({if (typeof(tables) %in% c("character", "NULL")) tables else otables},
+                  error = function(cond) {otables})
+
+
+  # Parameter checks
+  nms <- names(data)
+  if (!is.null(by)) {
+    if (!all(by %in% nms)) {
+
+      stop(paste("Invalid by name: ", by[!by %in% nms], "\n"))
+    }
+  }
+
+  if (is.null(tables)) {
+    stop("tables parameter is required.")
+  } else {
+    # split(c("Eyes", "Eyes * Hair"), "*")
+    #
+    # if (!all(tables %in% nms)) {
+    #
+    #   stop(paste("Invalid tables name: ", tables[!tables %in% nms], "\n"))
+    # }
+  }
+
+
   res <- list()
   # print("Orig print_location")
   # print(print_location)

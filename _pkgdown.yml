@@ -19,8 +19,8 @@ reference:
 - title: Other Functions
   desc: Other useful functions in the procs package.
   contents:
-  - compare_ds
   - round_up
+  - v
 
 navbar:
   type: inverse

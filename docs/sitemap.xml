@@ -4,9 +4,6 @@
     <loc>https://procs.r-sassy.org/index.html</loc>
   </url>
   <url>
-    <loc>https://procs.r-sassy.org/reference/compare_ds.html</loc>
-  </url>
-  <url>
     <loc>https://procs.r-sassy.org/reference/proc_freq.html</loc>
   </url>
   <url>
@@ -17,6 +14,9 @@
   </url>
   <url>
     <loc>https://procs.r-sassy.org/reference/round_up.html</loc>
+  </url>
+  <url>
+    <loc>https://procs.r-sassy.org/reference/v.html</loc>
   </url>
   <url>
     <loc>https://procs.r-sassy.org/articles/procs-example1.html</loc>

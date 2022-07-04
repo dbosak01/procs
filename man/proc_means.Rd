@@ -21,13 +21,19 @@ proc_means(
 \arguments{
 \item{data}{The input data frame for which calculate summary statistics.}
 
-\item{by}{An optional by group.}
+\item{by}{An optional by group. You may
+pass unquoted variable names to this parameter using the \code{\link{v}}
+function.}
 
-\item{var}{The variable(s) to calculate summary statistics for.}
+\item{var}{The variable(s) to calculate summary statistics for. You may
+pass unquoted variable names to this parameter using the \code{\link{v}}
+function.}
 
 \item{stats}{A quoted vector of summary statistics keywords.  Valid
-keywords are: "css", "cv", "n", "means", "median", "std", "min", "max",
-"nmiss", "nobs", "range", "sum", "var".}
+keywords are: "css", "cv", "n", "mean", "median", "std", "min", "max",
+"nmiss", "nobs", "range", "sum", "var". You may
+pass unquoted variable names to this parameter using the \code{\link{v}}
+function.}
 
 \item{view}{Whether to display the report in the interactive viewer.  Valid
 values are TRUE and FALSE.  Default is TRUE.}

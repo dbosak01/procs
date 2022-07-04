@@ -827,3 +827,12 @@ test_that("freq30: Crosstab with by and out works.", {
 })
 
 
+test_that("freq31: Parameter checks work.", {
+
+
+  expect_error(proc_freq(dat, tables = c("Fork", "Eyes", "Bork")))
+  expect_error(proc_freq(dat, by = "Fork", tables = "Eye"))
+
+
+})
+

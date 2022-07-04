@@ -166,6 +166,7 @@ of tibbles.</p>
 
     <pre class="usage"><span><span class='fu'>proc_means</span><span class='op'>(</span></span>
 <span>  <span class='va'>data</span>,</span>
+<span>  by <span class='op'>=</span> <span class='cn'>NULL</span>,</span>
 <span>  var <span class='op'>=</span> <span class='cn'>NULL</span>,</span>
 <span>  stats <span class='op'>=</span> <span class='cn'>NULL</span>,</span>
 <span>  view <span class='op'>=</span> <span class='cn'>TRUE</span>,</span>
@@ -184,14 +185,24 @@ of tibbles.</p>
       <td><p>The input data frame for which calculate summary statistics.</p></td>
     </tr>
     <tr>
+      <th>by</th>
+      <td><p>An optional by group. You may
+pass unquoted variable names to this parameter using the <code><a href='v.html'>v</a></code>
+function.</p></td>
+    </tr>
+    <tr>
       <th>var</th>
-      <td><p>The variable(s) to calculate summary statistics for.</p></td>
+      <td><p>The variable(s) to calculate summary statistics for. You may
+pass unquoted variable names to this parameter using the <code><a href='v.html'>v</a></code>
+function.</p></td>
     </tr>
     <tr>
       <th>stats</th>
       <td><p>A quoted vector of summary statistics keywords.  Valid
-keywords are: "css", "cv", "n", "means", "median", "std", "min", "max",
-"nmiss", "nobs", "range", "sum", "var".</p></td>
+keywords are: "css", "cv", "n", "mean", "median", "std", "min", "max",
+"nmiss", "nobs", "range", "sum", "var". You may
+pass unquoted variable names to this parameter using the <code><a href='v.html'>v</a></code>
+function.</p></td>
     </tr>
     <tr>
       <th>view</th>

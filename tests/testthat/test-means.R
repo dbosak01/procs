@@ -145,3 +145,68 @@ test_that("means5: proc_means with two variables and two by groups.", {
   expect_equal(ncol(res[[1]]), 8)
 
 })
+
+
+test_that("means6: get_summaries works as expected for two variables with v().", {
+
+
+  res <- get_summaries(datm, var = v(PresentScore, TasteScore),
+                       stats = v(n, mean, min, max, range, median))
+
+  res
+
+
+  expect_equal(res[2, "N"], 20)
+  expect_equal(res[2, "Mean"], 81.35)
+  expect_equal(res[2, "Minimum"], 72)
+  expect_equal(res[2, "Maximum"], 94)
+  expect_equal(res[2, "Range"], 22)
+  expect_equal(res[2, "Median"], 82)
+
+})
+
+
+test_that("means7: proc_means with single parameter values.", {
+
+  res <- proc_means(datm, var = "PresentScore",
+                    stats = "mean",
+                    titles = "My first title for Means")
+
+  res
+
+  expect_equal(length(res), 1)
+  expect_equal(nrow(res[[1]]), 1)
+  expect_equal(ncol(res[[1]]), 2)
+
+})
+
+
+test_that("means8: proc_means with unquoted parameter values.", {
+
+  res <- proc_means(datm, var = PresentScore,
+                    stats = mean,
+                    titles = "My first title for Means")
+
+  res
+
+  expect_equal(length(res), 1)
+  expect_equal(nrow(res[[1]]), 1)
+  expect_equal(ncol(res[[1]]), 2)
+
+})
+
+
+test_that("means9: parameter checks work.", {
+
+  expect_error(proc_means(datm, var = "Fork",
+                    stats = "mean"))
+
+  expect_error(proc_means(datm, var = "PresentScore",
+                          stats = "Fork"))
+
+  expect_error(proc_means(datm, by = "Fork",
+                          var = "PresentScore",
+                          stats = "mean"))
+
+})
+

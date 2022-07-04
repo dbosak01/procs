@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Rounds numbers up — round_up • procs</title>
+<title>Combine unquoted values — v • procs</title>
 
 <!-- favicons -->
 <link rel="icon" type="image/png" sizes="16x16" href="../favicon-16x16.png">
@@ -46,10 +46,9 @@
 
 
 
-<meta property="og:title" content="Rounds numbers up — round_up" />
-<meta property="og:description" content="A function to round numbers up where the last digit is
-5 or above.  The function contains a parameter to control the number
-decimals to round to." />
+<meta property="og:title" content="Combine unquoted values — v" />
+<meta property="og:description" content="A function to combine unquoted values into a vector.  The
+function will return a vector of quoted values." />
 <meta property="og:image" content="https://procs.r-sassy.org/logo.png" />
 
 
@@ -149,47 +148,35 @@ decimals to round to." />
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Rounds numbers up</h1>
+    <h1>Combine unquoted values</h1>
     <small class="dont-index">Source: <a href='https://github.com/dbosak01/procs/blob/master/R/utilities.R'><code>R/utilities.R</code></a></small>
-    <div class="hidden name"><code>round_up.Rd</code></div>
+    <div class="hidden name"><code>v.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>A function to round numbers up where the last digit is
-5 or above.  The function contains a parameter to control the number
-decimals to round to.</p>
+    <p>A function to combine unquoted values into a vector.  The
+function will return a vector of quoted values.</p>
     </div>
 
-    <pre class="usage"><span><span class='fu'>round_up</span><span class='op'>(</span><span class='va'>x</span>, digits <span class='op'>=</span> <span class='fl'>0</span><span class='op'>)</span></span></pre>
+    <pre class="usage"><span><span class='fu'>v</span><span class='op'>(</span><span class='va'>...</span><span class='op'>)</span></span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
-      <th>x</th>
-      <td><p>A vector of values to round.</p></td>
-    </tr>
-    <tr>
-      <th>digits</th>
-      <td><p>A number of decimal places to round to. Default is zero.</p></td>
+      <th>...</th>
+      <td><p>One or more unquoted values.</p></td>
     </tr>
     </table>
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>The rounded data vector.</p>
+    <p>A vector of quoted values.</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><span><span class='co'># Round to even</span></span>
-<span><span class='fu'><a href='https://rdrr.io/r/base/Round.html'>round</a></span><span class='op'>(</span><span class='fl'>2.4</span><span class='op'>)</span>  <span class='co'># 2</span></span>
-<span><span class='fu'><a href='https://rdrr.io/r/base/Round.html'>round</a></span><span class='op'>(</span><span class='fl'>2.5</span><span class='op'>)</span>  <span class='co'># 2</span></span>
-<span><span class='fu'><a href='https://rdrr.io/r/base/Round.html'>round</a></span><span class='op'>(</span><span class='fl'>2.6</span><span class='op'>)</span>  <span class='co'># 3</span></span>
-<span></span>
-<span><span class='co'># Round up</span></span>
-<span><span class='fu'>round_up</span><span class='op'>(</span><span class='fl'>2.4</span><span class='op'>)</span> <span class='co'># 2</span></span>
-<span><span class='fu'>round_up</span><span class='op'>(</span><span class='fl'>2.5</span><span class='op'>)</span> <span class='co'># 3</span></span>
-<span><span class='fu'>round_up</span><span class='op'>(</span><span class='fl'>2.6</span><span class='op'>)</span> <span class='co'># 3</span></span>
-<span></span></pre>
+    <pre class="examples"><span><span class='co'># Combine unquoted values</span></span>
+<span><span class='fu'>v</span><span class='op'>(</span><span class='va'>var1</span>, <span class='va'>var2</span>, <span class='va'>var3</span><span class='op'>)</span></span>
+<span><span class='co'># [1] "var1" "var2" "var3"</span></span></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">

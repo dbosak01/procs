@@ -157,15 +157,35 @@ test_that("transpose8: transpose by with one variable.", {
 
   res <- proc_transpose(dat2, var =c("Length1", "Length2", "Length3", "Length4")
                         , by = "Location",
-                        name = "Measure", id = "Date")
+                        name = "Measure", id = "Date" )
 
   res
 
 
   expect_equal(ncol(res), 5)
   expect_equal(nrow(res), 8)
+  expect_equal(names(res)[3], "2JUN95")
 
 })
+
+test_that("transpose8: transpose by with one variable and id labels.", {
+
+
+
+  res <- proc_transpose(dat2, var =c("Length1", "Length2", "Length3", "Length4")
+                        , by = "Location",
+                        name = "Measure", idlabel = "Date" )
+
+  res
+
+
+  expect_equal(ncol(res), 5)
+  expect_equal(nrow(res), 8)
+  expect_equal(names(res)[3], "COL1")
+  expect_equal(attr(res[[3]], "label"), "2JUN95")
+
+})
+
 
 test_that("transpose9: transpose by with two variables.", {
 
@@ -182,22 +202,20 @@ test_that("transpose9: transpose by with two variables.", {
 
 })
 
-#
-# test_that("transpose9: transpose by with two variables.", {
-#
-#
-#   res <- proc_transpose(datm, var =c("PresentScore", "TasteScore")
-#                         , by = c("Layers", "Flavor"),
-#                         id = "LastName")
-#
-#
-#   res
-#
-#   expect_equal(length(res), 12)
-#   expect_equal(nrow(res[[1]]), 2)
-#   expect_equal(ncol(res[[1]]), 6)
-#
-# })
+test_that("transpose9: transpose by with two variables and v() function.", {
+
+
+  res <- proc_transpose(dat2, var =v(Length1, Length2, Length3, Length4)
+                        , by = v(Location, Date),
+                        name = "Measure")
+
+
+  res
+
+  expect_equal(nrow(res), 24)
+  expect_equal(ncol(res), 4)
+
+})
 
 
 
