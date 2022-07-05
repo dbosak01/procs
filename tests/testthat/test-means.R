@@ -210,3 +210,63 @@ test_that("means9: parameter checks work.", {
 
 })
 
+
+
+test_that("means10: proc_means with variable parameter values.", {
+
+  var1 <- "PresentScore"
+  var2 <- c("n", "mean", "min", "max")
+
+  res <- proc_means(datm, var = var1,
+                    stats = var2,
+                    titles = "My first title for Means")
+
+  res
+
+  expect_equal(length(res), 1)
+  expect_equal(nrow(res[[1]]), 1)
+  expect_equal(ncol(res[[1]]), 5)
+
+})
+
+
+test_that("means10: proc_means with variable parameter values and v().", {
+
+  var1 <- "PresentScore"
+  var2 <- v(n, mean, min, max, median)
+
+  res <- proc_means(datm, var = var1,
+                    stats = var2,
+                    titles = "My first title for Means")
+
+  res
+
+  expect_equal(length(res), 1)
+  expect_equal(nrow(res[[1]]), 1)
+  expect_equal(ncol(res[[1]]), 6)
+
+})
+
+
+test_that("means11: proc_means in function works.", {
+
+  var1 <- c("PresentScore", "TasteScore")
+  var2 <- v(n, mean, min, max, median)
+
+  myfunc <- function(myvar1, myvar2) {
+
+    myres <- proc_means(datm, var = var1,
+                      stats = var2,
+                      titles = "My first title for Means")
+
+    return(myres)
+  }
+
+  res <- myfunc(var1, var2)
+
+  expect_equal(length(res), 1)
+  expect_equal(nrow(res[[1]]), 2)
+  expect_equal(ncol(res[[1]]), 6)
+
+})
+
