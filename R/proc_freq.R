@@ -295,12 +295,18 @@ proc_freq <- function(data,
   if (is.null(tables)) {
     stop("tables parameter is required.")
   } else {
-    # split(c("Eyes", "Eyes * Hair"), "*")
-    #
-    # if (!all(tables %in% nms)) {
-    #
-    #   stop(paste("Invalid tables name: ", tables[!tables %in% nms], "\n"))
-    # }
+
+    locs <- grepl("*", tables, fixed = TRUE)
+    slocs <- unlist(strsplit(tables[locs], "*", fixed = TRUE))
+
+    vars <- c(tables[!locs], trimws(slocs))
+
+    vars <- unique(vars)
+
+    if (!all(vars %in% nms)) {
+
+      stop(paste("Invalid tables name: ", vars[!vars %in% nms], "\n"))
+    }
   }
 
 

@@ -30,8 +30,9 @@ pass unquoted variable names to this parameter using the \code{\link{v}}
 function.}
 
 \item{stats}{A quoted vector of summary statistics keywords.  Valid
-keywords are: "css", "cv", "n", "mean", "median", "std", "min", "max",
-"nmiss", "nobs", "range", "sum", "var". You may
+keywords are: "css", "clm", "cv", "n", "lclm", "mean", "median", "mode",
+"min", "max",
+"nmiss", "nobs", "range", "std", "stderr", "sum", "uclm", "var". You may
 pass unquoted variable names to this parameter using the \code{\link{v}}
 function.}
 

@@ -41,8 +41,9 @@
 #' pass unquoted variable names to this parameter using the \code{\link{v}}
 #' function.
 #' @param stats A quoted vector of summary statistics keywords.  Valid
-#' keywords are: "css", "cv", "n", "mean", "median", "std", "min", "max",
-#' "nmiss", "nobs", "range", "sum", "var". You may
+#' keywords are: "css", "clm", "cv", "n", "lclm", "mean", "median", "mode",
+#' "min", "max",
+#' "nmiss", "nobs", "range", "std", "stderr", "sum", "uclm", "var". You may
 #' pass unquoted variable names to this parameter using the \code{\link{v}}
 #' function.
 # @param weight An optional weight parameter.
@@ -125,7 +126,8 @@ proc_means <- function(data,
     stop("stats parameter is required.")
   } else {
     st <- c( "css", "cv", "n", "mean", "median", "std", "min", "max",
-             "nmiss", "nobs", "range", "sum", "var")
+             "nmiss", "nobs", "range", "sum", "stderr", "var", "clm", "uclm",
+             "lclm","mode")
     if (!all(stats %in% st)) {
 
       stop(paste("Invalid stat name: ", stats[!stats %in% st], "\n"))
@@ -297,6 +299,14 @@ get_summaries <- function(data, var, stats) {
             rw[["Mean"]] <- mean(var, na.rm = TRUE)
         }
 
+        if (st == "mode") {
+
+          if (all(is.na(var)))
+            rw[["Mode"]] <- NA
+          else
+            rw[["Mode"]] <- getmode(var)
+        }
+
         if (st == "max") {
           if (all(is.na(var)))
             rw[["Maximum"]] <- NA
@@ -363,6 +373,44 @@ get_summaries <- function(data, var, stats) {
 
           rw[["Variance"]] <- var(var, na.rm = TRUE)
         }
+
+        if (st == "stderr") {
+
+          rw[["Std_Err"]] <- stderror(var)
+        }
+
+
+
+        if (st == "lclm") {
+
+          tmp <- clm(var)
+
+          rw[["LCLM"]] <- tmp[["lcl"]]
+
+
+        }
+
+        if (st == "uclm") {
+
+          tmp <- clm(var)
+
+          rw[["UCLM"]] <- tmp[["ucl"]]
+
+
+        }
+
+
+        if (st == "clm") {
+
+          tmp <- clm(var)
+
+          rw[["LCLM"]] <- tmp[["lcl"]]
+
+          rw[["UCLM"]] <- tmp[["ucl"]]
+
+
+        }
+
       }
 
     }

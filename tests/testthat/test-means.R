@@ -270,3 +270,27 @@ test_that("means11: proc_means in function works.", {
 
 })
 
+
+
+test_that("means3: check more stats options and piped parameter.", {
+
+  res <- proc_means(datm, var = c("PresentScore", "TasteScore"),
+                    stats = c("nmiss", "median", "mode", "clm", "stderr"),
+                    titles = "My first title for Means",
+                    piped = TRUE)
+
+  res
+
+  mode(datm$TasteScore)
+
+  expect_equal("data.frame" %in% class(res), TRUE)
+  expect_equal(ncol(res), 7)
+
+  expect_equal(res[2, "NMiss"], 0)
+  expect_equal(res[2, "Median"], 82)
+  expect_equal(res[2, "Mode"], 84)
+  expect_equal(res[2, "UCLM"], 84.44432)
+  expect_equal(res[2, "LCLM"], 78.25568)
+  expect_equal(res[2, "Std_Err"], 1.47839707)
+
+})
