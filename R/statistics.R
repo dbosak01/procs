@@ -5,7 +5,7 @@
 
 #' Include missing values
 #' @noRd
-stderror <- function(x, narm = TRUE) {
+get_stderr <- function(x, narm = TRUE) {
 
   ret <- sd(x, na.rm = narm) / sqrt(sum(!is.na(x)))
 
@@ -15,7 +15,7 @@ stderror <- function(x, narm = TRUE) {
 
 
 #' @noRd
-clm <- function(x, narm = TRUE) {
+get_clm <- function(x, narm = TRUE) {
 
   #Sample size
   n <- sum(!is.na(x), na.rm = narm)
@@ -37,7 +37,7 @@ clm <- function(x, narm = TRUE) {
 }
 
 #' @noRd
-getmode <- function(x) {
+get_mode <- function(x) {
 
   uniqv <- unique(x)
   res <- uniqv[which.max(tabulate(match(x, uniqv)))]
@@ -46,7 +46,7 @@ getmode <- function(x) {
 }
 
 
-getfisher <- function(x, y, wgt = NULL) {
+get_fisher <- function(x, y, wgt = NULL) {
 
 
   if (!is.null(wgt)) {
@@ -74,13 +74,19 @@ getfisher <- function(x, y, wgt = NULL) {
            gres[["p.value"]],
            tres[["p.value"]])
 
+  names(val) <- NULL
+
   ret <- data.frame(Measure = mes, Value = val)
 
+  attr(ret$Value, "format") <- "%.4f"
+
+
+  return(ret)
 
 }
 
 
-getchisq <- function(x, y, wgt = NULL, corrct = FALSE) {
+get_chisq <- function(x, y, wgt = NULL, corrct = FALSE) {
 
 
   if (!is.null(wgt)) {
@@ -103,7 +109,11 @@ getchisq <- function(x, y, wgt = NULL, corrct = FALSE) {
   mes <- c("Chi-Square", "DF", "PR>ChiSq")
   val <- c(res[["statistic"]], res[["parameter"]], res[["p.value"]])
 
+  names(val) <- NULL
+
   ret <- data.frame(Measure = mes, Value = val)
+
+  attr(ret$Value, "format") <- "%.4f"
 
 
   return(ret)

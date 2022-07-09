@@ -851,28 +851,47 @@ test_that("freq31: Parameter checks work.", {
 })
 
 
-#
-# test_that("freq32: chi sqr works with weight.", {
-#
-#
-#   # fp <- file.path(base_path, "/data/treatment.csv")
-#   # csv <- read.csv(fp)
-#
-#
-#
-#
-# })
-#
-#
-# test_that("freq33: fisher's works with weight.", {
-#
-#   res <- proc_freq(prt, tables = "internship * enrollment",
-#                    weight = "count", stats = "Fisher")
-#
-#   res
-#
-#   expect_equal(length(res), 4)
-#   expect_equal(nrow(res[[1]]), 14)
-#
-#
-# })
+
+test_that("freq32: chi sqr works with weight.", {
+
+
+  # fp <- file.path(base_path, "/data/treatment.csv")
+  # csv <- read.csv(fp)
+
+
+  res <- proc_freq(prt, tables = "internship * enrollment",
+                   table_options = list(ChiSq = TRUE),
+                   weight = "count")
+
+  res
+
+  expect_equal(length(res), 2)
+
+  res2 <- res[[2]]
+  expect_equal(res2[1, 2], 0.8189423)
+  expect_equal(res2[2, 2], 1)
+  expect_equal(res2[3, 2], 0.365489592)
+  #expect_equal(nrow(res[[2]]), 14)
+
+})
+
+
+test_that("freq33: fisher's works with weight.", {
+
+  res <- proc_freq(prt, tables = "internship * enrollment",
+                   table_options = list(Fisher = TRUE),
+                   weight = "count")
+
+  res
+
+  expect_equal(length(res), 2)
+
+  res2 <- res[[2]]
+  expect_equal(res2[1, 2],67)
+  expect_equal(res2[2, 2], 0.85127668)
+  expect_equal(res2[3, 2], 0.22133142)
+  expect_equal(res2[4, 2], 0.41215159)
+
+  #expect_equal(nrow(res[[1]]), 14)
+
+})

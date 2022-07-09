@@ -317,7 +317,7 @@ get_summaries <- function(data, var, stats, missing = FALSE) {
           if (all(is.na(var)))
             rw[["Mode"]] <- NA
           else
-            rw[["Mode"]] <- getmode(var)
+            rw[["Mode"]] <- get_mode(var)
         }
 
         if (st == "max") {
@@ -389,14 +389,14 @@ get_summaries <- function(data, var, stats, missing = FALSE) {
 
         if (st == "stderr") {
 
-          rw[["Std_Err"]] <- stderror(var, narm)
+          rw[["Std_Err"]] <- get_stderr(var, narm)
         }
 
 
 
         if (st == "lclm") {
 
-          tmp <- clm(var, narm)
+          tmp <- get_clm(var, narm)
 
           rw[["LCLM"]] <- tmp[["lcl"]]
 
@@ -405,7 +405,7 @@ get_summaries <- function(data, var, stats, missing = FALSE) {
 
         if (st == "uclm") {
 
-          tmp <- clm(var, narm)
+          tmp <- get_clm(var, narm)
 
           rw[["UCLM"]] <- tmp[["ucl"]]
 
@@ -415,7 +415,7 @@ get_summaries <- function(data, var, stats, missing = FALSE) {
 
         if (st == "clm") {
 
-          tmp <- clm(var, narm)
+          tmp <- get_clm(var, narm)
 
           rw[["LCLM"]] <- tmp[["lcl"]]
 

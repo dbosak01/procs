@@ -194,3 +194,52 @@ test_that("utils7: round_up() function works as expected.", {
 
 })
 
+test_that("utils8: Options are case-insensitive", {
+
+  opts <- list(Fisher = TRUE)
+
+  res <- get_option(opts, "fisher", FALSE)
+
+  res
+
+  expect_equal(res, TRUE)
+
+  res <- get_option(opts, "fishEr", FALSE)
+
+  res
+
+  expect_equal(res, TRUE)
+
+  expect_equal(has_option(opts, "FISHER"), TRUE)
+  expect_equal(has_option(opts, "FASHER"), FALSE)
+
+
+})
+
+
+test_that("utils9: round_up() matches SAS and not R", {
+
+
+  vct0 <- c(-2.5, -1.5, -.5, 1.5, 2.5)
+  vct1 <- c(8.75, 8.85, 8.95, 9.05, 9.15, 9.25)
+
+  res0 <- round_up(vct0)
+
+  sasres0 <- c(-3, -2, -1, 2,3)
+  expect_equal(all(res0 == sasres0), TRUE)
+
+  rres0 <- round(vct0)
+  expect_equal(all(res0 == rres0), FALSE)
+
+  res1 <- round_up(vct1, 1)
+
+  sasres1 <- c(8.8, 8.9, 9.0, 9.1, 9.2, 9.3)
+  expect_equal(all(res1 == sasres1), TRUE)
+
+  rres1 <- round(vct1)
+  expect_equal(all(res1 == rres1), FALSE)
+
+
+})
+
+

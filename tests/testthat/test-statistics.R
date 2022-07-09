@@ -17,7 +17,7 @@ test_that("stats1: Standard error works.", {
 
   dt <- c(4, -1, 7, -4, 6, 8, 10)
 
-  res <- stderror(dt)
+  res <- get_stderr(dt)
 
   res
 
@@ -32,7 +32,7 @@ test_that("stats2: CLM works.", {
 
   dt <- c(4, -1, 7, -4, 6, 8, 10)
 
-  res <- clm(dt)
+  res <- get_clm(dt)
 
   res
 
@@ -46,14 +46,14 @@ test_that("stats3: getmode works.", {
 
   dt <- c(4, 3, 7, 4, 3, 3, 10)
 
-  res <- getmode(dt)
+  res <- get_mode(dt)
 
 
   expect_equal(res, 3)
 
   dt <- c("a", "c", "b", "a", "c", "c", "d")
 
-  res <- getmode(dt)
+  res <- get_mode(dt)
 
   expect_equal(res, "c")
 
@@ -64,7 +64,7 @@ test_that("stats4: CLM works with NA.", {
 
   dt <- c(4, -1, 7, -4, NA, 8, 10)
 
-  res <- clm(dt, TRUE)
+  res <- get_clm(dt, TRUE)
 
   res
 
@@ -77,7 +77,7 @@ test_that("stats4: CLM works with NA.", {
 test_that("stat5: chisq works no weight uncorrected", {
 
 
-  res <- getchisq(prt$enrollment, prt$internship)
+  res <- get_chisq(prt$enrollment, prt$internship)
 
   res
 
@@ -91,7 +91,7 @@ test_that("stat5: chisq works no weight uncorrected", {
 # Matches SAS!
 test_that("stat6: chisq works with weight uncorrected", {
 
-  res <- getchisq(prt$internship, prt$enrollment, prt$count)
+  res <- get_chisq(prt$internship, prt$enrollment, prt$count)
 
 
   expect_equal(res[1, 2], 0.8189423)
@@ -105,7 +105,7 @@ test_that("stat6: chisq works with weight uncorrected", {
 
 test_that("stat7: chisq works with weight corrected", {
 
-  res <- getchisq(prt$internship, prt$enrollment, prt$count, TRUE)
+  res <- get_chisq(prt$internship, prt$enrollment, prt$count, TRUE)
 
   res
 
@@ -121,7 +121,7 @@ test_that("stat7: chisq works with weight corrected", {
 test_that("stat8: fisher works no weight", {
 
 
-  res <- getfisher(prt$enrollment, prt$internship)
+  res <- get_fisher(prt$enrollment, prt$internship)
 
   res
 
@@ -138,7 +138,7 @@ test_that("stat8: fisher works no weight", {
 test_that("stat9: fisher works with weight", {
 
 
-  res <- getfisher(prt$internship, prt$enrollment, prt$count)
+  res <- get_fisher(prt$internship, prt$enrollment, prt$count)
 
   res
 

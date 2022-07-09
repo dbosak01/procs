@@ -277,8 +277,15 @@ option_true <- function(options, name, default = FALSE) {
 
   ret <- default
 
+
+  #browser()
+  # print("option_true")
+  # print(options)
+
   if (!is.null(options)) {
-    vl <- options[[name]]
+    names(options) <- tolower(names(options))
+
+    vl <- options[[tolower(name)]]
     if (!is.null(vl)) {
       if (vl == TRUE)
         ret <- TRUE
@@ -297,8 +304,14 @@ has_option <- function(options, name) {
 
   ret <- FALSE
 
+  # print("has_option")
+  # print(options)
+
   if (!is.null(options)) {
-    vl <- options[[name]]
+
+    names(options) <- tolower(names(options))
+
+    vl <- options[[tolower(name)]]
     if (!is.null(vl)) {
       ret <- TRUE
     }
@@ -311,11 +324,18 @@ has_option <- function(options, name) {
 
 get_option <- function(options, name, default = NULL) {
 
+  # print("get_option")
+  # print(name)
+  # print(options)
+
 
   ret <- default
 
   if (!is.null(options)) {
-    vl <- options[[name]]
+
+    names(options) <- tolower(names(options))
+
+    vl <- options[[tolower(name)]]
     if (!is.null(vl)) {
       ret <- vl
     }

@@ -282,6 +282,10 @@ proc_freq <- function(data,
   tables <- tryCatch({if (typeof(tables) %in% c("character", "NULL")) tables else otables},
                   error = function(cond) {otables})
 
+  owgt <- deparse(substitute(weight, env = environment()))
+  weight <- tryCatch({if (typeof(weight) %in% c("character", "NULL")) weight else owgt},
+                 error = function(cond) {owgt})
+
 
   # Parameter checks
   nms <- names(data)
@@ -289,6 +293,13 @@ proc_freq <- function(data,
     if (!all(by %in% nms)) {
 
       stop(paste("Invalid by name: ", by[!by %in% nms], "\n"))
+    }
+  }
+
+  if (!is.null(weight)) {
+    if (!all(weight %in% nms)) {
+
+      stop(paste("Invalid weight name: ", weight[!weight %in% nms], "\n"))
     }
   }
 
@@ -358,6 +369,8 @@ proc_freq <- function(data,
       out <- i == length(tables) & has_option(table_options, "out")
 
       crstab <- NULL
+      chisq <- NULL
+      fisher <- NULL
 
       # Split cross variables
       splt <- trimws(strsplit(tb, "*", fixed = TRUE)[[1]])
@@ -389,6 +402,22 @@ proc_freq <- function(data,
         # Perform cross tab by default
         crstab <- cross_tab(result, table_options, splt[1], splt[2], bylbl)
 
+        if (get_option(table_options, "fisher", FALSE)) {
+
+          if (!is.null(weight))
+            fisher <- get_fisher(dt[[splt[1]]], dt[[splt[[2]]]], dt[[weight]])
+          else
+            fisher <- get_fisher(dt[[splt[1]]], dt[[splt[[2]]]])
+        }
+
+        if (get_option(table_options, "chisq", FALSE)) {
+
+          if (!is.null(weight))
+            chisq <- get_chisq(dt[[splt[1]]], dt[[splt[[2]]]], dt[[weight]])
+          else
+            chisq <- get_chisq(dt[[splt[1]]], dt[[splt[[2]]]])
+        }
+
       } else {
 
         stop("Procedure does not yet support n-way frequencies.")
@@ -401,6 +430,12 @@ proc_freq <- function(data,
 
         if (!is.null(result))
           result <- as_tibble(result)
+
+        if (!is.null(fisher))
+          fisher <- as_tibble(fisher)
+
+        if (!is.null(chisq))
+          chisq <- as_tibble(chisq)
 
       }
 
@@ -418,6 +453,16 @@ proc_freq <- function(data,
 
           res[[get_name(nm, tb, bylbls[j])]] <- result
 
+      }
+
+      if (!is.null(chisq)) {
+
+        res[[get_name("Chisq", tb, bylbls[j])]] <- chisq
+      }
+
+      if (!is.null(fisher)) {
+
+        res[[get_name("Fisher", tb, bylbls[j])]] <- fisher
       }
     }
 
