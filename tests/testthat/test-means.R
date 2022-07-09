@@ -273,7 +273,7 @@ test_that("means11: proc_means in function works.", {
 
 
 
-test_that("means3: check more stats options and piped parameter.", {
+test_that("means12: check more stats options and piped parameter.", {
 
   res <- proc_means(datm, var = c("PresentScore", "TasteScore"),
                     stats = c("nmiss", "median", "mode", "clm", "stderr"),
@@ -296,7 +296,7 @@ test_that("means3: check more stats options and piped parameter.", {
 
 })
 
-test_that("means3: check missing parameter works.", {
+test_that("means13: check missing parameter works.", {
 
 
   datm2 <- datm
@@ -331,3 +331,57 @@ test_that("means3: check missing parameter works.", {
 
 })
 
+test_that("means13: check missing parameter works.", {
+
+
+  res <- proc_means(datm, var = c("PresentScore", "TasteScore"),
+                    stats = c("n", "p1", "p5", "p10", "p20", "p25", "p30",
+                              "p40", "p50",
+                              "p60", "p70",
+                              "p75", "p80", "p90", "p95", "p99", "q1", "q3",
+                              "qrange"),
+                    titles = "My first title for Means")[[1]]
+
+
+  res
+  expect_equal(res[1, "N"], 20)
+  expect_equal(res[1, "P1"], 56)
+  expect_equal(res[1, "P5"], 59)
+  expect_equal(res[1, "P10"], 64)
+  expect_equal(res[1, "P20"], 67.5)
+  expect_equal(res[1, "P25"], 68.5)
+  expect_equal(res[1, "P30"], 70.5)
+  expect_equal(res[1, "P40"], 75)
+  expect_equal(res[1, "P50"], 77.5)
+  expect_equal(res[1, "P60"], 80)
+  expect_equal(res[1, "P70"], 81.5)
+  expect_equal(res[1, "P75"], 83)
+  expect_equal(res[1, "P80"], 84.5)
+  expect_equal(res[1, "P90"], 86.5)
+  expect_equal(res[1, "P95"], 90)
+  expect_equal(res[1, "P99"], 93)
+  expect_equal(res[1, "Q1"], 68.5)
+  expect_equal(res[1, "Q3"], 83)
+  expect_equal(res[1, "QRange"], 14.5)
+
+  expect_equal(res[2, "N"], 20)
+  expect_equal(res[2, "P1"], 72)
+  expect_equal(res[2, "P5"], 72)
+  expect_equal(res[2, "P10"], 72.5)
+  expect_equal(res[2, "P20"], 74.5)
+  expect_equal(res[2, "P25"], 75)
+  expect_equal(res[2, "P30"], 77)
+  expect_equal(res[2, "P40"], 79.5)
+  expect_equal(res[2, "P50"], 82)
+  expect_equal(res[2, "P60"], 83.5)
+  expect_equal(res[2, "P70"], 84)
+  expect_equal(res[2, "P75"], 84.5)
+  expect_equal(res[2, "P80"], 86)
+  expect_equal(res[2, "P90"], 91.5)
+  expect_equal(res[2, "P95"], 93)
+  expect_equal(res[2, "P99"], 94)
+  expect_equal(res[2, "Q1"], 75)
+  expect_equal(res[2, "Q3"], 84.5)
+  expect_equal(res[2, "QRange"], 9.5)
+
+})

@@ -1,5 +1,17 @@
 
 
+prt <- read.table(header = TRUE, text = '
+  sex internship enrollment count
+  1  boys        yes        yes    35
+  2  boys         no        yes    14
+  3 girls        yes        yes    32
+  4 girls         no        yes    53
+  5  boys        yes         no    29
+  6  boys         no         no    27
+  7 girls        yes         no    10
+  8 girls         no         no    23')
+
+
 test_that("stats1: Standard error works.", {
 
 
@@ -60,3 +72,89 @@ test_that("stats4: CLM works with NA.", {
   expect_equal(res[["lcl"]], -1.74799573)
 
 })
+
+# Matches SAS!
+test_that("stat5: chisq works no weight uncorrected", {
+
+
+  res <- getchisq(prt$enrollment, prt$internship)
+
+  res
+
+  expect_equal(res[1, 2], 0)
+  expect_equal(res[2, 2], 1)
+  expect_equal(res[3, 2], 1)
+
+})
+
+
+# Matches SAS!
+test_that("stat6: chisq works with weight uncorrected", {
+
+  res <- getchisq(prt$internship, prt$enrollment, prt$count)
+
+
+  expect_equal(res[1, 2], 0.8189423)
+  expect_equal(res[2, 2], 1)
+  expect_equal(res[3, 2], 0.365489592)
+
+
+
+})
+
+
+test_that("stat7: chisq works with weight corrected", {
+
+  res <- getchisq(prt$internship, prt$enrollment, prt$count, TRUE)
+
+  res
+
+  expect_equal(res[1, 2], 0.58989261)
+  expect_equal(res[2, 2], 1)
+  expect_equal(res[3, 2], 0.44246065)
+
+
+
+})
+
+# Matches SAS!
+test_that("stat8: fisher works no weight", {
+
+
+  res <- getfisher(prt$enrollment, prt$internship)
+
+  res
+
+  expect_equal(res[1, 2], 2)
+  expect_equal(res[2, 2], 0.75714286)
+  expect_equal(res[3, 2], 0.75714286)
+  expect_equal(res[4, 2], 1)
+
+})
+
+
+
+# Matches SAS!
+test_that("stat9: fisher works with weight", {
+
+
+  res <- getfisher(prt$internship, prt$enrollment, prt$count)
+
+  res
+
+  expect_equal(res[1, 2], 67)
+  expect_equal(res[2, 2], 0.85127668)
+  expect_equal(res[3, 2], 0.22133142)
+  expect_equal(res[4, 2], 0.41215159)
+
+
+})
+
+
+
+
+
+
+
+
+

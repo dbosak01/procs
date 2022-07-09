@@ -43,7 +43,10 @@
 #' @param stats A quoted vector of summary statistics keywords.  Valid
 #' keywords are: "css", "clm", "cv", "n", "lclm", "mean", "median", "mode",
 #' "min", "max",
-#' "nmiss", "nobs", "range", "std", "stderr", "sum", "uclm", "var". You may
+#' "nmiss", "nobs", "range", "std", "stderr", "sum", "uclm", "var",
+#' "q1", "q3", "p1", "p5", "p10", "p20", "p25", "p30", "p40",
+#' "p50", "p60", "p70", "p75", "p80", "p90",
+#' "p95", "p99", "qrange". You may
 #' pass unquoted variable names to this parameter using the \code{\link{v}}
 #' function.
 # @param weight An optional weight parameter.
@@ -134,7 +137,10 @@ proc_means <- function(data,
   } else {
     st <- c( "css", "cv", "n", "mean", "median", "std", "min", "max",
              "nmiss", "nobs", "range", "sum", "stderr", "var", "clm", "uclm",
-             "lclm","mode")
+             "lclm","mode", "q1", "q3", "p1", "p5", "p10", "p20",
+             "p25", "p30", "p40",
+             "p50", "p60", "p70", "p75", "p80", "p90",
+             "p95", "p99", "qrange")
     if (!all(stats %in% st)) {
 
       stop(paste("Invalid stat name: ", stats[!stats %in% st], "\n"))
@@ -422,6 +428,116 @@ get_summaries <- function(data, var, stats, missing = FALSE) {
 
           rw[["USS"]] <-  sum(var^2, na.rm = narm)
         }
+
+        if (st == "p1") {
+
+          rw[["P1"]] <- quantile(var, probs = c(0.01), type = 2, na.rm = narm)
+
+        }
+
+        if (st == "p5") {
+
+          rw[["P5"]] <- quantile(var, probs = c(0.05), type = 2, na.rm = narm)
+
+        }
+
+        if (st == "p10") {
+
+          rw[["P10"]] <- quantile(var, probs = c(0.1), type = 2, na.rm = narm)
+
+        }
+
+        if (st == "p20") {
+
+          rw[["P20"]] <- quantile(var, probs = c(0.2), type = 2, na.rm = narm)
+
+        }
+
+        if (st == "p25") {
+
+          rw[["P25"]] <- quantile(var, probs = c(0.25), type = 2, na.rm = narm)
+
+        }
+
+        if (st == "q1") {
+
+          rw[["Q1"]] <- quantile(var, probs = c(0.25), type = 2, na.rm = narm)
+
+        }
+
+        if (st == "p30") {
+
+          rw[["P30"]] <- quantile(var, probs = c(0.3), type = 2, na.rm = narm)
+
+        }
+        if (st == "p40") {
+
+          rw[["P40"]] <- quantile(var, probs = c(0.4), type = 2, na.rm = narm)
+
+        }
+
+        if (st == "p50") {
+
+          rw[["P50"]] <- quantile(var, probs = c(0.5), type = 2, na.rm = narm)
+
+        }
+
+        if (st == "p60") {
+
+          rw[["P60"]] <- quantile(var, probs = c(0.6), type = 2, na.rm = narm)
+
+        }
+        if (st == "p70") {
+
+          rw[["P70"]] <- quantile(var, probs = c(0.7), type = 2, na.rm = narm)
+
+        }
+
+        if (st == "p75") {
+
+          rw[["P75"]] <- quantile(var, probs = c(0.75), type = 2, na.rm = narm)
+
+        }
+
+        if (st == "q3") {
+
+          rw[["Q3"]] <- quantile(var, probs = c(0.75), type = 2, na.rm = narm)
+
+        }
+
+        if (st == "p80") {
+
+          rw[["P80"]] <- quantile(var, probs = c(0.8), type = 2, na.rm = narm)
+
+        }
+
+        if (st == "p90") {
+
+          rw[["P90"]] <- quantile(var, probs = c(0.9), type = 2, na.rm = narm)
+
+        }
+
+        if (st == "p95") {
+
+          rw[["P95"]] <- quantile(var, probs = c(0.95), type = 2, na.rm = narm)
+
+        }
+
+        if (st == "p99") {
+
+          rw[["P99"]] <- quantile(var, probs = c(0.99), type = 2, na.rm = narm)
+
+        }
+
+        if (st == "qrange") {
+
+          q25 <- quantile(var, probs = c(0.25), type = 2, na.rm = narm)
+          q75 <- quantile(var, probs = c(0.75), type = 2, na.rm = narm)
+
+          rw[["QRange"]] <- q75 - q25
+
+        }
+
 
       }
 

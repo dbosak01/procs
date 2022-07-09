@@ -35,6 +35,20 @@ dat <- read.table(header = TRUE, text = '
   2 brown black  13
   ')
 
+
+prt <- read.table(header = TRUE, text = '
+  sex internship enrollment count
+  1  boys        yes        yes    35
+  2  boys         no        yes    14
+  3 girls        yes        yes    32
+  4 girls         no        yes    53
+  5  boys        yes         no    29
+  6  boys         no         no    27
+  7 girls        yes         no    10
+  8 girls         no         no    23')
+
+
+
 test_that("freq1: Simple proc_freq test works.", {
 
   library(fmtr)
@@ -836,3 +850,29 @@ test_that("freq31: Parameter checks work.", {
 
 })
 
+
+#
+# test_that("freq32: chi sqr works with weight.", {
+#
+#
+#   # fp <- file.path(base_path, "/data/treatment.csv")
+#   # csv <- read.csv(fp)
+#
+#
+#
+#
+# })
+#
+#
+# test_that("freq33: fisher's works with weight.", {
+#
+#   res <- proc_freq(prt, tables = "internship * enrollment",
+#                    weight = "count", stats = "Fisher")
+#
+#   res
+#
+#   expect_equal(length(res), 4)
+#   expect_equal(nrow(res[[1]]), 14)
+#
+#
+# })
