@@ -46,7 +46,7 @@ get_mode <- function(x) {
 }
 
 
-get_fisher <- function(x, y, wgt = NULL) {
+get_fisher <- function(x, y, wgt = NULL, bylbl = "") {
 
 
   if (!is.null(wgt)) {
@@ -80,13 +80,15 @@ get_fisher <- function(x, y, wgt = NULL) {
 
   attr(ret$Value, "format") <- "%.4f"
 
+  spn <- list(span_spec(paste0(bylbl, "Fisher's Exact Test"), 1, 2, 1))
+  attr(ret, "spans") <- spn
 
   return(ret)
 
 }
 
 
-get_chisq <- function(x, y, wgt = NULL, corrct = FALSE) {
+get_chisq <- function(x, y, wgt = NULL, corrct = FALSE, bylbl = "") {
 
 
   if (!is.null(wgt)) {
@@ -114,6 +116,10 @@ get_chisq <- function(x, y, wgt = NULL, corrct = FALSE) {
   ret <- data.frame(Measure = mes, Value = val)
 
   attr(ret$Value, "format") <- "%.4f"
+
+
+  spn <- list(span_spec(paste0(bylbl, "Chi-Square Test"), 1, 2, 1))
+  attr(ret, "spans") <- spn
 
 
   return(ret)

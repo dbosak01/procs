@@ -405,17 +405,20 @@ proc_freq <- function(data,
         if (get_option(table_options, "fisher", FALSE)) {
 
           if (!is.null(weight))
-            fisher <- get_fisher(dt[[splt[1]]], dt[[splt[[2]]]], dt[[weight]])
+            fisher <- get_fisher(dt[[splt[1]]], dt[[splt[[2]]]], dt[[weight]],
+                                 bylbl = bylbls[j])
           else
-            fisher <- get_fisher(dt[[splt[1]]], dt[[splt[[2]]]])
+            fisher <- get_fisher(dt[[splt[1]]], dt[[splt[[2]]]],
+                                 bylbl = bylbls[j])
         }
 
         if (get_option(table_options, "chisq", FALSE)) {
 
           if (!is.null(weight))
-            chisq <- get_chisq(dt[[splt[1]]], dt[[splt[[2]]]], dt[[weight]])
+            chisq <- get_chisq(dt[[splt[1]]], dt[[splt[[2]]]], dt[[weight]],
+                               bylbl = bylbls[j])
           else
-            chisq <- get_chisq(dt[[splt[1]]], dt[[splt[[2]]]])
+            chisq <- get_chisq(dt[[splt[1]]], dt[[splt[[2]]]], bylbl = bylbls[j])
         }
 
       } else {
@@ -503,119 +506,6 @@ proc_freq <- function(data,
 
 }
 
-proc_freq2 <- function(data,
-                      by = NULL,
-                      tables = NULL,
-                      table_options = NULL,
-                      weight = NULL,
-                      #   weight_options = NULL,
-                      view = TRUE,
-                      #   output = NULL,
-                      report_type = NULL,
-                      report_location = NULL,
-                      report_style = NULL,
-                      titles = NULL,
-                      piped = FALSE) {
-
-  res <- list()
-  # print("Orig print_location")
-  # print(print_location)
-  #browser()
-
-
-
-
-
-  # Loop through table requests
-  for (i in seq_len(length(tables))) {
-
-    nm <- names(tables)[i]
-    tb <- tables[i]
-    #browser()
-    out <- i == length(tables) & has_option(table_options, "out")
-
-    crstab <- NULL
-
-    # Split cross variables
-    splt <- trimws(strsplit(tb, "*", fixed = TRUE)[[1]])
-
-    # Perform either one-way or two-way frequency count
-    if (length(splt) == 1) {
-
-      result <- freq_oneway(data, tb, weight, table_options, out)
-
-    } else if (length(splt) == 2) {
-
-      result <- freq_twoway(data, splt[1], splt[2], weight, table_options, out)
-
-      crstab <- cross_tab(result, table_options, splt[1], splt[2])
-
-    } else {
-
-      stop("Procedure does not yet support n-way frequencies.")
-    }
-
-    # If a cross tab was produced, add it to result
-    if (!is.null(crstab)) {
-
-      if (is.null(nm))
-        res[[tb]] <- as_tibble(crstab)
-      else if (nchar(nm) == 0)
-        res[[tb]] <- as_tibble(crstab)
-      else
-        res[[nm]] <- as_tibble(crstab)
-
-      if ("out" %in% names(table_options) & i == length(tables)) {
-
-        res[[table_options[["out"]]]] <- result
-      }
-
-    } else { # Otherwise add one-way to result
-
-      if (is.null(nm))
-        res[[tb]] <- as_tibble(result)
-      else if (nchar(nm) == 0)
-        res[[tb]] <- as_tibble(result)
-      else
-        res[[nm]] <- as_tibble(result)
-
-    }
-  }
-
-  # Create output reports if requested
-  if (!is.null(report_type)) {
-
-    loc <- get_location("freq", report_location)
-    out <- output_report(res, proc_type = 'freq', dir_name = loc["dir_name"],
-                         file_name = loc["file_name"], out_type = report_type,
-                         style = report_style,
-                         titles = titles, margins = 1)
-
-
-  }
-
-  # Create viewer report if requested
-  if (view == TRUE) {
-
-
-    vrfl <- tempfile()
-
-    out <- output_report(res, proc_type = 'freq', dir_name = dirname(vrfl),
-                         file_name = basename(vrfl), out_type = "HTML",
-                         style = report_style,
-                         titles = titles, margins = .5, viewer = TRUE)
-
-    show_viewer(out)
-  }
-
-  if (piped == TRUE) {
-
-    res <- res[[length(res)]]
-  }
-
-  return(res)
-
-}
 
 # Sub Procedures ----------------------------------------------------------
 
