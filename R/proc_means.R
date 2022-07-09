@@ -66,11 +66,13 @@
 #' See the \code{\link[reporter]{create_style}} in the \strong{reporter}
 #' package for additional information on styles.
 #' @param titles A vector of one or more titles to use for the report output.
+# @param missing Whether to include missing (NA) values in the analysis.
+# By default, missing values are not included.
 #' @param piped Whether or not the \code{proc_freq} function is part of a data
 #' pipeline.  Set this parameter to TRUE if you want the function to return
 #' a single dataset instead of a list of datasets.  If there is more than one
 #' table requested, the function will return the last requested table.
-#' @return A list of tibbles that contain the requested summary statistics.
+#' @return A list of datasets that contain the requested summary statistics.
 #' If the function is being used in a pipeline, set the
 #' \code{piped} parameter to TRUE, which will return only the last table.
 #' @import fmtr
@@ -90,7 +92,12 @@ proc_means <- function(data,
                        report_location = NULL,
                        report_style = NULL,
                        titles = NULL,
+                      # missing = FALSE,
                        piped = FALSE) {
+
+  # SAS seems to always ignore these
+  # Not sure why R as an option to keep them
+  missing <- FALSE
 
   # Deal with single value unquoted parameter values
   oby <- deparse(substitute(by, env = environment()))
@@ -179,7 +186,7 @@ proc_means <- function(data,
     dt <- dtlst[[j]]
 
     # Calculate summary statistics
-    smtbl <- get_summaries(dt, var, stats)
+    smtbl <- get_summaries(dt, var, stats, missing)
 
 
     nm <- length(res) + 1
@@ -250,9 +257,9 @@ proc_means <- function(data,
 }
 
 #' @import fmtr
-get_summaries <- function(data, var, stats) {
+get_summaries <- function(data, var, stats, missing = FALSE) {
 
-
+  narm <- !missing
   ret <- NULL
 
   for (nm in var) {
@@ -280,7 +287,7 @@ get_summaries <- function(data, var, stats) {
           if (all(is.na(var)))
             rw[["CSS"]] <- NA
           else
-            rw[["CSS"]] <- sum((var - mean(var, na.rm = TRUE))^2, na.rm = TRUE)
+            rw[["CSS"]] <- sum((var - mean(var, na.rm = narm))^2, na.rm = narm)
         }
 
         if (st == "cv") {
@@ -288,7 +295,7 @@ get_summaries <- function(data, var, stats) {
           if (all(is.na(var)))
             rw[["CV"]] <- NA
           else
-            rw[["CV"]] <- sd(var, na.rm = TRUE) / mean(var, na.rm = TRUE) * 100
+            rw[["CV"]] <- sd(var, na.rm = narm) / mean(var, na.rm = narm) * 100
         }
 
         if (st == "mean") {
@@ -296,7 +303,7 @@ get_summaries <- function(data, var, stats) {
           if (all(is.na(var)))
             rw[["Mean"]] <- NA
           else
-            rw[["Mean"]] <- mean(var, na.rm = TRUE)
+            rw[["Mean"]] <- mean(var, na.rm = narm)
         }
 
         if (st == "mode") {
@@ -311,7 +318,7 @@ get_summaries <- function(data, var, stats) {
           if (all(is.na(var)))
             rw[["Maximum"]] <- NA
           else
-            rw[["Maximum"]] <- max(var, na.rm = TRUE)
+            rw[["Maximum"]] <- max(var, na.rm = narm)
         }
 
         if (st == "min") {
@@ -319,7 +326,7 @@ get_summaries <- function(data, var, stats) {
           if (all(is.na(var)))
             rw[["Minimum"]] <- NA
           else
-            rw[["Minimum"]] <- min(var, na.rm = TRUE)
+            rw[["Minimum"]] <- min(var, na.rm = narm)
         }
 
         if (st == "median") {
@@ -327,7 +334,7 @@ get_summaries <- function(data, var, stats) {
           if (all(is.na(var)))
             rw[["Median"]] <- NA
           else
-            rw[["Median"]] <- median(var, na.rm = TRUE)
+            rw[["Median"]] <- median(var, na.rm = narm)
         }
 
         if (st == "nobs") {
@@ -345,7 +352,7 @@ get_summaries <- function(data, var, stats) {
           if (all(is.na(var)))
             rw[["Std_Dev"]] <- NA
           else
-            rw[["Std_Dev"]] <- sd(var, na.rm = TRUE)
+            rw[["Std_Dev"]] <- sd(var, na.rm = narm)
         }
 
         if (st == "sum") {
@@ -353,7 +360,7 @@ get_summaries <- function(data, var, stats) {
           if (all(is.na(var)))
             rw[["Sum"]] <- NA
           else
-            rw[["Sum"]] <- sum(var, na.rm = TRUE)
+            rw[["Sum"]] <- sum(var, na.rm = narm)
         }
 
         if (st == "range") {
@@ -361,7 +368,7 @@ get_summaries <- function(data, var, stats) {
           if (all(is.na(var))) {
             rw[["Range"]] <- NA
           } else {
-          rng <- range(var, na.rm = TRUE)
+          rng <- range(var, na.rm = narm)
             if (!is.null(rng) & length(rng) == 2)
               rw[["Range"]] <- rng[2] - rng[1]
             else
@@ -371,19 +378,19 @@ get_summaries <- function(data, var, stats) {
 
         if (st == "var") {
 
-          rw[["Variance"]] <- var(var, na.rm = TRUE)
+          rw[["Variance"]] <- var(var, na.rm = narm)
         }
 
         if (st == "stderr") {
 
-          rw[["Std_Err"]] <- stderror(var)
+          rw[["Std_Err"]] <- stderror(var, narm)
         }
 
 
 
         if (st == "lclm") {
 
-          tmp <- clm(var)
+          tmp <- clm(var, narm)
 
           rw[["LCLM"]] <- tmp[["lcl"]]
 
@@ -392,7 +399,7 @@ get_summaries <- function(data, var, stats) {
 
         if (st == "uclm") {
 
-          tmp <- clm(var)
+          tmp <- clm(var, narm)
 
           rw[["UCLM"]] <- tmp[["ucl"]]
 
@@ -402,13 +409,18 @@ get_summaries <- function(data, var, stats) {
 
         if (st == "clm") {
 
-          tmp <- clm(var)
+          tmp <- clm(var, narm)
 
           rw[["LCLM"]] <- tmp[["lcl"]]
 
           rw[["UCLM"]] <- tmp[["ucl"]]
 
 
+        }
+
+        if (st == "uss") {
+
+          rw[["USS"]] <-  sum(var^2, na.rm = narm)
         }
 
       }

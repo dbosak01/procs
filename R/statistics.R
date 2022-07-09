@@ -5,9 +5,9 @@
 
 #' Include missing values
 #' @noRd
-stderror <- function(x) {
+stderror <- function(x, narm = TRUE) {
 
-  ret <- sd(x, na.rm = TRUE) / sqrt(sum(!is.na(x)))
+  ret <- sd(x, na.rm = narm) / sqrt(sum(!is.na(x)))
 
   return(ret)
 
@@ -15,29 +15,23 @@ stderror <- function(x) {
 
 
 #' @noRd
-clm <- function(x) {
+clm <- function(x, narm = TRUE) {
 
   #Sample size
-  n <- sum(!is.na(x))
+  n <- sum(!is.na(x), na.rm = narm)
+
   # Sample mean weight
-  xbar <- mean(x, rm.na = TRUE)
+  xbar <- mean(x, na.rm = narm)
+
   # Sample standard deviation
-  s <- sd(x, na.rm = TRUE)
+  std <- sd(x, na.rm = narm)
 
   # Margin of error
-  margin <- qt(0.975,df=n-1)*s/sqrt(n)
-
+  margin <- qt(0.975,df=n-1)*std/sqrt(n)
 
   # Lower and upper confidence interval boundaries
   res <- c(ucl = xbar + margin,
            lcl = xbar - margin)
-
-
-  # lowerinterval <- xbar - margin
-  # lowerinterval
-  # #[1] 195.5191
-  # upperinterval <-
-  # upperinterval
 
   return(res)
 }

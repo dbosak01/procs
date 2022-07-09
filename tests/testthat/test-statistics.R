@@ -46,3 +46,17 @@ test_that("stats3: getmode works.", {
   expect_equal(res, "c")
 
 })
+
+test_that("stats4: CLM works with NA.", {
+
+
+  dt <- c(4, -1, 7, -4, NA, 8, 10)
+
+  res <- clm(dt, TRUE)
+
+  res
+
+  expect_equal(res[["ucl"]], 9.7479957)
+  expect_equal(res[["lcl"]], -1.74799573)
+
+})

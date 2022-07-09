@@ -63,7 +63,7 @@ a single dataset instead of a list of datasets.  If there is more than one
 table requested, the function will return the last requested table.}
 }
 \value{
-A list of tibbles that contain the requested summary statistics.
+A list of datasets that contain the requested summary statistics.
 If the function is being used in a pipeline, set the
 \code{piped} parameter to TRUE, which will return only the last table.
 }

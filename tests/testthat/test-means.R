@@ -34,7 +34,8 @@ test_that("means0: get_summaries works as expected for 1 variable.", {
 
 
   res <- get_summaries(datm, var = "PresentScore",
-                       stats = c("n", "mean", "min", "max", "range", "median"))
+                       stats = c("n", "mean", "min", "max", "range", "median"),
+                       missing = FALSE)
 
   res
 
@@ -294,3 +295,39 @@ test_that("means3: check more stats options and piped parameter.", {
   expect_equal(res[2, "Std_Err"], 1.47839707)
 
 })
+
+test_that("means3: check missing parameter works.", {
+
+
+  datm2 <- datm
+
+  datm2[5, "PresentScore"] <- NA
+
+  res <- proc_means(datm2, var = c("PresentScore", "TasteScore"),
+                    stats = c("n", "nmiss", "mean", "median", "mode", "clm", "std"),
+                    titles = "My first title for Means")[[1]]
+
+  res
+
+
+  expect_equal("data.frame" %in% class(res), TRUE)
+  expect_equal(ncol(res), 9)
+
+
+  expect_equal(res[1, "NMiss"], 1)
+  expect_equal(res[1, "Mean"], 76.105263158)
+  expect_equal(res[1, "Median"], 78)
+  expect_equal(res[1, "Mode"], 81)
+  expect_equal(res[1, "UCLM"], 80.747505)
+  expect_equal(res[1, "LCLM"], 71.463022)
+  expect_equal(res[1, "Std_Dev"], 9.6315150351)
+
+  expect_equal(res[2, "NMiss"], 0)
+  expect_equal(res[2, "Median"], 82)
+  expect_equal(res[2, "Mode"], 84)
+  expect_equal(res[2, "UCLM"], 84.44432)
+  expect_equal(res[2, "LCLM"], 78.25568)
+  expect_equal(res[2, "Std_Dev"], 6.6115926897)
+
+})
+
