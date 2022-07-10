@@ -1,0 +1,19 @@
+---
+title: "The Sort Function"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{The Sort Function}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+Write up on proc_sort...
+
+

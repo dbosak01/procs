@@ -9,7 +9,7 @@ proc_means(
   data,
   by = NULL,
   var = NULL,
-  stats = NULL,
+  stats = c("n", "mean", "std", "min", "max"),
   view = TRUE,
   report_type = NULL,
   report_location = NULL,

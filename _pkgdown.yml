@@ -7,6 +7,7 @@ articles:
   - procs-freq
   - procs-means
   - procs-transpose
+  - procs-sort
   - procs-example1
 
 reference:
@@ -16,6 +17,7 @@ reference:
   - proc_freq
   - proc_means
   - proc_transpose
+  - proc_sort
 - title: Other Functions
   desc: Other useful functions in the procs package.
   contents:
