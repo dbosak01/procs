@@ -819,7 +819,7 @@ cross_tab <- function(freqdata, options, var1, var2, bylbl = NULL) {
 
 
   # Combine everthing
-  ret <- rbind(dt1, dt2, dt3, dt4, dt5, dt6,
+  ret <- rbind(dt1, dt2, dt3, dt4,
                make.row.names = FALSE,
                stringsAsFactors = FALSE)
 
@@ -828,6 +828,15 @@ cross_tab <- function(freqdata, options, var1, var2, bylbl = NULL) {
 
   # Sort data frame by category and order
   ret <- ret[order(ret$Category1, ret$Order), c("Category1", "Statistic", nnms) ]
+
+
+  # Make sure total rows are at the end, after the sort
+  if (!is.null(dt5)) {
+    ret <- rbind(ret,
+                 dt5[,  c("Category1", "Statistic", nnms)],
+                 dt6[,  c("Category1", "Statistic", nnms)],
+                 make.row.names = FALSE, stringsAsFactors = FALSE)
+  }
 
   # Kill rownames
   rownames(ret) <- NULL

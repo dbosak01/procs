@@ -953,3 +953,28 @@ test_that("freq35: chi sqr works with weight and by.", {
 
 
 })
+
+
+test_that("freq35: 2 way table is sorted properly.", {
+
+
+
+  res <- proc_freq(prt, tables = "internship * enrollment",
+                   weight = "count")
+
+  res
+  expect_equal(res[[1]][9, 1], "Total")
+  expect_equal(res[[1]][10, 1], "Total")
+})
+
+
+
+# test_that("freq35: CMH works with weight.", {
+#
+#
+#   # fp <- file.path(base_path, "/data/treatment.csv")
+#   # csv <- read.csv(fp)
+#
+#   mantelhaen.test()
+#
+# })
