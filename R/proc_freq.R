@@ -614,8 +614,15 @@ freq_twoway <- function(data, tb1, tb2, weight, options, out = FALSE) {
   data[["__cnt"]] <- 1
 
   # Get target variables into vectors
-  v1 <- data[[tb1]]
-  v2 <- data[[tb2]]
+  if (is.factor(data[[tb1]]))
+    v1 <- as.character(data[[tb1]])
+  else
+    v1 <- data[[tb1]]
+
+  if (is.factor(data[[tb1]]))
+    v2 <- as.character(data[[tb2]])
+  else
+    v2 <- data[[tb2]]
 
   # Get unique values of variables
   t1 <- names(sort(table(v1)))

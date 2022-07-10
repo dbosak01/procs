@@ -955,7 +955,7 @@ test_that("freq35: chi sqr works with weight and by.", {
 })
 
 
-test_that("freq35: 2 way table is sorted properly.", {
+test_that("freq36: 2 way table is sorted properly.", {
 
 
 
@@ -965,6 +965,29 @@ test_that("freq35: 2 way table is sorted properly.", {
   res
   expect_equal(res[[1]][9, 1], "Total")
   expect_equal(res[[1]][10, 1], "Total")
+})
+
+
+
+test_that("freq37: Crosstab works with factors.", {
+
+  prt2 <- prt
+
+  prt2$internship <- as.factor(prt2$internship)
+  prt2$enrollment <- as.factor(prt2$enrollment)
+
+
+  res <- proc_freq(prt2, tables = c("sex", "internship * enrollment"),
+                   table_options = list(out = "FreqCounts"),
+                   weight = "count")
+
+  res
+  expect_equal(nrow(res[[1]]), 2)
+  expect_equal(ncol(res[[1]]), 5)
+  expect_equal(nrow(res[[2]]), 10)
+  expect_equal(ncol(res[[2]]), 5)
+  expect_equal(nrow(res[[3]]), 4)
+  expect_equal(ncol(res[[3]]), 4)
 })
 
 
