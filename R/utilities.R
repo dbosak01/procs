@@ -34,8 +34,8 @@ round_up <- function(x, digits = 0) {
 
 
 #' @title Combine unquoted values
-#' @description A function to combine unquoted values into a vector.  The
-#' function will return a vector of quoted values.
+#' @description A function to combine unquoted values into a vector.
+#' The function will return a vector of quoted values.
 #' @param ... One or more unquoted values.
 #' @returns A vector of quoted values.
 #' @examples

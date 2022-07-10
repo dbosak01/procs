@@ -53,6 +53,17 @@ Anderson    27 87 85  Chocolate  1
 Merritt     62 73 84  Chocolate  1
 ')
 
+prt <- read.table(header = TRUE, text = '
+  sex internship enrollment count
+  1  boys        yes        yes    35
+  2  boys         no        yes    14
+  3 girls        yes        yes    32
+  4 girls         no        yes    53
+  5  boys        yes         no    29
+  6  boys         no         no    27
+  7 girls        yes         no    10
+  8 girls         no         no    23')
+
 
 test_that("transpose1: basic var works without error.", {
 
@@ -217,5 +228,60 @@ test_that("transpose9: transpose by with two variables and v() function.", {
 
 })
 
+test_that("transpose10: copy parameter works recycle bigger.", {
+
+  stats <- proc_means(datm)
+
+
+  res1 <- data.frame(Group = "Group1", stats)
+
+  res2 <- proc_transpose(res1, copy = "Group",
+                         name = "Statistic", id = "Variable")
+
+  expect_equal(nrow(res2), 5)
+  expect_equal(ncol(res2), 6)
+  expect_equal("Group" %in% names(res2), TRUE)
+
+
+
+})
+
+
+test_that("transpose10: copy parameter works recycle smaller", {
+
+  stats <- proc_means(datm, stats = c("n", "mean", "median"))
+
+
+  res1 <- data.frame(Group = "Group1", stats)
+
+  res2 <- proc_transpose(res1, copy = "Group",
+                         name = "Statistic", id = "Variable")
+
+  expect_equal(nrow(res2), 3)
+  expect_equal(ncol(res2), 6)
+  expect_equal("Group" %in% names(res2), TRUE)
+
+
+
+})
+
+# Not working
+# test_that("transpose10: copy parameter works with by groups", {
+#
+#   stats <- proc_means(datm, stats = c("n", "mean", "median"), by = "Layers")
+#
+#
+#   res1 <- data.frame(Group = "Group1", stats)
+#
+#   res2 <- proc_transpose(res1, copy = "Group",
+#                          name = "Statistic", id = "Variable")
+#
+#   expect_equal(nrow(res2), 3)
+#   expect_equal(ncol(res2), 6)
+#   expect_equal("Group" %in% names(res2), TRUE)
+#
+#
+#
+# })
 
 

@@ -117,6 +117,19 @@ proc_means <- function(data,
 
   # Parameter checks
   nms <- names(data)
+
+  if (is.null(var)) {
+    var <- c()
+    for (nm in nms) {
+      if (is.numeric(data[[nm]])) {
+
+        var[length(var) + 1] <- nm
+      }
+
+    }
+  }
+
+
   if (!is.null(by)) {
     if (!all(by %in% nms)) {
 

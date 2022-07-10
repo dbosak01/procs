@@ -78,6 +78,8 @@ proc_transpose <- function(data,
     nms <- var
 
    } else {
+
+     # Use all numeric variables by default
      nms <- c()
      for (nm in names(data)) {
        if (is.numeric(data[[nm]])) {
@@ -86,11 +88,13 @@ proc_transpose <- function(data,
 
      }
    }
+
    if (length(nms) == 0) {
      stop("No variables to transpose.  You may need to specify the var parameter")
 
    }
 
+   # Prepare list of labels for by groups
    bylbls <- list()
    if (!is.null(by)) {
 
@@ -120,6 +124,16 @@ proc_transpose <- function(data,
      # Select desired column names
      tpd <- dt[, nms]
 
+     # Select copy columns
+     if (!is.null(copy)) {
+       if (length(copy) == 1) {
+         cpy <- as.data.frame(dt[, copy])
+         names(cpy) <- copy
+       } else
+         cpy <- dt[, copy]
+     } else
+       cpy <- NULL
+
      # Create ID column
      ret1 <- data.frame(name = nms, stringsAsFactors = FALSE)
 
@@ -144,11 +158,30 @@ proc_transpose <- function(data,
 
      }
 
+     # Recycle copy rows
+     if (!is.null(cpy)) {
+       if (nrow(cpy) != nrow(ret1)) {
+         cpy2 <- list()
+         for(cnm in names(cpy))
+          cpy2[[cnm]] <- rep_len(cpy[[cnm]], nrow(ret1))
+
+         cpy <- as.data.frame(cpy2)
+       }
+
+     }
+
      # Combine ID column and transposed columns
-     if (!is.null(by))
-       ret <- cbind(bygrps, ret1, ret2)
-     else
-       ret <- cbind(ret1, ret2)
+     if (!is.null(by)) {
+       if (!is.null(cpy))
+         ret <- cbind(bygrps, cpy, ret1, ret2)
+       else
+         ret <- cbind(bygrps, ret1, ret2)
+     } else {
+       if (!is.null(cpy))
+         ret <- cbind(cpy, ret1, ret2)
+       else
+         ret <- cbind(ret1, ret2)
+     }
 
      rownames(ret) <- NULL
 
@@ -165,13 +198,13 @@ proc_transpose <- function(data,
 
        nms_new <- paste0(prefix, dt[[id]], suffix)
 
-       names(ret) <- c(by, name,  nms_new)
+       names(ret) <- c(by, copy, name,  nms_new)
 
      } else {
 
        if (nrow(dt) > 0) {
          nms_new <- paste0("COL", seq(1, nrow(dt)))
-         names(ret) <- c(by, name,  nms_new)
+         names(ret) <- c(by, copy, name,  nms_new)
        } else {
          names(ret) <- name
        }

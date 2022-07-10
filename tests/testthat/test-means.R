@@ -275,8 +275,8 @@ test_that("means11: proc_means in function works.", {
 
 test_that("means12: check more stats options and piped parameter.", {
 
-  res <- proc_means(datm, var = c("PresentScore", "TasteScore"),
-                    stats = c("nmiss", "median", "mode", "clm", "stderr"),
+  res <- proc_means(datm, var = v(PresentScore, TasteScore),
+                    stats = v(nmiss, median, mode, clm, stderr),
                     titles = "My first title for Means",
                     piped = TRUE)
 
@@ -331,6 +331,7 @@ test_that("means13: check missing parameter works.", {
 
 })
 
+# These match SAS.
 test_that("means13: check missing parameter works.", {
 
 
@@ -383,5 +384,16 @@ test_that("means13: check missing parameter works.", {
   expect_equal(res[2, "Q1"], 75)
   expect_equal(res[2, "Q3"], 84.5)
   expect_equal(res[2, "QRange"], 9.5)
+
+})
+
+test_that("means14: default vars works.", {
+
+  res <- proc_means(datm)
+
+  res
+
+  expect_equal(nrow(res[[1]]), 4)
+  expect_equal(ncol(res[[1]]), 6)
 
 })
