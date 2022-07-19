@@ -8,6 +8,7 @@ articles:
   - procs-means
   - procs-transpose
   - procs-sort
+  - procs-compare
   - procs-example1
 
 reference:
@@ -18,11 +19,7 @@ reference:
   - proc_means
   - proc_transpose
   - proc_sort
-- title: Other Functions
-  desc: Other useful functions in the procs package.
-  contents:
-  - round_up
-  - v
+  - proc_compare
 
 navbar:
   type: inverse

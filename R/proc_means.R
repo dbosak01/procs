@@ -91,6 +91,7 @@ proc_means <- function(data,
               #         weight_options = NULL,
                        view = TRUE,
               #         output = NULL,
+              #         output_options = NULL,
                        report_type = NULL,
                        report_location = NULL,
                        report_style = NULL,
@@ -154,9 +155,9 @@ proc_means <- function(data,
              "p25", "p30", "p40",
              "p50", "p60", "p70", "p75", "p80", "p90",
              "p95", "p99", "qrange")
-    if (!all(stats %in% st)) {
+    if (!all(tolower(stats) %in% st)) {
 
-      stop(paste("Invalid stat name: ", stats[!stats %in% st], "\n"))
+      stop(paste("Invalid stat name: ", stats[!tolower(stats) %in% st], "\n"))
     }
   }
 

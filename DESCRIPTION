@@ -1,17 +1,26 @@
 Package: procs
 Type: Package
-Title: Recreates some SAS® statistical procedures in R
+Title: Recreates some SAS® procedures in R
 Version: 0.0.9003
 Authors@R: c(
     person(given = "David",
            family = "Bosak",
            role = c("aut", "cre"),
-           email = "dbosak01@gmail.com"))
-Maintainer: <dbosak01@gmail.com>
+           email = "dbosak01@gmail.com"),
+    person(given = "Duong",
+           family = "Tran",
+           role = c("ctb"),
+           email = "trand000@aol.com"),
+    person(given = "Brian",
+           family = "Varney",
+           role = c("ctb"),
+           email = "brian.varney@experis.com"))
+Maintainer: David Bosak <dbosak01@gmail.com>
 Description: Contains functions to simulate the most commonly used 
-    SAS® statistical procedures.  Specifically, the package aims to 
+    SAS® procedures.  Specifically, the package aims to 
     simulate the functionality of SAS® 'proc freq', 'proc means',
-    and 'proc transpose'. The simulation will include recreating 
+    'proc transpose', 'proc_sort', and 'proc_compare'. 
+    The simulation will include recreating 
     all datasets and reports with the highest fidelity possible. 
 License: CC0
 Encoding: UTF-8
@@ -28,7 +37,8 @@ Imports: utils,
          fmtr,
          reporter,
          stats,
-         tibble
+         tibble, 
+         common
 VignetteBuilder: knitr
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.2.0

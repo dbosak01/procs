@@ -18,20 +18,22 @@ PROC FREQ and PROC MEANS.
 Subsequent versions of the package will add additional options
 to these two procedures.  
 
-This first version of the package will also include a recreation of PROC TRANSPOSE.
-The reason the TRANSPOSE procedure is included is because it is frequently used
+This first version of the package will also include a recreation of PROC TRANSPOSE,
+PROC SORT, and PROC COMPARE.
+The reason these procedures are included is because they are frequently used
 in conjunction with PROC FREQ and PROC MEANS to prepare data for reporting.  
 
 There are three motivations for recreating SAS® statistical procedures in R:
 
 **1) Rich Outputs:** R provides a wide range of statistical packages and functions.
-However,
-these statistical functions frequently return a fragmented output.  The user
-is often left to compile R statistical results into a readable report themselves.
+However, these statistical functions frequently return a fragmented output.
+The user is often left to compile R statistical results into a readable 
+report themselves.
 
 SAS® software, on the other hand, provides the same statistical results, 
 but with rich outputs.  These outputs include multiple datasets, plots,
-and complete statistical reports. R currently has no equivalent functionality.
+and complete statistical reports. These rich outputs could be a benefit 
+to R users.
 
 **2) Pre-Validation:** There is an industry-wide movement to adopt R for 
 statistical analysis.  This 
@@ -45,8 +47,8 @@ it makes it much easier to rewrite
 SAS® programs in R. This pre-validation will
 ultimately save the industry tens of thousands of hours of effort.
 
-**3) Ease of Adoption:** A final goal of the package is to facilitate the adoption of 
-R by SAS® programmers.
+**3) Ease of Adoption:** A final goal of the package is to 
+facilitate the adoption of R by SAS® programmers.
 SAS® programmers will easily understand and be comfortable with the functions
 in this package.  They will become productive in R much faster than with
 Base R functions, or statistical functions from other packages.

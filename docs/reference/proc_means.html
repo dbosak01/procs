@@ -119,6 +119,12 @@ of tibbles." />
       <a href="../articles/procs-transpose.html">The Transpose Function</a>
     </li>
     <li>
+      <a href="../articles/procs-sort.html">The Sort Function</a>
+    </li>
+    <li>
+      <a href="../articles/procs-compare.html">The Compare Function</a>
+    </li>
+    <li>
       <a href="../articles/procs-example1.html">Complete Example</a>
     </li>
   </ul>
@@ -168,7 +174,7 @@ of tibbles.</p>
 <span>  <span class='va'>data</span>,</span>
 <span>  by <span class='op'>=</span> <span class='cn'>NULL</span>,</span>
 <span>  var <span class='op'>=</span> <span class='cn'>NULL</span>,</span>
-<span>  stats <span class='op'>=</span> <span class='cn'>NULL</span>,</span>
+<span>  stats <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"n"</span>, <span class='st'>"mean"</span>, <span class='st'>"std"</span>, <span class='st'>"min"</span>, <span class='st'>"max"</span><span class='op'>)</span>,</span>
 <span>  view <span class='op'>=</span> <span class='cn'>TRUE</span>,</span>
 <span>  report_type <span class='op'>=</span> <span class='cn'>NULL</span>,</span>
 <span>  report_location <span class='op'>=</span> <span class='cn'>NULL</span>,</span>
@@ -187,21 +193,25 @@ of tibbles.</p>
     <tr>
       <th>by</th>
       <td><p>An optional by group. You may
-pass unquoted variable names to this parameter using the <code><a href='v.html'>v</a></code>
+pass unquoted variable names to this parameter using the <code><a href='https://procs.r-sassy.org/reference/v.html'>v</a></code>
 function.</p></td>
     </tr>
     <tr>
       <th>var</th>
       <td><p>The variable(s) to calculate summary statistics for. You may
-pass unquoted variable names to this parameter using the <code><a href='v.html'>v</a></code>
+pass unquoted variable names to this parameter using the <code><a href='https://procs.r-sassy.org/reference/v.html'>v</a></code>
 function.</p></td>
     </tr>
     <tr>
       <th>stats</th>
       <td><p>A quoted vector of summary statistics keywords.  Valid
-keywords are: "css", "cv", "n", "mean", "median", "std", "min", "max",
-"nmiss", "nobs", "range", "sum", "var". You may
-pass unquoted variable names to this parameter using the <code><a href='v.html'>v</a></code>
+keywords are: "css", "clm", "cv", "n", "lclm", "mean", "median", "mode",
+"min", "max",
+"nmiss", "nobs", "range", "std", "stderr", "sum", "uclm", "var",
+"q1", "q3", "p1", "p5", "p10", "p20", "p25", "p30", "p40",
+"p50", "p60", "p70", "p75", "p80", "p90",
+"p95", "p99", "qrange". You may
+pass unquoted variable names to this parameter using the <code><a href='https://procs.r-sassy.org/reference/v.html'>v</a></code>
 function.</p></td>
     </tr>
     <tr>
@@ -246,7 +256,7 @@ table requested, the function will return the last requested table.</p></td>
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>A list of tibbles that contain the requested summary statistics.
+    <p>A list of datasets that contain the requested summary statistics.
 If the function is being used in a pipeline, set the
 <code>piped</code> parameter to TRUE, which will return only the last table.</p>
     <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>

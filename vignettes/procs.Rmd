@@ -27,7 +27,11 @@ The package includes the following major functions:
 
 * `proc_freq()`: A function to simulate the FREQ procedure.
 * `proc_means()`: A function to simulate the MEANS or SUMMARY procedure.
-* `proc_transpose()`: A function to pivot data similar in syntax to the TRANSPOSE procedure.
+* `proc_transpose()`: A function to pivot data similar in syntax to the 
+TRANSPOSE procedure.
+* `proc_sort()`: A function to sort and dedupe datasets.
+* `proc_compare()`: A function to compare two datasets and report on 
+the differences between them.
 
 
 ### How to Use
@@ -132,6 +136,12 @@ res3
 # 4 Cum_Pct    18.2  39.7  88.0 100  
 ```
 
+#### The `proc_sort()` Function
+
+
+#### The `proc_compare()` Function
+
+
 ### Next Steps
 
 For next steps, please review the examples provided in the vignette articles. 
@@ -140,6 +150,8 @@ Those articles include:
 * [The Frequency Function](procs-freq.html)
 * [The Means Function](procs-means.html)
 * [The Transpose Function](procs-transpose.html)
+* [The Sort Function](procs-sort.html)
+* [The Compare Function](procs-compare.html)
 * [Package Validation](procs-validation.html)
 * [Complete Example](procs-example1.html)
 

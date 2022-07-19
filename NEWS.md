@@ -2,6 +2,8 @@
 
 * Means and Transpose documentation.
 * More options on transpose.
+* Added `proc_sort()`.
+* Stub in proc compare.
 
 # procs 0.0.9002
 

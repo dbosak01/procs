@@ -2,18 +2,27 @@
 % Please edit documentation in R/proc_sort.R
 \name{proc_sort}
 \alias{proc_sort}
-\title{Sorts a data.frame or tibble}
+\title{Sorts a data frame or tibble}
 \usage{
-proc_sort(data, var = NULL, by = NULL, nodupkey = FALSE)
+proc_sort(data, by = NULL, keep = NULL, order = "ascending", nodupkey = FALSE)
 }
 \arguments{
 \item{data}{The input data to sort.}
 
-\item{var}{The variables on the output data to keep.}
-
 \item{by}{The variables to sort by.}
 
-\item{nodupkey}{Whether to remove duplicates.}
+\item{keep}{The variables on the output data to keep.}
+
+\item{order}{The sort order of the variables on the by parameter.
+Valid values are 'ascending' or 'descending'.  These values may
+also be abbreviated to 'asc', 'desc', 'a', or 'd'.  You may pass
+a vector of order values equal to the number of variables on the by
+parameter.  Default is 'ascending' for all by variables.}
+
+\item{nodupkey}{Whether to remove duplicates.  Valid values are
+TRUE or FALSE. Duplicate rows will be identified by the variables listed on
+the by parameter.  Other variables not listed on the by parameter will
+be ignored.}
 }
 \value{
 The sorted dataset.  If a data frame was input, a

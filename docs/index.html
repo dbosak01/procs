@@ -5,7 +5,7 @@
 <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Recreates some SAS® statistical procedures in R • procs</title>
+<title>Recreates some SAS® procedures in R • procs</title>
 <!-- favicons --><link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png">
 <link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
 <link rel="apple-touch-icon" type="image/png" sizes="180x180" href="apple-touch-icon.png">
@@ -17,11 +17,12 @@
 <script src="bootstrap-toc.js"></script><!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/v4-shims.min.css" integrity="sha256-wZjR52fzng1pJHwx4aV2AO3yyTOXrcDW7jBpJtTwVxw=" crossorigin="anonymous">
 <!-- clipboard.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script><!-- headroom.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/headroom.min.js" integrity="sha256-AsUX4SJE1+yuDu5+mAVzJbuYNPHj/WroHuZ8Ir/CkE0=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script><!-- pkgdown --><link href="pkgdown.css" rel="stylesheet">
-<script src="pkgdown.js"></script><meta property="og:title" content="Recreates some SAS® statistical procedures in R">
+<script src="pkgdown.js"></script><meta property="og:title" content="Recreates some SAS® procedures in R">
 <meta property="og:description" content="Contains functions to simulate the most commonly used 
-    SAS® statistical procedures.  Specifically, the package aims to 
+    SAS® procedures.  Specifically, the package aims to 
     simulate the functionality of SAS® proc freq, proc means,
-    and proc transpose. The simulation will include recreating 
+    proc transpose, proc_sort, and proc_compare. 
+    The simulation will include recreating 
     all datasets and reports with the highest fidelity possible. ">
 <meta property="og:image" content="https://procs.r-sassy.org/logo.png">
 <!-- mathjax --><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js" integrity="sha256-nvJJv9wWKEm88qvoQl9ekL2J+k/RWIsaSScxxlsrv8k=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/config/TeX-AMS-MML_HTMLorMML.js" integrity="sha256-84DKXVJXs0/F8OTMzX4UR909+jtl4G7SPypPavF+GfA=" crossorigin="anonymous"></script><!--[if lt IE 9]>
@@ -75,6 +76,12 @@
       <a href="articles/procs-transpose.html">The Transpose Function</a>
     </li>
     <li>
+      <a href="articles/procs-sort.html">The Sort Function</a>
+    </li>
+    <li>
+      <a href="articles/procs-compare.html">The Compare Function</a>
+    </li>
+    <li>
       <a href="articles/procs-example1.html">Complete Example</a>
     </li>
   </ul>
@@ -119,9 +126,9 @@ SAS® statistical procedures in R. The first version of the package will
 attempt to recreate PROC FREQ and PROC MEANS. Subsequent versions of the
 package will add additional options to these two procedures.</p>
 <p>This first version of the package will also include a recreation of
-PROC TRANSPOSE. The reason the TRANSPOSE procedure is included is
-because it is frequently used in conjunction with PROC FREQ and PROC
-MEANS to prepare data for reporting.</p>
+PROC TRANSPOSE, PROC SORT, and PROC COMPARE. The reason these procedures
+are included is because they are frequently used in conjunction with
+PROC FREQ and PROC MEANS to prepare data for reporting.</p>
 <p>There are three motivations for recreating SAS® statistical
 procedures in R:</p>
 <p><strong>1) Rich Outputs:</strong> R provides a wide range of
@@ -130,8 +137,8 @@ frequently return a fragmented output. The user is often left to compile
 R statistical results into a readable report themselves.</p>
 <p>SAS® software, on the other hand, provides the same statistical
 results, but with rich outputs. These outputs include multiple datasets,
-plots, and complete statistical reports. R currently has no equivalent
-functionality.</p>
+plots, and complete statistical reports. These rich outputs could be a
+benefit to R users.</p>
 <p><strong>2) Pre-Validation:</strong> There is an industry-wide
 movement to adopt R for statistical analysis. This effort is complicated
 by the fact that R statistical procedures frequently do not produce
@@ -211,6 +218,7 @@ programmers. You can read more about the <strong>sassy</strong> package
 <h2>Developers</h2>
 <ul class="list-unstyled">
 <li>David Bosak <br><small class="roles"> Author, maintainer </small>  </li>
+<li><a href="authors.html">All authors...</a></li>
 </ul>
 </div>
 

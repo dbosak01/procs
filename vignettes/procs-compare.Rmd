@@ -1,0 +1,19 @@
+---
+title: "The Compare Function"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{The Compare Function}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+Write up on proc_compare...
+
+

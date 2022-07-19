@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Changelog • procs</title>
+<title>Reports on the differences between two datasets — proc_compare • procs</title>
 
 <!-- favicons -->
 <link rel="icon" type="image/png" sizes="16x16" href="../favicon-16x16.png">
@@ -46,7 +46,8 @@
 
 
 
-<meta property="og:title" content="Changelog" />
+<meta property="og:title" content="Reports on the differences between two datasets — proc_compare" />
+<meta property="og:description" content="Here is a description" />
 <meta property="og:image" content="https://procs.r-sassy.org/logo.png" />
 
 
@@ -66,7 +67,7 @@
   </head>
 
   <body data-spy="scroll" data-target="#toc">
-    <div class="container template-news">
+    <div class="container template-reference-topic">
       <header>
       <div class="navbar navbar-inverse navbar-fixed-top" role="navigation">
   <div class="container">
@@ -152,54 +153,62 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-      <h1 data-toc-skip>Changelog <small></small></h1>
-      <small>Source: <a href='https://github.com/dbosak01/procs/blob/master/NEWS.md'><code>NEWS.md</code></a></small>
+    <h1>Reports on the differences between two datasets</h1>
+    <small class="dont-index">Source: <a href='https://github.com/dbosak01/procs/blob/master/R/proc_compare.R'><code>R/proc_compare.R</code></a></small>
+    <div class="hidden name"><code>proc_compare.Rd</code></div>
     </div>
 
-    <div id="procs-009003" class="section level1">
-<h1 class="page-header" data-toc-text="0.0.9003">
-<a href="#procs-009003" class="anchor"></a>procs 0.0.9003</h1>
-<ul>
-<li>Means and Transpose documentation.</li>
-<li>More options on transpose.</li>
-<li>Added <code><a href="../reference/proc_sort.html">proc_sort()</a></code>.</li>
-<li>Stub in proc compare.</li>
-</ul>
-</div>
-    <div id="procs-009002" class="section level1">
-<h1 class="page-header" data-toc-text="0.0.9002">
-<a href="#procs-009002" class="anchor"></a>procs 0.0.9002</h1>
-<ul>
-<li>Readme complete</li>
-<li>Freq documentation complete.</li>
-<li>proc_means basically working.</li>
-<li>proc_transpose basically working.</li>
-</ul>
-</div>
-    <div id="procs-009001" class="section level1">
-<h1 class="page-header" data-toc-text="0.0.9001">
-<a href="#procs-009001" class="anchor"></a>procs 0.0.9001</h1>
-<ul>
-<li>Create pkgdown site.</li>
-<li>Setup GitHub Actions.</li>
-<li>Add vignette stubs.</li>
-</ul>
-</div>
-    <div id="procs-009000" class="section level1">
-<h1 class="page-header" data-toc-text="0.0.9000">
-<a href="#procs-009000" class="anchor"></a>procs 0.0.9000</h1>
-<p>A package to recreate some common SAS statistical procedures.
-Development Version 0.0.9000 will attempt to provide some of the
-functionality of SAS ‘proc freq’.</p>
-</div>
-  </div>
+    <div class="ref-description">
+    <p>Here is a description</p>
+    </div>
 
+    <pre class="usage"><span><span class='fu'>proc_compare</span><span class='op'>(</span></span>
+<span>  <span class='va'>data1</span>,</span>
+<span>  <span class='va'>data2</span>,</span>
+<span>  precision <span class='op'>=</span> <span class='cn'>NULL</span>,</span>
+<span>  report_type <span class='op'>=</span> <span class='cn'>NULL</span>,</span>
+<span>  report_location <span class='op'>=</span> <span class='cn'>NULL</span></span>
+<span><span class='op'>)</span></span></pre>
+
+    <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
+    <table class="ref-arguments">
+    <colgroup><col class="name" /><col class="desc" /></colgroup>
+    <tr>
+      <th>data1</th>
+      <td><p>The first dataset to compare.</p></td>
+    </tr>
+    <tr>
+      <th>data2</th>
+      <td><p>The second dataset to compare.</p></td>
+    </tr>
+    <tr>
+      <th>precision</th>
+      <td><p>The variables to sort by.</p></td>
+    </tr>
+    <tr>
+      <th>report_type</th>
+      <td><p>The output type of the report to create.  Valid values
+are 'TXT', 'PDF', 'RTF', 'HTML' and 'DOCX'.</p></td>
+    </tr>
+    <tr>
+      <th>report_location</th>
+      <td><p>The the output path for the comparison report.</p></td>
+    </tr>
+    </table>
+
+    <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
+
+    <p>A list of datasets describing the results of the comparison.</p>
+    <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
+
+    <p>Here is some details</p>
+
+  </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">
       <h2 data-toc-skip>Contents</h2>
     </nav>
   </div>
-
 </div>
 
 

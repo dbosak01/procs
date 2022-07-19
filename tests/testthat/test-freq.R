@@ -51,7 +51,7 @@ prt <- read.table(header = TRUE, text = '
 
 test_that("freq1: Simple proc_freq test works.", {
 
-  library(fmtr)
+
 
   labels(dat) <- list(Eyes = "Eye Color",
                       Hair = "Hair Color",
@@ -71,7 +71,7 @@ test_that("freq1: Simple proc_freq test works.", {
 
 test_that("freq2: Simple proc_freq test with report_type html works.", {
 
-  library(fmtr)
+
 
   fl <- file.path(base_path, "freq/freq2.html")
 
@@ -92,7 +92,7 @@ test_that("freq2: Simple proc_freq test with report_type html works.", {
 
 test_that("freq3: Two table proc_freq test with report_type html works.", {
 
-  library(fmtr)
+
 
   fl <- file.path(base_path, "freq/freq3.html")
 
@@ -119,7 +119,7 @@ test_that("freq3: Two table proc_freq test with report_type html works.", {
 
 test_that("freq4: Simple proc_freq test with weight works.", {
 
-  library(fmtr)
+
 
   fl <- file.path(base_path, "freq/freq4.html")
 
@@ -145,7 +145,7 @@ test_that("freq4: Simple proc_freq test with weight works.", {
 
 test_that("freq5: Two var proc_freq with weight works.", {
 
-  library(fmtr)
+
 
   fl <- file.path(base_path, "freq/freq5.html")
 
@@ -172,7 +172,7 @@ test_that("freq5: Two var proc_freq with weight works.", {
 
 test_that("freq6: Simple proc_freq in docx works.", {
 
-  library(fmtr)
+
 
   fl <- file.path(base_path, "freq/freq6.docx")
 
@@ -198,7 +198,7 @@ test_that("freq6: Simple proc_freq in docx works.", {
 
 test_that("freq7: Simple proc_freq in pdf works.", {
 
-  library(fmtr)
+
 
   fl <- file.path(base_path, "freq/freq7.pdf")
 
@@ -225,7 +225,7 @@ test_that("freq7: Simple proc_freq in pdf works.", {
 
 test_that("freq8: Simple proc_freq in multiple outputs works.", {
 
-  library(fmtr)
+
 
   fl <- file.path(base_path, "freq/freq8")
 
@@ -255,7 +255,7 @@ test_that("freq8: Simple proc_freq in multiple outputs works.", {
 
 test_that("freq9: Simple proc_freq with no file name works.", {
 
-  library(fmtr)
+
 
   fl <- file.path(base_path, "freq")
 
@@ -282,7 +282,7 @@ test_that("freq9: Simple proc_freq with no file name works.", {
 
 test_that("freq10: Two way proc_freq works.", {
 
-  library(fmtr)
+
 
   fl <- file.path(base_path, "freq/freq10.html")
 
@@ -310,7 +310,7 @@ test_that("freq10: Two way proc_freq works.", {
 
 test_that("freq11: Two way proc_freq no weight works.", {
 
-  library(fmtr)
+
 
   fl <- file.path(base_path, "freq/freq11.html")
 
@@ -335,7 +335,6 @@ test_that("freq11: Two way proc_freq no weight works.", {
 
 test_that("freq12: One way and two way proc_freq works.", {
 
-  library(fmtr)
 
 
   fl <- file.path(base_path, "freq/freq12.html")

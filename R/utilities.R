@@ -1,72 +1,7 @@
 
 # Exported Utilities ------------------------------------------------------
 
-#' @title Rounds numbers up
-#' @description A function to round numbers up where the last digit is
-#' 5 or above.  The function contains a parameter to control the number
-#' decimals to round to.
-#' @param x A vector of values to round.
-#' @param digits A number of decimal places to round to. Default is zero.
-#' @returns The rounded data vector.
-#' @examples
-#' # Round to even
-#' round(2.4)  # 2
-#' round(2.5)  # 2
-#' round(2.6)  # 3
-#'
-#' # Round up
-#' round_up(2.4) # 2
-#' round_up(2.5) # 3
-#' round_up(2.6) # 3
-#'
-#' @export
-round_up <- function(x, digits = 0) {
 
-  posneg = sign(x)
-  z = abs(x)*10^digits
-  z = z + 0.5 + sqrt(.Machine$double.eps)
-  z = trunc(z)
-  z = z/10^digits
-  ret <- z*posneg
-
-  return(ret)
-}
-
-
-#' @title Combine unquoted values
-#' @description A function to combine unquoted values into a vector.
-#' The function will return a vector of quoted values.
-#' @param ... One or more unquoted values.
-#' @returns A vector of quoted values.
-#' @examples
-#' # Combine unquoted values
-#' v(var1, var2, var3)
-#' # [1] "var1" "var2" "var3"
-#' @export
-v <- function(...) {
-
-  # Determine if it is a vector or not.  "language" is a vector.
-  if (typeof(substitute(..., env = environment())) == "language")
-    vars <- substitute(..., env = environment())
-  else
-    vars <- substitute(list(...), env = environment())
-
-  # Turn each item into a character
-  vars_c <- c()
-  if (length(vars) > 1) {
-    for (i in 2:length(vars)) {
-      vars_c[[length(vars_c) + 1]] <- paste0(deparse(vars[[i]]), combine = "")
-    }
-
-  }
-
-  # Convert list to vector
-  vars_c <- unlist(vars_c)
-
-
-  return(vars_c)
-
-}
 
 
 # Internal Utilities ------------------------------------------------------
