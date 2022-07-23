@@ -215,7 +215,7 @@ proc_means <- function(data,
     if (!is.null(by)) {
 
       # Add spanning headers
-      spn <- span_spec(label = bylbls[j], 1, ncol(smtbl), 1)
+      spn <- spanattr(1, ncol(smtbl), label = bylbls[j], level = 1)
       attr(smtbl, "spans") <- list(spn)
 
       nm <-  bylbls[j]

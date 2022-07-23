@@ -51,7 +51,7 @@ prt <- read.table(header = TRUE, text = '
 
 test_that("freq1: Simple proc_freq test works.", {
 
-
+  library(common)
 
   labels(dat) <- list(Eyes = "Eye Color",
                       Hair = "Hair Color",
@@ -92,7 +92,7 @@ test_that("freq2: Simple proc_freq test with report_type html works.", {
 
 test_that("freq3: Two table proc_freq test with report_type html works.", {
 
-
+  library(common)
 
   fl <- file.path(base_path, "freq/freq3.html")
 
@@ -119,6 +119,7 @@ test_that("freq3: Two table proc_freq test with report_type html works.", {
 
 test_that("freq4: Simple proc_freq test with weight works.", {
 
+  library(common)
 
 
   fl <- file.path(base_path, "freq/freq4.html")
@@ -145,7 +146,7 @@ test_that("freq4: Simple proc_freq test with weight works.", {
 
 test_that("freq5: Two var proc_freq with weight works.", {
 
-
+  library(common)
 
   fl <- file.path(base_path, "freq/freq5.html")
 
@@ -172,7 +173,7 @@ test_that("freq5: Two var proc_freq with weight works.", {
 
 test_that("freq6: Simple proc_freq in docx works.", {
 
-
+  library(common)
 
   fl <- file.path(base_path, "freq/freq6.docx")
 
@@ -198,7 +199,7 @@ test_that("freq6: Simple proc_freq in docx works.", {
 
 test_that("freq7: Simple proc_freq in pdf works.", {
 
-
+  library(common)
 
   fl <- file.path(base_path, "freq/freq7.pdf")
 
@@ -225,7 +226,7 @@ test_that("freq7: Simple proc_freq in pdf works.", {
 
 test_that("freq8: Simple proc_freq in multiple outputs works.", {
 
-
+  library(common)
 
   fl <- file.path(base_path, "freq/freq8")
 
@@ -255,7 +256,7 @@ test_that("freq8: Simple proc_freq in multiple outputs works.", {
 
 test_that("freq9: Simple proc_freq with no file name works.", {
 
-
+  library(common)
 
   fl <- file.path(base_path, "freq")
 
@@ -282,7 +283,7 @@ test_that("freq9: Simple proc_freq with no file name works.", {
 
 test_that("freq10: Two way proc_freq works.", {
 
-
+  library(common)
 
   fl <- file.path(base_path, "freq/freq10.html")
 
@@ -310,7 +311,7 @@ test_that("freq10: Two way proc_freq works.", {
 
 test_that("freq11: Two way proc_freq no weight works.", {
 
-
+  library(common)
 
   fl <- file.path(base_path, "freq/freq11.html")
 
@@ -335,7 +336,7 @@ test_that("freq11: Two way proc_freq no weight works.", {
 
 test_that("freq12: One way and two way proc_freq works.", {
 
-
+  library(common)
 
   fl <- file.path(base_path, "freq/freq12.html")
 
@@ -491,7 +492,7 @@ test_that("freq17: Sparse option works as expected.", {
 
 test_that("freq18: Crosstab works.", {
 
-  library(fmtr)
+  library(common)
 
 
   labels(dat) <- list(Eyes = "Eye Color",
@@ -516,7 +517,7 @@ test_that("freq18: Crosstab works.", {
 
 test_that("freq19: Format options on table.", {
 
-  library(fmtr)
+  library(common)
 
 
   labels(dat) <- list(Eyes = "Eye Color",
@@ -540,7 +541,7 @@ test_that("freq19: Format options on table.", {
 
 test_that("freq20: SAS replication of one way tables works.", {
 
-  library(fmtr)
+  library(common)
 
   labels(dat) <- list(Eyes = "Eye Color",
                       Hair = "Hair Color",
@@ -562,7 +563,7 @@ test_that("freq20: SAS replication of one way tables works.", {
 
 test_that("freq21: Rowpct and Colpct options on table work.", {
 
-  library(fmtr)
+  library(common)
 
 
   labels(dat) <- list(Eyes = "Eye Color",
@@ -584,7 +585,7 @@ test_that("freq21: Rowpct and Colpct options on table work.", {
 
 test_that("freq22: Crosstab option to turn off totals works.", {
 
-  library(fmtr)
+  library(common)
 
 
   labels(dat) <- list(Eyes = "Eye Color",
@@ -605,7 +606,7 @@ test_that("freq22: Crosstab option to turn off totals works.", {
 
 test_that("freq23: Piped option works as expected.", {
 
-  library(fmtr)
+  library(common)
 
 
   labels(dat) <- list(Eyes = "Eye Color",
@@ -628,7 +629,7 @@ test_that("freq23: Piped option works as expected.", {
 
 test_that("freq24: report_style parameter works as expected.", {
 
-  library(fmtr)
+  library(common)
 
 
   labels(dat) <- list(Eyes = "Eye Color",
@@ -661,7 +662,7 @@ test_that("freq24: report_style parameter works as expected.", {
 
 test_that("freq25: Single by group on single table works.", {
 
-  library(fmtr)
+  library(common)
 
 
   labels(dat) <- list(Eyes = "Eye Color",
@@ -683,7 +684,7 @@ test_that("freq25: Single by group on single table works.", {
 
 test_that("freq26: Single by group on double table works.", {
 
-  library(fmtr)
+  library(common)
 
 
   labels(dat) <- list(Eyes = "Eye Color",
@@ -706,7 +707,7 @@ test_that("freq26: Single by group on double table works.", {
 
 test_that("freq27: Double by group on double table works.", {
 
-  library(fmtr)
+  library(common)
 
   spdat <- dat
 
@@ -732,7 +733,7 @@ test_that("freq27: Double by group on double table works.", {
 
 test_that("freq28: Double by group on double table with table names works.", {
 
-  library(fmtr)
+  library(common)
 
   spdat <- dat
 
@@ -760,7 +761,7 @@ test_that("freq28: Double by group on double table with table names works.", {
 
 test_that("freq29: Double by group on double table no labels works.", {
 
-  library(fmtr)
+  library(common)
 
   spdat <- dat
 
@@ -785,7 +786,7 @@ test_that("freq29: Double by group on double table no labels works.", {
 
 test_that("freq30: Crosstab with by works.", {
 
-  library(fmtr)
+  library(common)
 
   spdat <- dat
 
@@ -813,7 +814,7 @@ test_that("freq30: Crosstab with by works.", {
 
 test_that("freq30: Crosstab with by and out works.", {
 
-  library(fmtr)
+  library(common)
 
   spdat <- dat
 

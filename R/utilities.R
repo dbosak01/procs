@@ -99,18 +99,18 @@ output_report <- function(lst, proc_type,
 
     #browser()
     # Add spanning headers if requested
-    spns <- attr(dt, "spans")
-    if (!is.null(spns)) {
-
-      for (i in seq_len(length(spns))) {
-        spn <- spns[[i]]
-        tbl <- spanning_header(tbl, label = spn$label, from = as.character(spn$start),
-                               to = as.character(spn$end), level = spn$level,
-                               standard_eval = TRUE)
-
-      }
-
-    }
+    # spns <- attr(dt, "spans")
+    # if (!is.null(spns)) {
+    #
+    #   for (i in seq_len(length(spns))) {
+    #     spn <- spns[[i]]
+    #     tbl <- spanning_header(tbl, label = spn$label, from = as.character(spn$start),
+    #                            to = as.character(spn$end), level = spn$level,
+    #                            standard_eval = TRUE)
+    #
+    #   }
+    #
+    # }
 
     # Append table to report
     rpt <- add_content(rpt, tbl, align = 'center', page_break = FALSE)

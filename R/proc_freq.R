@@ -257,6 +257,7 @@
 #' #8      Red   Percent  2.871622   4.391892  2.3648649  2.364865
 #' @import fmtr
 #' @import tibble
+#' @import common
 #' @export
 proc_freq <- function(data,
                       by = NULL,
@@ -513,6 +514,8 @@ proc_freq <- function(data,
 
 #' @import fmtr
 #' @import stats
+#' @import reporter
+#' @import common
 #' @noRd
 freq_oneway <- function(data, tb, weight, options, out = FALSE) {
 
@@ -597,7 +600,7 @@ freq_oneway <- function(data, tb, weight, options, out = FALSE) {
 
 
   # Add spanning headers
-  spn <- span_spec(label = lbl, 1, ncol(result), 1)
+  spn <- spanattr(1, ncol(result), label = lbl, level = 1)
   attr(result, "spans") <- list(spn)
 
 
@@ -607,6 +610,7 @@ freq_oneway <- function(data, tb, weight, options, out = FALSE) {
 
 #' @import fmtr
 #' @import stats
+#' @import common
 #' @noRd
 freq_twoway <- function(data, tb1, tb2, weight, options, out = FALSE) {
 
@@ -725,6 +729,7 @@ freq_twoway <- function(data, tb1, tb2, weight, options, out = FALSE) {
 
 #' @import fmtr
 #' @import stats
+#' @import common
 #' @noRd
 cross_tab <- function(freqdata, options, var1, var2, bylbl = NULL) {
 
@@ -881,8 +886,8 @@ cross_tab <- function(freqdata, options, var1, var2, bylbl = NULL) {
   } else {
     lbl <- paste0("Table of ", var1, " by ", var2)
   }
-  spn2 <- span_spec(label = lbl, 1, ncol(ret), 2)
-  spn1 <- span_spec(label = lbl2, 3, ncol(ret), 1)
+  spn2 <- spanattr(1, ncol(ret), label = lbl, level = 2)
+  spn1 <- spanattr(3, ncol(ret), label = lbl2, level = 1)
   attr(ret, "spans") <- list(spn1, spn2)
 
   return(ret)

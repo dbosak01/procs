@@ -150,6 +150,7 @@ test_that("means5: proc_means with two variables and two by groups.", {
 
 test_that("means6: get_summaries works as expected for two variables with v().", {
 
+  library(common)
 
   res <- get_summaries(datm, var = v(PresentScore, TasteScore),
                        stats = v(n, mean, min, max, range, median))
@@ -397,3 +398,4 @@ test_that("means14: default vars works.", {
   expect_equal(ncol(res[[1]]), 6)
 
 })
+

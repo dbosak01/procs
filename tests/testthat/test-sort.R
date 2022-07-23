@@ -87,7 +87,7 @@ test_that("sort5: proc_sort works with single sort variable.", {
 
 test_that("sort6: proc_sort works with unquoted variables.", {
 
-
+  library(common)
 
   res <- proc_sort(prt, by = sex, keep = v(sex, count))
 
@@ -120,7 +120,7 @@ test_that("sort8: proc_sort returns tibble.", {
 
   prt2 <- as_tibble(prt)
 
-  res <- proc_sort(prt2, by = sex, keep = v(sex, count))
+  res <- proc_sort(prt2, by = sex, keep = c("sex", "count"))
 
   res
 
@@ -130,13 +130,7 @@ test_that("sort8: proc_sort returns tibble.", {
 
 })
 
-test_that("sort8: order_df works as expected.", {
 
-
-expect_equal(1, 1)
-
-
-})
 
 
 

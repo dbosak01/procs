@@ -20,7 +20,6 @@
 #' data frame will be output.  If a tibble was input, a tibble will
 #' be output.
 #' @import tibble
-#' @import common
 #' @export
 proc_sort <- function(data,  by = NULL, keep = NULL, order = "ascending",
                       nodupkey = FALSE) {

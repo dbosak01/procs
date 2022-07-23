@@ -12,16 +12,16 @@ margin-top: 1in;
 margin-bottom: 0.5in;
 margin-left: 1in;
 margin-right: 1in;
-}
-.thdr {border-bottom: thin solid black;font-weight: normal;}
-.shdr {font-weight: normal;}
+background-color: #FAFBFE;color: DimGrey;}
+.thdr {border-bottom: thin solid Grey;background-color: #EDF2F9;color: MidnightBlue;font-weight: bold;}
+.shdr {background-color: #EDF2F9;color: MidnightBlue;font-weight: bold;}
 .tdc {text-align:center;}
 .tdl {text-align:left;}
 .tdr {text-align:right;}
-.tc {}
+.tc {background-color: White;}
 .tbs {}
 .tbstr {}
-.ts {}
+.ts {background-color: #EDF2F9;font-weight: bold;color: MidnightBlue;}
 .tlr {}
 table {border-spacing: 0;border-collapse: collapse;}
 td {padding:0px 2px 0px 2px;}
@@ -30,11 +30,11 @@ td {padding:0px 2px 0px 2px;}
 <body>
 
 <div align="center" >
-<table style="width:3.622in;text-align: center;">
+<table style="width:4.152in;text-align: center;color: MidnightBlue;font-weight: bold;font-size: 11pt;">
 <tr><td>Eye&nbsp;and&nbsp;Hair&nbsp;Color&nbsp;of&nbsp;European&nbsp;Children</td></tr>
 <tr><td>&nbsp;</td></tr>
 </table>
-<table class="tbs" style="width:3.622in;">
+<table class="tbs" style="width:4.152in;">
 <colgroup>
 <col style="width:0.48in;">
 <col style="width:0.75in;">
@@ -43,15 +43,16 @@ td {padding:0px 2px 0px 2px;}
 <col style="width:0.45in;">
 <col style="width:0.591541666666667in;">
 <col style="width:0.45in;">
+<col style="width:0.53in;">
 </colgroup>
 <thead>
 <tr>
-<td class="shdr" colspan="7" style="vertical-align:bottom;text-align:center;border-top:thin solid black;border-bottom:thin solid black">Table&nbsp;of&nbsp;Eyes&nbsp;by&nbsp;Hair</td>
+<td class="shdr" colspan="8" style="vertical-align:bottom;text-align:center;border-top:thin solid Grey;border-bottom:thin solid Grey">Table&nbsp;of&nbsp;Eyes&nbsp;by&nbsp;Hair</td>
 </tr>
 <tr>
 <td class="shdr" colspan="1" style="vertical-align:bottom;text-align:left;">&nbsp;</td>
 <td class="shdr" colspan="1" style="vertical-align:bottom;text-align:left;">&nbsp;</td>
-<td class="shdr" colspan="5" style="vertical-align:bottom;text-align:center;border-bottom:thin solid black">Hair&nbsp;Color</td>
+<td class="shdr" colspan="6" style="vertical-align:bottom;text-align:center;border-bottom:thin solid Grey">Hair&nbsp;Color</td>
 </tr>
 <tr>
 <td class="thdr tdl">Eye<br>Color</td>
@@ -61,22 +62,25 @@ td {padding:0px 2px 0px 2px;}
 <td class="thdr tdr">fair</td>
 <td class="thdr tdr">medium</td>
 <td class="thdr tdr">red</td>
+<td class="thdr tdr">Total</td>
 </tr>
 </thead>
 
 <tbody>
-<tr><td class="tc tdl ">blue</td><td class="tc tdl ">Frequency</td><td class="tc tdr ">1</td><td class="tc tdr ">2</td><td class="tc tdr ">2</td><td class="tc tdr ">2</td><td class="tc tdr ">2</td></tr>
-<tr><td class="tc tdl tbstr ">blue</td><td class="tc tdl tbstr ">Percent</td><td class="tc tdr tbstr ">3.70</td><td class="tc tdr tbstr ">7.41</td><td class="tc tdr tbstr ">7.41</td><td class="tc tdr tbstr ">7.41</td><td class="tc tdr tbstr ">7.41</td></tr>
-<tr><td class="tc tdl ">blue</td><td class="tc tdl ">Row&nbsp;Pct</td><td class="tc tdr ">11.11</td><td class="tc tdr ">22.22</td><td class="tc tdr ">22.22</td><td class="tc tdr ">22.22</td><td class="tc tdr ">22.22</td></tr>
-<tr><td class="tc tdl tbstr ">blue</td><td class="tc tdl tbstr ">Col&nbsp;Pct</td><td class="tc tdr tbstr ">33.33</td><td class="tc tdr tbstr ">33.33</td><td class="tc tdr tbstr ">33.33</td><td class="tc tdr tbstr ">33.33</td><td class="tc tdr tbstr ">33.33</td></tr>
-<tr><td class="tc tdl ">brown</td><td class="tc tdl ">Frequency</td><td class="tc tdr ">2</td><td class="tc tdr ">2</td><td class="tc tdr ">2</td><td class="tc tdr ">2</td><td class="tc tdr ">2</td></tr>
-<tr><td class="tc tdl tbstr ">brown</td><td class="tc tdl tbstr ">Percent</td><td class="tc tdr tbstr ">7.41</td><td class="tc tdr tbstr ">7.41</td><td class="tc tdr tbstr ">7.41</td><td class="tc tdr tbstr ">7.41</td><td class="tc tdr tbstr ">7.41</td></tr>
-<tr><td class="tc tdl ">brown</td><td class="tc tdl ">Row&nbsp;Pct</td><td class="tc tdr ">20.00</td><td class="tc tdr ">20.00</td><td class="tc tdr ">20.00</td><td class="tc tdr ">20.00</td><td class="tc tdr ">20.00</td></tr>
-<tr><td class="tc tdl tbstr ">brown</td><td class="tc tdl tbstr ">Col&nbsp;Pct</td><td class="tc tdr tbstr ">66.67</td><td class="tc tdr tbstr ">33.33</td><td class="tc tdr tbstr ">33.33</td><td class="tc tdr tbstr ">33.33</td><td class="tc tdr tbstr ">33.33</td></tr>
-<tr><td class="tc tdl ">green</td><td class="tc tdl ">Frequency</td><td class="tc tdr ">0</td><td class="tc tdr ">2</td><td class="tc tdr ">2</td><td class="tc tdr ">2</td><td class="tc tdr ">2</td></tr>
-<tr><td class="tc tdl tbstr ">green</td><td class="tc tdl tbstr ">Percent</td><td class="tc tdr tbstr ">0.00</td><td class="tc tdr tbstr ">7.41</td><td class="tc tdr tbstr ">7.41</td><td class="tc tdr tbstr ">7.41</td><td class="tc tdr tbstr ">7.41</td></tr>
-<tr><td class="tc tdl ">green</td><td class="tc tdl ">Row&nbsp;Pct</td><td class="tc tdr ">0.00</td><td class="tc tdr ">25.00</td><td class="tc tdr ">25.00</td><td class="tc tdr ">25.00</td><td class="tc tdr ">25.00</td></tr>
-<tr><td class="tc tdl tbstr " style="border-bottom:thin solid black;">green</td><td class="tc tdl tbstr " style="border-bottom:thin solid black;">Col&nbsp;Pct</td><td class="tc tdr tbstr " style="border-bottom:thin solid black;">0.00</td><td class="tc tdr tbstr " style="border-bottom:thin solid black;">33.33</td><td class="tc tdr tbstr " style="border-bottom:thin solid black;">33.33</td><td class="tc tdr tbstr " style="border-bottom:thin solid black;">33.33</td><td class="tc tdr tbstr " style="border-bottom:thin solid black;">33.33</td></tr>
+<tr><td class="tc tdl ">blue</td><td class="tc tdl ">Frequency</td><td class="tc tdr ">1</td><td class="tc tdr ">2</td><td class="tc tdr ">2</td><td class="tc tdr ">2</td><td class="tc tdr ">2</td><td class="tc tdr ">9</td></tr>
+<tr><td class="tc tdl tbstr ">blue</td><td class="tc tdl tbstr ">Percent</td><td class="tc tdr tbstr ">3.70</td><td class="tc tdr tbstr ">7.41</td><td class="tc tdr tbstr ">7.41</td><td class="tc tdr tbstr ">7.41</td><td class="tc tdr tbstr ">7.41</td><td class="tc tdr tbstr ">33.33</td></tr>
+<tr><td class="tc tdl ">blue</td><td class="tc tdl ">Row&nbsp;Pct</td><td class="tc tdr ">11.11</td><td class="tc tdr ">22.22</td><td class="tc tdr ">22.22</td><td class="tc tdr ">22.22</td><td class="tc tdr ">22.22</td><td class="tc tdr ">&nbsp;</td></tr>
+<tr><td class="tc tdl tbstr ">blue</td><td class="tc tdl tbstr ">Col&nbsp;Pct</td><td class="tc tdr tbstr ">33.33</td><td class="tc tdr tbstr ">33.33</td><td class="tc tdr tbstr ">33.33</td><td class="tc tdr tbstr ">33.33</td><td class="tc tdr tbstr ">33.33</td><td class="tc tdr tbstr ">&nbsp;</td></tr>
+<tr><td class="tc tdl ">brown</td><td class="tc tdl ">Frequency</td><td class="tc tdr ">2</td><td class="tc tdr ">2</td><td class="tc tdr ">2</td><td class="tc tdr ">2</td><td class="tc tdr ">2</td><td class="tc tdr ">10</td></tr>
+<tr><td class="tc tdl tbstr ">brown</td><td class="tc tdl tbstr ">Percent</td><td class="tc tdr tbstr ">7.41</td><td class="tc tdr tbstr ">7.41</td><td class="tc tdr tbstr ">7.41</td><td class="tc tdr tbstr ">7.41</td><td class="tc tdr tbstr ">7.41</td><td class="tc tdr tbstr ">37.04</td></tr>
+<tr><td class="tc tdl ">brown</td><td class="tc tdl ">Row&nbsp;Pct</td><td class="tc tdr ">20.00</td><td class="tc tdr ">20.00</td><td class="tc tdr ">20.00</td><td class="tc tdr ">20.00</td><td class="tc tdr ">20.00</td><td class="tc tdr ">&nbsp;</td></tr>
+<tr><td class="tc tdl tbstr ">brown</td><td class="tc tdl tbstr ">Col&nbsp;Pct</td><td class="tc tdr tbstr ">66.67</td><td class="tc tdr tbstr ">33.33</td><td class="tc tdr tbstr ">33.33</td><td class="tc tdr tbstr ">33.33</td><td class="tc tdr tbstr ">33.33</td><td class="tc tdr tbstr ">&nbsp;</td></tr>
+<tr><td class="tc tdl ">green</td><td class="tc tdl ">Frequency</td><td class="tc tdr ">0</td><td class="tc tdr ">2</td><td class="tc tdr ">2</td><td class="tc tdr ">2</td><td class="tc tdr ">2</td><td class="tc tdr ">8</td></tr>
+<tr><td class="tc tdl tbstr ">green</td><td class="tc tdl tbstr ">Percent</td><td class="tc tdr tbstr ">0.00</td><td class="tc tdr tbstr ">7.41</td><td class="tc tdr tbstr ">7.41</td><td class="tc tdr tbstr ">7.41</td><td class="tc tdr tbstr ">7.41</td><td class="tc tdr tbstr ">29.63</td></tr>
+<tr><td class="tc tdl ">green</td><td class="tc tdl ">Row&nbsp;Pct</td><td class="tc tdr ">0.00</td><td class="tc tdr ">25.00</td><td class="tc tdr ">25.00</td><td class="tc tdr ">25.00</td><td class="tc tdr ">25.00</td><td class="tc tdr ">&nbsp;</td></tr>
+<tr><td class="tc tdl tbstr ">green</td><td class="tc tdl tbstr ">Col&nbsp;Pct</td><td class="tc tdr tbstr ">0.00</td><td class="tc tdr tbstr ">33.33</td><td class="tc tdr tbstr ">33.33</td><td class="tc tdr tbstr ">33.33</td><td class="tc tdr tbstr ">33.33</td><td class="tc tdr tbstr ">&nbsp;</td></tr>
+<tr><td class="tc tdl ">Total</td><td class="tc tdl ">Frequency</td><td class="tc tdr ">3</td><td class="tc tdr ">6</td><td class="tc tdr ">6</td><td class="tc tdr ">6</td><td class="tc tdr ">6</td><td class="tc tdr ">27</td></tr>
+<tr><td class="tc tdl tbstr " style="border-bottom:thin solid Grey;">Total</td><td class="tc tdl tbstr " style="border-bottom:thin solid Grey;">Percent</td><td class="tc tdr tbstr " style="border-bottom:thin solid Grey;">11.11</td><td class="tc tdr tbstr " style="border-bottom:thin solid Grey;">22.22</td><td class="tc tdr tbstr " style="border-bottom:thin solid Grey;">22.22</td><td class="tc tdr tbstr " style="border-bottom:thin solid Grey;">22.22</td><td class="tc tdr tbstr " style="border-bottom:thin solid Grey;">22.22</td><td class="tc tdr tbstr " style="border-bottom:thin solid Grey;">100.00</td></tr>
 </tbody>
 </table>
 <br>

@@ -1,3 +1,8 @@
+# procs 0.0.9004
+
+* Big revision on return datasets.
+* Added attributes to reporter.
+
 # procs 0.0.9003
 
 * Means and Transpose documentation.
