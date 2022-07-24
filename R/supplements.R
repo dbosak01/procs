@@ -16,9 +16,8 @@
 #' values are "long" or "wide".  The default is "long".
 #' @param ... Various options.
 #' @return The output specifications.
-#' @import tibble
 #' @export
-output <- function(stats = NULL, direction = NULL, ...) {
+output <- function(stats = NULL, direction = "long", ...) {
 
   ret <- structure(list(), class = c("output_spec", "list"))
 
@@ -28,4 +27,23 @@ output <- function(stats = NULL, direction = NULL, ...) {
   ret$parameters <-  list(...)
 
   return(ret)
+}
+
+
+#' @title Specifies options
+#' @description The \code{output} function is a generic options collection.
+#' Used on multiple functions and parameters.
+#' @details Here is some details
+#' @param ... Various options.
+#' @return An options class with the requested options.
+#' @export
+opts <- function(...) {
+
+  ret <- structure(list(), class = c("opts", "list"))
+
+  ret$options <- list(...)
+
+
+  return(ret)
+
 }

@@ -69,9 +69,9 @@ test_that("means1: get_summaries works as expected for two variables.", {
 
 
 
-test_that("means2: generate_report works as expected with two variables.", {
+test_that("means2: gen_report_means works as expected with two variables.", {
 
-  res <- generate_report(datm, var = c("PresentScore", "TasteScore"),
+  res <- gen_report_means(datm, var = c("PresentScore", "TasteScore"),
                     stats = c("n", "mean", "max", "min",
                               "range", "median", "std"),
                     titles = "My first title for Means")
@@ -113,9 +113,9 @@ test_that("means2: generate_report works as expected with two variables.", {
 #
 # })
 
-test_that("means4: generate_report with two variables and by group.", {
+test_that("means4: gen_report_means with two variables and by group.", {
 
-  res <- generate_report(datm, var = c("PresentScore", "TasteScore"),
+  res <- gen_report_means(datm, var = c("PresentScore", "TasteScore"),
                     by = "Layers",
                     stats = c("n", "mean", "max", "min",
                               "range", "median", "std"),
@@ -131,9 +131,9 @@ test_that("means4: generate_report with two variables and by group.", {
 
 })
 
-test_that("means5: generate_report with two variables and two by groups.", {
+test_that("means5: gen_report_means with two variables and two by groups.", {
 
-  res <- generate_report(datm, var = c("PresentScore", "TasteScore"),
+  res <- gen_report_means(datm, var = c("PresentScore", "TasteScore"),
                     by = c("Flavor", "Layers"),
                     stats = c("n", "mean", "max", "min",
                               "range", "median", "std"),
@@ -168,9 +168,9 @@ test_that("means6: get_summaries works as expected for two variables with v().",
 })
 
 
-test_that("means7: generate_report with single parameter values.", {
+test_that("means7: gen_report_means with single parameter values.", {
 
-  res <- generate_report(datm, var = "PresentScore",
+  res <- gen_report_means(datm, var = "PresentScore",
                     stats = "mean",
                     titles = "My first title for Means")
 
@@ -419,10 +419,141 @@ test_that("means15: get_summaries direction long works as expected.", {
 })
 
 
+test_that("means16: get_output long works.", {
 
-# test_that("means15: output parameters work.", {
+  res <- get_output(datm,  var = c("PresentScore", "TasteScore"),
+                    stats = c("n", "mean", "min", "max", "range", "median"),
+                    direction = "long", type = 0, freq = TRUE,
+                    by = c(by1 = "By1"),
+                    class = c(cls1 = "Class1", cls2 = "Class2"))
+
+  res
+
+  expect_equal(nrow(res), 6)
+  expect_equal(res$by1[1], "By1")
+  expect_equal(res$cls1[1], "Class1")
+  expect_equal(res$cls2[1], "Class2")
+  expect_equal(res$TYPE[1], 0)
+  expect_equal(res$FREQ[1], 20)
+
+})
+
+
+test_that("means17: get_output wide works.", {
+
+  res <- get_output(datm,  var = c("PresentScore", "TasteScore"),
+                    stats = c("n", "mean", "min", "max", "range", "median"),
+                    direction = "wide", type = 0, freq = TRUE,
+                    by = c(by1 = "By1"),
+                    class = c(cls1 = "Class1", cls2 = "Class2"))
+
+  res
+
+  expect_equal(nrow(res), 2)
+  expect_equal(res$by1[1], "By1")
+  expect_equal(res$cls1[1], "Class1")
+  expect_equal(res$cls2[1], "Class2")
+  expect_equal(res$TYPE[1], 0)
+  expect_equal(res$FREQ[1], 20)
+
+})
+
+
+test_that("means18: get_output wide no by or class works.", {
+
+  res <- get_output(datm,  var = c("PresentScore", "TasteScore"),
+                    stats = c("n", "mean", "min", "max", "range", "median"),
+                    direction = "wide", type = 0, freq = TRUE)
+
+  res
+
+  expect_equal(nrow(res), 2)
+  expect_equal(res$TYPE[1], 0)
+  expect_equal(res$FREQ[1], 20)
+
+})
+
+
+test_that("means19: get_output wide no extra works.", {
+
+  res <- get_output(datm,  var = c("PresentScore", "TasteScore"),
+                    stats = c("n", "mean", "min", "max", "range", "median"),
+                    direction = "wide")
+
+  res
+
+  expect_equal(nrow(res), 2)
+  expect_equal("TYPE" %in% names(res), FALSE)
+  expect_equal("FREQ" %in% names(res), FALSE)
+
+})
+
+
+
+test_that("means20: gen_output_means works.", {
+
+  res <- gen_output_means(datm,
+                          var = c("PresentScore", "TasteScore"),
+          output = list(out1 = output(stats = c("n", "mean", "min", "max")),
+                        out2 = output(stats = c("n", "mean", "std"))))
+
+  res
+
+  expect_equal(length(res), 2)
+
+  res1 <- res[[1]]
+  expect_equal(res1$STAT, c("N", "Mean", "Minimum", "Maximum"))
+
+  res2 <- res[[2]]
+  expect_equal(res2$STAT, c("N", "Mean", "Std_Dev"))
+
+
+})
+
+
+test_that("means21: get_class works.", {
+
+  res <- get_class(datm, var = c("PresentScore", "TasteScore"),
+                   class = "Layers",
+                   outp = output(stats = c("n", "mean", "min", "max"),
+                                 direction = "long"))
+
+
+  res
+
+  expect_equal(nrow(res), 12)
+
+})
+
+
+
+test_that("means15: gen_output_means works.", {
+
+  res <- gen_output_means(datm,
+                          var = c("PresentScore", "TasteScore"),
+                          class = "Layers",
+                          output = list(out1 = output(stats = c("n", "mean", "min", "max")),
+                                        out2 = output(stats = c("n", "mean", "std"))))
+
+  res
+
+  expect_equal(length(res), 2)
+
+  res1 <- res[[1]]
+  expect_equal(res1$STAT, c("N", "Mean", "Minimum", "Maximum"))
+
+  res2 <- res[[2]]
+  expect_equal(res2$STAT, c("N", "Mean", "Std_Dev"))
+
+
+})
+
+
+# test_that("means?: output parameters work.", {
 #
 #   res <- proc_means(datm, out = output(c("n", "means", "std")))
+#
+#
 #
 #
 # })

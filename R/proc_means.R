@@ -1,4 +1,8 @@
 
+# Means Procedure ---------------------------------------------------------
+
+
+
 #' @title Calculates Summary Statistics
 #' @encoding UTF-8
 #' @description The \code{proc_means} function generates summary statistics
@@ -70,7 +74,9 @@
 #' package for additional information on styles.
 #' @param titles A vector of one or more titles to use for the report output.
 # @param missing Whether to include missing (NA) values in the analysis.
-# By default, missing values are not included.
+# By default, missing values are not
+#' @param options An options object created with the \code{\link{opts}}
+#' function. This parameter can accept a variety of options.
 #' @param ... One or more output requests. To request a dataset output,
 #' use the desired dataset name as the parameter name, and pass in the
 #' \code{\link{output}} function with the desired parameters.  If only one
@@ -83,20 +89,18 @@
 #' @export
 proc_means <- function(data,
                        by = NULL,
-              #         class = NULL,
+                       class = NULL,
               #         class_options = NULL,
                        var = NULL,
                        stats = c("n", "mean", "std", "min", "max"),
               #         weight = NULL,
               #         weight_options = NULL,
                        view = TRUE,
-              #         output = NULL,
-              #         output_options = NULL,
                        report_type = NULL,
                        report_location = NULL,
                        report_style = NULL,
                        titles = NULL,
-                      # missing = FALSE,
+                       options = NULL,
                        ...) {
 
   # SAS seems to always ignore these
@@ -163,163 +167,75 @@ proc_means <- function(data,
     }
   }
 
+  res <- NULL
 
-  rptres <- generate_report(data, by = by, var = var,
+
+  rptres <- gen_report_means(data, by = by, var = var,
                             stats = stats, view = view,
                             report_type = report_type,
                             report_style = report_style,
                             titles = titles)
 
-  res <- rptres
-
- # res <- res[[length(res)]]
-
+  if (length(outreq) > 0) {
+    res <- gen_output_means(data,
+                           by = by,
+                           class = class,
+                           var = var,
+                           output = outreq
+                           )
+  }
 
 
   return(res)
 }
 
 
-generate_report <- function(data,
-                        by = NULL,
-                        #         class = NULL,
-                        #         class_options = NULL,
-                        var = NULL,
-                        stats = c("n", "mean", "std", "min", "max"),
-                        #         weight = NULL,
-                        #         weight_options = NULL,
-                        view = TRUE,
-                        report_type = NULL,
-                        report_location = NULL,
-                        report_style = NULL,
-                        titles = NULL) {
-
-  # Declare return list
-  res <- list()
-
-  #browser()
-
-  bylbls <- c()
-  if (!is.null(by)) {
-
-    lst <- unclass(data)[by]
-    for (nm in names(lst))
-      lst[[nm]] <- as.factor(lst[[nm]])
-    dtlst <- split(data, lst, sep = "|")
-
-    snms <- strsplit(names(dtlst), "|", fixed = TRUE)
-
-    for (k in seq_len(length(snms))) {
-      for (l in seq_len(length(by))) {
-        lv <- ""
-        if (!is.null(bylbls[k])) {
-          if (!is.na(bylbls[k])) {
-            lv <- bylbls[k]
-          }
-        }
-
-        if (l == length(by))
-          cma <- ""
-        else
-          cma <- ", "
-
-        bylbls[k] <- paste0(lv, by[l], "=", snms[[k]][l], cma)
-      }
-    }
-
-  } else {
-
-    dtlst <- list(data)
-  }
-
-  # Loop through by groups
-  for (j in seq_len(length(dtlst))) {
-
-    # Get table for this by group
-    dt <- dtlst[[j]]
-
-    # Calculate summary statistics
-    smtbl <- get_summaries(dt, var, stats, missing)
+# Stats ---------------------------------------------------------------
 
 
-    nm <- length(res) + 1
-
-    # Add spanning headers if there are by groups
-    if (!is.null(by)) {
-
-      # Add spanning headers
-      spn <- spanattr(1, ncol(smtbl), label = bylbls[j], level = 1)
-      attr(smtbl, "spans") <- list(spn)
-
-      nm <-  bylbls[j]
-    }
-
-    # Add default formats
-    for (cnm in names(smtbl)) {
-
-      if (typeof(smtbl[[cnm]]) %in% c("double")) {
-
-        attr(smtbl[[cnm]], "format") <- "%.4f"
-      }
-
-    }
-
-    # Convert to tibble if incoming data is a tibble
-    if ("tbl_df" %in% class(data))
-      res[[nm]] <- as_tibble(smtbl)
-    else
-      res[[nm]] <- smtbl
-
-
-  }
-
-
-  # Create output reports if requested
-  if (!is.null(report_type)) {
-
-    loc <- get_location("means", report_location)
-    out <- output_report(res, proc_type = 'means', dir_name = loc["dir_name"],
-                         file_name = loc["file_name"], out_type = report_type,
-                         style = report_style,
-                         titles = titles, margins = 1)
-
-
-  }
-
-  # Create viewer report if requested
-  if (view == TRUE) {
-
-
-    vrfl <- tempfile()
-
-    out <- output_report(res, proc_type = 'means', dir_name = dirname(vrfl),
-                         file_name = basename(vrfl), out_type = "HTML",
-                         style = report_style,
-                         titles = titles, margins = .5, viewer = TRUE)
-
-    show_viewer(out)
-  }
-
-
-  return(res)
-
-}
 
 
 get_output <- function(data, var, stats, missing = FALSE,
                              direction = "long", type = NULL, freq = FALSE,
                              by = NULL, class = NULL) {
 
+  ret <- get_summaries(data, var, stats, missing = missing,
+                       direction = direction)
 
-
-  dlst <-
+  if (freq)
+    ret <- cbind(data.frame(FREQ = nrow(data)), ret)
 
 
   if (!is.null(type))
-    ret <- cbind(data.frame(TYPE = type, FREQ = nrow(data)), ret)
-  else
-    ret <- cbind(data.frame(FREQ = nrow(data)), ret)
+    ret <- cbind(data.frame(TYPE = type), ret)
 
+  if (!is.null(class)) {
+    tmp <- list()
+    for(nm in names(class)) {
+      tmp[[nm]] <- class[nm]
+    }
+
+    df <- as.data.frame(tmp, stringsAsFactors = FALSE)
+
+    rownames(df) <- NULL
+
+    ret <- cbind(df, ret)
+  }
+
+  if (!is.null(by)) {
+    tmp <- list()
+    for(nm in names(by)) {
+      tmp[[nm]] <- by[nm]
+    }
+
+    df <- as.data.frame(tmp, stringsAsFactors = FALSE)
+
+    rownames(df) <- NULL
+
+    ret <- cbind(df, ret)
+  }
+
+  return(ret)
 }
 
 get_summaries <- function(data, var, stats, missing = FALSE,
@@ -622,3 +538,231 @@ get_summaries <- function(data, var, stats, missing = FALSE,
 }
 
 
+
+# Drivers --------------------------------------------------------------------
+
+
+gen_report_means <- function(data,
+                            by = NULL,
+                            #         class = NULL,
+                            #         class_options = NULL,
+                            var = NULL,
+                            stats = c("n", "mean", "std", "min", "max"),
+                            #         weight = NULL,
+                            #         weight_options = NULL,
+                            view = TRUE,
+                            report_type = NULL,
+                            report_location = NULL,
+                            report_style = NULL,
+                            titles = NULL) {
+
+  # Declare return list
+  res <- list()
+
+  #browser()
+
+  bylbls <- c()
+  if (!is.null(by)) {
+
+    lst <- unclass(data)[by]
+    for (nm in names(lst))
+      lst[[nm]] <- as.factor(lst[[nm]])
+    dtlst <- split(data, lst, sep = "|")
+
+    snms <- strsplit(names(dtlst), "|", fixed = TRUE)
+
+    for (k in seq_len(length(snms))) {
+      for (l in seq_len(length(by))) {
+        lv <- ""
+        if (!is.null(bylbls[k])) {
+          if (!is.na(bylbls[k])) {
+            lv <- bylbls[k]
+          }
+        }
+
+        if (l == length(by))
+          cma <- ""
+        else
+          cma <- ", "
+
+        bylbls[k] <- paste0(lv, by[l], "=", snms[[k]][l], cma)
+      }
+    }
+
+  } else {
+
+    dtlst <- list(data)
+  }
+
+  # Loop through by groups
+  for (j in seq_len(length(dtlst))) {
+
+    # Get table for this by group
+    dt <- dtlst[[j]]
+
+    # Calculate summary statistics
+    smtbl <- get_summaries(dt, var, stats, missing)
+
+
+    nm <- length(res) + 1
+
+    # Add spanning headers if there are by groups
+    if (!is.null(by)) {
+
+      # Add spanning headers
+      spn <- spanattr(1, ncol(smtbl), label = bylbls[j], level = 1)
+      attr(smtbl, "spans") <- list(spn)
+
+      nm <-  bylbls[j]
+    }
+
+    # Add default formats
+    for (cnm in names(smtbl)) {
+
+      if (typeof(smtbl[[cnm]]) %in% c("double")) {
+
+        attr(smtbl[[cnm]], "format") <- "%.4f"
+      }
+
+    }
+
+    # Convert to tibble if incoming data is a tibble
+    if ("tbl_df" %in% class(data))
+      res[[nm]] <- as_tibble(smtbl)
+    else
+      res[[nm]] <- smtbl
+
+
+  }
+
+
+  # Create output reports if requested
+  if (!is.null(report_type)) {
+
+    loc <- get_location("means", report_location)
+    out <- output_report(res, proc_type = 'means', dir_name = loc["dir_name"],
+                         file_name = loc["file_name"], out_type = report_type,
+                         style = report_style,
+                         titles = titles, margins = 1)
+
+
+  }
+
+  # Create viewer report if requested
+  if (view == TRUE) {
+
+
+    vrfl <- tempfile()
+
+    out <- output_report(res, proc_type = 'means', dir_name = dirname(vrfl),
+                         file_name = basename(vrfl), out_type = "HTML",
+                         style = report_style,
+                         titles = titles, margins = .5, viewer = TRUE)
+
+    show_viewer(out)
+  }
+
+
+  return(res)
+
+}
+
+
+gen_output_means <- function(data,
+                            by = NULL,
+                            class = NULL,
+                            #         class_options = NULL,
+                            var = NULL,
+                            #         weight = NULL,
+                            #         weight_options = NULL,
+                            output = NULL
+                            # missing = FALSE
+                            ) {
+
+  res <- list()
+  if (length(output) > 0) {
+
+    nms <- names(output)
+    for (i in seq_len(length(output))) {
+
+      outp <- output[[i]]
+      tp <- 0
+
+      # Always add type 0
+      tmpres <- get_output(data, var = var,
+                           by = NULL,
+                           class = NULL,
+                           stats = outp$stats,
+                           direction = outp$direction,
+                           freq = TRUE,
+                           type = tp)
+
+      bdat <- list(data)
+      if (!is.null(by)) {
+
+        bdat <- split(data, data[ , by], sep = "|")
+
+      }
+
+
+      if (!is.null(class)) {
+
+
+
+
+      }
+
+      res[[nms[i]]]  <- tmpres
+
+    }
+  }
+
+  if (length(res) == 1)
+    res <- res[[1]]
+
+
+  return(res)
+
+}
+
+
+get_class <- function(data, var, class, outp, freq = TRUE,
+                      type = NULL, byvals = NULL) {
+
+
+  res <- NULL
+
+  clslist <- list(data)
+  cnms <- NULL
+  if (!is.null(class)) {
+    clslist <- split(data, data[ , class], sep = "|")
+    cnms <- names(clslist)
+  }
+
+  for (k in seq_len(length(clslist))) {
+
+    cnmv <- NULL
+    if (!is.null(cnms)) {
+      cnmv <- strsplit(cnms[k], "|", fixed = TRUE)[[1]]
+      names(cnmv) <- class
+
+    }
+
+    tmpres <- get_output(clslist[[k]], var = var,
+                         by = byvals,
+                         class = cnmv,
+                         stats = outp$stats,
+                         direction = outp$direction,
+                         freq = freq,
+                         type = type)
+
+    if (!is.null(res))
+      res <- rbind(res, tmpres)
+    else
+      res <- tmpres
+  }
+
+
+
+  return(res)
+}
