@@ -15,7 +15,7 @@ proc_means(
   report_location = NULL,
   report_style = NULL,
   titles = NULL,
-  piped = FALSE
+  ...
 )
 }
 \arguments{
@@ -60,15 +60,15 @@ package for additional information on styles.}
 
 \item{titles}{A vector of one or more titles to use for the report output.}
 
-\item{piped}{Whether or not the \code{proc_freq} function is part of a data
-pipeline.  Set this parameter to TRUE if you want the function to return
-a single dataset instead of a list of datasets.  If there is more than one
-table requested, the function will return the last requested table.}
+\item{...}{One or more output requests. To request a dataset output,
+use the desired dataset name as the parameter name, and pass in the
+\code{\link{output}} function with the desired parameters.  If only one
+output dataset is requested, the function will return a single data frame.
+If more than one output dataset is requested, the function will return
+a list of data frames.}
 }
 \value{
-A list of datasets that contain the requested summary statistics.
-If the function is being used in a pipeline, set the
-\code{piped} parameter to TRUE, which will return only the last table.
+The requested summary statistics.
 }
 \description{
 The \code{proc_means} function generates summary statistics

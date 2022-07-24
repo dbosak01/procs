@@ -186,6 +186,23 @@ test_that("utils8: Options are case-insensitive", {
 })
 
 
+test_that("utils9: output() function works as expected.", {
+
+
+
+  out <- output(stats = c("mean", "median", "min", "max"), direction = "wide",
+                fork = "sammy", bork = c("one", "two", "three"))
+
+  out
+
+  expect_equal(length(out$stats), 4)
+  expect_equal(out$direction, "wide")
+  expect_equal(out$parameters$fork, "sammy")
+  expect_equal(length(out$parameters$bork), 3)
+
+
+})
+
 # test_that("utils9: round_up() matches SAS and not R", {
 #
 #

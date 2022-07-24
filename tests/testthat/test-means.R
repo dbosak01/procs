@@ -69,9 +69,9 @@ test_that("means1: get_summaries works as expected for two variables.", {
 
 
 
-test_that("means2: proc_means works as expected with two variables.", {
+test_that("means2: generate_report works as expected with two variables.", {
 
-  res <- proc_means(datm, var = c("PresentScore", "TasteScore"),
+  res <- generate_report(datm, var = c("PresentScore", "TasteScore"),
                     stats = c("n", "mean", "max", "min",
                               "range", "median", "std"),
                     titles = "My first title for Means")
@@ -93,29 +93,29 @@ test_that("means2: proc_means works as expected with two variables.", {
 
 })
 
-test_that("means3: check more stats options and piped parameter.", {
+# test_that("means3: check more stats options and piped parameter.", {
+#
+#   res <- proc_means(datm, var = c("PresentScore", "TasteScore"),
+#                     stats = c("sum", "nobs", "nmiss", "var", "css", "cv"),
+#                     titles = "My first title for Means",
+#                     piped = TRUE)
+#
+#   res
+#
+#   expect_equal("data.frame" %in% class(res), TRUE)
+#   expect_equal(ncol(res), 7)
+#
+#   expect_equal(res[2, "Sum"], 1627)
+#   expect_equal(res[2, "Nobs"], 20)
+#   expect_equal(res[2, "NMiss"], 0)
+#   expect_equal(res[2, "CSS"], 830.55)
+#   expect_equal(res[2, "CV"] > 8, TRUE)
+#
+# })
 
-  res <- proc_means(datm, var = c("PresentScore", "TasteScore"),
-                    stats = c("sum", "nobs", "nmiss", "var", "css", "cv"),
-                    titles = "My first title for Means",
-                    piped = TRUE)
+test_that("means4: generate_report with two variables and by group.", {
 
-  res
-
-  expect_equal("data.frame" %in% class(res), TRUE)
-  expect_equal(ncol(res), 7)
-
-  expect_equal(res[2, "Sum"], 1627)
-  expect_equal(res[2, "Nobs"], 20)
-  expect_equal(res[2, "NMiss"], 0)
-  expect_equal(res[2, "CSS"], 830.55)
-  expect_equal(res[2, "CV"] > 8, TRUE)
-
-})
-
-test_that("means4: proc_means with two variables and by group.", {
-
-  res <- proc_means(datm, var = c("PresentScore", "TasteScore"),
+  res <- generate_report(datm, var = c("PresentScore", "TasteScore"),
                     by = "Layers",
                     stats = c("n", "mean", "max", "min",
                               "range", "median", "std"),
@@ -131,9 +131,9 @@ test_that("means4: proc_means with two variables and by group.", {
 
 })
 
-test_that("means5: proc_means with two variables and two by groups.", {
+test_that("means5: generate_report with two variables and two by groups.", {
 
-  res <- proc_means(datm, var = c("PresentScore", "TasteScore"),
+  res <- generate_report(datm, var = c("PresentScore", "TasteScore"),
                     by = c("Flavor", "Layers"),
                     stats = c("n", "mean", "max", "min",
                               "range", "median", "std"),
@@ -168,9 +168,9 @@ test_that("means6: get_summaries works as expected for two variables with v().",
 })
 
 
-test_that("means7: proc_means with single parameter values.", {
+test_that("means7: generate_report with single parameter values.", {
 
-  res <- proc_means(datm, var = "PresentScore",
+  res <- generate_report(datm, var = "PresentScore",
                     stats = "mean",
                     titles = "My first title for Means")
 
@@ -234,6 +234,7 @@ test_that("means10: proc_means with variable parameter values.", {
 
 test_that("means10: proc_means with variable parameter values and v().", {
 
+  library(common)
   var1 <- "PresentScore"
   var2 <- v(n, mean, min, max, median)
 
@@ -274,14 +275,13 @@ test_that("means11: proc_means in function works.", {
 
 
 
-test_that("means12: check more stats options and piped parameter.", {
+test_that("means12: check more stats options", {
 
-  res <- proc_means(datm, var = v(PresentScore, TasteScore),
+  res1 <- proc_means(datm, var = v(PresentScore, TasteScore),
                     stats = v(nmiss, median, mode, clm, stderr),
-                    titles = "My first title for Means",
-                    piped = TRUE)
+                    titles = "My first title for Means")
 
-  res
+  res <- res1[[1]]
 
   mode(datm$TasteScore)
 
@@ -297,7 +297,7 @@ test_that("means12: check more stats options and piped parameter.", {
 
 })
 
-test_that("means13: check missing parameter works.", {
+test_that("means13: check missing value works.", {
 
 
   datm2 <- datm
@@ -398,4 +398,34 @@ test_that("means14: default vars works.", {
   expect_equal(ncol(res[[1]]), 6)
 
 })
+
+test_that("means15: get_summaries direction long works as expected.", {
+
+
+  res <- get_summaries(datm, var = c("PresentScore", "TasteScore"),
+                       stats = c("n", "mean", "min", "max", "range", "median"),
+                       direction = "long")
+
+  res
+
+
+  expect_equal(res[1, "PresentScore"], 20)
+  expect_equal(res[2, "PresentScore"], 76.15)
+  expect_equal(res[3, "PresentScore"], 56)
+  expect_equal(res[4, "PresentScore"], 93)
+  expect_equal(res[5, "PresentScore"], 37)
+  expect_equal(res[6, "PresentScore"], 77.5)
+
+})
+
+
+
+# test_that("means15: output parameters work.", {
+#
+#   res <- proc_means(datm, out = output(c("n", "means", "std")))
+#
+#
+# })
+
+
 

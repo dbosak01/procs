@@ -71,13 +71,13 @@
 #' @param titles A vector of one or more titles to use for the report output.
 # @param missing Whether to include missing (NA) values in the analysis.
 # By default, missing values are not included.
-#' @param piped Whether or not the \code{proc_freq} function is part of a data
-#' pipeline.  Set this parameter to TRUE if you want the function to return
-#' a single dataset instead of a list of datasets.  If there is more than one
-#' table requested, the function will return the last requested table.
-#' @return A list of datasets that contain the requested summary statistics.
-#' If the function is being used in a pipeline, set the
-#' \code{piped} parameter to TRUE, which will return only the last table.
+#' @param ... One or more output requests. To request a dataset output,
+#' use the desired dataset name as the parameter name, and pass in the
+#' \code{\link{output}} function with the desired parameters.  If only one
+#' output dataset is requested, the function will return a single data frame.
+#' If more than one output dataset is requested, the function will return
+#' a list of data frames.
+#' @return The requested summary statistics.
 #' @import fmtr
 #' @import tibble
 #' @export
@@ -97,11 +97,13 @@ proc_means <- function(data,
                        report_style = NULL,
                        titles = NULL,
                       # missing = FALSE,
-                       piped = FALSE) {
+                       ...) {
 
   # SAS seems to always ignore these
   # Not sure why R as an option to keep them
   missing <- FALSE
+
+  outreq <- list(...)
 
   # Deal with single value unquoted parameter values
   oby <- deparse(substitute(by, env = environment()))
@@ -160,6 +162,37 @@ proc_means <- function(data,
       stop(paste("Invalid stat name: ", stats[!tolower(stats) %in% st], "\n"))
     }
   }
+
+
+  rptres <- generate_report(data, by = by, var = var,
+                            stats = stats, view = view,
+                            report_type = report_type,
+                            report_style = report_style,
+                            titles = titles)
+
+  res <- rptres
+
+ # res <- res[[length(res)]]
+
+
+
+  return(res)
+}
+
+
+generate_report <- function(data,
+                        by = NULL,
+                        #         class = NULL,
+                        #         class_options = NULL,
+                        var = NULL,
+                        stats = c("n", "mean", "std", "min", "max"),
+                        #         weight = NULL,
+                        #         weight_options = NULL,
+                        view = TRUE,
+                        report_type = NULL,
+                        report_location = NULL,
+                        report_style = NULL,
+                        titles = NULL) {
 
   # Declare return list
   res <- list()
@@ -268,18 +301,31 @@ proc_means <- function(data,
   }
 
 
-  if (piped)
-    res <- res[[length(res)]]
-
-
-
   return(res)
+
 }
 
-#' @import fmtr
-get_summaries <- function(data, var, stats, missing = FALSE) {
 
-  narm <- !missing
+get_output <- function(data, var, stats, missing = FALSE,
+                             direction = "long", type = NULL, freq = FALSE,
+                             by = NULL, class = NULL) {
+
+
+
+  dlst <-
+
+
+  if (!is.null(type))
+    ret <- cbind(data.frame(TYPE = type, FREQ = nrow(data)), ret)
+  else
+    ret <- cbind(data.frame(FREQ = nrow(data)), ret)
+
+}
+
+get_summaries <- function(data, var, stats, missing = FALSE,
+                          direction = "wide") {
+
+  narm <- TRUE
   ret <- NULL
 
   for (nm in var) {
@@ -561,6 +607,13 @@ get_summaries <- function(data, var, stats, missing = FALSE) {
       ret <- rw
     else
       ret <- rbind(ret, rw)
+  }
+
+  if (direction == "long") {
+
+    ret <- proc_transpose(ret, id = "Variable", name = "STAT", )
+
+
   }
 
 

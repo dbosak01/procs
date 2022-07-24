@@ -147,10 +147,9 @@ test_that("transpose7: proc_means and proc_transpose.", {
 
 
   mres <- proc_means(score, var = c("Test1", "Test2", "Final"),
-                    stats = c("n", "mean", "std", "median", "min", "max"),
-                    piped = TRUE)
+                    stats = c("n", "mean", "std", "median", "min", "max"))
 
-  res <- proc_transpose(mres, id = "Variable", name = "Statistic")
+  res <- proc_transpose(mres[[1]], id = "Variable", name = "Statistic")
 
   res
 
