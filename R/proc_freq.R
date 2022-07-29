@@ -600,7 +600,7 @@ freq_oneway <- function(data, tb, weight, options, out = FALSE) {
 
 
   # Add spanning headers
-  spn <- spanattr(1, ncol(result), label = lbl, level = 1)
+  spn <- span(1, ncol(result), label = lbl, level = 1)
   attr(result, "spans") <- list(spn)
 
 
@@ -886,8 +886,8 @@ cross_tab <- function(freqdata, options, var1, var2, bylbl = NULL) {
   } else {
     lbl <- paste0("Table of ", var1, " by ", var2)
   }
-  spn2 <- spanattr(1, ncol(ret), label = lbl, level = 2)
-  spn1 <- spanattr(3, ncol(ret), label = lbl2, level = 1)
+  spn2 <- span(1, ncol(ret), label = lbl, level = 2)
+  spn1 <- span(3, ncol(ret), label = lbl2, level = 1)
   attr(ret, "spans") <- list(spn1, spn2)
 
   return(ret)

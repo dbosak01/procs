@@ -147,9 +147,11 @@ test_that("transpose7: proc_means and proc_transpose.", {
 
 
   mres <- proc_means(score, var = c("Test1", "Test2", "Final"),
-                    stats = c("n", "mean", "std", "median", "min", "max"))
+                    stats = c("n", "mean", "std", "median", "min", "max"),
+                    out = out(direction = "wide", type = FALSE,
+                              freq = FALSE))
 
-  res <- proc_transpose(mres[[1]], id = "Variable", name = "Statistic")
+  res <- proc_transpose(mres, id = "Variable", name = "Statistic")
 
   res
 
@@ -212,7 +214,7 @@ test_that("transpose9: transpose by with two variables.", {
 
 })
 
-test_that("transpose9: transpose by with two variables and v() function.", {
+test_that("transpose10: transpose by with two variables and v() function.", {
 
 
   res <- proc_transpose(dat2, var =v(Length1, Length2, Length3, Length4)
@@ -227,9 +229,10 @@ test_that("transpose9: transpose by with two variables and v() function.", {
 
 })
 
-test_that("transpose10: copy parameter works recycle bigger.", {
+test_that("transpose11: copy parameter works recycle bigger.", {
 
-  stats <- proc_means(datm)
+  stats <- proc_means(datm, out = out(direction = "wide",
+                                      type = FALSE, freq = FALSE))
 
 
   res1 <- data.frame(Group = "Group1", stats)
@@ -237,6 +240,8 @@ test_that("transpose10: copy parameter works recycle bigger.", {
   res2 <- proc_transpose(res1, copy = "Group",
                          name = "Statistic", id = "Variable")
 
+
+  res2
   expect_equal(nrow(res2), 5)
   expect_equal(ncol(res2), 6)
   expect_equal("Group" %in% names(res2), TRUE)
@@ -246,9 +251,10 @@ test_that("transpose10: copy parameter works recycle bigger.", {
 })
 
 
-test_that("transpose10: copy parameter works recycle smaller", {
+test_that("transpose12: copy parameter works recycle smaller", {
 
-  stats <- proc_means(datm, stats = c("n", "mean", "median"))
+  stats <- proc_means(datm, stats = c("n", "mean", "median"),
+                      out = out(direction = "wide", type = FALSE, freq = FALSE))
 
 
   res1 <- data.frame(Group = "Group1", stats)
@@ -256,6 +262,8 @@ test_that("transpose10: copy parameter works recycle smaller", {
   res2 <- proc_transpose(res1, copy = "Group",
                          name = "Statistic", id = "Variable")
 
+
+  res2
   expect_equal(nrow(res2), 3)
   expect_equal(ncol(res2), 6)
   expect_equal("Group" %in% names(res2), TRUE)

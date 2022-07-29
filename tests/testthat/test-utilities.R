@@ -186,11 +186,11 @@ test_that("utils8: Options are case-insensitive", {
 })
 
 
-test_that("utils9: output() function works as expected.", {
+test_that("utils9: out() function works as expected.", {
 
 
 
-  out <- output(stats = c("mean", "median", "min", "max"), direction = "wide",
+  out <- out(stats = c("mean", "median", "min", "max"), direction = "wide",
                 fork = "sammy", bork = c("one", "two", "three"))
 
   out

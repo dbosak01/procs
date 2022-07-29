@@ -5,9 +5,9 @@
 
 
 
-#' @title Specifies output dataset parameters
-#' @description The \code{output} function is used to request an output
-#' dataset.  The function is used as a parameter to multiple functions in
+#' @title Function to request an output dataset
+#' @description The \code{out} function is used to request an output
+#' dataset.  The function is used as a parameter to multiple procedures in
 #' the \strong{procs} package.
 #' @details Here is some details
 #' @param stats The requested statistics. The available statistics depend
@@ -17,7 +17,8 @@
 #' @param ... Various options.
 #' @return The output specifications.
 #' @export
-output <- function(stats = NULL, direction = "long", ...) {
+out <- function(stats = NULL,
+                direction = "long", ...) {
 
   ret <- structure(list(), class = c("output_spec", "list"))
 

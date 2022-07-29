@@ -79,10 +79,13 @@
 #' function. This parameter can accept a variety of options.
 #' @param ... One or more output requests. To request a dataset output,
 #' use the desired dataset name as the parameter name, and pass in the
-#' \code{\link{output}} function with the desired parameters.  If only one
+#' \code{\link{out}} function with the desired specifics.  If only one
 #' output dataset is requested, the function will return a single data frame.
 #' If more than one output dataset is requested, the function will return
-#' a list of data frames.
+#' a list of data frames. If no statistics are specified in the \code{\link{out}}
+#' function, the procedure will default to the statistics assigned on
+#' the \code{stats} parameter above.  Note that this default behavior is different
+#' from SAS®.
 #' @return The requested summary statistics.
 #' @import fmtr
 #' @import tibble
@@ -107,7 +110,8 @@ proc_means <- function(data,
   # Not sure why R as an option to keep them
   missing <- FALSE
 
-  outreq <- list(...)
+
+
 
   # Deal with single value unquoted parameter values
   oby <- deparse(substitute(by, env = environment()))
@@ -167,6 +171,18 @@ proc_means <- function(data,
     }
   }
 
+  # Set default statistics for output parameters
+  outreq <- list(...)
+  if (length(outreq) >= 1) {
+    for (nm in names(outreq)) {
+
+      if (is.null(outreq[[nm]]$stats)) {
+
+        outreq[[nm]]$stats <- stats
+      }
+    }
+  }
+
   res <- NULL
 
 
@@ -198,6 +214,9 @@ proc_means <- function(data,
 get_output <- function(data, var, stats, missing = FALSE,
                              direction = "long", type = NULL, freq = FALSE,
                              by = NULL, class = NULL) {
+
+  if (is.null(stats))
+    stats <- c("n", "mean", "std", "min", "max")
 
   ret <- get_summaries(data, var, stats, missing = missing,
                        direction = direction)
@@ -610,7 +629,7 @@ gen_report_means <- function(data,
     if (!is.null(by)) {
 
       # Add spanning headers
-      spn <- spanattr(1, ncol(smtbl), label = bylbls[j], level = 1)
+      spn <- span(1, ncol(smtbl), label = bylbls[j], level = 1)
       attr(smtbl, "spans") <- list(spn)
 
       nm <-  bylbls[j]
@@ -667,7 +686,7 @@ gen_report_means <- function(data,
 
 }
 
-
+#' @import common
 gen_output_means <- function(data,
                             by = NULL,
                             class = NULL,
@@ -686,7 +705,16 @@ gen_output_means <- function(data,
     for (i in seq_len(length(output))) {
 
       outp <- output[[i]]
+
+      # Whether to include type variable
       tp <- 0
+      if (outp$parameters$type %eq% FALSE)
+        tp <- NULL
+
+      # Whether to include freq variable
+      frq <- TRUE
+      if (outp$parameters$freq %eq% FALSE)
+        frq <- FALSE
 
       # Always add type 0
       tmpres <- get_output(data, var = var,
@@ -694,7 +722,7 @@ gen_output_means <- function(data,
                            class = NULL,
                            stats = outp$stats,
                            direction = outp$direction,
-                           freq = TRUE,
+                           freq = frq,
                            type = tp)
 
       bdat <- list(data)

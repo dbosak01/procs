@@ -80,7 +80,7 @@ get_fisher <- function(x, y, wgt = NULL, bylbl = "") {
 
   attr(ret$Value, "format") <- "%.4f"
 
-  spn <- list(spanattr(1, 2, paste0(bylbl, "Fisher's Exact Test"), level = 1))
+  spn <- list(span(1, 2, paste0(bylbl, "Fisher's Exact Test"), level = 1))
   attr(ret, "spans") <- spn
 
   return(ret)
@@ -118,7 +118,7 @@ get_chisq <- function(x, y, wgt = NULL, corrct = FALSE, bylbl = "") {
   attr(ret$Value, "format") <- "%.4f"
 
 
-  spn <- list(spanattr(1, 2, paste0(bylbl, "Chi-Square Test"), level = 1))
+  spn <- list(span(1, 2, paste0(bylbl, "Chi-Square Test"), level = 1))
   attr(ret, "spans") <- spn
 
 

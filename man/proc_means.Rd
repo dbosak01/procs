@@ -8,6 +8,7 @@
 proc_means(
   data,
   by = NULL,
+  class = NULL,
   var = NULL,
   stats = c("n", "mean", "std", "min", "max"),
   view = TRUE,
@@ -15,6 +16,7 @@ proc_means(
   report_location = NULL,
   report_style = NULL,
   titles = NULL,
+  options = NULL,
   ...
 )
 }
@@ -59,6 +61,9 @@ See the \code{\link[reporter]{create_style}} in the \strong{reporter}
 package for additional information on styles.}
 
 \item{titles}{A vector of one or more titles to use for the report output.}
+
+\item{options}{An options object created with the \code{\link{opts}}
+function. This parameter can accept a variety of options.}
 
 \item{...}{One or more output requests. To request a dataset output,
 use the desired dataset name as the parameter name, and pass in the
