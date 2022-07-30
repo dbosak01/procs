@@ -280,14 +280,13 @@ test_that("means11: proc_means in function works.", {
 
 test_that("means12: check more stats options", {
 
-  res1 <- proc_means(datm, var = v(PresentScore, TasteScore),
+  res <- proc_means(datm, var = v(PresentScore, TasteScore),
                     out1 = out(stats = v(nmiss, median, mode, clm, stderr),
                                direction = "wide", type = FALSE, freq = FALSE),
                     titles = "My first title for Means")
 
-  res <- res1
+  res
 
-  mode(datm$TasteScore)
 
   expect_equal("data.frame" %in% class(res), TRUE)
   expect_equal(ncol(res), 7)
@@ -547,14 +546,145 @@ test_that("means23: gen_output_means works.", {
   expect_equal(length(res), 2)
 
   res1 <- res[[1]]
-  expect_equal(res1$STAT, c("N", "Mean", "Minimum", "Maximum"))
+  expect_equal(res1$STAT[1:4], c("N", "Mean", "Minimum", "Maximum"))
 
   res2 <- res[[2]]
-  expect_equal(res2$STAT, c("N", "Mean", "Std_Dev"))
+  expect_equal(res2$STAT[1:3], c("N", "Mean", "Std_Dev"))
 
 
 })
 
+# Matches SAS
+test_that("means24: class parameter works.", {
+
+  var1 <- c("Age", "PresentScore", "TasteScore")
+  var2 <- c("n", "min", "max", "mean", "std")
+
+  res <- proc_means(datm, var = var1,
+                    stats = var2,
+                    class = Layers,
+                    titles = "My first title for Means",
+                    out = out())
+
+  res
+
+  expect_equal("data.frame" %in% class(res), TRUE)
+  expect_equal(nrow(res), 20)
+  expect_equal(ncol(res), 7)
+  expect_equal(res[1, 5], 20)
+  expect_equal(res[2, 5], 19)
+  expect_equal(res[3, 5], 69)
+  expect_equal(res[4, 5], 40.2)
+  expect_equal(res[5, 5], 14.827428354)
+  expect_equal(res[6, 6], 9)
+  expect_equal(res[7, 6], 56)
+  expect_equal(res[8, 6], 93)
+  expect_equal(res[9, 6], 76.777777778)
+  expect_equal(res[10, 6], 11.829811683)
+  expect_equal(res[11, 7], 8)
+  expect_equal(res[12, 7], 72)
+  expect_equal(res[13, 7], 92)
+  expect_equal(res[14, 7], 79.375)
+  expect_equal(res[15, 7], 7.5769858312)
+  expect_equal(res[16, 7], 3)
+  expect_equal(res[17, 7], 84)
+  expect_equal(res[18, 7], 91)
+  expect_equal(res[19, 7], 86.333333333)
+  expect_equal(res[20, 7], 4.0414518843)
+})
+
+
+test_that("means24: get_output with by works", {
+  var2 <- c("n", "min", "max", "mean", "std")
+
+  res <- get_output(datm, var = "PresentScore", stats = var2,
+             by = c("Layers" = 1))
+  res
+
+  expect_equal(nrow(res), 5)
+
+})
+
+test_that("means25: by parameter works.", {
+
+  var1 <- c("Age", "PresentScore", "TasteScore")
+  var2 <- c("n",  "mean", "std", "min", "max")
+
+  res <- proc_means(datm, var = var1,
+                    stats = var2,
+                    by = "Layers",
+                  #  class = "Flavor",
+                    titles = "My first title for Means",
+                    out = out())
+
+  res
+
+  expect_equal(nrow(res), 15)
+  expect_equal(ncol(res), 7)
+
+})
+
+test_that("means26: by with class works.", {
+
+  var1 <- c("Age", "PresentScore", "TasteScore")
+  var2 <- c("n",  "mean", "std", "min", "max")
+
+  res <- proc_means(datm, var = var1,
+                    stats = var2,
+                    by = "Layers",
+                    class = "Flavor",
+                    titles = "My first title for Means",
+                    out = out())
+
+  res
+
+  expect_equal(nrow(res), 60)
+  expect_equal(ncol(res), 8)
+
+})
+
+
+test_that("means27: 2 class vars works.", {
+
+  var1 <- c("Age", "PresentScore", "TasteScore")
+  var2 <- c("n",  "mean", "std", "min", "max")
+
+  res <- proc_means(datm, var = var1,
+                    stats = var2,
+                    #by = "Layers",
+                    class = c("Layers", "Flavor"),
+                    titles = "My first title for Means",
+                    out = out())
+
+  res
+
+  expect_equal(nrow(res), 53)
+  expect_equal(ncol(res), 8)
+
+})
+
+
+
+test_that("means28: by and 2 class vars works.", {
+
+  var1 <- c("Age", "PresentScore", "TasteScore")
+  var2 <- c("n",  "mean", "std", "min", "max")
+  datm2 <- datm
+  datm2$Group <- c(rep("A", 10), rep("B", 10))
+
+  res <- proc_means(datm2, var = var1,
+                    stats = var2,
+                    by = "Group",
+                    class = c("Layers", "Flavor"),
+                    titles = "My first title for Means",
+                    out = out())
+
+  res
+
+  expect_equal(nrow(res), 72)
+  expect_equal(ncol(res), 9)
+
+})
 
 # test_that("means?: output parameters work.", {
 #

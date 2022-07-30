@@ -118,6 +118,11 @@ proc_means <- function(data,
   by <- tryCatch({if (typeof(by) %in% c("character", "NULL")) by else oby},
                  error = function(cond) {oby})
 
+  # Deal with single value unquoted parameter values
+  oclass <- deparse(substitute(class, env = environment()))
+  class <- tryCatch({if (typeof(class) %in% c("character", "NULL")) class else oclass},
+                 error = function(cond) {oclass})
+
   ovar <- deparse(substitute(var, env = environment()))
   var <- tryCatch({if (typeof(var) %in% c("character", "NULL")) var else ovar},
                  error = function(cond) {ovar})
@@ -156,6 +161,14 @@ proc_means <- function(data,
       stop(paste("Invalid variable name: ", var[!var %in% nms], "\n"))
     }
   }
+
+  if (!is.null(class)) {
+    if (!all(class %in% nms)) {
+
+      stop(paste("Invalid variable name: ", class[!class %in% nms], "\n"))
+    }
+  }
+
   if (is.null(stats)) {
     stop("stats parameter is required.")
   } else {
@@ -186,7 +199,7 @@ proc_means <- function(data,
   res <- NULL
 
 
-  rptres <- gen_report_means(data, by = by, var = var,
+  rptres <- gen_report_means(data, by = by, var = var, class = class,
                             stats = stats, view = view,
                             report_type = report_type,
                             report_style = report_style,
@@ -563,7 +576,7 @@ get_summaries <- function(data, var, stats, missing = FALSE,
 
 gen_report_means <- function(data,
                             by = NULL,
-                            #         class = NULL,
+                            class = NULL,
                             #         class_options = NULL,
                             var = NULL,
                             stats = c("n", "mean", "std", "min", "max"),
@@ -619,8 +632,13 @@ gen_report_means <- function(data,
     # Get table for this by group
     dt <- dtlst[[j]]
 
+    # data, var, class, outp, freq = TRUE,
+    # type = NULL, byvals = NULL
+    outp <- out(stats = stats, direction = "wide")
+    smtbl <- get_class(dt, var, class, outp, freq = FALSE)
+
     # Calculate summary statistics
-    smtbl <- get_summaries(dt, var, stats, missing)
+    #smtbl <- get_summaries(dt, var, stats, missing)
 
 
     nm <- length(res) + 1
@@ -716,14 +734,13 @@ gen_output_means <- function(data,
       if (outp$parameters$freq %eq% FALSE)
         frq <- FALSE
 
-      # Always add type 0
-      tmpres <- get_output(data, var = var,
-                           by = NULL,
-                           class = NULL,
-                           stats = outp$stats,
-                           direction = outp$direction,
-                           freq = frq,
-                           type = tp)
+      # Create vector of NA class values
+      cls <- NULL
+      if (!is.null(class)) {
+        cls <- rep(NA, length(class))
+        names(cls) <- class
+
+      }
 
       bdat <- list(data)
       if (!is.null(by)) {
@@ -731,12 +748,48 @@ gen_output_means <- function(data,
         bdat <- split(data, data[ , by], sep = "|")
 
       }
+      bynms <- names(bdat)
+
+      tmpres <- NULL
+
+      for (j in seq_len(length(bdat))) {
+
+        dat <- bdat[[j]]
+
+        # Deal with by variable values
+        bynm <- NULL
+        if (!is.null(bynms)) {
+          bynm <- strsplit(bynms[j], "|", fixed = TRUE)
+          names(bynm) <- by
+        }
+
+        # Always add type 0
+        tmpby <- get_output(dat, var = var,
+                             by = bynm,
+                             class = cls,
+                             stats = outp$stats,
+                             direction = outp$direction,
+                             freq = frq,
+                             type = tp)
+
+        if (is.null(tmpres))
+          tmpres <- tmpby
+        else
+          tmpres <- rbind(tmpres, tmpby)
 
 
-      if (!is.null(class)) {
+        if (!is.null(class)) {
 
+          if (!is.null(tp))
+            tp <- 1
 
+          tmpcls <- get_class(dat, var = var,
+                              class = class, outp = outp,
+                              freq = frq, type = tp, byvals = bynm)
 
+          tmpres <- rbind(tmpres, tmpcls)
+
+        }
 
       }
 
