@@ -67,10 +67,13 @@ function. This parameter can accept a variety of options.}
 
 \item{...}{One or more output requests. To request a dataset output,
 use the desired dataset name as the parameter name, and pass in the
-\code{\link{output}} function with the desired parameters.  If only one
+\code{\link{out}} function with the desired specifics.  If only one
 output dataset is requested, the function will return a single data frame.
 If more than one output dataset is requested, the function will return
-a list of data frames.}
+a list of data frames. If no statistics are specified in the \code{\link{out}}
+function, the procedure will default to the statistics assigned on
+the \code{stats} parameter above.  Note that this default behavior is different
+from SAS®.}
 }
 \value{
 The requested summary statistics.

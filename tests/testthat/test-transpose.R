@@ -272,23 +272,53 @@ test_that("transpose12: copy parameter works recycle smaller", {
 
 })
 
-# Not working
-# test_that("transpose10: copy parameter works with by groups", {
-#
-#   stats <- proc_means(datm, stats = c("n", "mean", "median"), by = "Layers")
-#
-#
-#   res1 <- data.frame(Group = "Group1", stats)
-#
-#   res2 <- proc_transpose(res1, copy = "Group",
-#                          name = "Statistic", id = "Variable")
-#
-#   expect_equal(nrow(res2), 3)
-#   expect_equal(ncol(res2), 6)
-#   expect_equal("Group" %in% names(res2), TRUE)
-#
-#
-#
-# })
+
+test_that("transpose12: copy parameter works recycle smaller", {
+
+
+  mns <- proc_means(datm, stats = c("n", "mean", "median", "min", "max"),
+                    var = "Age", class = "Flavor",
+                    out = out(direction = "wide", type = FALSE, freq = FALSE))
+
+  mns[1, 1] <- "Total"
+  mns
+
+  res <- proc_transpose(mns, var = c("N", "Mean", "Median", "Minimum", "Maximum"),
+                        copy = "Variable", name = "Stat", id = "Flavor")
+
+
+  res <- res[, c("Variable", "Stat", "Chocolate", "Rum", "Spice", "Vanilla", "Total")]
+
+  res
+
+  expect_equal(nrow(res), 5)
+  expect_equal(ncol(res), 7)
+
+})
+
+# Is working
+test_that("transpose13: copy parameter works with by groups", {
+
+  stats <- proc_means(datm, stats = c("n", "mean", "median"),
+                      var = c("Age", "PresentScore", "TasteScore"),
+                      by = "Layers", out = out(type = FALSE, freq = FALSE,
+                                               direction ="wide"))
+
+  stats
+
+  res1 <- data.frame(Group = "Group1", stats)
+
+  res2 <- proc_transpose(res1, copy = "Group", by = "Layers",
+                         name = "Statistic", id = "Variable")
+
+  res2
+
+  expect_equal(nrow(res2), 9)
+  expect_equal(ncol(res2), 6)
+  expect_equal("Group" %in% names(res2), TRUE)
+
+
+
+})
 
 

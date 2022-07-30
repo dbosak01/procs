@@ -2,7 +2,7 @@
 % Please edit documentation in R/supplements.R
 \name{out}
 \alias{out}
-\title{Specifies output dataset parameters}
+\title{Function to request an output dataset}
 \usage{
 out(stats = NULL, direction = "long", ...)
 }
@@ -20,7 +20,7 @@ The output specifications.
 }
 \description{
 The \code{out} function is used to request an output
-dataset.  The function is used as a parameter to multiple functions in
+dataset.  The function is used as a parameter to multiple procedures in
 the \strong{procs} package.
 }
 \details{

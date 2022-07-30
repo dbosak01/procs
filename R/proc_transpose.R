@@ -89,6 +89,8 @@ proc_transpose <- function(data,
      }
    }
 
+   var <- var[!var %in% c(by, id, idlabel, copy)]
+
    if (length(nms) == 0) {
      stop("No variables to transpose.  You may need to specify the var parameter")
 

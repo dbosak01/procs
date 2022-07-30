@@ -159,10 +159,6 @@
 #' See the \code{\link[reporter]{create_style}} in the \strong{reporter}
 #' package for additional information on styles.
 #' @param titles A vector of one or more titles to use for the report output.
-#' @param piped Whether or not the \code{proc_freq} function is part of a data
-#' pipeline.  Set this parameter to TRUE if you want the function to return
-#' a single dataset instead of a list of datasets.  If there is more than one
-#' table requested, the function will return the last requested table.
 #' @return By default the function returns a list of tibbles
 #' that contains the requested frequency tables.
 #' The tables are named according to the variable or variables
@@ -270,8 +266,7 @@ proc_freq <- function(data,
                       report_type = NULL,
                       report_location = NULL,
                       report_style = NULL,
-                      titles = NULL,
-                      piped = FALSE) {
+                      titles = NULL) {
 
 
   # Deal with single value unquoted parameter values
@@ -498,10 +493,7 @@ proc_freq <- function(data,
     show_viewer(out)
   }
 
-  if (piped == TRUE) {
 
-    res <- res[[length(res)]]
-  }
 
   return(res)
 
@@ -892,4 +884,45 @@ cross_tab <- function(freqdata, options, var1, var2, bylbl = NULL) {
 
   return(ret)
 }
+
+
+
+# Drivers -----------------------------------------------------------------
+
+
+gen_report_freq <- function() {
+
+
+
+
+  gv <- options("procs.view")[[1]]
+  if (is.null(gv))
+    gv <- TRUE
+
+  if (gv) {
+
+
+
+  }
+
+}
+
+
+
+
+gen_output_freq <- function() {
+
+
+
+}
+
+
+get_class <- function() {
+
+
+
+}
+
+
+
 

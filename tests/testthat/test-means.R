@@ -686,6 +686,26 @@ test_that("means28: by and 2 class vars works.", {
 
 })
 
+
+test_that("means29: Default outputs work as expected.", {
+
+  options("procs.view" = FALSE)
+
+  res <- proc_means(datm)
+
+  expect_equal(nrow(res), 4)
+  expect_equal(ncol(res), 6)
+
+
+  res2 <- proc_means(datm, out = out())
+
+  expect_equal(nrow(res2), 5)
+  expect_equal(ncol(res2), 7)
+
+  options("procs.view" = NULL)
+
+})
+
 # test_that("means?: output parameters work.", {
 #
 #   res <- proc_means(datm, out = output(c("n", "means", "std")))

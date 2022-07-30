@@ -604,27 +604,27 @@ test_that("freq22: Crosstab option to turn off totals works.", {
 
 })
 
-test_that("freq23: Piped option works as expected.", {
-
-  library(common)
-
-
-  labels(dat) <- list(Eyes = "Eye Color",
-                      Hair = "Hair Color",
-                      Region = "Geographic Region")
-
-  res <- proc_freq(dat, tables = c("Eyes * Hair"),
-                   table_options = list(out = "FreqTbl"),
-                   weight = "Count",
-                   titles = "Eye and Hair Color of European Children",
-                   piped = TRUE)
-
-  res
-
-  expect_equal("data.frame" %in% class(res), TRUE)
-
-
-})
+# test_that("freq23: Piped option works as expected.", {
+#
+#   library(common)
+#
+#
+#   labels(dat) <- list(Eyes = "Eye Color",
+#                       Hair = "Hair Color",
+#                       Region = "Geographic Region")
+#
+#   res <- proc_freq(dat, tables = c("Eyes * Hair"),
+#                    table_options = list(out = "FreqTbl"),
+#                    weight = "Count",
+#                    titles = "Eye and Hair Color of European Children",
+#                    piped = TRUE)
+#
+#   res
+#
+#   expect_equal("data.frame" %in% class(res), TRUE)
+#
+#
+# })
 
 
 test_that("freq24: report_style parameter works as expected.", {

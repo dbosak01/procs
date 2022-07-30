@@ -194,6 +194,11 @@ proc_means <- function(data,
         outreq[[nm]]$stats <- stats
       }
     }
+  } else {
+
+   outreq[["out"]] <- out(stats = stats, direction = "wide",
+                          type = FALSE, freq = FALSE)
+
   }
 
   res <- NULL
@@ -685,18 +690,25 @@ gen_report_means <- function(data,
 
   }
 
+
+  gv <- options("procs.view")[[1]]
+  if (is.null(gv))
+    gv <- TRUE
+
   # Create viewer report if requested
-  if (view == TRUE) {
+  if (gv) {
+    if (view == TRUE) {
 
 
-    vrfl <- tempfile()
+      vrfl <- tempfile()
 
-    out <- output_report(res, proc_type = 'means', dir_name = dirname(vrfl),
-                         file_name = basename(vrfl), out_type = "HTML",
-                         style = report_style,
-                         titles = titles, margins = .5, viewer = TRUE)
+      out <- output_report(res, proc_type = 'means', dir_name = dirname(vrfl),
+                           file_name = basename(vrfl), out_type = "HTML",
+                           style = report_style,
+                           titles = titles, margins = .5, viewer = TRUE)
 
-    show_viewer(out)
+      show_viewer(out)
+    }
   }
 
 
