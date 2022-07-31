@@ -159,6 +159,8 @@
 #' See the \code{\link[reporter]{create_style}} in the \strong{reporter}
 #' package for additional information on styles.
 #' @param titles A vector of one or more titles to use for the report output.
+#' @param ... One or more output dataset requests.  Use the \code{\link{out}}
+#' function to make these requests.
 #' @return By default the function returns a list of tibbles
 #' that contains the requested frequency tables.
 #' The tables are named according to the variable or variables
@@ -263,10 +265,11 @@ proc_freq <- function(data,
                    #   weight_options = NULL,
                       view = TRUE,
                    #   output = NULL,
-                      report_type = NULL,
-                      report_location = NULL,
-                      report_style = NULL,
-                      titles = NULL) {
+                      # report_type = NULL,
+                      # report_location = NULL,
+                      # report_style = NULL,
+                      titles = NULL,
+                      ...) {
 
 
   # Deal with single value unquoted parameter values
@@ -316,183 +319,44 @@ proc_freq <- function(data,
     }
   }
 
+  # Set default statistics for output parameters
+  outreq <- list(...)
+  # if (length(outreq) >= 1) {
+  #   for (nm in names(outreq)) {
+  #
+  #     if (is.null(outreq[[nm]]$stats)) {
+  #
+  #       outreq[[nm]]$stats <- stats
+  #     }
+  #   }
+  # } else {
+  #
+  #   outreq[["out"]] <- out(stats = stats, direction = "wide",
+  #                          type = FALSE, freq = FALSE)
+  #
+  # }
 
-  res <- list()
-  # print("Orig print_location")
-  # print(print_location)
-  # browser()
 
-  bylbls <- c()
-  if (!is.null(by)) {
+  res <- NULL
 
-    lst <- unclass(data)[by]
-    for (nm in names(lst))
-      lst[[nm]] <- as.factor(lst[[nm]])
-    dtlst <- split(data, lst, sep = "|")
+  rptres <- gen_report_freq(data = data,
+                            by = by,
+                            tables = tables,
+                            table_options = table_options,
+                            weight = weight,
+                            view = view,
+                            titles = titles)
 
-    snms <- strsplit(names(dtlst), "|", fixed = TRUE)
+  if (length(outreq) > 0) {
 
-    for (k in seq_len(length(snms))) {
-      for (l in seq_len(length(by))) {
-        lv <- ""
-        if (!is.null(bylbls[k])) {
-          if (!is.na(bylbls[k])) {
-            lv <- bylbls[k]
-          }
-        }
-
-        bylbls[k] <- paste0(lv, by[l], "=", snms[[k]][l], ", ")
-      }
-    }
-
-  } else {
-
-    dtlst <- list(data)
-  }
-
-  # Loop through by groups
-  for (j in seq_len(length(dtlst))) {
-
-    # Get table for this by group
-    dt <- dtlst[[j]]
-
-    # Loop through table requests
-    for (i in seq_len(length(tables))) {
-
-      nm <- names(tables)[i]
-      tb <- tables[i]
-      #browser()
-      out <- i == length(tables) & has_option(table_options, "out")
-
-      crstab <- NULL
-      chisq <- NULL
-      fisher <- NULL
-
-      # Split cross variables
-      splt <- trimws(strsplit(tb, "*", fixed = TRUE)[[1]])
-
-      # Perform either one-way or two-way frequency count
-      if (length(splt) == 1) {
-
-        # Assign new label if there are by groups
-        if (length(bylbls[j]) > 0) {
-          if (!is.null(attr(data[[tb]], "label")))
-            attr(dt[[tb]], "label") <- paste0(bylbls[j], attr(data[[tb]], "label"))
-          else
-            attr(dt[[tb]], "label") <- paste0(bylbls[j], tb)
-        }
-
-        # Perform one-way frequency
-        result <- freq_oneway(dt, tb, weight, table_options, out)
-
-      } else if (length(splt) == 2) {
-
-        bylbl <- NULL
-        if (length(bylbls[j]) > 0) {
-          bylbl <- bylbls[j]
-        }
-
-        # Perform two-way frequency
-        result <- freq_twoway(dt, splt[1], splt[2], weight, table_options, out)
-
-        # Perform cross tab by default
-        crstab <- cross_tab(result, table_options, splt[1], splt[2], bylbl)
-
-        if (get_option(table_options, "fisher", FALSE)) {
-
-          if (!is.null(weight))
-            fisher <- get_fisher(dt[[splt[1]]], dt[[splt[[2]]]], dt[[weight]],
-                                 bylbl = bylbls[j])
-          else
-            fisher <- get_fisher(dt[[splt[1]]], dt[[splt[[2]]]],
-                                 bylbl = bylbls[j])
-        }
-
-        if (get_option(table_options, "chisq", FALSE)) {
-
-          if (!is.null(weight))
-            chisq <- get_chisq(dt[[splt[1]]], dt[[splt[[2]]]], dt[[weight]],
-                               bylbl = bylbls[j])
-          else
-            chisq <- get_chisq(dt[[splt[1]]], dt[[splt[[2]]]], bylbl = bylbls[j])
-        }
-
-      } else {
-
-        stop("Procedure does not yet support n-way frequencies.")
-      }
-
-      # Cast to tibble if incoming data was a tibble
-      if ("tbl_df" %in% class(data)) {
-        if (!is.null(crstab))
-          crstab <- as_tibble(crstab)
-
-        if (!is.null(result))
-          result <- as_tibble(result)
-
-        if (!is.null(fisher))
-          fisher <- as_tibble(fisher)
-
-        if (!is.null(chisq))
-          chisq <- as_tibble(chisq)
-
-      }
-
-      # If a cross tab was produced, add it to result
-      if (!is.null(crstab)) {
-
-          res[[get_name(nm, tb, bylbls[j])]] <- crstab
-
-        if ("out" %in% names(table_options) & i == length(tables)) {
-
-          res[[get_name(table_options[["out"]], "", bylbls[j])]] <- result
-        }
-
-      } else { # Otherwise add one-way to result
-
-          res[[get_name(nm, tb, bylbls[j])]] <- result
-
-      }
-
-      if (!is.null(chisq)) {
-
-        res[[get_name("Chisq", tb, bylbls[j])]] <- chisq
-      }
-
-      if (!is.null(fisher)) {
-
-        res[[get_name("Fisher", tb, bylbls[j])]] <- fisher
-      }
-    }
+    res <- gen_output_freq(data = data,
+                           by = by,
+                           tables = tables,
+                           table_options = table_options,
+                           weight = weight,
+                           output = outreq)
 
   }
-
-  # Create output reports if requested
-  if (!is.null(report_type)) {
-
-    loc <- get_location("freq", report_location)
-    out <- output_report(res, proc_type = 'freq', dir_name = loc["dir_name"],
-                         file_name = loc["file_name"], out_type = report_type,
-                         style = report_style,
-                         titles = titles, margins = 1)
-
-
-  }
-
-  # Create viewer report if requested
-  if (view == TRUE) {
-
-
-    vrfl <- tempfile()
-
-    out <- output_report(res, proc_type = 'freq', dir_name = dirname(vrfl),
-                         file_name = basename(vrfl), out_type = "HTML",
-                         style = report_style,
-                         titles = titles, margins = .5, viewer = TRUE)
-
-    show_viewer(out)
-  }
-
 
 
   return(res)
@@ -885,32 +749,230 @@ cross_tab <- function(freqdata, options, var1, var2, bylbl = NULL) {
   return(ret)
 }
 
+get_output_oneway <- function(data, tb, weight = NULL, options = NULL, out = FALSE,
+                              by = NULL, class = NULL) {
+
+
+}
+
+
+get_output_twoway <- function(data, tb1, tb2, weight, options, out = FALSE,
+                              by = NULL, class = NULL) {
+
+
+
+}
+
 
 
 # Drivers -----------------------------------------------------------------
 
 
-gen_report_freq <- function() {
+gen_report_freq <- function(data,
+                            by = NULL,
+                            tables = NULL,
+                            table_options = NULL,
+                            weight = NULL,
+                            #   weight_options = NULL,
+                            view = TRUE,
+                            #   output = NULL,
+                            titles = NULL ) {
 
+  res <- list()
+  # print("Orig print_location")
+  # print(print_location)
+  # browser()
 
+  bylbls <- c()
+  if (!is.null(by)) {
+
+    lst <- unclass(data)[by]
+    for (nm in names(lst))
+      lst[[nm]] <- as.factor(lst[[nm]])
+    dtlst <- split(data, lst, sep = "|")
+
+    snms <- strsplit(names(dtlst), "|", fixed = TRUE)
+
+    for (k in seq_len(length(snms))) {
+      for (l in seq_len(length(by))) {
+        lv <- ""
+        if (!is.null(bylbls[k])) {
+          if (!is.na(bylbls[k])) {
+            lv <- bylbls[k]
+          }
+        }
+
+        bylbls[k] <- paste0(lv, by[l], "=", snms[[k]][l], ", ")
+      }
+    }
+
+  } else {
+
+    dtlst <- list(data)
+  }
+
+  # Loop through by groups
+  for (j in seq_len(length(dtlst))) {
+
+    # Get table for this by group
+    dt <- dtlst[[j]]
+
+    # Loop through table requests
+    for (i in seq_len(length(tables))) {
+
+      nm <- names(tables)[i]
+      tb <- tables[i]
+      #browser()
+      out <- i == length(tables) & has_option(table_options, "out")
+
+      crstab <- NULL
+      chisq <- NULL
+      fisher <- NULL
+
+      # Split cross variables
+      splt <- trimws(strsplit(tb, "*", fixed = TRUE)[[1]])
+
+      # Perform either one-way or two-way frequency count
+      if (length(splt) == 1) {
+
+        # Assign new label if there are by groups
+        if (length(bylbls[j]) > 0) {
+          if (!is.null(attr(data[[tb]], "label")))
+            attr(dt[[tb]], "label") <- paste0(bylbls[j], attr(data[[tb]], "label"))
+          else
+            attr(dt[[tb]], "label") <- paste0(bylbls[j], tb)
+        }
+
+        # Perform one-way frequency
+        result <- freq_oneway(dt, tb, weight, table_options, out)
+
+      } else if (length(splt) == 2) {
+
+        bylbl <- NULL
+        if (length(bylbls[j]) > 0) {
+          bylbl <- bylbls[j]
+        }
+
+        # Perform two-way frequency
+        result <- freq_twoway(dt, splt[1], splt[2], weight, table_options, out)
+
+        # Perform cross tab by default
+        crstab <- cross_tab(result, table_options, splt[1], splt[2], bylbl)
+
+        if (get_option(table_options, "fisher", FALSE)) {
+
+          if (!is.null(weight))
+            fisher <- get_fisher(dt[[splt[1]]], dt[[splt[[2]]]], dt[[weight]],
+                                 bylbl = bylbls[j])
+          else
+            fisher <- get_fisher(dt[[splt[1]]], dt[[splt[[2]]]],
+                                 bylbl = bylbls[j])
+        }
+
+        if (get_option(table_options, "chisq", FALSE)) {
+
+          if (!is.null(weight))
+            chisq <- get_chisq(dt[[splt[1]]], dt[[splt[[2]]]], dt[[weight]],
+                               bylbl = bylbls[j])
+          else
+            chisq <- get_chisq(dt[[splt[1]]], dt[[splt[[2]]]], bylbl = bylbls[j])
+        }
+
+      } else {
+
+        stop("Procedure does not yet support n-way frequencies.")
+      }
+
+      # Cast to tibble if incoming data was a tibble
+      if ("tbl_df" %in% class(data)) {
+        if (!is.null(crstab))
+          crstab <- as_tibble(crstab)
+
+        if (!is.null(result))
+          result <- as_tibble(result)
+
+        if (!is.null(fisher))
+          fisher <- as_tibble(fisher)
+
+        if (!is.null(chisq))
+          chisq <- as_tibble(chisq)
+
+      }
+
+      # If a cross tab was produced, add it to result
+      if (!is.null(crstab)) {
+
+        res[[get_name(nm, tb, bylbls[j])]] <- crstab
+
+        if ("out" %in% names(table_options) & i == length(tables)) {
+
+          res[[get_name(table_options[["out"]], "", bylbls[j])]] <- result
+        }
+
+      } else { # Otherwise add one-way to result
+
+        res[[get_name(nm, tb, bylbls[j])]] <- result
+
+      }
+
+      if (!is.null(chisq)) {
+
+        res[[get_name("Chisq", tb, bylbls[j])]] <- chisq
+      }
+
+      if (!is.null(fisher)) {
+
+        res[[get_name("Fisher", tb, bylbls[j])]] <- fisher
+      }
+    }
+
+  }
+
+  # Create output reports if requested
+  # if (!is.null(report_type)) {
+  #
+  #   loc <- get_location("freq", report_location)
+  #   out <- output_report(res, proc_type = 'freq', dir_name = loc["dir_name"],
+  #                        file_name = loc["file_name"], out_type = report_type,
+  #                        style = report_style,
+  #                        titles = titles, margins = 1)
+  #
+  #
+  # }
 
 
   gv <- options("procs.view")[[1]]
   if (is.null(gv))
     gv <- TRUE
 
+  # Create viewer report if requested
   if (gv) {
+    if (view == TRUE) {
 
 
+      vrfl <- tempfile()
 
+      out <- output_report(res, dir_name = dirname(vrfl),
+                           file_name = basename(vrfl), out_type = "HTML",
+                           titles = titles, margins = .5, viewer = TRUE)
+
+      show_viewer(out)
+    }
   }
+
+  return(res)
 
 }
 
 
 
 
-gen_output_freq <- function() {
+gen_output_freq <- function(data,
+                            by = NULL,
+                            tables = NULL,
+                            table_options = NULL,
+                            weight = NULL,
+                            output = NULL) {
 
 
 

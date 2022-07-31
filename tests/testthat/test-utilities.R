@@ -79,7 +79,7 @@ test_that("utils2: output_report works as expected.", {
 
   lst <- list(mtcars)
 
-  res <- output_report(lst, proc_type = "freq",
+  res <- output_report(lst,
                        dir_name = dirname(fp),
                        file_name = "test2")
 

@@ -96,12 +96,10 @@ proc_means <- function(data,
               #         class_options = NULL,
                        var = NULL,
                        stats = c("n", "mean", "std", "min", "max"),
+              #        ways = NULL,   # Hold off for now
               #         weight = NULL,
               #         weight_options = NULL,
                        view = TRUE,
-                       report_type = NULL,
-                       report_location = NULL,
-                       report_style = NULL,
                        titles = NULL,
                        options = NULL,
                        ...) {
@@ -206,8 +204,6 @@ proc_means <- function(data,
 
   rptres <- gen_report_means(data, by = by, var = var, class = class,
                             stats = stats, view = view,
-                            report_type = report_type,
-                            report_style = report_style,
                             titles = titles)
 
   if (length(outreq) > 0) {
@@ -588,9 +584,6 @@ gen_report_means <- function(data,
                             #         weight = NULL,
                             #         weight_options = NULL,
                             view = TRUE,
-                            report_type = NULL,
-                            report_location = NULL,
-                            report_style = NULL,
                             titles = NULL) {
 
   # Declare return list
@@ -679,16 +672,16 @@ gen_report_means <- function(data,
 
 
   # Create output reports if requested
-  if (!is.null(report_type)) {
-
-    loc <- get_location("means", report_location)
-    out <- output_report(res, proc_type = 'means', dir_name = loc["dir_name"],
-                         file_name = loc["file_name"], out_type = report_type,
-                         style = report_style,
-                         titles = titles, margins = 1)
-
-
-  }
+  # if (!is.null(report_type)) {
+  #
+  #   loc <- get_location("means", report_location)
+  #   out <- output_report(res, proc_type = 'means', dir_name = loc["dir_name"],
+  #                        file_name = loc["file_name"], out_type = report_type,
+  #                        style = report_style,
+  #                        titles = titles, margins = 1)
+  #
+  #
+  # }
 
 
   gv <- options("procs.view")[[1]]
@@ -702,9 +695,8 @@ gen_report_means <- function(data,
 
       vrfl <- tempfile()
 
-      out <- output_report(res, proc_type = 'means', dir_name = dirname(vrfl),
+      out <- output_report(res, dir_name = dirname(vrfl),
                            file_name = basename(vrfl), out_type = "HTML",
-                           style = report_style,
                            titles = titles, margins = .5, viewer = TRUE)
 
       show_viewer(out)

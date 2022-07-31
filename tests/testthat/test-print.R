@@ -49,10 +49,103 @@ prt <- read.table(header = TRUE, text = '
 
 
 
-test_that("print1: Simple proc_print test works.", {
+test_that("print1: Simple proc_print text works.", {
+
+
+  fp <- file.path(base_path, "print/test1.txt")
+
+  res <- proc_print(mtcars, fp, output_type = "TXT", view = FALSE)
+
+  res
+
+
+  expect_equal(file.exists(fp), TRUE)
+
+})
+
+test_that("print2: Simple proc_print pdf works.", {
+
+
+  fp <- file.path(base_path, "print/test2")
+
+  res <- proc_print(mtcars, fp, output_type = "PDF",
+                    titles = "My title", view = FALSE)
+
+  res
+
+  expect_equal(file.exists(res[[1]]), TRUE)
+
+})
 
 
 
-  expect_equal(1, 1)
+test_that("print3: Simple proc_print docx works.", {
+
+
+  fp <- file.path(base_path, "print/test3")
+
+  res <- proc_print(mtcars, fp, output_type = "DOCX",
+                    titles = "My title", view = FALSE)
+
+  res
+
+  expect_equal(file.exists(res[[1]]), TRUE)
+
+})
+
+
+
+test_that("print4: Simple proc_print rtf works.", {
+
+
+  fp <- file.path(base_path, "print/test4")
+
+  res <- proc_print(mtcars, fp, output_type = "RTF",
+                    titles = "My title", view = FALSE)
+
+  res
+
+  expect_equal(file.exists(res[[1]]), TRUE)
+
+})
+
+
+test_that("print5: Simple proc_print html works.", {
+
+
+  fp <- file.path(base_path, "print/test5")
+
+  res <- proc_print(mtcars, fp, output_type = "HTML",
+                    titles = "My title", view = FALSE)
+
+  res
+
+  expect_equal(file.exists(res[[1]]), TRUE)
+
+})
+
+
+test_that("print6: Simple proc_print no output works.", {
+
+
+
+  res <- proc_print(mtcars, titles = "My title2")
+
+  res
+
+  expect_equal(is.null(res), TRUE)
+
+})
+
+
+test_that("print6: Simple proc_print style works.", {
+
+
+
+  res <- proc_print(mtcars, titles = "My title2", style = "MidnightBlue")
+
+  res
+
+  expect_equal(is.null(res), TRUE)
 
 })

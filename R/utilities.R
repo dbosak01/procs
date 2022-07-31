@@ -10,7 +10,7 @@
 
 #' @import reporter
 #' @noRd
-output_report <- function(lst, proc_type,
+output_report <- function(lst,
                           dir_name, file_name, out_type = 'HTML',
                           style = NULL,
                           titles = NULL, margins = 1, viewer = FALSE) {
@@ -124,7 +124,10 @@ output_report <- function(lst, proc_type,
   # Deal with multiple output types
   for (ot in out_type) {
 
-    fl <- paste0(flnm, ".", tolower(ot))
+    fl <- flnm
+    if (all(grepl(".", flnm, fixed = TRUE) == FALSE))
+      fl <- paste0(flnm, ".", tolower(ot))
+
     pth <- file.path(targetDir, fl)
 
 
