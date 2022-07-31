@@ -109,8 +109,6 @@ proc_means <- function(data,
   missing <- FALSE
 
 
-
-
   # Deal with single value unquoted parameter values
   oby <- deparse(substitute(by, env = environment()))
   by <- tryCatch({if (typeof(by) %in% c("character", "NULL")) by else oby},
@@ -143,6 +141,7 @@ proc_means <- function(data,
     }
   }
 
+  var <- var[!var %in% c(by, class)]
 
   if (!is.null(by)) {
     if (!all(by %in% nms)) {
@@ -186,10 +185,14 @@ proc_means <- function(data,
   outreq <- list(...)
   if (length(outreq) >= 1) {
     for (nm in names(outreq)) {
+      if ("output_spec" %in% class(outreq[[nm]])) {
+        if (is.null(outreq[[nm]]$stats)) {
 
-      if (is.null(outreq[[nm]]$stats)) {
+          outreq[[nm]]$stats <- stats
+        }
+      } else {
 
-        outreq[[nm]]$stats <- stats
+        outreq[[nm]] <- out()
       }
     }
   } else {

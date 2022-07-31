@@ -142,7 +142,8 @@ test_that("print6: Simple proc_print style works.", {
 
 
 
-  res <- proc_print(mtcars, titles = "My title2", style = "MidnightBlue")
+  res <- proc_print(mtcars, titles = "My title2",
+                    style = "MidnightBlue")
 
   res
 

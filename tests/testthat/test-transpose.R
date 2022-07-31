@@ -273,7 +273,7 @@ test_that("transpose12: copy parameter works recycle smaller", {
 })
 
 
-test_that("transpose12: copy parameter works recycle smaller", {
+test_that("transpose13: copy parameter works recycle smaller", {
 
 
   mns <- proc_means(datm, stats = c("n", "mean", "median", "min", "max"),
@@ -297,7 +297,7 @@ test_that("transpose12: copy parameter works recycle smaller", {
 })
 
 # Is working
-test_that("transpose13: copy parameter works with by groups", {
+test_that("transpose14: copy parameter works with by groups", {
 
   stats <- proc_means(datm, stats = c("n", "mean", "median"),
                       var = c("Age", "PresentScore", "TasteScore"),
@@ -322,3 +322,24 @@ test_that("transpose13: copy parameter works with by groups", {
 })
 
 
+test_that("transpose15: copy parameter works with by groups", {
+
+  stats <- proc_means(datm, stats = c("n", "mean", "median"),
+                      by = "Layers")
+
+  stats
+
+  res1 <- data.frame(Group = "Group1", stats)
+
+  res2 <- proc_transpose(res1, copy = "Group", by = "Layers",
+                         name = "Statistic", id = "Variable")
+
+  res2
+
+  expect_equal(nrow(res2), 9)
+  expect_equal(ncol(res2), 6)
+  expect_equal("Group" %in% names(res2), TRUE)
+
+
+
+})
