@@ -322,7 +322,7 @@ test_that("transpose14: copy parameter works with by groups", {
 })
 
 
-test_that("transpose15: copy parameter works with by groups", {
+test_that("transpose15: all vars eliminates by, copy, and id from transpose", {
 
   stats <- proc_means(datm, stats = c("n", "mean", "median"),
                       by = "Layers")
@@ -343,3 +343,22 @@ test_that("transpose15: copy parameter works with by groups", {
 
 
 })
+
+
+test_that("freq39: get_output_twoway() works as expected.", {
+
+
+
+  res2 <- get_output_twoway(prt, "internship", "enrollment", "count",  NULL,
+                            FALSE, by = c(by1 = "A", by2 = "B"))
+
+  res2
+
+  proc_transpose(res2, name = "STAT", id = c("CAT1", "CAT2"),
+                 copy = c("by1", "by2", "VAR1", "VAR2"))
+
+  expect_equal(nrow(res2), 4)
+  expect_equal(ncol(res2), 6)
+
+})
+

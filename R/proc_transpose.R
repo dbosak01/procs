@@ -198,7 +198,17 @@ proc_transpose <- function(data,
      # Assign column names
      if (!is.null(id)) {
 
-       nms_new <- paste0(prefix, dt[[id]], suffix)
+       idcat <- c()
+       cntr <- 1
+       for (idnm in id) {
+         if (cntr == length(id))
+           idcat <- paste0(idcat, dt[[idnm]])
+         else
+           idcat <- paste0(idcat, dt[[idnm]], sep = delimiter)
+         cntr <- cntr + 1
+       }
+
+       nms_new <- paste0(prefix, idcat, suffix)
 
        names(ret) <- c(by, copy, name,  nms_new)
 

@@ -14,18 +14,30 @@
 #' on the function the output parameter applies to.
 #' @param direction How the output dataset should be organized.  Valid
 #' values are "long" or "wide".  The default is "long".
+#' @param report Whether to output the tables produced for the
+#' procedure report.
 #' @param ... Various options.
 #' @return The output specifications.
 #' @export
 out <- function(stats = NULL,
-                direction = "long", ...) {
+                direction = NULL, report = FALSE, ...) {
 
   ret <- structure(list(), class = c("output_spec", "list"))
 
 
   ret$stats <- stats
   ret$direction <- direction
-  ret$parameters <-  list(...)
+
+  lst <- list(...)
+  for (nm in names(lst)) {
+    if (nm == "table") {
+      ret$table <- lst[[nm]]
+      lst[[nm]] <- NULL
+    }
+  }
+
+  ret$parameters <-  lst
+
 
   return(ret)
 }

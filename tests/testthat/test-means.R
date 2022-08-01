@@ -522,7 +522,7 @@ test_that("means22: get_class works.", {
   res <- get_class(datm, var = c("PresentScore", "TasteScore"),
                    class = "Layers",
                    outp = out(stats = c("n", "mean", "min", "max"),
-                                 direction = "long"))
+                                 direction = "wide"))
 
 
   res

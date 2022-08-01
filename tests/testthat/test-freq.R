@@ -63,8 +63,8 @@ test_that("freq1: Simple proc_freq test works.", {
 
   res
 
-  expect_equal(nrow(res[[1]]), 3)
-  expect_equal(ncol(res[[1]]), 5)
+  expect_equal(nrow(res), 3)
+  expect_equal(ncol(res), 6)
 
 })
 
@@ -94,7 +94,6 @@ test_that("freq3: Two table proc_freq test with report_type html works.", {
 
   library(common)
 
-  fl <- file.path(base_path, "freq/freq3.html")
 
   labels(dat) <- list(Eyes = "Eye Color",
                       Hair = "Hair Color",
@@ -107,20 +106,18 @@ test_that("freq3: Two table proc_freq test with report_type html works.", {
 
   res$Eyes
 
-  #ex <- file.exists(fl)
-
+  expect_equal(length(res), 2)
+  expect_equal(names(res), c("Eyes", "HairCount"))
   expect_equal(nrow(res[[1]]), 3)
-  expect_equal(ncol(res[[1]]), 5)
-  #expect_equal(ex, TRUE)
+  expect_equal(ncol(res[[1]]), 6)
+  expect_equal(nrow(res[[2]]), 5)
+  expect_equal(ncol(res[[2]]), 6)
 
 })
 
 test_that("freq4: Simple proc_freq test with weight works.", {
 
   library(common)
-
-
-  fl <- file.path(base_path, "freq/freq4.html")
 
   labels(dat) <- list(Eyes = "Eye Color",
                       Hair = "Hair Color",
@@ -131,20 +128,18 @@ test_that("freq4: Simple proc_freq test with weight works.", {
                    titles = "My first Frequency Table")
 
   res
-  #ex <- file.exists(fl)
 
 
-  expect_equal(nrow(res[[1]]), 3)
-  expect_equal(ncol(res[[1]]), 5)
-  #expect_equal(ex, TRUE)
+  expect_equal(res$COUNT[1], 222)
+  expect_equal(nrow(res), 3)
+  expect_equal(ncol(res), 6)
+
 
 })
 
 test_that("freq5: Two var proc_freq with weight works.", {
 
   library(common)
-
-  fl <- file.path(base_path, "freq/freq5.html")
 
   labels(dat) <- list(Eyes = "Eye Color",
                       Hair = "Hair Color",
@@ -158,18 +153,18 @@ test_that("freq5: Two var proc_freq with weight works.", {
   #ex <- file.exists(fl)
 
 
+  expect_equal(length(res), 2)
   expect_equal(nrow(res[[1]]), 3)
-  expect_equal(ncol(res[[1]]), 5)
-  #expect_equal(ex, TRUE)
+  expect_equal(ncol(res[[1]]), 6)
+  expect_equal(res[[1]]$COUNT[1], 222)
+  expect_equal(res[[2]]$COUNT[5], 113)
 
 })
 
 
-test_that("freq6: Simple proc_freq in docx works.", {
+test_that("freq6: Simple proc_freq with output long works.", {
 
   library(common)
-
-  fl <- file.path(base_path, "freq/freq6.docx")
 
   labels(dat) <- list(Eyes = "Eye Color",
                       Hair = "Hair Color",
@@ -177,124 +172,108 @@ test_that("freq6: Simple proc_freq in docx works.", {
 
   res <- proc_freq(dat, tables = c("Eyes"),
                    weight = "Count",
-                   titles = "My first Frequency Table")
+                   titles = "My first Frequency Table",
+                   out = out(direction = "long"))
 
   res
-  #ex <- file.exists(fl)
 
+  expect_equal(nrow(res), 4)
+  expect_equal(ncol(res), 5)
 
-  expect_equal(nrow(res[[1]]), 3)
-  expect_equal(ncol(res[[1]]), 5)
-  #expect_equal(ex, TRUE)
 
 })
 
-# test_that("freq7: Simple proc_freq in pdf works.", {
-#
-#   library(common)
-#
-#   fl <- file.path(base_path, "freq/freq7.pdf")
-#
-#   labels(dat) <- list(Eyes = "Eye Color",
-#                       Hair = "Hair Color",
-#                       Region = "Geographic Region")
-#
-#   res <- proc_freq(dat, tables = c("Eyes"),
-#                    weight = "Count",
-#                    titles = "My first Frequency Table",
-#                    report_type = "PDF",
-#                    report_location = fl)
-#
-#   res
-#   ex <- file.exists(fl)
-#
-#
-#   expect_equal(nrow(res[[1]]), 3)
-#   expect_equal(ncol(res[[1]]), 5)
-#   expect_equal(ex, TRUE)
-#
-# })
+test_that("freq7: Simple proc_freq with 2 way works.", {
 
-#
-# test_that("freq8: Simple proc_freq in multiple outputs works.", {
-#
-#   library(common)
-#
-#   fl <- file.path(base_path, "freq/freq8")
-#
-#   labels(dat) <- list(Eyes = "Eye Color",
-#                       Hair = "Hair Color",
-#                       Region = "Geographic Region")
-#
-#   res <- proc_freq(dat, tables = c("Eyes"),
-#                    weight = "Count",
-#                    titles = "My first Frequency Table",
-#                    report_type = c("TXT", "RTF", "PDF"),
-#                    report_location = fl)
-#
-#   res
-#   ex1 <- file.exists(paste0(fl, ".txt"))
-#   ex2 <- file.exists(paste0(fl, ".rtf"))
-#   ex3 <- file.exists(paste0(fl, ".pdf"))
-#
-#
-#   expect_equal(nrow(res[[1]]), 3)
-#   expect_equal(ncol(res[[1]]), 5)
-#   expect_equal(ex1, TRUE)
-#   expect_equal(ex2, TRUE)
-#   expect_equal(ex3, TRUE)
-#
-# })
-#
-# test_that("freq9: Simple proc_freq with no file name works.", {
-#
-#   library(common)
-#
-#   fl <- file.path(base_path, "freq")
-#
-#   labels(dat) <- list(Eyes = "Eye Color",
-#                       Hair = "Hair Color",
-#                       Region = "Geographic Region")
-#
-#   res <- proc_freq(dat, tables = c("Eyes"),
-#                    weight = "Count",
-#                    titles = "My first Frequency Table",
-#                    report_type = "TXT",
-#                    report_location = fl)
-#
-#   res
-#   ex <- file.exists(file.path(fl, "freq.txt"))
-#
-#
-#   expect_equal(nrow(res[[1]]), 3)
-#   expect_equal(ncol(res[[1]]), 5)
-#   expect_equal(ex, TRUE)
-#
-# })
+  library(common)
+
+  fl <- file.path(base_path, "freq/freq7.pdf")
+
+  labels(dat) <- list(Eyes = "Eye Color",
+                      Hair = "Hair Color",
+                      Region = "Geographic Region")
+
+  res <- proc_freq(dat, tables = v(Eyes * Hair),
+                   weight = "Count",
+                   titles = "My first Frequency Table")
+
+  res
+
+  expect_equal(nrow(res), 15)
+  expect_equal(ncol(res), 6)
+
+})
+
+
+test_that("freq8: Simple proc_freq in multiple outputs works.", {
+
+  library(common)
+
+  labels(dat) <- list(Eyes = "Eye Color",
+                      Hair = "Hair Color",
+                      Region = "Geographic Region")
+
+  res <- proc_freq(dat,
+                   weight = "Count",
+                   titles = "My first Frequency Table",
+                   out1 = out(table = "Eyes"),
+                   out2 = out(table = "Hair"),
+                   out3 = out(table = "Eyes * Hair")
+                   )
+
+  res
+
+  expect_equal(length(res), 3)
+  expect_equal(names(res), c("out1", "out2", "out3"))
+  expect_equal(nrow(res[[1]]), 3)
+  expect_equal(ncol(res[[1]]), 6)
+  expect_equal(nrow(res[[2]]), 5)
+  expect_equal(ncol(res[[2]]), 6)
+  expect_equal(nrow(res[[3]]), 15)
+  expect_equal(ncol(res[[3]]), 6)
+
+})
+
+test_that("freq9: Simple proc_freq 1 way by variable works.", {
+
+  library(common)
+
+  labels(dat) <- list(Eyes = "Eye Color",
+                      Hair = "Hair Color",
+                      Region = "Geographic Region")
+
+  res <- proc_freq(dat, tables = c("Eyes"),
+                   weight = "Count",
+                   titles = "My first Frequency Table",
+                   by = "Region")
+
+  res
+
+  expect_equal(nrow(res), 6)
+  expect_equal(ncol(res), 7)
+
+})
 
 
 test_that("freq10: Two way proc_freq works.", {
 
   library(common)
 
-  fl <- file.path(base_path, "freq/freq10.html")
 
   labels(dat) <- list(Eyes = "Eye Color",
                       Hair = "Hair Color",
                       Region = "Geographic Region")
 
   res <- proc_freq(dat, tables = c(FreqCount = "Eyes * Hair"),
-                   table_options = list(out = "MyFreq"),
+                   # table_options = list(out = "MyFreq", cumsum = TRUE,
+                   #                      cumpct = TRUE),
                    weight = "Count",
                    titles = "Eye and Hair Color of European Children")
 
   res
-  #ex <- file.exists(fl)
 
-
-  expect_equal(nrow(res[[1]]), 14)
-  expect_equal(ncol(res[[1]]), 8)
-  #expect_equal(ex, TRUE)
+  expect_equal(nrow(res), 15)
+  expect_equal(ncol(res), 8)
 
 })
 
@@ -313,12 +292,9 @@ test_that("freq11: Two way proc_freq no weight works.", {
                    titles = "Eye and Hair Color of European Children")
 
   res
-  #ex <- file.exists(fl)
 
-
-  expect_equal(nrow(res[[1]]), 14)
-  expect_equal(ncol(res[[1]]), 8)
-  #expect_equal(ex, TRUE)
+  expect_equal(nrow(res), 15)
+  expect_equal(ncol(res), 8)
 
 })
 
@@ -338,15 +314,13 @@ test_that("freq12: One way and two way proc_freq works.", {
 
   res
 
-  #ex <- file.exists(fl)
-
   expect_equal(nrow(res[[1]]), 3)
-  expect_equal(ncol(res[[1]]), 5)
+  expect_equal(ncol(res[[1]]), 6)
   expect_equal(nrow(res[[2]]), 5)
-  expect_equal(ncol(res[[2]]), 5)
-  expect_equal(nrow(res[[3]]), 14)
+  expect_equal(ncol(res[[2]]), 6)
+  expect_equal(nrow(res[[3]]), 15)
   expect_equal(ncol(res[[3]]), 8)
-  #expect_equal(ex, TRUE)
+
 
 })
 
@@ -387,7 +361,7 @@ test_that("freq14: Out = options on table.", {
 
   expect_equal(d[1], "Eyes")
   expect_equal(d[2], "Eyes * Hair")
-  expect_equal(d[3], "FreqCount")
+  #expect_equal(d[3], "FreqCount")
 
 
 })
@@ -403,7 +377,7 @@ test_that("freq15: Outcum option works as expected.", {
 
   res
 
-  d <- names(res[["fork"]])
+  d <- names(res)
 
 
   expect_equal("Cum_Freq" %in% d, FALSE)
@@ -415,11 +389,11 @@ test_that("freq15: Outcum option works as expected.", {
 
   res
 
-  d <- names(res[["Eyes"]])
+  d <- names(res)
 
 
-  expect_equal("Cum_Freq" %in% d, TRUE)
-  expect_equal("Cum_Pct" %in% d, TRUE)
+  expect_equal("Cum_Freq" %in% d, FALSE)
+  expect_equal("Cum_Pct" %in% d, FALSE)
 
 
 
@@ -436,11 +410,11 @@ test_that("freq16: Freq and Pct options works as expected.", {
 
   res
 
-  d <- names(res[["Eyes"]])
+  d <- names(res)
 
 
-  expect_equal("Frequency" %in% d, FALSE)
-  expect_equal("Percent" %in% d, TRUE)
+  expect_equal("COUNT" %in% d, FALSE)
+  expect_equal("PERCENT" %in% d, TRUE)
 
   res <- proc_freq(dat, tables = c("Eyes"),
                    table_options = list(freq = TRUE,
@@ -449,11 +423,11 @@ test_that("freq16: Freq and Pct options works as expected.", {
 
   res
 
-  d <- names(res[["Eyes"]])
+  d <- names(res)
 
 
-  expect_equal("Frequency" %in% d, TRUE)
-  expect_equal("Percent" %in% d, FALSE)
+  expect_equal("COUNT" %in% d, TRUE)
+  expect_equal("PERCENT" %in% d, FALSE)
 
 
 
@@ -471,8 +445,8 @@ test_that("freq17: Sparse option works as expected.", {
   res
 
 
-  expect_equal(nrow(res[[2]]), 14)
-  expect_equal(ncol(res[[2]]), 4)
+  expect_equal(nrow(res), 14)
+  expect_equal(ncol(res), 8)
 
 })
 
@@ -491,12 +465,8 @@ test_that("freq18: Crosstab works.", {
 
   res
 
-  freqdata <- res[[1]]
-
-
-
-  expect_equal(nrow(res[[1]]), 14)
-  expect_equal(ncol(res[[1]]), 8)
+  expect_equal(nrow(res), 15)
+  expect_equal(ncol(res), 8)
 
 })
 
@@ -515,7 +485,7 @@ test_that("freq19: Format options on table.", {
                    weight = "Count",
                    titles = "Eye and Hair Color of European Children")
 
-  crs <- res[[1]]$dark
+  crs <- res$dark
 
   fmt <- attr(crs, "format")
 
@@ -541,9 +511,9 @@ test_that("freq20: SAS replication of one way tables works.", {
   res
 
   expect_equal(nrow(res[[1]]), 3)
-  expect_equal(ncol(res[[1]]), 5)
+  expect_equal(ncol(res[[1]]), 6)
   expect_equal(nrow(res[[2]]), 5)
-  expect_equal(ncol(res[[2]]), 5)
+  expect_equal(ncol(res[[2]]), 6)
 
 })
 
@@ -976,6 +946,163 @@ test_that("freq37: Crosstab works with factors.", {
   expect_equal(ncol(res[[3]]), 4)
 })
 
+test_that("freq38: get_output_specs works as expected.", {
+
+
+  res1 <- get_output_specs(c("A", "B", "A * B"), list())
+
+  res1
+  expect_equal(length(res1), 3)
+  expect_equal(res1[[1]]$table, "A")
+  expect_equal(res1[[2]]$table, "B")
+  expect_equal(res1[[3]]$table, "A * B")
+
+
+  res2 <- get_output_specs(c(tab1 = "A", "B", tab3 = "A * B"), list())
+
+  res2
+  expect_equal(length(res2), 3)
+  expect_equal(names(res2), c("tab1", "B", "tab3"))
+  expect_equal(res2[[1]]$table, "A")
+  expect_equal(res2[[2]]$table, "B")
+  expect_equal(res2[[3]]$table, "A * B")
+
+  ot <- list(out = out(stats = c("n", "pct"), direction = "wide"))
+  res3 <- get_output_specs(c(tab1 = "A", "B", tab3 = "A * B"), ot)
+
+  res3
+  expect_equal(length(res3), 3)
+  expect_equal(names(res3), c("tab1", "B", "tab3"))
+  expect_equal(res3[[1]]$table, "A")
+  expect_equal(res3[[2]]$table, "B")
+  expect_equal(res3[[3]]$table, "A * B")
+
+
+
+  ot <- list(out1 = out(table = "A", stats = c("n", "pct"), direction = "wide"),
+             out2 = out(table = "B", stats = c("n", "pct"), direction = "wide"),
+             out3 = out(table = "A * B", stats = c("n", "pct"), direction = "wide")
+
+             )
+  res4 <- get_output_specs(NULL, ot)
+
+  res4
+  expect_equal(length(res4), 3)
+  expect_equal(names(res4), c("out1", "out2", "out3"))
+  expect_equal(res4[[1]]$table, "A")
+  expect_equal(res4[[2]]$table, "B")
+  expect_equal(res4[[3]]$table, "A * B")
+
+
+  ot <- list(out1 = out(stats = c("n", "pct"), direction = "wide"),
+             out2 = out(table = "A * B", stats = c("chisq"), direction = "wide")
+
+  )
+  res5 <- get_output_specs(c(tab1 = "A", "B", tab3 = "A * B"), ot)
+
+  res5
+  expect_equal(length(res5), 4)
+  expect_equal(names(res5), c("tab1", "B", "tab3", "out2"))
+  expect_equal(res5[[1]]$table, "A")
+  expect_equal(res5[[2]]$table, "B")
+  expect_equal(res5[[3]]$table, "A * B")
+  expect_equal(res5[[4]]$table, "A * B")
+  expect_equal(res5[[4]]$stats, "chisq")
+
+})
+
+
+test_that("freq39: get_output_oneway() works as expected.", {
+
+
+  res1 <- get_output_oneway(prt, "internship", "count", NULL, by = c(am = 1),
+                            direction = "wide")
+
+  res1
+
+
+  expect_equal(nrow(res1), 2)
+  expect_equal(ncol(res1), 7)
+
+  res2 <- get_output_oneway(prt, "internship", "count", NULL, by = c(am = "A",
+                                                                     pm = "B"))
+
+  res2
+
+
+  expect_equal(nrow(res2), 2)
+  expect_equal(ncol(res2), 8)
+
+})
+
+
+test_that("freq40: get_output_oneway() long works as expected.", {
+
+
+  res1 <- get_output_oneway(prt, "internship", "count", NULL, by = c(am = 1),
+                            direction = "long")
+
+  res1
+
+
+  expect_equal(nrow(res1), 4)
+  expect_equal(ncol(res1), 5)
+
+  res2 <- get_output_oneway(prt, "internship", "count", NULL,
+                            by = c(am = "A", pm = "B"), direction = "long")
+
+  res2
+
+
+  expect_equal(nrow(res2), 4)
+  expect_equal(ncol(res2), 6)
+
+})
+
+test_that("freq41: get_output_twoway() works as expected.", {
+
+
+  res1 <- get_output_twoway(prt, "internship", "enrollment", "count", NULL,
+                            FALSE, by = c(by1 = 1), direction = "wide")
+
+  res1
+
+  expect_equal(nrow(res1), 4)
+  expect_equal(ncol(res1), 7)
+
+  res2 <- get_output_twoway(prt, "internship", "enrollment", "count",  NULL,
+                            FALSE, by = c(by1 = "A", by2 = "B"))
+
+  res2
+
+
+  expect_equal(nrow(res2), 4)
+  expect_equal(ncol(res2), 8)
+
+})
+
+test_that("freq42: get_output_twoway() long works as expected.", {
+
+
+  res1 <- get_output_twoway(prt, "internship", "enrollment", "count", NULL,
+                            FALSE, by = c(by1 = 1), direction = "long")
+
+  res1
+
+  expect_equal(nrow(res1), 2)
+  expect_equal(ncol(res1), 8)
+
+  res2 <- get_output_twoway(prt, "internship", "enrollment", "count",  NULL,
+                            FALSE, by = c(by1 = "A", by2 = "B"),
+                            direction = "long")
+
+  res2
+
+
+  expect_equal(nrow(res2), 2)
+  expect_equal(ncol(res2), 9)
+
+})
 
 
 # test_that("freq35: CMH works with weight.", {

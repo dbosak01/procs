@@ -144,20 +144,6 @@
 # the \code{proc_freq} function.
 #' @param view Whether to display procedure results in the viewer.  Valid values
 #' are TRUE and FALSE.  Default is TRUE.
-#' @param report_type The output type for any report output.  Valid values are
-#' 'HTML', 'TXT', 'PDF', 'RTF', and 'DOCX'.  Multiple outputs can be
-#' requested by passing a vector of output types.  If the \code{report_location}
-#' parameter is specified, the outputs will be written to that location.
-#' Otherwise, they will be written to a temp directory.  The default value is NULL.
-#' @param report_location A path to write any report output requested by
-#' the \code{report_type} parameter. The path may be either a full path with
-#' file name, or a directory name.  If a directory name, the function
-#' will create a default file name based on the report type.
-#' If no path is specified, files will be
-#' written to a temp directory.  Default is NULL.
-#' @param report_style A theme name or style object to use on the report output.
-#' See the \code{\link[reporter]{create_style}} in the \strong{reporter}
-#' package for additional information on styles.
 #' @param titles A vector of one or more titles to use for the report output.
 #' @param ... One or more output dataset requests.  Use the \code{\link{out}}
 #' function to make these requests.
@@ -302,10 +288,7 @@ proc_freq <- function(data,
     }
   }
 
-  if (is.null(tables)) {
-    stop("tables parameter is required.")
-  } else {
-
+  if (!is.null(tables)) {
     locs <- grepl("*", tables, fixed = TRUE)
     slocs <- unlist(strsplit(tables[locs], "*", fixed = TRUE))
 
@@ -319,22 +302,9 @@ proc_freq <- function(data,
     }
   }
 
+  stats <- c("n", "pct", "cumsum", "cumpct")
   # Set default statistics for output parameters
-  outreq <- list(...)
-  # if (length(outreq) >= 1) {
-  #   for (nm in names(outreq)) {
-  #
-  #     if (is.null(outreq[[nm]]$stats)) {
-  #
-  #       outreq[[nm]]$stats <- stats
-  #     }
-  #   }
-  # } else {
-  #
-  #   outreq[["out"]] <- out(stats = stats, direction = "wide",
-  #                          type = FALSE, freq = FALSE)
-  #
-  # }
+  outreq <- get_output_specs(tables, list(...))
 
 
   res <- NULL
@@ -392,7 +362,7 @@ freq_oneway <- function(data, tb, weight, options, out = FALSE) {
   }
 
   # Perform calculations
-  n <- sum(frequencies)
+  n <- sum(frequencies, na.rm = TRUE)
   percentages <- frequencies / n * 100
   cum_frequencies <- cumsum(frequencies)
   cum_percentages <- cumsum(percentages)
@@ -400,6 +370,7 @@ freq_oneway <- function(data, tb, weight, options, out = FALSE) {
 
   # Create result data frame
   result <- data.frame("Category" = categories,
+                       "N" = n,
                        "Frequency" = frequencies,
                        "Percent" = percentages,
                        "Cum_Freq" = cum_frequencies,
@@ -441,15 +412,15 @@ freq_oneway <- function(data, tb, weight, options, out = FALSE) {
   }
 
   # Kill cum freq if requested
-  if ((out == FALSE & !option_true(options, "cumsum", TRUE)) |
-      (out == TRUE & !option_true(options, "outcum", TRUE))) {
+  if ((!option_true(options, "cumsum", TRUE)) |
+      (!option_true(options, "outcum", TRUE))) {
 
     result[["Cum_Freq"]] <- NULL
   }
 
   # Kill cum pct if requested
-  if ((out == FALSE & !option_true(options, "cumpct", TRUE)) |
-      (out == TRUE & !option_true(options, "outcum", TRUE))) {
+  if ((!option_true(options, "cumpct", TRUE)) |
+      (!option_true(options, "outcum", TRUE))) {
 
     result[["Cum_Pct"]] <- NULL
   }
@@ -518,14 +489,18 @@ freq_twoway <- function(data, tb1, tb2, weight, options, out = FALSE) {
   categories2 <- cnts$Group.2
   frequencies <- cnts$x
 
+
+
   # Perform calculations
-  n <- sum(frequencies)
+  n <- sum(frequencies, na.rm = TRUE)
   percentages <- frequencies / n * 100
+
 
 
   # Create result data frame
   result <- data.frame("Category1" = categories1,
                        "Category2" = categories2,
+                       "N" = n,
                        "Frequency" = frequencies,
                        "Percent" = percentages,
                        stringsAsFactors = FALSE)
@@ -535,6 +510,9 @@ freq_twoway <- function(data, tb1, tb2, weight, options, out = FALSE) {
 
   # Kill rownames
   rownames(result) <- NULL
+
+  result$Cum_Freq =  cumsum(result$Frequency)
+  result$Cum_Pct = cumsum(result$Percent)
 
   # Get labels on target variables if they exist
   lbl1 <- attr(data[[tb1]], "label")
@@ -547,10 +525,13 @@ freq_twoway <- function(data, tb1, tb2, weight, options, out = FALSE) {
 
   # Assign labels
   labels(result) <- c(Category1 = lbl1,
-                      Category2 = lbl2)
+                      Category2 = lbl2,
+                      Cum_Freq = "Cumulative Frequency",
+                      Cum_Pct = "Cumulative Percent")
 
   # Assign default formats
-  formats(result) <- list(Percent = paste0("%.4f"))
+  formats(result) <- list(Percent = paste0("%.4f"),
+                          Cum_Pct = paste0("%.4f"))
 
   # Kill freq if requested
   if ((!option_true(options, "freq", TRUE))) {
@@ -564,16 +545,23 @@ freq_twoway <- function(data, tb1, tb2, weight, options, out = FALSE) {
     result[["Percent"]] <- NULL
   }
 
+  if (out == FALSE)
+    result[["N"]] <- NULL
+
   # Kill cum freq if requested
-  if ((out == FALSE & !option_true(options, "cumsum", TRUE)) |
-      (out == TRUE & !option_true(options, "outcum", TRUE))) {
+  if (out == FALSE)
+    result[["Cum_Freq"]] <- NULL
+  else if ((!option_true(options, "cumsum", TRUE)) |
+      (!option_true(options, "outcum", TRUE))) {
 
     result[["Cum_Freq"]] <- NULL
   }
 
   # Kill cum pct if requested
-  if ((out == FALSE & !option_true(options, "cumpct", TRUE)) |
-      (out == TRUE & !option_true(options, "outcum", TRUE))) {
+  if (out == FALSE)
+    result[["Cum_Pct"]] <- NULL
+  else if ((!option_true(options, "cumpct", TRUE)) |
+      (!option_true(options, "outcum", TRUE))) {
 
     result[["Cum_Pct"]] <- NULL
   }
@@ -749,21 +737,201 @@ cross_tab <- function(freqdata, options, var1, var2, bylbl = NULL) {
   return(ret)
 }
 
-get_output_oneway <- function(data, tb, weight = NULL, options = NULL, out = FALSE,
-                              by = NULL, class = NULL) {
+get_output_oneway <- function(data, tb, weight = NULL, options = NULL,
+                              by = NULL, direction = "wide") {
 
 
+
+  ret <- freq_oneway(data = data, tb = tb, weight = weight,
+                     options = options)
+
+  # Bind variable name
+  tmp <- list(VAR = tb)
+  df <- as.data.frame(tmp, stringsAsFactors = FALSE)
+  ret <- cbind(df, ret)
+
+  # Bind by variables
+  if (!is.null(by)) {
+    tmp <- list()
+    for(nm in names(by)) {
+      tmp[[nm]] <- by[nm]
+    }
+
+    df <- as.data.frame(tmp, stringsAsFactors = FALSE)
+
+    rownames(df) <- NULL
+
+    ret <- cbind(df, ret)
+  }
+
+  nms <- names(ret)
+
+
+  # Rename stuff
+  if ("Category" %in% nms) {
+
+    names(ret)[which(nms == "Category")] <- "CAT"
+  }
+
+  if ("Frequency" %in% nms) {
+    names(ret)[which(nms == "Frequency")] <-  "COUNT"
+  }
+
+  if ("Percent" %in% nms) {
+    names(ret)[which(nms == "Percent")] <-  "PERCENT"
+  }
+
+
+  if ("Cum_Pct" %in% nms) {
+    names(ret)[which(nms == "Cum_Pct")] <-  "CUM_PCT"
+  }
+
+
+  if ("Cum_Freq" %in% nms) {
+    names(ret)[which(nms == "Cum_Freq")] <-  "CUM_FREQ"
+  }
+
+  if (!is.null(direction)) {
+    if (direction == "long") {
+
+      ret <- proc_transpose(ret, copy = c(names(by), "VAR"),
+                            id = "CAT", name = "STAT")
+    }
+  }
+
+  return(ret)
 }
 
 
 get_output_twoway <- function(data, tb1, tb2, weight, options, out = FALSE,
-                              by = NULL, class = NULL) {
+                              by = NULL, direction = "wide") {
+
+  ret <- freq_twoway(data = data, tb1 = tb1, tb2 = tb2, weight = weight,
+                     options = options, out = out)
+
+  # Bind variable names
+  tmp <- list(VAR1 = tb1, VAR2 = tb2)
+  df <- as.data.frame(tmp, stringsAsFactors = FALSE)
+  ret <- cbind(df, ret)
 
 
+  if (!is.null(by)) {
+    tmp <- list()
+    for(nm in names(by)) {
+      tmp[[nm]] <- by[nm]
+    }
+
+    df <- as.data.frame(tmp, stringsAsFactors = FALSE)
+
+    rownames(df) <- NULL
+
+    ret <- cbind(df, ret)
+  }
+
+  nms <- names(ret)
+
+
+  # Rename stuff
+  if ("Category1" %in% nms) {
+
+    names(ret)[which(nms == "Category1")] <- "CAT1"
+  }
+
+  if ("Category2" %in% nms) {
+
+    names(ret)[which(nms == "Category2")] <- "CAT2"
+  }
+
+  if ("Frequency" %in% nms) {
+    names(ret)[which(nms == "Frequency")] <-  "COUNT"
+  }
+
+  if ("Percent" %in% nms) {
+    names(ret)[which(nms == "Percent")] <-  "PERCENT"
+  }
+
+  if ("Cum_Pct" %in% nms) {
+    names(ret)[which(nms == "Cum_Pct")] <-  "CUM_PCT"
+  }
+
+
+  if ("Cum_Freq" %in% nms) {
+    names(ret)[which(nms == "Cum_Freq")] <-  "CUM_FREQ"
+  }
+
+  if (!is.null(direction)) {
+    if (direction == "long") {
+
+      ret <- proc_transpose(ret, id = c("CAT1", "CAT2"),
+                            copy = c(names(by), "VAR1", "VAR2"),
+                            name = "STAT")
+    }
+  }
+
+  return(ret)
 
 }
 
+get_output_specs <- function(tbls, outs) {
 
+
+  ret <- list()
+  sts <- c("n", "pct", "cumsum", "cumpct")
+
+  if (length(outs) >= 1) {
+    for (nm in names(outs)) {
+      if ("output_spec" %in% class(outs[[nm]])) {
+        if (is.null(outs[[nm]]$table)) {
+          ot <- outs[[nm]]
+
+          tnms <- names(tbls)
+          if (is.null(tnms))
+            tnms <- tbls
+
+          for (i in seq_len(length(tbls))) {
+            tnm <- tnms[[i]]
+            if (tnm == "")
+              tnm <- tbls[[i]]
+
+            ot$table <- tbls[[i]]
+            ot$direction <- "wide"
+            ret[[tnm]] <- ot
+
+          }
+
+
+
+        } else {
+
+          ot <- outs[[nm]]
+          if (is.null(ot$direction))
+            ot$direction = "wide"
+          ret[[nm]] <- ot
+
+        }
+
+      }
+    }
+  } else {
+
+    tnms <- names(tbls)
+    if (is.null(tnms))
+      tnms <- tbls
+
+    for (i in seq_len(length(tbls))) {
+      nm <- tnms[[i]]
+      if (nm == "")
+        nm <- tbls[[i]]
+
+      ret[[nm]] <- out(table = tbls[[i]], stats = sts, direction = "wide")
+
+    }
+
+  }
+
+
+  return(ret)
+}
 
 # Drivers -----------------------------------------------------------------
 
@@ -854,7 +1022,8 @@ gen_report_freq <- function(data,
         }
 
         # Perform two-way frequency
-        result <- freq_twoway(dt, splt[1], splt[2], weight, table_options, out)
+        result <- freq_twoway(dt, splt[1], splt[2], weight, table_options,
+                              out = FALSE)
 
         # Perform cross tab by default
         crstab <- cross_tab(result, table_options, splt[1], splt[2], bylbl)
@@ -928,17 +1097,6 @@ gen_report_freq <- function(data,
 
   }
 
-  # Create output reports if requested
-  # if (!is.null(report_type)) {
-  #
-  #   loc <- get_location("freq", report_location)
-  #   out <- output_report(res, proc_type = 'freq', dir_name = loc["dir_name"],
-  #                        file_name = loc["file_name"], out_type = report_type,
-  #                        style = report_style,
-  #                        titles = titles, margins = 1)
-  #
-  #
-  # }
 
 
   gv <- options("procs.view")[[1]]
@@ -975,15 +1133,167 @@ gen_output_freq <- function(data,
                             output = NULL) {
 
 
+  byvals <- list()
+  if (!is.null(by)) {
+
+    lst <- unclass(data)[by]
+    for (nm in names(lst))
+      lst[[nm]] <- as.factor(lst[[nm]])
+    dtlst <- split(data, lst, sep = "|")
+
+    snms <- strsplit(names(dtlst), "|", fixed = TRUE)
+
+    for (k in seq_len(length(snms))) {
+
+      byvals[[k]] <- snms[[k]]
+      names(byvals[[k]]) <- by
+    }
+
+  } else {
+
+    dtlst <- list(data)
+  }
+
+
+  res <- list()
+  if (length(output) > 0) {
+
+    for (nm in names(output)) {
+
+      # print("Orig print_location")
+      # print(print_location)
+      # browser()
+
+      outp <- output[[nm]]
+      tb <- outp$table
+
+      # Loop through by groups
+      for (j in seq_len(length(dtlst))) {
+
+        # Get table for this by group
+        dt <- dtlst[[j]]
+
+        crstab <- NULL
+        chisq <- NULL
+        fisher <- NULL
+
+        # Split cross variables
+        splt <- trimws(strsplit(tb, "*", fixed = TRUE)[[1]])
+
+        # Perform either one-way or two-way frequency count
+        if (length(splt) == 1) {
+
+          if (length(byvals) >= j) {
+            result <- get_output_oneway(dt, tb, weight, table_options,
+                                      byvals[[j]], direction = outp$direction)
+          } else {
+            result <- get_output_oneway(dt, tb, weight, table_options,
+                                        NULL, direction = outp$direction)
+          }
+
+        } else if (length(splt) == 2) {
+
+
+
+          # Perform two-way frequency
+          if (length(byvals) >= j) {
+            result <- get_output_twoway(dt, splt[1], splt[2], weight, table_options,
+                                byvals[[j]], direction = outp$direction, out = TRUE)
+          } else {
+
+            result <- get_output_twoway(dt, splt[1], splt[2], weight, table_options,
+                                     NULL, direction = outp$direction, out = TRUE)
+          }
+
+#
+#           if (get_option(table_options, "fisher", FALSE)) {
+#
+#             if (!is.null(weight))
+#               fisher <- get_fisher(dt[[splt[1]]], dt[[splt[[2]]]], dt[[weight]],
+#                                    bylbl = bylbls[j])
+#             else
+#               fisher <- get_fisher(dt[[splt[1]]], dt[[splt[[2]]]],
+#                                    bylbl = bylbls[j])
+#           }
+#
+#           if (get_option(table_options, "chisq", FALSE)) {
+#
+#             if (!is.null(weight))
+#               chisq <- get_chisq(dt[[splt[1]]], dt[[splt[[2]]]], dt[[weight]],
+#                                  bylbl = bylbls[j])
+#             else
+#               chisq <- get_chisq(dt[[splt[1]]], dt[[splt[[2]]]], bylbl = bylbls[j])
+#           }
+
+        } else {
+
+          stop("Procedure does not yet support n-way frequencies.")
+        }
+
+        # Cast to tibble if incoming data was a tibble
+        if ("tbl_df" %in% class(data)) {
+          # if (!is.null(crstab))
+          #   crstab <- as_tibble(crstab)
+
+          if (!is.null(result))
+            result <- as_tibble(result)
+
+          # if (!is.null(fisher))
+          #   fisher <- as_tibble(fisher)
+          #
+          # if (!is.null(chisq))
+          #   chisq <- as_tibble(chisq)
+
+        }
+
+        # If a cross tab was produced, add it to result
+        # if (!is.null(crstab)) {
+        #
+        #   res[[get_name(nm, tb, bylbls[j])]] <- crstab
+        #
+        #   if ("out" %in% names(table_options) & i == length(tables)) {
+        #
+        #     res[[get_name(table_options[["out"]], "", bylbls[j])]] <- result
+        #   }
+        #
+        # } else { # Otherwise add one-way to result
+
+
+        if (!is.null(res[[nm]]))
+          res[[nm]] <- rbind(res[[nm]], result)
+        else
+          res[[nm]] <- result
+
+        #}
+
+        # if (!is.null(chisq)) {
+        #
+        #   if (!is.null(res[[nm]]))
+        #     res[[nm]] <- rbind(res[[nm]], chisq)
+        #   else
+        #     res[[nm]] <- result
+        # }
+        #
+        # if (!is.null(fisher)) {
+        #
+        #   if (!is.null(res[[nm]]))
+        #     res[[nm]] <- rbind(res[[nm]], fisher)
+        #   else
+        #     res[[nm]] <- result
+        # }
+      }
+
+    }
+  }
+
+  if (length(res) == 1)
+    res <- res[[1]]
+
+
+  return(res)
 
 }
 
-
-get_class <- function() {
-
-
-
-}
 
 
 

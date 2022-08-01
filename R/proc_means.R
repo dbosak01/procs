@@ -59,19 +59,6 @@
 # the \code{proc_freq} function.
 #' @param view Whether to display the report in the interactive viewer.  Valid
 #' values are TRUE and FALSE.  Default is TRUE.
-#' @param report_type The output type for any report output.  Valid values are
-#' 'HTML', 'TXT', 'PDF', 'RTF', 'DOCX'.  Multiple outputs can be
-#' requested by passing a vector of output types.  If the report_location parameter
-#' is specified, the outputs will be written to that location.  Otherwise,
-#' they will be written to a temp directory.  The default value is NULL.
-#' @param report_location A path to write any report output requested by
-#' the print parameter. The path may be either a full path with file name,
-#' or a directory name.  If the file name is not specified, the procedure
-#' type will be used.  If no path is specified, files will be
-#' written to a temp directory.  Default is NULL.
-#' @param report_style A theme name or style object to use on the report output.
-#' See the \code{\link[reporter]{create_style}} in the \strong{reporter}
-#' package for additional information on styles.
 #' @param titles A vector of one or more titles to use for the report output.
 # @param missing Whether to include missing (NA) values in the analysis.
 # By default, missing values are not
