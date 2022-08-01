@@ -172,7 +172,7 @@ proc_means <- function(data,
   outreq <- list(...)
   if (length(outreq) >= 1) {
     for (nm in names(outreq)) {
-      if ("output_spec" %in% class(outreq[[nm]])) {
+      if ("out_req" %in% class(outreq[[nm]])) {
         if (is.null(outreq[[nm]]$stats)) {
 
           outreq[[nm]]$stats <- stats

@@ -22,7 +22,7 @@
 out <- function(stats = NULL,
                 direction = NULL, report = FALSE, ...) {
 
-  ret <- structure(list(), class = c("output_spec", "list"))
+  ret <- structure(list(), class = c("out_req", "list"))
 
 
   ret$stats <- stats
@@ -37,7 +37,7 @@ out <- function(stats = NULL,
   }
 
   ret$parameters <-  lst
-
+  ret$report = report
 
   return(ret)
 }

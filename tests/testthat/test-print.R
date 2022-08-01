@@ -138,7 +138,7 @@ test_that("print6: Simple proc_print no output works.", {
 })
 
 
-test_that("print6: Simple proc_print style works.", {
+test_that("print7: Simple proc_print style works.", {
 
 
 
@@ -150,3 +150,37 @@ test_that("print6: Simple proc_print style works.", {
   expect_equal(is.null(res), TRUE)
 
 })
+
+test_that("print8: Print freq report works.", {
+
+  library(common)
+
+  fp <- file.path(base_path, "print/test8")
+
+  labels(dat) <- list(Eyes = "Eye Color",
+                      Hair = "Hair Color",
+                      Region = "Geographic Region")
+
+  res <- proc_freq(dat,
+                   tables = c("Eyes", "Hair",  Cross = "Hair * Eyes"),
+                   titles = "My first Frequency Table",
+                   by = "Region",
+                   view = TRUE,
+                   weight = "Count",
+                   report = out(report = TRUE))
+
+  expect_equal(length(res), 6)
+
+
+  res1 <- proc_print(res, fp, output_type = c("HTML", "RTF"),
+                     titles = "My Nice Titles",
+                     style = "MidnightBlue")
+  res1
+
+  expect_equal(length(res1), 2)
+  expect_equal(file.exists(res1[1]), TRUE)
+  expect_equal(file.exists(res1[1]), TRUE)
+
+
+})
+

@@ -1118,9 +1118,9 @@ test_that("freq43: oneway output statistics work.", {
                    titles = "My first Frequency Table",
                    view = TRUE,
                    weight = "Count",
-                   out1 = out(table ="Eyes", stats = c("freq", "pct", "n")),
+                   out1 = out(table ="Eyes", stats = c("cnt", "pct", "n")),
                    out2 = out(table = "Hair",
-                              stats = c("cumsum", "freq", "pct"),
+                              stats = c("cumsum", "cnt", "pct"),
                               direction = "long"))
 
   res
@@ -1142,13 +1142,13 @@ test_that("freq44: twoway output statistics work.", {
                       Region = "Geographic Region")
 
   res <- proc_freq(dat,
-                 #  tables = c("Region * Eyes", "Region * Hair"),
+                   tables = c("Eyes", "Region * Eyes", "Region"),
                    titles = "My first Frequency Table",
                    view = TRUE,
                    weight = "Count",
-                   out1 = out(table ="Region * Eyes", stats = c("freq", "pct", "n")),
+                   out1 = out(table ="Region * Eyes", stats = c("cnt", "pct", "n")),
                    out2 = out(table = "Region * Hair",
-                              stats = c("cumsum", "freq", "pct"),
+                              stats = c("cumsum", "cnt", "pct"),
                               direction = "long"))
 
   res
@@ -1159,6 +1159,62 @@ test_that("freq44: twoway output statistics work.", {
   expect_equal(nrow(res[[2]]), 3)
   expect_equal(res[[2]]$STAT, c("CUM_FREQ", "COUNT", "PERCENT"))
 
+})
+
+test_that("freq44: output parameter works.", {
+
+  library(common)
+
+  labels(dat) <- list(Eyes = "Eye Color",
+                      Hair = "Hair Color",
+                      Region = "Geographic Region")
+
+  res <- proc_freq(dat,
+                   tables = c("Eyes", "Region * Eyes", "Region"),
+                   titles = "My first Frequency Table",
+                   view = TRUE,
+                   weight = "Count",
+                   output = list(
+                   out1 = out(table ="Region * Eyes", stats = c("cnt", "pct", "n")),
+                   out2 = out(table = "Region * Hair",
+                              stats = c("cumsum", "cnt", "pct"),
+                              direction = "long")))
+
+
+  res
+
+  expect_equal(length(res), 2)
+  expect_equal(names(res[[1]]), c("VAR1", "VAR2", "CAT1", "CAT2", "COUNT", "PERCENT", "N"))
+  expect_equal(nrow(res[[1]]), 6)
+  expect_equal(nrow(res[[2]]), 3)
+  expect_equal(res[[2]]$STAT, c("CUM_FREQ", "COUNT", "PERCENT"))
+
+})
+
+
+test_that("freq44: output report works.", {
+
+
+  library(common)
+
+  labels(dat) <- list(Eyes = "Eye Color",
+                      Hair = "Hair Color",
+                      Region = "Geographic Region")
+
+  res <- proc_freq(dat,
+                   tables = c("Eyes", "Hair",  Cross = "Hair * Eyes"),
+                   titles = "My first Frequency Table",
+                   by = "Region",
+                   view = TRUE,
+                   weight = "Count",
+                   report = out(report = TRUE))
+
+
+  res
+  expect_equal(length(res), 6)
+  nms <- names(res)
+  expect_equal(nms[1], "Region=1, Eyes")
+  expect_equal(nms[4], "Region=2, Eyes")
 })
 
 

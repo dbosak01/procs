@@ -147,6 +147,12 @@
 #' @param titles A vector of one or more titles to use for the report output.
 #' @param ... One or more output dataset requests.  Use the \code{\link{out}}
 #' function to make these requests.
+#' @param output A named list of output data requests.  The name of the list item
+#' will become the name of the item in the return list, if there is one.  The
+#' value of the list item is a output request created with the \code{\link{out}}
+#' function.  Output data requests may also be made on the \code{...} parameter
+#' for convenience.  This parameter is provided in case you need to generate
+#' output requests dynamically inside a function.
 #' @return By default the function returns a list of tibbles
 #' that contains the requested frequency tables.
 #' The tables are named according to the variable or variables
@@ -250,12 +256,9 @@ proc_freq <- function(data,
                       weight = NULL,
                    #   weight_options = NULL,
                       view = TRUE,
-                   #   output = NULL,
-                      # report_type = NULL,
-                      # report_location = NULL,
-                      # report_style = NULL,
                       titles = NULL,
-                      ...) {
+                      ...,
+                      output = NULL) {
 
 
   # Deal with single value unquoted parameter values
@@ -302,20 +305,32 @@ proc_freq <- function(data,
     }
   }
 
-  stats <- c("n", "pct", "cumsum", "cumpct")
   # Set default statistics for output parameters
-  outreq <- get_output_specs(tables, list(...))
+  if (!is.null(output))
+    outreq <- get_output_specs(tables, output)
+  else
+    outreq <- get_output_specs(tables, list(...))
 
+  rptflg <- FALSE
+  rptnm <- ""
+  if (has_report(outreq)) {
+    rptflg <- TRUE
+    rptnm <- get_report_name(outreq)
+    outreq[[rptnm]] <- NULL
+  }
 
+  rptres <- NULL
   res <- NULL
 
-  rptres <- gen_report_freq(data = data,
-                            by = by,
-                            tables = tables,
-                            table_options = table_options,
-                            weight = weight,
-                            view = view,
-                            titles = titles)
+  if (view == TRUE | rptflg) {
+    rptres <- gen_report_freq(data = data,
+                              by = by,
+                              tables = tables,
+                              table_options = table_options,
+                              weight = weight,
+                              view = view,
+                              titles = titles)
+  }
 
   if (length(outreq) > 0) {
 
@@ -327,6 +342,19 @@ proc_freq <- function(data,
                            output = outreq)
 
   }
+
+  # Add report list if requested
+  if (rptflg & !is.null(rptres)) {
+
+    if (is.null(res))
+      res <- rptres
+    else
+      res[[rptnm]] <- rptres
+  }
+
+  # If only one dataset returned, remove list
+  if (length(res) == 1)
+    res <- res[[1]]
 
 
   return(res)
@@ -346,7 +374,7 @@ proc_freq <- function(data,
 freq_oneway <- function(data, tb, weight, options, out = FALSE, stats = NULL) {
 
   if (is.null(stats))
-    stats <- c("n", "freq", "pct", "cumsum", "cumpct")
+    stats <- c("n", "cnt", "pct", "cumsum", "cumpct")
 
   # Get target variable vector
   var <- data[[tb]]
@@ -410,7 +438,7 @@ freq_oneway <- function(data, tb, weight, options, out = FALSE, stats = NULL) {
 
   # Kill freq if requested
   if (!option_true(options, "freq", TRUE) |
-      !"freq" %in% stats) {
+      !"cnt" %in% stats) {
 
     result[["Frequency"]] <- NULL
   }
@@ -439,7 +467,7 @@ freq_oneway <- function(data, tb, weight, options, out = FALSE, stats = NULL) {
   }
 
   if (!is.null(stats)) {
-    mp <- c(n = "N", freq = "Frequency", pct = "Percent",
+    mp <- c(n = "N", cnt = "Frequency", pct = "Percent",
             cumsum = "Cum_Freq", cumpct = "Cum_Pct")
 
     fstats <- stats[mp[stats] %in% names(result)]
@@ -465,7 +493,7 @@ freq_twoway <- function(data, tb1, tb2, weight, options,
                         out = FALSE, stats = NULL) {
 
   if (is.null(stats))
-    stats <- c("n", "freq", "pct", "cumsum", "cumpct")
+    stats <- c("n", "cnt", "pct", "cumsum", "cumpct")
 
   # Assign 1 to count column
   data[["__cnt"]] <- 1
@@ -566,7 +594,7 @@ freq_twoway <- function(data, tb1, tb2, weight, options,
 
   # Kill freq if requested
   if (!option_true(options, "freq", TRUE) |
-      !"freq" %in% stats) {
+      !"cnt" %in% stats) {
 
     result[["Frequency"]] <- NULL
   }
@@ -603,7 +631,7 @@ freq_twoway <- function(data, tb1, tb2, weight, options,
 
 
   if (!is.null(stats)) {
-    mp <- c(n = "N", freq = "Frequency", pct = "Percent",
+    mp <- c(n = "N", cnt = "Frequency", pct = "Percent",
             cumsum = "Cum_Freq", cumpct = "Cum_Pct")
 
     fstats <- stats[mp[stats] %in% names(result)]
@@ -916,16 +944,20 @@ get_output_twoway <- function(data, tb1, tb2, weight, options, out = FALSE,
 
 }
 
+#' @import common
 get_output_specs <- function(tbls, outs) {
 
 
   ret <- list()
-  sts <- c("n", "freq", "pct", "cumsum", "cumpct")
+  sts <- c("n", "cnt", "pct", "cumsum", "cumpct")
 
   if (length(outs) >= 1) {
     for (nm in names(outs)) {
-      if ("output_spec" %in% class(outs[[nm]])) {
-        if (is.null(outs[[nm]]$table)) {
+      if ("out_req" %in% class(outs[[nm]])) {
+        if (outs[[nm]]$report %eq% TRUE) {
+          ret[[nm]] <- outs[[nm]]
+
+        } else if (is.null(outs[[nm]]$table)) {
           ot <- outs[[nm]]
 
           tnms <- names(tbls)
@@ -1333,9 +1365,6 @@ gen_output_freq <- function(data,
 
     }
   }
-
-  if (length(res) == 1)
-    res <- res[[1]]
 
 
   return(res)

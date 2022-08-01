@@ -206,5 +206,22 @@ test_that("utils9: out() function works as expected.", {
 
 
 
+test_that("utils10: has_report() funtion works.", {
 
+  expect_equal(has_report(NULL), FALSE)
+
+  opts1 <- list(out = out(stats = "n"))
+
+  expect_equal(has_report(opts1), FALSE)
+
+  opts2 <- list(out = out(stats = "n"),
+                out2 = out(report = TRUE))
+
+
+  expect_equal(has_report(opts2), TRUE)
+
+  nm <- get_report_name(opts2)
+  expect_equal(nm, "out2")
+
+})
 

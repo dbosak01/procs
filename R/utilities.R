@@ -309,5 +309,45 @@ get_name <- function(nm = NULL, var = NULL, bylbl = NULL) {
 
 
 
+has_report <- function(outreq) {
 
+  ret <- FALSE
+
+  if (!is.null(outreq)) {
+    for (itm in outreq) {
+
+      if (!is.null(itm$report)) {
+        if (itm$report == TRUE)
+          ret <- TRUE
+
+      }
+    }
+  }
+
+
+  return(ret)
+
+}
+
+get_report_name <- function(outreq) {
+
+  ret <- ""
+
+  if (!is.null(outreq)) {
+
+    nms <- names(outreq)
+    for (nm in nms) {
+
+      if (!is.null(outreq[[nm]]$report)) {
+        if (outreq[[nm]]$report == TRUE)
+          ret <- nm
+
+      }
+    }
+  }
+
+
+  return(ret)
+
+}
 
