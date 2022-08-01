@@ -343,7 +343,10 @@ proc_freq <- function(data,
 #' @import reporter
 #' @import common
 #' @noRd
-freq_oneway <- function(data, tb, weight, options, out = FALSE) {
+freq_oneway <- function(data, tb, weight, options, out = FALSE, stats = NULL) {
+
+  if (is.null(stats))
+    stats <- c("n", "freq", "pct", "cumsum", "cumpct")
 
   # Get target variable vector
   var <- data[[tb]]
@@ -399,30 +402,49 @@ freq_oneway <- function(data, tb, weight, options, out = FALSE) {
 
  # browser()
 
+  if (!"n" %in% stats) {
+
+    result[["N"]] <- NULL
+
+  }
+
   # Kill freq if requested
-  if ((!option_true(options, "freq", TRUE))) {
+  if (!option_true(options, "freq", TRUE) |
+      !"freq" %in% stats) {
 
     result[["Frequency"]] <- NULL
   }
 
   # Kill pct if requested
-  if ((!option_true(options, "pct", TRUE))) {
+  if (!option_true(options, "pct", TRUE) |
+      !"pct" %in% stats) {
 
     result[["Percent"]] <- NULL
   }
 
   # Kill cum freq if requested
-  if ((!option_true(options, "cumsum", TRUE)) |
-      (!option_true(options, "outcum", TRUE))) {
+  if (!option_true(options, "cumsum", TRUE) |
+      !option_true(options, "outcum", TRUE) |
+      !"cumsum" %in% stats) {
 
     result[["Cum_Freq"]] <- NULL
   }
 
   # Kill cum pct if requested
-  if ((!option_true(options, "cumpct", TRUE)) |
-      (!option_true(options, "outcum", TRUE))) {
+  if (!option_true(options, "cumpct", TRUE) |
+      !option_true(options, "outcum", TRUE) |
+      !"cumpct" %in% stats) {
 
     result[["Cum_Pct"]] <- NULL
+  }
+
+  if (!is.null(stats)) {
+    mp <- c(n = "N", freq = "Frequency", pct = "Percent",
+            cumsum = "Cum_Freq", cumpct = "Cum_Pct")
+
+    fstats <- stats[mp[stats] %in% names(result)]
+
+    result <- result[ , c("Category", mp[stats])]
   }
 
 
@@ -439,7 +461,11 @@ freq_oneway <- function(data, tb, weight, options, out = FALSE) {
 #' @import stats
 #' @import common
 #' @noRd
-freq_twoway <- function(data, tb1, tb2, weight, options, out = FALSE) {
+freq_twoway <- function(data, tb1, tb2, weight, options,
+                        out = FALSE, stats = NULL) {
+
+  if (is.null(stats))
+    stats <- c("n", "freq", "pct", "cumsum", "cumpct")
 
   # Assign 1 to count column
   data[["__cnt"]] <- 1
@@ -533,14 +559,21 @@ freq_twoway <- function(data, tb1, tb2, weight, options, out = FALSE) {
   formats(result) <- list(Percent = paste0("%.4f"),
                           Cum_Pct = paste0("%.4f"))
 
+  if (out == FALSE | !"n" %in% stats) {
+
+    result[["N"]] <- NULL
+  }
+
   # Kill freq if requested
-  if ((!option_true(options, "freq", TRUE))) {
+  if (!option_true(options, "freq", TRUE) |
+      !"freq" %in% stats) {
 
     result[["Frequency"]] <- NULL
   }
 
   # Kill pct if requested
-  if ((!option_true(options, "pct", TRUE))) {
+  if (!option_true(options, "pct", TRUE) |
+      !"pct" %in% stats) {
 
     result[["Percent"]] <- NULL
   }
@@ -551,8 +584,9 @@ freq_twoway <- function(data, tb1, tb2, weight, options, out = FALSE) {
   # Kill cum freq if requested
   if (out == FALSE)
     result[["Cum_Freq"]] <- NULL
-  else if ((!option_true(options, "cumsum", TRUE)) |
-      (!option_true(options, "outcum", TRUE))) {
+  else if (!option_true(options, "cumsum", TRUE) |
+           !option_true(options, "outcum", TRUE) |
+           !"cumsum" %in% stats) {
 
     result[["Cum_Freq"]] <- NULL
   }
@@ -560,12 +594,22 @@ freq_twoway <- function(data, tb1, tb2, weight, options, out = FALSE) {
   # Kill cum pct if requested
   if (out == FALSE)
     result[["Cum_Pct"]] <- NULL
-  else if ((!option_true(options, "cumpct", TRUE)) |
-      (!option_true(options, "outcum", TRUE))) {
+  else if (!option_true(options, "cumpct", TRUE) |
+           !option_true(options, "outcum", TRUE) |
+           !"cumpct" %in% stats) {
 
     result[["Cum_Pct"]] <- NULL
   }
 
+
+  if (!is.null(stats)) {
+    mp <- c(n = "N", freq = "Frequency", pct = "Percent",
+            cumsum = "Cum_Freq", cumpct = "Cum_Pct")
+
+    fstats <- stats[mp[stats] %in% names(result)]
+
+    result <- result[ , c("Category1", "Category2", mp[fstats])]
+  }
 
   return(result)
 
@@ -738,12 +782,12 @@ cross_tab <- function(freqdata, options, var1, var2, bylbl = NULL) {
 }
 
 get_output_oneway <- function(data, tb, weight = NULL, options = NULL,
-                              by = NULL, direction = "wide") {
+                              by = NULL, direction = "wide", stats = NULL) {
 
 
 
   ret <- freq_oneway(data = data, tb = tb, weight = weight,
-                     options = options)
+                     options = options, stats = stats)
 
   # Bind variable name
   tmp <- list(VAR = tb)
@@ -804,10 +848,10 @@ get_output_oneway <- function(data, tb, weight = NULL, options = NULL,
 
 
 get_output_twoway <- function(data, tb1, tb2, weight, options, out = FALSE,
-                              by = NULL, direction = "wide") {
+                              by = NULL, direction = "wide", stats = NULL) {
 
   ret <- freq_twoway(data = data, tb1 = tb1, tb2 = tb2, weight = weight,
-                     options = options, out = out)
+                     options = options, out = out, stats = stats)
 
   # Bind variable names
   tmp <- list(VAR1 = tb1, VAR2 = tb2)
@@ -876,7 +920,7 @@ get_output_specs <- function(tbls, outs) {
 
 
   ret <- list()
-  sts <- c("n", "pct", "cumsum", "cumpct")
+  sts <- c("n", "freq", "pct", "cumsum", "cumpct")
 
   if (length(outs) >= 1) {
     for (nm in names(outs)) {
@@ -1185,10 +1229,12 @@ gen_output_freq <- function(data,
 
           if (length(byvals) >= j) {
             result <- get_output_oneway(dt, tb, weight, table_options,
-                                      byvals[[j]], direction = outp$direction)
+                                      byvals[[j]], direction = outp$direction,
+                                      stats = outp$stats)
           } else {
             result <- get_output_oneway(dt, tb, weight, table_options,
-                                        NULL, direction = outp$direction)
+                                        NULL, direction = outp$direction,
+                                        stats = outp$stats)
           }
 
         } else if (length(splt) == 2) {
@@ -1198,11 +1244,13 @@ gen_output_freq <- function(data,
           # Perform two-way frequency
           if (length(byvals) >= j) {
             result <- get_output_twoway(dt, splt[1], splt[2], weight, table_options,
-                                byvals[[j]], direction = outp$direction, out = TRUE)
+                                byvals[[j]], direction = outp$direction,
+                                out = TRUE, stats = outp$stats)
           } else {
 
             result <- get_output_twoway(dt, splt[1], splt[2], weight, table_options,
-                                     NULL, direction = outp$direction, out = TRUE)
+                                     NULL, direction = outp$direction,
+                                     out = TRUE, stats = outp$stats)
           }
 
 #

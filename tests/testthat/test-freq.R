@@ -90,7 +90,7 @@ test_that("freq1: Simple proc_freq test works.", {
 #
 # })
 
-test_that("freq3: Two table proc_freq test with report_type html works.", {
+test_that("freq3: Two table proc_freq test with output works.", {
 
   library(common)
 
@@ -265,15 +265,15 @@ test_that("freq10: Two way proc_freq works.", {
                       Region = "Geographic Region")
 
   res <- proc_freq(dat, tables = c(FreqCount = "Eyes * Hair"),
-                   # table_options = list(out = "MyFreq", cumsum = TRUE,
-                   #                      cumpct = TRUE),
+                   table_options = list(out = "MyFreq", cumsum = FALSE,
+                                        cumpct = FALSE),
                    weight = "Count",
                    titles = "Eye and Hair Color of European Children")
 
   res
 
   expect_equal(nrow(res), 15)
-  expect_equal(ncol(res), 8)
+  expect_equal(ncol(res), 7)
 
 })
 
@@ -1101,6 +1101,63 @@ test_that("freq42: get_output_twoway() long works as expected.", {
 
   expect_equal(nrow(res2), 2)
   expect_equal(ncol(res2), 9)
+
+})
+
+
+
+test_that("freq43: oneway output statistics work.", {
+
+  library(common)
+
+  labels(dat) <- list(Eyes = "Eye Color",
+                      Hair = "Hair Color",
+                      Region = "Geographic Region")
+
+  res <- proc_freq(dat,
+                   titles = "My first Frequency Table",
+                   view = TRUE,
+                   weight = "Count",
+                   out1 = out(table ="Eyes", stats = c("freq", "pct", "n")),
+                   out2 = out(table = "Hair",
+                              stats = c("cumsum", "freq", "pct"),
+                              direction = "long"))
+
+  res
+
+  expect_equal(length(res), 2)
+  expect_equal(names(res[[1]]), c("VAR", "CAT", "COUNT", "PERCENT", "N"))
+  expect_equal(nrow(res[[1]]), 3)
+  expect_equal(nrow(res[[2]]), 3)
+  expect_equal(res[[2]]$STAT, c("CUM_FREQ", "COUNT", "PERCENT"))
+
+})
+
+test_that("freq44: twoway output statistics work.", {
+
+  library(common)
+
+  labels(dat) <- list(Eyes = "Eye Color",
+                      Hair = "Hair Color",
+                      Region = "Geographic Region")
+
+  res <- proc_freq(dat,
+                 #  tables = c("Region * Eyes", "Region * Hair"),
+                   titles = "My first Frequency Table",
+                   view = TRUE,
+                   weight = "Count",
+                   out1 = out(table ="Region * Eyes", stats = c("freq", "pct", "n")),
+                   out2 = out(table = "Region * Hair",
+                              stats = c("cumsum", "freq", "pct"),
+                              direction = "long"))
+
+  res
+
+  expect_equal(length(res), 2)
+  expect_equal(names(res[[1]]), c("VAR1", "VAR2", "CAT1", "CAT2", "COUNT", "PERCENT", "N"))
+  expect_equal(nrow(res[[1]]), 6)
+  expect_equal(nrow(res[[2]]), 3)
+  expect_equal(res[[2]]$STAT, c("CUM_FREQ", "COUNT", "PERCENT"))
 
 })
 
