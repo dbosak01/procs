@@ -14,7 +14,8 @@ proc_means(
   view = TRUE,
   titles = NULL,
   options = NULL,
-  ...
+  ...,
+  output = NULL
 )
 }
 \arguments{
@@ -23,6 +24,8 @@ proc_means(
 \item{by}{An optional by group. You may
 pass unquoted variable names to this parameter using the \code{\link{v}}
 function.}
+
+\item{class}{The variable or variables to perform frequency counts on.}
 
 \item{var}{The variable(s) to calculate summary statistics for. You may
 pass unquoted variable names to this parameter using the \code{\link{v}}
@@ -55,6 +58,13 @@ a list of data frames. If no statistics are specified in the \code{\link{out}}
 function, the procedure will default to the statistics assigned on
 the \code{stats} parameter above.  Note that this default behavior is different
 from SAS®.}
+
+\item{output}{A named list of output data requests.  The name of the list item
+will become the name of the item in the return list, if there is one.  The
+value of the list item is a output request created with the \code{\link{out}}
+function.  Output data requests may also be made on the \code{...} parameter
+for convenience.  This parameter is provided in case you need to generate
+output requests dynamically inside a function.}
 }
 \value{
 The requested summary statistics.

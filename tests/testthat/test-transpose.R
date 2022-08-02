@@ -151,7 +151,7 @@ test_that("transpose7: proc_means and proc_transpose.", {
                     out = out(direction = "wide", type = FALSE,
                               freq = FALSE))
 
-  res <- proc_transpose(mres, id = "Variable", name = "Statistic")
+  res <- proc_transpose(mres, id = "VAR", name = "STAT")
 
   res
 
@@ -238,7 +238,7 @@ test_that("transpose11: copy parameter works recycle bigger.", {
   res1 <- data.frame(Group = "Group1", stats)
 
   res2 <- proc_transpose(res1, copy = "Group",
-                         name = "Statistic", id = "Variable")
+                         name = "STAT", id = "VAR")
 
 
   res2
@@ -260,7 +260,7 @@ test_that("transpose12: copy parameter works recycle smaller", {
   res1 <- data.frame(Group = "Group1", stats)
 
   res2 <- proc_transpose(res1, copy = "Group",
-                         name = "Statistic", id = "Variable")
+                         name = "STAT", id = "VAR")
 
 
   res2
@@ -283,11 +283,11 @@ test_that("transpose13: copy parameter works recycle smaller", {
   mns[1, 1] <- "Total"
   mns
 
-  res <- proc_transpose(mns, var = c("N", "Mean", "Median", "Minimum", "Maximum"),
-                        copy = "Variable", name = "Stat", id = "Flavor")
+  res <- proc_transpose(mns, var = c("N", "MEAN", "MEDIAN", "MIN", "MAX"),
+                        copy = "VAR", name = "Stat", id = "Flavor")
 
-
-  res <- res[, c("Variable", "Stat", "Chocolate", "Rum", "Spice", "Vanilla", "Total")]
+  res
+  res <- res[, c("VAR", "Stat", "Chocolate", "Rum", "Spice", "Vanilla", "Total")]
 
   res
 
@@ -309,7 +309,7 @@ test_that("transpose14: copy parameter works with by groups", {
   res1 <- data.frame(Group = "Group1", stats)
 
   res2 <- proc_transpose(res1, copy = "Group", by = "Layers",
-                         name = "Statistic", id = "Variable")
+                         name = "STAT", id = "VAR")
 
   res2
 
@@ -332,7 +332,7 @@ test_that("transpose15: all vars eliminates by, copy, and id from transpose", {
   res1 <- data.frame(Group = "Group1", stats)
 
   res2 <- proc_transpose(res1, copy = "Group", by = "Layers",
-                         name = "Statistic", id = "Variable")
+                         name = "STAT", id = "VAR")
 
   res2
 
@@ -359,6 +359,29 @@ test_that("tranpose16: get_output_twoway() works as expected.", {
 
   expect_equal(nrow(res2), 4)
   expect_equal(ncol(res2), 8)
+
+})
+
+
+test_that("transpose15: NSE works on transpose", {
+
+  stats <- proc_means(datm, stats = v(n, mean, median),
+                      by = Layers)
+
+  stats
+
+  res1 <- data.frame(Group = "Group1", stats)
+
+  res2 <- proc_transpose(res1, copy = Group, by = Layers,
+                         name = STAT, id = VAR)
+
+  res2
+
+  expect_equal(nrow(res2), 9)
+  expect_equal(ncol(res2), 6)
+  expect_equal("Group" %in% names(res2), TRUE)
+
+
 
 })
 

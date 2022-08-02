@@ -41,11 +41,11 @@ test_that("means0: get_summaries works as expected for 1 variable.", {
 
 
   expect_equal(res[1, "N"], 20)
-  expect_equal(res[1, "Mean"], 76.15)
-  expect_equal(res[1, "Minimum"], 56)
-  expect_equal(res[1, "Maximum"], 93)
-  expect_equal(res[1, "Range"], 37)
-  expect_equal(res[1, "Median"], 77.5)
+  expect_equal(res[1, "MEAN"], 76.15)
+  expect_equal(res[1, "MIN"], 56)
+  expect_equal(res[1, "MAX"], 93)
+  expect_equal(res[1, "RANGE"], 37)
+  expect_equal(res[1, "MEDIAN"], 77.5)
 
 })
 
@@ -59,11 +59,11 @@ test_that("means1: get_summaries works as expected for two variables.", {
 
 
   expect_equal(res[2, "N"], 20)
-  expect_equal(res[2, "Mean"], 81.35)
-  expect_equal(res[2, "Minimum"], 72)
-  expect_equal(res[2, "Maximum"], 94)
-  expect_equal(res[2, "Range"], 22)
-  expect_equal(res[2, "Median"], 82)
+  expect_equal(res[2, "MEAN"], 81.35)
+  expect_equal(res[2, "MIN"], 72)
+  expect_equal(res[2, "MAX"], 94)
+  expect_equal(res[2, "RANGE"], 22)
+  expect_equal(res[2, "MEDIAN"], 82)
 
 })
 
@@ -84,11 +84,11 @@ test_that("means2: gen_report_means works as expected with two variables.", {
 
   res <- res[[1]]
   expect_equal(res[2, "N"], 20)
-  expect_equal(res[2, "Mean"], 81.35)
-  expect_equal(res[2, "Minimum"], 72)
-  expect_equal(res[2, "Maximum"], 94)
-  expect_equal(res[2, "Range"], 22)
-  expect_equal(res[2, "Median"], 82)
+  expect_equal(res[2, "MEAN"], 81.35)
+  expect_equal(res[2, "MIN"], 72)
+  expect_equal(res[2, "MAX"], 94)
+  expect_equal(res[2, "RANGE"], 22)
+  expect_equal(res[2, "MEDIAN"], 82)
 
 
 })
@@ -107,7 +107,7 @@ test_that("means2: gen_report_means works as expected with two variables.", {
 #
 #   expect_equal(res[2, "Sum"], 1627)
 #   expect_equal(res[2, "Nobs"], 20)
-#   expect_equal(res[2, "NMiss"], 0)
+#   expect_equal(res[2, "NMISS"], 0)
 #   expect_equal(res[2, "CSS"], 830.55)
 #   expect_equal(res[2, "CV"] > 8, TRUE)
 #
@@ -159,11 +159,11 @@ test_that("means6: get_summaries works as expected for two variables with v().",
 
 
   expect_equal(res[2, "N"], 20)
-  expect_equal(res[2, "Mean"], 81.35)
-  expect_equal(res[2, "Minimum"], 72)
-  expect_equal(res[2, "Maximum"], 94)
-  expect_equal(res[2, "Range"], 22)
-  expect_equal(res[2, "Median"], 82)
+  expect_equal(res[2, "MEAN"], 81.35)
+  expect_equal(res[2, "MIN"], 72)
+  expect_equal(res[2, "MAX"], 94)
+  expect_equal(res[2, "RANGE"], 22)
+  expect_equal(res[2, "MEDIAN"], 82)
 
 })
 
@@ -291,12 +291,12 @@ test_that("means12: check more stats options", {
   expect_equal("data.frame" %in% class(res), TRUE)
   expect_equal(ncol(res), 7)
 
-  expect_equal(res[2, "NMiss"], 0)
-  expect_equal(res[2, "Median"], 82)
-  expect_equal(res[2, "Mode"], 84)
+  expect_equal(res[2, "NMISS"], 0)
+  expect_equal(res[2, "MEDIAN"], 82)
+  expect_equal(res[2, "MODE"], 84)
   expect_equal(res[2, "UCLM"], 84.44432)
   expect_equal(res[2, "LCLM"], 78.25568)
-  expect_equal(res[2, "Std_Err"], 1.47839707)
+  expect_equal(res[2, "STDERR"], 1.47839707)
 
 })
 
@@ -320,20 +320,20 @@ test_that("means13: check missing value works.", {
   expect_equal(ncol(res), 9)
 
 
-  expect_equal(res[1, "NMiss"], 1)
-  expect_equal(res[1, "Mean"], 76.105263158)
-  expect_equal(res[1, "Median"], 78)
-  expect_equal(res[1, "Mode"], 81)
+  expect_equal(res[1, "NMISS"], 1)
+  expect_equal(res[1, "MEAN"], 76.105263158)
+  expect_equal(res[1, "MEDIAN"], 78)
+  expect_equal(res[1, "MODE"], 81)
   expect_equal(res[1, "UCLM"], 80.747505)
   expect_equal(res[1, "LCLM"], 71.463022)
-  expect_equal(res[1, "Std_Dev"], 9.6315150351)
+  expect_equal(res[1, "STD"], 9.6315150351)
 
-  expect_equal(res[2, "NMiss"], 0)
-  expect_equal(res[2, "Median"], 82)
-  expect_equal(res[2, "Mode"], 84)
+  expect_equal(res[2, "NMISS"], 0)
+  expect_equal(res[2, "MEDIAN"], 82)
+  expect_equal(res[2, "MODE"], 84)
   expect_equal(res[2, "UCLM"], 84.44432)
   expect_equal(res[2, "LCLM"], 78.25568)
-  expect_equal(res[2, "Std_Dev"], 6.6115926897)
+  expect_equal(res[2, "STD"], 6.6115926897)
 
 })
 
@@ -370,7 +370,7 @@ test_that("means14: check missing parameter works.", {
   expect_equal(res[1, "P99"], 93)
   expect_equal(res[1, "Q1"], 68.5)
   expect_equal(res[1, "Q3"], 83)
-  expect_equal(res[1, "QRange"], 14.5)
+  expect_equal(res[1, "QRANGE"], 14.5)
 
   expect_equal(res[2, "N"], 20)
   expect_equal(res[2, "P1"], 72)
@@ -390,7 +390,7 @@ test_that("means14: check missing parameter works.", {
   expect_equal(res[2, "P99"], 94)
   expect_equal(res[2, "Q1"], 75)
   expect_equal(res[2, "Q3"], 84.5)
-  expect_equal(res[2, "QRange"], 9.5)
+  expect_equal(res[2, "QRANGE"], 9.5)
 
 })
 
@@ -510,10 +510,10 @@ test_that("means21: gen_output_means works.", {
   expect_equal(length(res), 2)
 
   res1 <- res[[1]]
-  expect_equal(res1$STAT, c("N", "Mean", "Minimum", "Maximum"))
+  expect_equal(res1$STAT, c("N", "MEAN", "MIN", "MAX"))
 
   res2 <- res[[2]]
-  expect_equal(res2$STAT, c("N", "Mean", "Std_Dev"))
+  expect_equal(res2$STAT, c("N", "MEAN", "STD"))
 
 
 })
@@ -550,10 +550,10 @@ test_that("means23: gen_output_means works.", {
   expect_equal(length(res), 2)
 
   res1 <- res[[1]]
-  expect_equal(res1$STAT[1:4], c("N", "Mean", "Minimum", "Maximum"))
+  expect_equal(res1$STAT[1:4], c("N", "MEAN", "MIN", "MAX"))
 
   res2 <- res[[2]]
-  expect_equal(res2$STAT[1:3], c("N", "Mean", "Std_Dev"))
+  expect_equal(res2$STAT[1:3], c("N", "MEAN", "STD"))
 
 
 })

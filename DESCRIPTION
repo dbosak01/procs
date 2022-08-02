@@ -19,9 +19,9 @@ Maintainer: David Bosak <dbosak01@gmail.com>
 Description: Contains functions to simulate the most commonly used 
     SAS® procedures.  Specifically, the package aims to 
     simulate the functionality of SAS® 'proc freq', 'proc means',
-    'proc transpose', 'proc_sort', and 'proc_compare'. 
+    'proc transpose', 'proc sort', 'proc print' and 'proc_compare'. 
     The simulation will include recreating 
-    all datasets and reports with the highest fidelity possible. 
+    all statistics with the highest fidelity possible. 
 License: CC0
 Encoding: UTF-8
 URL: https://procs.r-sassy.org

@@ -39,8 +39,7 @@
 #' @param by An optional by group. You may
 #' pass unquoted variable names to this parameter using the \code{\link{v}}
 #' function.
-# @param class The variable or variables to perform frequency counts on.
-# @param class_options The option specifications for the table parameter.
+#' @param class The variable or variables to perform frequency counts on.
 #' @param var The variable(s) to calculate summary statistics for. You may
 #' pass unquoted variable names to this parameter using the \code{\link{v}}
 #' function.
@@ -73,6 +72,12 @@
 #' function, the procedure will default to the statistics assigned on
 #' the \code{stats} parameter above.  Note that this default behavior is different
 #' from SAS®.
+#' @param output A named list of output data requests.  The name of the list item
+#' will become the name of the item in the return list, if there is one.  The
+#' value of the list item is a output request created with the \code{\link{out}}
+#' function.  Output data requests may also be made on the \code{...} parameter
+#' for convenience.  This parameter is provided in case you need to generate
+#' output requests dynamically inside a function.
 #' @return The requested summary statistics.
 #' @import fmtr
 #' @import tibble
@@ -89,7 +94,8 @@ proc_means <- function(data,
                        view = TRUE,
                        titles = NULL,
                        options = NULL,
-                       ...) {
+                       ...,
+                       output = NULL) {
 
   # SAS seems to always ignore these
   # Not sure why R as an option to keep them
@@ -169,28 +175,33 @@ proc_means <- function(data,
   }
 
   # Set default statistics for output parameters
-  outreq <- list(...)
-  if (length(outreq) >= 1) {
-    for (nm in names(outreq)) {
-      if ("out_req" %in% class(outreq[[nm]])) {
-        if (is.null(outreq[[nm]]$stats)) {
+  if (!is.null(output)) {
+    outreq <- output  # need to check this
 
-          outreq[[nm]]$stats <- stats
-        }
-        if (is.null(outreq[[nm]]$direction)) {
-
-          outreq[[nm]]$direction <- "long"
-        }
-      } else {
-
-        outreq[[nm]] <- out(direction = "long")
-      }
-    }
   } else {
+    outreq <- list(...)
+    if (length(outreq) >= 1) {
+      for (nm in names(outreq)) {
+        if ("out_req" %in% class(outreq[[nm]])) {
+          if (is.null(outreq[[nm]]$stats)) {
 
-   outreq[["out"]] <- out(stats = stats, direction = "wide",
-                          type = FALSE, freq = FALSE)
+            outreq[[nm]]$stats <- stats
+          }
+          if (is.null(outreq[[nm]]$direction)) {
 
+            outreq[[nm]]$direction <- "long"
+          }
+        } else {
+
+          outreq[[nm]] <- out(direction = "long")
+        }
+      }
+    } else {
+
+     outreq[["out"]] <- out(stats = stats, direction = "wide",
+                            type = FALSE, freq = FALSE)
+
+    }
   }
 
   res <- NULL
@@ -278,7 +289,7 @@ get_summaries <- function(data, var, stats, missing = FALSE,
       stop(paste0("Variable '", nm, "' not found on input dataset."))
     } else {
 
-      rw <- data.frame(Variable = nm, stringsAsFactors = FALSE)
+      rw <- data.frame(VAR = nm, stringsAsFactors = FALSE)
       var <- data[[nm]]
 
       sts <- tolower(stats)
@@ -310,89 +321,89 @@ get_summaries <- function(data, var, stats, missing = FALSE,
         if (st == "mean") {
 
           if (all(is.na(var)))
-            rw[["Mean"]] <- NA
+            rw[["MEAN"]] <- NA
           else
-            rw[["Mean"]] <- mean(var, na.rm = narm)
+            rw[["MEAN"]] <- mean(var, na.rm = narm)
         }
 
         if (st == "mode") {
 
           if (all(is.na(var)))
-            rw[["Mode"]] <- NA
+            rw[["MODE"]] <- NA
           else
-            rw[["Mode"]] <- get_mode(var)
+            rw[["MODE"]] <- get_mode(var)
         }
 
         if (st == "max") {
           if (all(is.na(var)))
-            rw[["Maximum"]] <- NA
+            rw[["MAX"]] <- NA
           else
-            rw[["Maximum"]] <- max(var, na.rm = narm)
+            rw[["MAX"]] <- max(var, na.rm = narm)
         }
 
         if (st == "min") {
 
           if (all(is.na(var)))
-            rw[["Minimum"]] <- NA
+            rw[["MIN"]] <- NA
           else
-            rw[["Minimum"]] <- min(var, na.rm = narm)
+            rw[["MIN"]] <- min(var, na.rm = narm)
         }
 
         if (st == "median") {
 
           if (all(is.na(var)))
-            rw[["Median"]] <- NA
+            rw[["MEDIAN"]] <- NA
           else
-            rw[["Median"]] <- median(var, na.rm = narm)
+            rw[["MEDIAN"]] <- median(var, na.rm = narm)
         }
 
         if (st == "nobs") {
 
-          rw[["Nobs"]] <- nrow(data)
+          rw[["NOBS"]] <- nrow(data)
         }
 
         if (st == "nmiss") {
 
-          rw[["NMiss"]] <- sum(is.na(var))
+          rw[["NMISS"]] <- sum(is.na(var))
         }
 
         if (st == "std") {
 
           if (all(is.na(var)))
-            rw[["Std_Dev"]] <- NA
+            rw[["STD"]] <- NA
           else
-            rw[["Std_Dev"]] <- sd(var, na.rm = narm)
+            rw[["STD"]] <- sd(var, na.rm = narm)
         }
 
         if (st == "sum") {
 
           if (all(is.na(var)))
-            rw[["Sum"]] <- NA
+            rw[["SUM"]] <- NA
           else
-            rw[["Sum"]] <- sum(var, na.rm = narm)
+            rw[["SUM"]] <- sum(var, na.rm = narm)
         }
 
         if (st == "range") {
 
           if (all(is.na(var))) {
-            rw[["Range"]] <- NA
+            rw[["RANGE"]] <- NA
           } else {
           rng <- range(var, na.rm = narm)
             if (!is.null(rng) & length(rng) == 2)
-              rw[["Range"]] <- rng[2] - rng[1]
+              rw[["RANGE"]] <- rng[2] - rng[1]
             else
-              rw[["Range"]] <- NA
+              rw[["RANGE"]] <- NA
           }
         }
 
         if (st == "var") {
 
-          rw[["Variance"]] <- var(var, na.rm = narm)
+          rw[["VARI"]] <- var(var, na.rm = narm)
         }
 
         if (st == "stderr") {
 
-          rw[["Std_Err"]] <- get_stderr(var, narm)
+          rw[["STDERR"]] <- get_stderr(var, narm)
         }
 
 
@@ -537,7 +548,7 @@ get_summaries <- function(data, var, stats, missing = FALSE,
           q25 <- quantile(var, probs = c(0.25), type = 2, na.rm = narm)
           q75 <- quantile(var, probs = c(0.75), type = 2, na.rm = narm)
 
-          rw[["QRange"]] <- q75 - q25
+          rw[["QRANGE"]] <- q75 - q25
 
         }
 
@@ -555,7 +566,7 @@ get_summaries <- function(data, var, stats, missing = FALSE,
   if (!is.null(direction)) {
     if (direction == "long") {
 
-      ret <- proc_transpose(ret, id = "Variable", name = "STAT", )
+      ret <- proc_transpose(ret, id = "VAR", name = "STAT", )
 
 
     }

@@ -69,6 +69,77 @@ proc_transpose <- function(data,
    stop("Input data must be inherited from a data frame.")
   }
 
+  # Deal with single value unquoted parameter values
+  oby <- deparse(substitute(by, env = environment()))
+  by <- tryCatch({if (typeof(by) %in% c("character", "NULL")) by else oby},
+                 error = function(cond) {oby})
+
+  # Deal with single value unquoted parameter values
+  ovar <- deparse(substitute(var, env = environment()))
+  var <- tryCatch({if (typeof(var) %in% c("character", "NULL")) var else ovar},
+                 error = function(cond) {ovar})
+
+  # Deal with single value unquoted parameter values
+  oid <- deparse(substitute(id, env = environment()))
+  id <- tryCatch({if (typeof(id) %in% c("character", "NULL")) id else oid},
+                 error = function(cond) {oid})
+
+  # Deal with single value unquoted parameter values
+  oidlabel <- deparse(substitute(idlabel, env = environment()))
+  idlabel <- tryCatch({if (typeof(idlabel) %in% c("character", "NULL")) idlabel else oidlabel},
+                 error = function(cond) {oidlabel})
+
+  # Deal with single value unquoted parameter values
+  ocopy <- deparse(substitute(copy, env = environment()))
+  copy <- tryCatch({if (typeof(copy) %in% c("character", "NULL")) copy else ocopy},
+                 error = function(cond) {ocopy})
+
+  oname <- deparse(substitute(name, env = environment()))
+  name <- tryCatch({if (typeof(name) %in% c("character", "NULL")) name else oname},
+                   error = function(cond) {oname})
+
+  onamelabel <- deparse(substitute(namelabel, env = environment()))
+  namelabel <- tryCatch({if (typeof(namelabel) %in% c("character", "NULL")) namelabel else onamelabel},
+                   error = function(cond) {onamelabel})
+
+  # Parameter checks
+  nms <- names(data)
+  if (!is.null(by)) {
+    if (!all(by %in% nms)) {
+
+      stop(paste("Invalid by name: ", by[!by %in% nms], "\n"))
+    }
+  }
+
+  if (!is.null(var)) {
+    if (!all(var %in% nms)) {
+
+      stop(paste("Invalid var name: ", var[!var %in% nms], "\n"))
+    }
+  }
+
+  if (!is.null(id)) {
+    if (!all(id %in% nms)) {
+
+      stop(paste("Invalid id name: ", id[!id %in% nms], "\n"))
+    }
+  }
+
+  if (!is.null(idlabel)) {
+    if (!all(idlabel %in% nms)) {
+
+      stop(paste("Invalid idlabel name: ", idlabel[!idlabel %in% nms], "\n"))
+    }
+  }
+
+  if (!is.null(copy)) {
+    if (!all(copy %in% nms)) {
+
+      stop(paste("Invalid copy name: ", copy[!copy %in% nms], "\n"))
+    }
+  }
+
+
    ret <- NULL
    retlst <- list()
 
