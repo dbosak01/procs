@@ -64,7 +64,7 @@ test_that("freq1: Simple proc_freq test works.", {
   res
 
   expect_equal(nrow(res), 3)
-  expect_equal(ncol(res), 6)
+  expect_equal(ncol(res), 7)
 
 })
 
@@ -109,9 +109,9 @@ test_that("freq3: Two table proc_freq test with output works.", {
   expect_equal(length(res), 2)
   expect_equal(names(res), c("Eyes", "HairCount"))
   expect_equal(nrow(res[[1]]), 3)
-  expect_equal(ncol(res[[1]]), 6)
+  expect_equal(ncol(res[[1]]), 7)
   expect_equal(nrow(res[[2]]), 5)
-  expect_equal(ncol(res[[2]]), 6)
+  expect_equal(ncol(res[[2]]), 7)
 
 })
 
@@ -132,7 +132,7 @@ test_that("freq4: Simple proc_freq test with weight works.", {
 
   expect_equal(res$COUNT[1], 222)
   expect_equal(nrow(res), 3)
-  expect_equal(ncol(res), 6)
+  expect_equal(ncol(res), 7)
 
 
 })
@@ -155,7 +155,7 @@ test_that("freq5: Two var proc_freq with weight works.", {
 
   expect_equal(length(res), 2)
   expect_equal(nrow(res[[1]]), 3)
-  expect_equal(ncol(res[[1]]), 6)
+  expect_equal(ncol(res[[1]]), 7)
   expect_equal(res[[1]]$COUNT[1], 222)
   expect_equal(res[[2]]$COUNT[5], 113)
 
@@ -177,8 +177,8 @@ test_that("freq6: Simple proc_freq with output long works.", {
 
   res
 
-  expect_equal(nrow(res), 4)
-  expect_equal(ncol(res), 5)
+  expect_equal(nrow(res), 3)
+  expect_equal(ncol(res), 7)
 
 
 })
@@ -200,7 +200,7 @@ test_that("freq7: Simple proc_freq with 2 way works.", {
   res
 
   expect_equal(nrow(res), 15)
-  expect_equal(ncol(res), 6)
+  expect_equal(ncol(res), 9)
 
 })
 
@@ -226,11 +226,11 @@ test_that("freq8: Simple proc_freq in multiple outputs works.", {
   expect_equal(length(res), 3)
   expect_equal(names(res), c("out1", "out2", "out3"))
   expect_equal(nrow(res[[1]]), 3)
-  expect_equal(ncol(res[[1]]), 6)
+  expect_equal(ncol(res[[1]]), 7)
   expect_equal(nrow(res[[2]]), 5)
-  expect_equal(ncol(res[[2]]), 6)
+  expect_equal(ncol(res[[2]]), 7)
   expect_equal(nrow(res[[3]]), 15)
-  expect_equal(ncol(res[[3]]), 6)
+  expect_equal(ncol(res[[3]]), 9)
 
 })
 
@@ -250,7 +250,7 @@ test_that("freq9: Simple proc_freq 1 way by variable works.", {
   res
 
   expect_equal(nrow(res), 6)
-  expect_equal(ncol(res), 7)
+  expect_equal(ncol(res), 8)
 
 })
 
@@ -294,7 +294,7 @@ test_that("freq11: Two way proc_freq no weight works.", {
   res
 
   expect_equal(nrow(res), 15)
-  expect_equal(ncol(res), 8)
+  expect_equal(ncol(res), 9)
 
 })
 
@@ -315,11 +315,11 @@ test_that("freq12: One way and two way proc_freq works.", {
   res
 
   expect_equal(nrow(res[[1]]), 3)
-  expect_equal(ncol(res[[1]]), 6)
+  expect_equal(ncol(res[[1]]), 7)
   expect_equal(nrow(res[[2]]), 5)
-  expect_equal(ncol(res[[2]]), 6)
+  expect_equal(ncol(res[[2]]), 7)
   expect_equal(nrow(res[[3]]), 15)
-  expect_equal(ncol(res[[3]]), 8)
+  expect_equal(ncol(res[[3]]), 9)
 
 
 })
@@ -337,11 +337,11 @@ test_that("freq13: Cumsum and Cumpct options work as expected.", {
 
   res
 
-  d <- names(res[[1]])
+  d <- names(res)
 
 
-  expect_equal("Cum_Sum" %in% d, FALSE)
-  expect_equal("Cum_Pct" %in% d, FALSE)
+  expect_equal("CUM_FREQ" %in% d, FALSE)
+  expect_equal("CUM_PCT" %in% d, FALSE)
 
 
 })
@@ -361,7 +361,6 @@ test_that("freq14: Out = options on table.", {
 
   expect_equal(d[1], "Eyes")
   expect_equal(d[2], "Eyes * Hair")
-  #expect_equal(d[3], "FreqCount")
 
 
 })
@@ -380,8 +379,8 @@ test_that("freq15: Outcum option works as expected.", {
   d <- names(res)
 
 
-  expect_equal("Cum_Freq" %in% d, FALSE)
-  expect_equal("Cum_Pct" %in% d, FALSE)
+  expect_equal("CUM_FREQ" %in% d, FALSE)
+  expect_equal("CUM_PCT" %in% d, FALSE)
 
   res <- proc_freq(dat, tables = c("Eyes"),
                    table_options = list(outcum = FALSE),
@@ -392,8 +391,8 @@ test_that("freq15: Outcum option works as expected.", {
   d <- names(res)
 
 
-  expect_equal("Cum_Freq" %in% d, FALSE)
-  expect_equal("Cum_Pct" %in% d, FALSE)
+  expect_equal("CUM_FREQ" %in% d, FALSE)
+  expect_equal("CUM_PCT" %in% d, FALSE)
 
 
 
@@ -446,7 +445,7 @@ test_that("freq17: Sparse option works as expected.", {
 
 
   expect_equal(nrow(res), 14)
-  expect_equal(ncol(res), 8)
+  expect_equal(ncol(res), 9)
 
 })
 
@@ -466,7 +465,7 @@ test_that("freq18: Crosstab works.", {
   res
 
   expect_equal(nrow(res), 15)
-  expect_equal(ncol(res), 8)
+  expect_equal(ncol(res), 9)
 
 })
 
@@ -483,7 +482,8 @@ test_that("freq19: Format options on table.", {
   res <- proc_freq(dat, tables = c("Eyes * Hair"),
                    table_options = list(format = "%.3f%%"),
                    weight = "Count",
-                   titles = "Eye and Hair Color of European Children")
+                   titles = "Eye and Hair Color of European Children",
+                   out = out(report = TRUE))
 
   crs <- res$dark
 
@@ -511,9 +511,9 @@ test_that("freq20: SAS replication of one way tables works.", {
   res
 
   expect_equal(nrow(res[[1]]), 3)
-  expect_equal(ncol(res[[1]]), 6)
+  expect_equal(ncol(res[[1]]), 7)
   expect_equal(nrow(res[[2]]), 5)
-  expect_equal(ncol(res[[2]]), 6)
+  expect_equal(ncol(res[[2]]), 7)
 
 })
 
@@ -529,12 +529,13 @@ test_that("freq21: Rowpct and Colpct options on table work.", {
   res <- proc_freq(dat, tables = c("Eyes * Hair"),
                    table_options = list(rowpct = FALSE, colpct = FALSE),
                    weight = "Count",
-                   titles = "Eye and Hair Color of European Children")
+                   titles = "Eye and Hair Color of European Children",
+                   out = out(report = TRUE))
 
   res
 
-  expect_equal(nrow(res[[1]]), 8)
-  expect_equal(ncol(res[[1]]), 8)
+  expect_equal(nrow(res), 8)
+  expect_equal(ncol(res), 8)
 
 
 })
@@ -551,7 +552,8 @@ test_that("freq22: Crosstab option to turn off totals works.", {
   res <- proc_freq(dat, tables = c("Eyes", "Hair", "Eyes * Hair"),
                    table_options = list(totcol = FALSE, totrow = FALSE),
                    weight = "Count",
-                   titles = "Eye and Hair Color of European Children")
+                   titles = "Eye and Hair Color of European Children",
+                   out = out(report = TRUE))
 
   res
 
@@ -605,16 +607,6 @@ test_that("freq22: Crosstab option to turn off totals works.", {
 #
 # })
 
-#
-# lst <- unclass(mtcars)[c("mpg", "cyl")]
-#
-# f1 <- as.factor(mtcars$vs)
-# f2 <- as.factor(mtcars$am)
-#
-# flst <- list(vs = f1, am = f2)
-# dtlst <- split(mtcars, flst, sep = " by ")
-#
-# dtlst
 
 test_that("freq25: Single by group on single table works.", {
 
@@ -632,8 +624,9 @@ test_that("freq25: Single by group on single table works.", {
 
   res
 
-  expect_equal(length(res), 2)
-  expect_equal(nrow(res[[1]]), 3)
+  expect_equal("data.frame" %in% class(res), TRUE)
+  expect_equal(nrow(res), 6)
+  expect_equal(ncol(res), 8)
 
 
 })
@@ -654,9 +647,9 @@ test_that("freq26: Single by group on double table works.", {
 
   res
 
-  expect_equal(length(res), 4)
-  expect_equal(nrow(res[[1]]), 3)
-  expect_equal(nrow(res[[2]]), 5)
+  expect_equal(length(res), 2)
+  expect_equal(nrow(res[[1]]), 6)
+  expect_equal(nrow(res[[2]]), 10)
 
 })
 
@@ -680,9 +673,9 @@ test_that("freq27: Double by group on double table works.", {
 
   res
 
-  expect_equal(length(res), 8)
-  expect_equal(nrow(res[[1]]), 3)
-  expect_equal(names(res)[1], "Sex=F, Region=1, Eyes")
+  expect_equal(length(res), 2)
+  expect_equal(nrow(res[[1]]), 12)
+  expect_equal(nrow(res[[2]]), 17)
 
 
 })
@@ -706,10 +699,11 @@ test_that("freq28: Double by group on double table with table names works.", {
 
   res
 
-  expect_equal(length(res), 8)
-  expect_equal(nrow(res[[1]]), 3)
-  expect_equal(names(res)[1], "Sex=F, Region=1, EyeTbl")
-  expect_equal(names(res)[2], "Sex=F, Region=1, HairTbl")
+  expect_equal(length(res), 2)
+  expect_equal(nrow(res[[1]]), 12)
+  expect_equal(nrow(res[[2]]), 17)
+  expect_equal(names(res)[1], "EyeTbl")
+  expect_equal(names(res)[2], "HairTbl")
 
 
 })
@@ -732,10 +726,11 @@ test_that("freq29: Double by group on double table no labels works.", {
 
   res
 
-  expect_equal(length(res), 8)
-  expect_equal(nrow(res[[1]]), 3)
-  expect_equal(names(res)[1], "Sex=F, Region=1, EyeTbl")
-  expect_equal(names(res)[2], "Sex=F, Region=1, HairTbl")
+  expect_equal(length(res), 2)
+  expect_equal(nrow(res[[1]]), 12)
+  expect_equal(nrow(res[[2]]), 17)
+  expect_equal(names(res)[1], "EyeTbl")
+  expect_equal(names(res)[2], "HairTbl")
 
 
 })
@@ -753,17 +748,15 @@ test_that("freq30: Crosstab with by works.", {
                         Region = "Geographic Region")
 
   res <- proc_freq(spdat, tables = c("Eyes * Hair"),
-                 #  table_options = list(out = "FreqTable"),
                    by = c("Sex"),
                    weight = "Count",
                    titles = "Eye and Hair Color of European Children")
 
   res
 
-  expect_equal(length(res), 2)
-  expect_equal(nrow(res[[1]]), 14)
-  expect_equal(names(res)[1], "Sex=F, Eyes * Hair")
-  expect_equal(names(res)[2], "Sex=M, Eyes * Hair")
+
+  expect_equal(nrow(res), 30)
+  expect_equal(ncol(res), 10)
 
 
 })
@@ -784,7 +777,8 @@ test_that("freq30: Crosstab with by and out works.", {
                     table_options = list(out = "FreqTable"),
                    by = c("Sex"),
                    weight = "Count",
-                   titles = "Eye and Hair Color of European Children")
+                   titles = "Eye and Hair Color of European Children",
+                   out = out(report = TRUE))
 
   res
 
@@ -817,7 +811,8 @@ test_that("freq32: chi sqr works with weight.", {
 
   res <- proc_freq(prt, tables = "internship * enrollment",
                    table_options = list(ChiSq = TRUE),
-                   weight = "count")
+                   weight = "count",
+                   out = out(report = TRUE))
 
   res
 
@@ -836,7 +831,8 @@ test_that("freq33: fisher's works with weight.", {
 
   res <- proc_freq(prt, tables = "internship * enrollment",
                    table_options = list(Fisher = TRUE),
-                   weight = "count")
+                   weight = "count",
+                   out = out(report = TRUE))
 
   res
 
@@ -857,7 +853,8 @@ test_that("freq34: fisher's works with weight and by.", {
   res <- proc_freq(prt, tables = "internship * enrollment",
                    table_options = list(Fisher = TRUE),
                    by = "sex",
-                   weight = "count")
+                   weight = "count",
+                   out = out(report = TRUE))
 
   res
 
@@ -890,7 +887,8 @@ test_that("freq35: chi sqr works with weight and by.", {
   res <- proc_freq(prt, tables = "internship * enrollment",
                    table_options = list(ChiSq = TRUE),
                    by = "sex",
-                   weight = "count")
+                   weight = "count",
+                   out = out(report = TRUE))
 
   res
 
@@ -916,11 +914,12 @@ test_that("freq36: 2 way table is sorted properly.", {
 
 
   res <- proc_freq(prt, tables = "internship * enrollment",
-                   weight = "count")
+                   weight = "count",
+                   out = out(report = TRUE))
 
   res
-  expect_equal(res[[1]][9, 1], "Total")
-  expect_equal(res[[1]][10, 1], "Total")
+  expect_equal(res[9, 1], "Total")
+  expect_equal(res[10, 1], "Total")
 })
 
 
@@ -935,11 +934,12 @@ test_that("freq37: Crosstab works with factors.", {
 
   res <- proc_freq(prt2, tables = c("sex", "internship * enrollment"),
                    table_options = list(out = "FreqCounts"),
-                   weight = "count")
+                   weight = "count",
+                   out = out(report = TRUE))
 
   res
   expect_equal(nrow(res[[1]]), 2)
-  expect_equal(ncol(res[[1]]), 5)
+  expect_equal(ncol(res[[1]]), 6)
   expect_equal(nrow(res[[2]]), 10)
   expect_equal(ncol(res[[2]]), 5)
   expect_equal(nrow(res[[3]]), 4)
@@ -1022,7 +1022,7 @@ test_that("freq39: get_output_oneway() works as expected.", {
 
 
   expect_equal(nrow(res1), 2)
-  expect_equal(ncol(res1), 7)
+  expect_equal(ncol(res1), 8)
 
   res2 <- get_output_oneway(prt, "internship", "count", NULL, by = c(am = "A",
                                                                      pm = "B"))
@@ -1031,7 +1031,7 @@ test_that("freq39: get_output_oneway() works as expected.", {
 
 
   expect_equal(nrow(res2), 2)
-  expect_equal(ncol(res2), 8)
+  expect_equal(ncol(res2), 9)
 
 })
 
@@ -1045,7 +1045,7 @@ test_that("freq40: get_output_oneway() long works as expected.", {
   res1
 
 
-  expect_equal(nrow(res1), 4)
+  expect_equal(nrow(res1), 5)
   expect_equal(ncol(res1), 5)
 
   res2 <- get_output_oneway(prt, "internship", "count", NULL,
@@ -1054,7 +1054,7 @@ test_that("freq40: get_output_oneway() long works as expected.", {
   res2
 
 
-  expect_equal(nrow(res2), 4)
+  expect_equal(nrow(res2), 5)
   expect_equal(ncol(res2), 6)
 
 })

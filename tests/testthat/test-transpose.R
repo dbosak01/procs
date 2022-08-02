@@ -345,7 +345,7 @@ test_that("transpose15: all vars eliminates by, copy, and id from transpose", {
 })
 
 
-test_that("freq39: get_output_twoway() works as expected.", {
+test_that("tranpose16: get_output_twoway() works as expected.", {
 
 
 
@@ -358,7 +358,7 @@ test_that("freq39: get_output_twoway() works as expected.", {
                  copy = c("by1", "by2", "VAR1", "VAR2"))
 
   expect_equal(nrow(res2), 4)
-  expect_equal(ncol(res2), 6)
+  expect_equal(ncol(res2), 8)
 
 })
 

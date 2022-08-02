@@ -177,9 +177,13 @@ proc_means <- function(data,
 
           outreq[[nm]]$stats <- stats
         }
+        if (is.null(outreq[[nm]]$direction)) {
+
+          outreq[[nm]]$direction <- "long"
+        }
       } else {
 
-        outreq[[nm]] <- out()
+        outreq[[nm]] <- out(direction = "long")
       }
     }
   } else {
@@ -548,11 +552,13 @@ get_summaries <- function(data, var, stats, missing = FALSE,
       ret <- rbind(ret, rw)
   }
 
-  if (direction == "long") {
+  if (!is.null(direction)) {
+    if (direction == "long") {
 
-    ret <- proc_transpose(ret, id = "Variable", name = "STAT", )
+      ret <- proc_transpose(ret, id = "Variable", name = "STAT", )
 
 
+    }
   }
 
 

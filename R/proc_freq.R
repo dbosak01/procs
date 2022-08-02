@@ -472,7 +472,7 @@ freq_oneway <- function(data, tb, weight, options, out = FALSE, stats = NULL) {
 
     fstats <- stats[mp[stats] %in% names(result)]
 
-    result <- result[ , c("Category", mp[stats])]
+    result <- result[ , c("Category", mp[fstats])]
   }
 
 

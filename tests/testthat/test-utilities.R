@@ -206,7 +206,7 @@ test_that("utils9: out() function works as expected.", {
 
 
 
-test_that("utils10: has_report() funtion works.", {
+test_that("utils10: has_report() function works.", {
 
   expect_equal(has_report(NULL), FALSE)
 

@@ -500,8 +500,10 @@ test_that("means21: gen_output_means works.", {
 
   res <- gen_output_means(datm,
                           var = c("PresentScore", "TasteScore"),
-          output = list(out1 = out(stats = c("n", "mean", "min", "max")),
-                        out2 = out(stats = c("n", "mean", "std"))))
+          output = list(out1 = out(stats = c("n", "mean", "min", "max"),
+                                   direction = "long"),
+                        out2 = out(stats = c("n", "mean", "std"),
+                                   direction = "long")))
 
   res
 
@@ -527,7 +529,7 @@ test_that("means22: get_class works.", {
 
   res
 
-  expect_equal(nrow(res), 12)
+  expect_equal(nrow(res), 6)
 
 })
 
@@ -538,8 +540,10 @@ test_that("means23: gen_output_means works.", {
   res <- gen_output_means(datm,
                           var = c("PresentScore", "TasteScore"),
                           class = "Layers",
-                          output = list(out1 = out(stats = c("n", "mean", "min", "max")),
-                                        out2 = out(stats = c("n", "mean", "std"))))
+                          output = list(out1 = out(stats = c("n", "mean", "min", "max"),
+                                                   direction = "long"),
+                                        out2 = out(stats = c("n", "mean", "std"),
+                                                   direction = "long")))
 
   res
 
@@ -624,6 +628,7 @@ test_that("means25: by parameter works.", {
 
 })
 
+# Need to work on this
 test_that("means26: by with class works.", {
 
   var1 <- c("Age", "PresentScore", "TasteScore")
