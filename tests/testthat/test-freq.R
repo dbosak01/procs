@@ -130,7 +130,7 @@ test_that("freq4: Simple proc_freq test with weight works.", {
   res
 
 
-  expect_equal(res$COUNT[1], 222)
+  expect_equal(res$CNT[1], 222)
   expect_equal(nrow(res), 3)
   expect_equal(ncol(res), 7)
 
@@ -156,8 +156,8 @@ test_that("freq5: Two var proc_freq with weight works.", {
   expect_equal(length(res), 2)
   expect_equal(nrow(res[[1]]), 3)
   expect_equal(ncol(res[[1]]), 7)
-  expect_equal(res[[1]]$COUNT[1], 222)
-  expect_equal(res[[2]]$COUNT[5], 113)
+  expect_equal(res[[1]]$CNT[1], 222)
+  expect_equal(res[[2]]$CNT[5], 113)
 
 })
 
@@ -187,7 +187,6 @@ test_that("freq7: Simple proc_freq with 2 way works.", {
 
   library(common)
 
-  fl <- file.path(base_path, "freq/freq7.pdf")
 
   labels(dat) <- list(Eyes = "Eye Color",
                       Hair = "Hair Color",
@@ -195,6 +194,7 @@ test_that("freq7: Simple proc_freq with 2 way works.", {
 
   res <- proc_freq(dat, tables = v(Eyes * Hair),
                    weight = "Count",
+                   view = TRUE,
                    titles = "My first Frequency Table")
 
   res
@@ -340,8 +340,8 @@ test_that("freq13: Cumsum and Cumpct options work as expected.", {
   d <- names(res)
 
 
-  expect_equal("CUM_FREQ" %in% d, FALSE)
-  expect_equal("CUM_PCT" %in% d, FALSE)
+  expect_equal("CUMSUM" %in% d, FALSE)
+  expect_equal("CUMPCT" %in% d, FALSE)
 
 
 })
@@ -379,8 +379,8 @@ test_that("freq15: Outcum option works as expected.", {
   d <- names(res)
 
 
-  expect_equal("CUM_FREQ" %in% d, FALSE)
-  expect_equal("CUM_PCT" %in% d, FALSE)
+  expect_equal("CUMSUM" %in% d, FALSE)
+  expect_equal("CUMPCT" %in% d, FALSE)
 
   res <- proc_freq(dat, tables = c("Eyes"),
                    table_options = list(outcum = FALSE),
@@ -391,8 +391,8 @@ test_that("freq15: Outcum option works as expected.", {
   d <- names(res)
 
 
-  expect_equal("CUM_FREQ" %in% d, FALSE)
-  expect_equal("CUM_PCT" %in% d, FALSE)
+  expect_equal("CUMSUM" %in% d, FALSE)
+  expect_equal("CUMPCT" %in% d, FALSE)
 
 
 
@@ -412,8 +412,8 @@ test_that("freq16: Freq and Pct options works as expected.", {
   d <- names(res)
 
 
-  expect_equal("COUNT" %in% d, FALSE)
-  expect_equal("PERCENT" %in% d, TRUE)
+  expect_equal("CNT" %in% d, FALSE)
+  expect_equal("PCT" %in% d, TRUE)
 
   res <- proc_freq(dat, tables = c("Eyes"),
                    table_options = list(freq = TRUE,
@@ -425,8 +425,8 @@ test_that("freq16: Freq and Pct options works as expected.", {
   d <- names(res)
 
 
-  expect_equal("COUNT" %in% d, TRUE)
-  expect_equal("PERCENT" %in% d, FALSE)
+  expect_equal("CNT" %in% d, TRUE)
+  expect_equal("PCT" %in% d, FALSE)
 
 
 
@@ -1126,10 +1126,10 @@ test_that("freq43: oneway output statistics work.", {
   res
 
   expect_equal(length(res), 2)
-  expect_equal(names(res[[1]]), c("VAR", "CAT", "COUNT", "PERCENT", "N"))
+  expect_equal(names(res[[1]]), c("VAR", "CAT", "CNT", "PCT", "N"))
   expect_equal(nrow(res[[1]]), 3)
   expect_equal(nrow(res[[2]]), 3)
-  expect_equal(res[[2]]$STAT, c("CUM_FREQ", "COUNT", "PERCENT"))
+  expect_equal(res[[2]]$STAT, c("CUMSUM", "CNT", "PCT"))
 
 })
 
@@ -1154,10 +1154,10 @@ test_that("freq44: twoway output statistics work.", {
   res
 
   expect_equal(length(res), 2)
-  expect_equal(names(res[[1]]), c("VAR1", "VAR2", "CAT1", "CAT2", "COUNT", "PERCENT", "N"))
+  expect_equal(names(res[[1]]), c("VAR1", "VAR2", "CAT1", "CAT2", "CNT", "PCT", "N"))
   expect_equal(nrow(res[[1]]), 6)
   expect_equal(nrow(res[[2]]), 3)
-  expect_equal(res[[2]]$STAT, c("CUM_FREQ", "COUNT", "PERCENT"))
+  expect_equal(res[[2]]$STAT, c("CUMSUM", "CNT", "PCT"))
 
 })
 
@@ -1184,10 +1184,10 @@ test_that("freq44: output parameter works.", {
   res
 
   expect_equal(length(res), 2)
-  expect_equal(names(res[[1]]), c("VAR1", "VAR2", "CAT1", "CAT2", "COUNT", "PERCENT", "N"))
+  expect_equal(names(res[[1]]), c("VAR1", "VAR2", "CAT1", "CAT2", "CNT", "PCT", "N"))
   expect_equal(nrow(res[[1]]), 6)
   expect_equal(nrow(res[[2]]), 3)
-  expect_equal(res[[2]]$STAT, c("CUM_FREQ", "COUNT", "PERCENT"))
+  expect_equal(res[[2]]$STAT, c("CUMSUM", "CNT", "PCT"))
 
 })
 

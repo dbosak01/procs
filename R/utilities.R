@@ -64,12 +64,12 @@ output_report <- function(lst,
 
     if (viewer == TRUE) {
 
-      if ("Category" %in% names(dt)) {
-        lbl <-  attr(dt$Category, "label")
+      if ("CAT" %in% names(dt)) {
+        lbl <-  attr(dt$CAT, "label")
         if (is.null(lbl))
-          lbl <- "Category"
+          lbl <- "CAT"
         nms <- names(dt)
-        names(dt) <- gsub("Category", "stub", nms, fixed = TRUE)
+        names(dt) <- gsub("CAT", "stub", nms, fixed = TRUE)
       }
 
       # Create table
@@ -87,7 +87,7 @@ output_report <- function(lst,
     } else {
 
       # Create table
-      tbl <- create_table(dt, borders = c("top", "bottom"))
+      tbl <- create_table(dt, borders = c("outside"))
     }
 
     #

@@ -6,20 +6,24 @@
 \usage{
 proc_print(
   data,
+  file_path = NULL,
+  output_type = "HTML",
   titles = NULL,
-  report_type = "HTML",
-  report_location = NULL,
+  style = NULL,
   view = TRUE
 )
 }
 \arguments{
-\item{data}{The data to print.}
+\item{data}{The data to print.  Can be either a single dataset, or
+a list of datasets.}
+
+\item{file_path}{The path of the report to print.}
+
+\item{output_type}{The type of report to create.}
 
 \item{titles}{A vector of titles.}
 
-\item{report_type}{The type of report to create.}
-
-\item{report_location}{The location of the report to create.}
+\item{style}{A style object.}
 
 \item{view}{Whether to send the print output to the viewer.  Valid
 values are TRUE and FALSE.}
@@ -29,9 +33,9 @@ The \code{proc_print} function is used to print a dataset
 or datasets.  To print multiple datasets, pass them to the \code{data}
 parameter in a list.
 By default, the function prints to the viewer. It may also be used
-to print to the file system using the \code{report_type} and
-\code{report_location} parameters.
+to print to the file system using the \code{output_type} and
+\code{file_path} parameters.
 }
 \details{
-Here is some details
+Here are some details
 }

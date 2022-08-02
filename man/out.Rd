@@ -4,7 +4,7 @@
 \alias{out}
 \title{Function to request an output dataset}
 \usage{
-out(stats = NULL, direction = "long", ...)
+out(stats = NULL, direction = NULL, report = FALSE, ...)
 }
 \arguments{
 \item{stats}{The requested statistics. The available statistics depend
@@ -12,6 +12,9 @@ on the function the output parameter applies to.}
 
 \item{direction}{How the output dataset should be organized.  Valid
 values are "long" or "wide".  The default is "long".}
+
+\item{report}{Whether to output the tables produced for the
+procedure report.}
 
 \item{...}{Various options.}
 }

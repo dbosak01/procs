@@ -12,9 +12,6 @@ proc_means(
   var = NULL,
   stats = c("n", "mean", "std", "min", "max"),
   view = TRUE,
-  report_type = NULL,
-  report_location = NULL,
-  report_style = NULL,
   titles = NULL,
   options = NULL,
   ...
@@ -43,22 +40,6 @@ function.}
 
 \item{view}{Whether to display the report in the interactive viewer.  Valid
 values are TRUE and FALSE.  Default is TRUE.}
-
-\item{report_type}{The output type for any report output.  Valid values are
-'HTML', 'TXT', 'PDF', 'RTF', 'DOCX'.  Multiple outputs can be
-requested by passing a vector of output types.  If the report_location parameter
-is specified, the outputs will be written to that location.  Otherwise,
-they will be written to a temp directory.  The default value is NULL.}
-
-\item{report_location}{A path to write any report output requested by
-the print parameter. The path may be either a full path with file name,
-or a directory name.  If the file name is not specified, the procedure
-type will be used.  If no path is specified, files will be
-written to a temp directory.  Default is NULL.}
-
-\item{report_style}{A theme name or style object to use on the report output.
-See the \code{\link[reporter]{create_style}} in the \strong{reporter}
-package for additional information on styles.}
 
 \item{titles}{A vector of one or more titles to use for the report output.}
 

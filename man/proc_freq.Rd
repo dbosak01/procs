@@ -12,11 +12,9 @@ proc_freq(
   table_options = NULL,
   weight = NULL,
   view = TRUE,
-  report_type = NULL,
-  report_location = NULL,
-  report_style = NULL,
   titles = NULL,
-  piped = FALSE
+  ...,
+  output = NULL
 )
 }
 \arguments{
@@ -52,29 +50,17 @@ counts.}
 \item{view}{Whether to display procedure results in the viewer.  Valid values
 are TRUE and FALSE.  Default is TRUE.}
 
-\item{report_type}{The output type for any report output.  Valid values are
-'HTML', 'TXT', 'PDF', 'RTF', and 'DOCX'.  Multiple outputs can be
-requested by passing a vector of output types.  If the \code{report_location}
-parameter is specified, the outputs will be written to that location.
-Otherwise, they will be written to a temp directory.  The default value is NULL.}
-
-\item{report_location}{A path to write any report output requested by
-the \code{report_type} parameter. The path may be either a full path with
-file name, or a directory name.  If a directory name, the function
-will create a default file name based on the report type.
-If no path is specified, files will be
-written to a temp directory.  Default is NULL.}
-
-\item{report_style}{A theme name or style object to use on the report output.
-See the \code{\link[reporter]{create_style}} in the \strong{reporter}
-package for additional information on styles.}
-
 \item{titles}{A vector of one or more titles to use for the report output.}
 
-\item{piped}{Whether or not the \code{proc_freq} function is part of a data
-pipeline.  Set this parameter to TRUE if you want the function to return
-a single dataset instead of a list of datasets.  If there is more than one
-table requested, the function will return the last requested table.}
+\item{...}{One or more output dataset requests.  Use the \code{\link{out}}
+function to make these requests.}
+
+\item{output}{A named list of output data requests.  The name of the list item
+will become the name of the item in the return list, if there is one.  The
+value of the list item is a output request created with the \code{\link{out}}
+function.  Output data requests may also be made on the \code{...} parameter
+for convenience.  This parameter is provided in case you need to generate
+output requests dynamically inside a function.}
 }
 \value{
 By default the function returns a list of tibbles

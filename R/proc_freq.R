@@ -400,12 +400,12 @@ freq_oneway <- function(data, tb, weight, options, out = FALSE, stats = NULL) {
 
 
   # Create result data frame
-  result <- data.frame("Category" = categories,
+  result <- data.frame("CAT" = categories,
                        "N" = n,
-                       "Frequency" = frequencies,
-                       "Percent" = percentages,
-                       "Cum_Freq" = cum_frequencies,
-                       "Cum_Pct" = cum_percentages,
+                       "CNT" = frequencies,
+                       "PCT" = percentages,
+                       "CUMSUM" = cum_frequencies,
+                       "CUMPCT" = cum_percentages,
                        stringsAsFactors = FALSE)
 
 
@@ -420,13 +420,15 @@ freq_oneway <- function(data, tb, weight, options, out = FALSE, stats = NULL) {
   names(tb) <- NULL
 
   # Apply default labels
-  labels(result) <- c(Category = tb,
-                      Cum_Freq = "Cumulative Frequency",
-                      Cum_Pct = "Cumulative Percent")
+  labels(result) <- c(CAT= tb,
+                      CNT = "Frequency",
+                      PCT = "Percent",
+                      CUMSUM = "Cumulative Frequency",
+                      CUMPCT = "Cumulative Percent")
 
   # Apply default formats
-  formats(result) <- list(Cum_Pct = "%.2f",
-                          Percent = "%.2f")
+  formats(result) <- list(CUMPCT = "%.2f",
+                          PCT = "%.2f")
 
  # browser()
 
@@ -440,14 +442,14 @@ freq_oneway <- function(data, tb, weight, options, out = FALSE, stats = NULL) {
   if (!option_true(options, "freq", TRUE) |
       !"cnt" %in% stats) {
 
-    result[["Frequency"]] <- NULL
+    result[["CNT"]] <- NULL
   }
 
   # Kill pct if requested
   if (!option_true(options, "pct", TRUE) |
       !"pct" %in% stats) {
 
-    result[["Percent"]] <- NULL
+    result[["PCT"]] <- NULL
   }
 
   # Kill cum freq if requested
@@ -455,7 +457,7 @@ freq_oneway <- function(data, tb, weight, options, out = FALSE, stats = NULL) {
       !option_true(options, "outcum", TRUE) |
       !"cumsum" %in% stats) {
 
-    result[["Cum_Freq"]] <- NULL
+    result[["CUMSUM"]] <- NULL
   }
 
   # Kill cum pct if requested
@@ -463,16 +465,16 @@ freq_oneway <- function(data, tb, weight, options, out = FALSE, stats = NULL) {
       !option_true(options, "outcum", TRUE) |
       !"cumpct" %in% stats) {
 
-    result[["Cum_Pct"]] <- NULL
+    result[["CUMPCT"]] <- NULL
   }
 
   if (!is.null(stats)) {
-    mp <- c(n = "N", cnt = "Frequency", pct = "Percent",
-            cumsum = "Cum_Freq", cumpct = "Cum_Pct")
+    # mp <- c(n = "N", cnt = "Frequency", pct = "Percent",
+    #         cumsum = "Cum_Freq", cumpct = "Cum_Pct")
 
-    fstats <- stats[mp[stats] %in% names(result)]
+    fstats <- stats[toupper(stats) %in% names(result)]
 
-    result <- result[ , c("Category", mp[fstats])]
+    result <- result[ , c("CAT", toupper(fstats))]
   }
 
 
@@ -552,21 +554,21 @@ freq_twoway <- function(data, tb1, tb2, weight, options,
 
 
   # Create result data frame
-  result <- data.frame("Category1" = categories1,
-                       "Category2" = categories2,
+  result <- data.frame("CAT1" = categories1,
+                       "CAT2" = categories2,
                        "N" = n,
-                       "Frequency" = frequencies,
-                       "Percent" = percentages,
+                       "CNT" = frequencies,
+                       "PCT" = percentages,
                        stringsAsFactors = FALSE)
 
   # Sort result data frame
-  result <- result[order(result$Category1, result$Category2), ]
+  result <- result[order(result$CAT1, result$CAT2), ]
 
   # Kill rownames
   rownames(result) <- NULL
 
-  result$Cum_Freq =  cumsum(result$Frequency)
-  result$Cum_Pct = cumsum(result$Percent)
+  result$CUMSUM =  cumsum(result$CNT)
+  result$CUMPCT = cumsum(result$PCT)
 
   # Get labels on target variables if they exist
   lbl1 <- attr(data[[tb1]], "label")
@@ -578,14 +580,16 @@ freq_twoway <- function(data, tb1, tb2, weight, options,
     lbl2 <- tb2
 
   # Assign labels
-  labels(result) <- c(Category1 = lbl1,
-                      Category2 = lbl2,
-                      Cum_Freq = "Cumulative Frequency",
-                      Cum_Pct = "Cumulative Percent")
+  labels(result) <- c(CAT1 = lbl1,
+                      CAT2 = lbl2,
+                      CNT = "Frequency",
+                      PCT = "Percent",
+                      CUMSUM = "Cumulative Frequency",
+                      CUMPCT = "Cumulative Percent")
 
   # Assign default formats
-  formats(result) <- list(Percent = paste0("%.4f"),
-                          Cum_Pct = paste0("%.4f"))
+  formats(result) <- list(PCT = paste0("%.4f"),
+                          CUMPCT = paste0("%.4f"))
 
   if (out == FALSE | !"n" %in% stats) {
 
@@ -596,14 +600,14 @@ freq_twoway <- function(data, tb1, tb2, weight, options,
   if (!option_true(options, "freq", TRUE) |
       !"cnt" %in% stats) {
 
-    result[["Frequency"]] <- NULL
+    result[["CNT"]] <- NULL
   }
 
   # Kill pct if requested
   if (!option_true(options, "pct", TRUE) |
       !"pct" %in% stats) {
 
-    result[["Percent"]] <- NULL
+    result[["PCT"]] <- NULL
   }
 
   if (out == FALSE)
@@ -611,32 +615,32 @@ freq_twoway <- function(data, tb1, tb2, weight, options,
 
   # Kill cum freq if requested
   if (out == FALSE)
-    result[["Cum_Freq"]] <- NULL
+    result[["CUMSUM"]] <- NULL
   else if (!option_true(options, "cumsum", TRUE) |
            !option_true(options, "outcum", TRUE) |
            !"cumsum" %in% stats) {
 
-    result[["Cum_Freq"]] <- NULL
+    result[["CUMSUM"]] <- NULL
   }
 
   # Kill cum pct if requested
   if (out == FALSE)
-    result[["Cum_Pct"]] <- NULL
+    result[["CUMPCT"]] <- NULL
   else if (!option_true(options, "cumpct", TRUE) |
            !option_true(options, "outcum", TRUE) |
            !"cumpct" %in% stats) {
 
-    result[["Cum_Pct"]] <- NULL
+    result[["CUMPCT"]] <- NULL
   }
 
 
   if (!is.null(stats)) {
-    mp <- c(n = "N", cnt = "Frequency", pct = "Percent",
-            cumsum = "Cum_Freq", cumpct = "Cum_Pct")
+    # mp <- c(n = "N", cnt = "Frequency", pct = "Percent",
+    #         cumsum = "Cum_Freq", cumpct = "Cum_Pct")
 
-    fstats <- stats[mp[stats] %in% names(result)]
+    fstats <- stats[toupper(stats) %in% names(result)]
 
-    result <- result[ , c("Category1", "Category2", mp[fstats])]
+    result <- result[ , c("CAT1", "CAT2", toupper(fstats))]
   }
 
   return(result)
@@ -649,14 +653,14 @@ freq_twoway <- function(data, tb1, tb2, weight, options,
 #' @noRd
 cross_tab <- function(freqdata, options, var1, var2, bylbl = NULL) {
 
-  lbl1 <- attr(freqdata$Category1, "label")
-  lbl2 <- attr(freqdata$Category2, "label")
+  lbl1 <- attr(freqdata$CAT1, "label")
+  lbl2 <- attr(freqdata$CAT2, "label")
 
   #browser()
 
   # Group by both dimensions
-  cat1grp <- aggregate(freqdata$Frequency, list(freqdata$Category1), FUN=sum)
-  cat2grp <- aggregate(freqdata$Frequency, list(freqdata$Category2), FUN=sum)
+  cat1grp <- aggregate(freqdata$CNT, list(freqdata$CAT1), FUN=sum)
+  cat2grp <- aggregate(freqdata$CNT, list(freqdata$CAT2), FUN=sum)
 
   # Create lookup from cat1 group (rows)
   lkp1 <- cat1grp$x
@@ -670,39 +674,39 @@ cross_tab <- function(freqdata, options, var1, var2, bylbl = NULL) {
   dt <- freqdata
 
   # Create freq columns for both dimensions
-  dt$rowcnt <- lkp1[dt$Category1]
-  dt$colcnt <- lkp2[dt$Category2]
+  dt$rowcnt <- lkp1[dt$CAT1]
+  dt$colcnt <- lkp2[dt$CAT2]
 
   # Create percentages for both dimensions
-  dt$Percentage <- dt$Percentage
-  dt$rowpct <- dt$Frequency / dt$rowcnt * 100
-  dt$colpct <- dt$Frequency / dt$colcnt * 100
+  #dt$Percentage <- dt$Percentage
+  dt$rowpct <- dt$CNT / dt$rowcnt * 100
+  dt$colpct <- dt$CNT / dt$colcnt * 100
 
   # Transpose Frequency statistics
-  dt1 <- reshape(dt, timevar = "Category2", idvar = "Category1",
-                 v.names = "Frequency", direction = "wide",
-                 drop = c("Percent", "rowcnt", "colcnt", "rowpct", "colpct"))
-  dt1$Total <- lkp1[dt1$Category1]
+  dt1 <- reshape(dt, timevar = "CAT2", idvar = "CAT1",
+                 v.names = "CNT", direction = "wide",
+                 drop = c("PCT", "rowcnt", "colcnt", "rowpct", "colpct"))
+  dt1$Total <- lkp1[dt1$CAT1]
   dt1$Order <- 1
   dt1$Statistic <- "Frequency"
-  names(dt1) <- gsub("Frequency.",  "", names(dt1), fixed = TRUE)
+  names(dt1) <- gsub("CNT.",  "", names(dt1), fixed = TRUE)
 
   # Transpose Percents
-  dt2 <- reshape(dt, timevar = "Category2", idvar = "Category1",
-                 v.names = "Percent", direction = "wide",
-                 drop = c("Frequency", "rowcnt", "colcnt", "rowpct", "colpct"))
-  dt2$Total <- lkp1[dt1$Category1] / sum(lkp1, na.rm = TRUE) * 100
+  dt2 <- reshape(dt, timevar = "CAT2", idvar = "CAT1",
+                 v.names = "PCT", direction = "wide",
+                 drop = c("CNT", "rowcnt", "colcnt", "rowpct", "colpct"))
+  dt2$Total <- lkp1[dt1$CAT1] / sum(lkp1, na.rm = TRUE) * 100
   dt2$Order <- 2
   dt2$Statistic <- "Percent"
-  names(dt2) <- gsub("Percent.",  "", names(dt2), fixed = TRUE)
+  names(dt2) <- gsub("PCT.",  "", names(dt2), fixed = TRUE)
 
 
   # Transpose Row Percents
   dt3 <- NULL
   if (get_option(options, "rowpct", TRUE) == TRUE) {
-    dt3 <- reshape(dt, timevar = "Category2", idvar = "Category1",
+    dt3 <- reshape(dt, timevar = "CAT2", idvar = "CAT1",
                    v.names = "rowpct", direction = "wide",
-                   drop = c("Percent", "rowcnt", "colcnt", "Frequency", "colpct"))
+                   drop = c("PCT", "rowcnt", "colcnt", "CNT", "colpct"))
     dt3$Total <- NA
     dt3$Order <- 3
     dt3$Statistic <- "Row Pct"
@@ -712,9 +716,9 @@ cross_tab <- function(freqdata, options, var1, var2, bylbl = NULL) {
   # Transpose Col Percents
   dt4 <- NULL
   if (get_option(options, "colpct", TRUE) == TRUE) {
-    dt4 <- reshape(dt, timevar = "Category2", idvar = "Category1",
+    dt4 <- reshape(dt, timevar = "CAT2", idvar = "CAT1",
                    v.names = "colpct", direction = "wide",
-                   drop = c("Percent", "rowcnt", "colcnt", "Frequency", "rowpct"))
+                   drop = c("PCT", "rowcnt", "colcnt", "CNT", "rowpct"))
     dt4$Total <- NA
     dt4$Order <- 4
     dt4$Statistic <- "Col Pct"
@@ -727,7 +731,7 @@ cross_tab <- function(freqdata, options, var1, var2, bylbl = NULL) {
 
   # Add row total if requested
   if (option_true(options, "totrow", TRUE)) {
-    dt5 <- data.frame(Category1 = "Total")
+    dt5 <- data.frame(CAT1 = "Total")
     for (nm in names(lkp2)) {
       dt5[[nm]] <- lkp2[[nm]]
     }
@@ -736,7 +740,7 @@ cross_tab <- function(freqdata, options, var1, var2, bylbl = NULL) {
     dt5$Statistic = "Frequency"
 
 
-    dt6 <- data.frame(Category1 = "Total")
+    dt6 <- data.frame(CAT1 = "Total")
     for (nm in names(lkp2)) {
       dt6[[nm]] <- lkp2[[nm]] / sum(lkp2, na.rm = TRUE) * 100
     }
@@ -752,17 +756,17 @@ cross_tab <- function(freqdata, options, var1, var2, bylbl = NULL) {
                stringsAsFactors = FALSE)
 
   # Get all value column names
-  nnms <- names(ret)[!names(ret) %in% c("Category1", "Order", "Statistic")]
+  nnms <- names(ret)[!names(ret) %in% c("CAT1", "Order", "Statistic")]
 
   # Sort data frame by category and order
-  ret <- ret[order(ret$Category1, ret$Order), c("Category1", "Statistic", nnms) ]
+  ret <- ret[order(ret$CAT1, ret$Order), c("CAT1", "Statistic", nnms) ]
 
 
   # Make sure total rows are at the end, after the sort
   if (!is.null(dt5)) {
     ret <- rbind(ret,
-                 dt5[,  c("Category1", "Statistic", nnms)],
-                 dt6[,  c("Category1", "Statistic", nnms)],
+                 dt5[,  c("CAT1", "Statistic", nnms)],
+                 dt6[,  c("CAT1", "Statistic", nnms)],
                  make.row.names = FALSE, stringsAsFactors = FALSE)
   }
 
@@ -770,7 +774,7 @@ cross_tab <- function(freqdata, options, var1, var2, bylbl = NULL) {
   rownames(ret) <- NULL
 
   # Rename to Category so output_report() will recognize as a stub
-  names(ret)[1] <- "Category"
+  names(ret)[1] <- "CAT"
 
   # Get format
   fmt <- get_option(options, "format", "%.2f")
@@ -794,7 +798,7 @@ cross_tab <- function(freqdata, options, var1, var2, bylbl = NULL) {
   }
 
   # Assign label to Category
-  attr(ret$Category, "label") <- lbl1
+  attr(ret$CAT, "label") <- lbl1
 
   # Add spanning headers
   if (!is.null(bylbl)) {
