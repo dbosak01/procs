@@ -265,7 +265,7 @@ test_that("freq10: Two way proc_freq works.", {
                       Region = "Geographic Region")
 
   res <- proc_freq(dat, tables = c(FreqCount = "Eyes * Hair"),
-                   table_options = list(out = "MyFreq", cumsum = FALSE,
+                   options = opts(out = "MyFreq", cumsum = FALSE,
                                         cumpct = FALSE),
                    weight = "Count",
                    titles = "Eye and Hair Color of European Children")
@@ -331,7 +331,7 @@ test_that("freq13: Cumsum and Cumpct options work as expected.", {
 
 
   res <- proc_freq(dat, tables = c("Eyes"),
-                   table_options = list(cumsum = FALSE,
+                   options = opts(cumsum = FALSE,
                                         cumpct = FALSE),
                    titles = "Eye and Hair Color of European Children")
 
@@ -351,7 +351,7 @@ test_that("freq14: Out = options on table.", {
 
 
   res <- proc_freq(dat, tables = c("Eyes", "Eyes * Hair"),
-                   table_options = list(out = "FreqCount"),
+                   options = opts(out = "FreqCount"),
                    titles = "Eye and Hair Color of European Children")
 
   res
@@ -370,7 +370,7 @@ test_that("freq15: Outcum option works as expected.", {
 
 
   res <- proc_freq(dat, tables = c("Eyes"),
-                   table_options = list(out = "fork",
+                   options = opts(out = "fork",
                                         outcum = FALSE),
                    titles = "Eye and Hair Color of European Children")
 
@@ -383,7 +383,7 @@ test_that("freq15: Outcum option works as expected.", {
   expect_equal("CUMPCT" %in% d, FALSE)
 
   res <- proc_freq(dat, tables = c("Eyes"),
-                   table_options = list(outcum = FALSE),
+                   options = opts(outcum = FALSE),
                    titles = "Eye and Hair Color of European Children")
 
   res
@@ -403,7 +403,7 @@ test_that("freq16: Freq and Pct options works as expected.", {
 
 
   res <- proc_freq(dat, tables = c("Eyes"),
-                   table_options = list(freq = FALSE,
+                   options = opts(freq = FALSE,
                                         pct = TRUE),
                    titles = "Eye and Hair Color of European Children")
 
@@ -416,7 +416,7 @@ test_that("freq16: Freq and Pct options works as expected.", {
   expect_equal("PCT" %in% d, TRUE)
 
   res <- proc_freq(dat, tables = c("Eyes"),
-                   table_options = list(freq = TRUE,
+                   options = opts(freq = TRUE,
                                         pct = FALSE),
                    titles = "Eye and Hair Color of European Children")
 
@@ -438,7 +438,7 @@ test_that("freq17: Sparse option works as expected.", {
 
 
   res <- proc_freq(dat, tables = c("Eyes * Hair"),
-                   table_options = list(out = "freqtbl", sparse = FALSE),
+                   options = opts(out = "freqtbl", sparse = FALSE),
                    titles = "Eye and Hair Color of European Children")
 
   res
@@ -480,7 +480,7 @@ test_that("freq19: Format options on table.", {
                       Region = "Geographic Region")
 
   res <- proc_freq(dat, tables = c("Eyes * Hair"),
-                   table_options = list(format = "%.3f%%"),
+                   options = opts(format = "%.3f%%"),
                    weight = "Count",
                    titles = "Eye and Hair Color of European Children",
                    out = out(report = TRUE))
@@ -527,7 +527,7 @@ test_that("freq21: Rowpct and Colpct options on table work.", {
                       Region = "Geographic Region")
 
   res <- proc_freq(dat, tables = c("Eyes * Hair"),
-                   table_options = list(rowpct = FALSE, colpct = FALSE),
+                   options = opts(rowpct = FALSE, colpct = FALSE),
                    weight = "Count",
                    titles = "Eye and Hair Color of European Children",
                    out = out(report = TRUE))
@@ -550,7 +550,7 @@ test_that("freq22: Crosstab option to turn off totals works.", {
                       Region = "Geographic Region")
 
   res <- proc_freq(dat, tables = c("Eyes", "Hair", "Eyes * Hair"),
-                   table_options = list(totcol = FALSE, totrow = FALSE),
+                   options = opts(totcol = FALSE, totrow = FALSE),
                    weight = "Count",
                    titles = "Eye and Hair Color of European Children",
                    out = out(report = TRUE))
@@ -572,7 +572,7 @@ test_that("freq22: Crosstab option to turn off totals works.", {
 #                       Region = "Geographic Region")
 #
 #   res <- proc_freq(dat, tables = c("Eyes * Hair"),
-#                    table_options = list(out = "FreqTbl"),
+#                    options = opts(out = "FreqTbl"),
 #                    weight = "Count",
 #                    titles = "Eye and Hair Color of European Children",
 #                    piped = TRUE)
@@ -595,7 +595,7 @@ test_that("freq22: Crosstab option to turn off totals works.", {
 #                       Region = "Geographic Region")
 #
 #   res <- proc_freq(dat, tables = c("Eyes * Hair"),
-#                    table_options = list(out = "FreqTbl"),
+#                    options = list(out = "FreqTbl"),
 #                    weight = "Count",
 #                    titles = "Eye and Hair Color of European Children",
 #                    report_style = "MidnightBlue")
@@ -774,7 +774,7 @@ test_that("freq30: Crosstab with by and out works.", {
                         Region = "Geographic Region")
 
   res <- proc_freq(spdat, tables = c("Eyes * Hair"),
-                    table_options = list(out = "FreqTable"),
+                    options = opts(out = "FreqTable"),
                    by = c("Sex"),
                    weight = "Count",
                    titles = "Eye and Hair Color of European Children",
@@ -810,7 +810,7 @@ test_that("freq32: chi sqr works with weight.", {
 
 
   res <- proc_freq(prt, tables = "internship * enrollment",
-                   table_options = list(ChiSq = TRUE),
+                   options = opts(ChiSq = TRUE),
                    weight = "count",
                    out = out(report = TRUE))
 
@@ -830,7 +830,7 @@ test_that("freq32: chi sqr works with weight.", {
 test_that("freq33: fisher's works with weight.", {
 
   res <- proc_freq(prt, tables = "internship * enrollment",
-                   table_options = list(Fisher = TRUE),
+                   options = opts(Fisher = TRUE),
                    weight = "count",
                    out = out(report = TRUE))
 
@@ -851,7 +851,7 @@ test_that("freq33: fisher's works with weight.", {
 test_that("freq34: fisher's works with weight and by.", {
 
   res <- proc_freq(prt, tables = "internship * enrollment",
-                   table_options = list(Fisher = TRUE),
+                   options = opts(Fisher = TRUE),
                    by = "sex",
                    weight = "count",
                    out = out(report = TRUE))
@@ -885,7 +885,7 @@ test_that("freq35: chi sqr works with weight and by.", {
 
 
   res <- proc_freq(prt, tables = "internship * enrollment",
-                   table_options = list(ChiSq = TRUE),
+                   options = opts(ChiSq = TRUE),
                    by = "sex",
                    weight = "count",
                    out = out(report = TRUE))
@@ -933,7 +933,7 @@ test_that("freq37: Crosstab works with factors.", {
 
 
   res <- proc_freq(prt2, tables = c("sex", "internship * enrollment"),
-                   table_options = list(out = "FreqCounts"),
+                   options = opts(out = "FreqCounts"),
                    weight = "count",
                    out = out(report = TRUE))
 

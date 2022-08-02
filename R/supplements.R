@@ -52,9 +52,7 @@ out <- function(stats = NULL,
 #' @export
 opts <- function(...) {
 
-  ret <- structure(list(), class = c("opts", "list"))
-
-  ret$options <- list(...)
+  ret <- structure(list(...), class = c("opts", "list"))
 
 
   return(ret)

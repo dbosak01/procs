@@ -9,7 +9,7 @@ proc_freq(
   data,
   by = NULL,
   tables = NULL,
-  table_options = NULL,
+  options = NULL,
   weight = NULL,
   view = TRUE,
   titles = NULL,
@@ -33,14 +33,16 @@ list of tables.  For one-way frequencies, simply pass the variable name.
 For two-way tables, pass the desired combination of variables separated by a
 star (*) operator.}
 
-\item{table_options}{The option specifications for the \code{table} parameter.
-Table options are passed to the parameter as a named list.  The name
-of each list item should correspond to the option you wish to set.  The
+\item{options}{The options desired for the function.
+Table options are passed to the parameter as a \code{\link{opts}} object
+or a named list.  The name
+of each option should correspond to the option you wish to set.  The
 value of the list item should be the value you wish to set the option
-to.  The following options are available: "colpct", "cumsum", "cumpct",
+to.  The following options are available on \code{proc_freq}:
+"colpct", "cumsum", "cumpct",
 "freq", "format", "out", "outcum", "pct", "rowpct", "sparse", "totcol"
 and "totrow". See
-the \strong{Table Options} section for a description of these options.}
+the \strong{Options} section for a description of these options.}
 
 \item{weight}{An optional weight parameter.  This parameter is passed
 as a quoted variable name to use for the weight.  If a weight variable is
@@ -137,11 +139,11 @@ accepts a quoted variable/column name to use as the weighted value.  If the
 instead of counting rows.
 }
 
-\section{Table Options}{
+\section{Options}{
 
-The \code{table_options} parameter accepts a named list of options and
+The \code{options} parameter accepts a named list of options and
 their values.  For example, the "sparse" option may be turned off
-like this: \code{table_options = list(sparse = FALSE)}.
+like this: \code{options = list(sparse = FALSE)}.
 
 Below are all the available table options and a description of each:
 \itemize{
@@ -256,10 +258,10 @@ res
 
 #' # Example #3: Crosstab table with totrow, totcol, rowpct, and colpct turned off
 res <- proc_freq(df, tables = c(HairByEyes = "Hair * Eye"),
-                 table_options = list(totrow = FALSE,
-                                      totcol = FALSE,
-                                      rowpct = FALSE,
-                                      colpct = FALSE),
+                 options = opts(totrow = FALSE,
+                                totcol = FALSE,
+                                rowpct = FALSE,
+                                colpct = FALSE),
                  weight = "Freq")
 
 # View result data
