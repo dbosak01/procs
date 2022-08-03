@@ -510,9 +510,12 @@ test_that("means21: gen_output_means works.", {
   expect_equal(length(res), 2)
 
   res1 <- res[[1]]
-  expect_equal(res1$STAT, c("N", "MEAN", "MIN", "MAX"))
+
+  labels(res1) <- NULL
+  expect_equal(res1[["STAT"]], c("N", "MEAN", "MIN", "MAX"))
 
   res2 <- res[[2]]
+  labels(res2) <- NULL
   expect_equal(res2$STAT, c("N", "MEAN", "STD"))
 
 

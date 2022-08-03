@@ -1169,16 +1169,17 @@ test_that("freq44: output parameter works.", {
                       Hair = "Hair Color",
                       Region = "Geographic Region")
 
+  myouts <- list(out1 = out(table ="Region * Eyes", stats = c("cnt", "pct", "n")),
+                 out2 = out(table = "Region * Hair",
+                             stats = c("cumsum", "cnt", "pct"),
+                             direction = "long"))
+
   res <- proc_freq(dat,
                    tables = c("Eyes", "Region * Eyes", "Region"),
                    titles = "My first Frequency Table",
                    view = TRUE,
                    weight = "Count",
-                   output = list(
-                   out1 = out(table ="Region * Eyes", stats = c("cnt", "pct", "n")),
-                   out2 = out(table = "Region * Hair",
-                              stats = c("cumsum", "cnt", "pct"),
-                              direction = "long")))
+                   output = myouts)
 
 
   res

@@ -325,7 +325,7 @@ proc_freq <- function(data,
     rptres <- gen_report_freq(data = data,
                               by = by,
                               tables = tables,
-                              table_options = options,
+                              options = options,
                               weight = weight,
                               view = view,
                               titles = titles)
@@ -336,7 +336,7 @@ proc_freq <- function(data,
     res <- gen_output_freq(data = data,
                            by = by,
                            tables = tables,
-                           table_options = options,
+                           options = options,
                            weight = weight,
                            output = outreq)
 
@@ -1018,7 +1018,7 @@ get_output_specs <- function(tbls, outs) {
 gen_report_freq <- function(data,
                             by = NULL,
                             tables = NULL,
-                            table_options = NULL,
+                            options = NULL,
                             weight = NULL,
                             #   weight_options = NULL,
                             view = TRUE,
@@ -1070,7 +1070,7 @@ gen_report_freq <- function(data,
       nm <- names(tables)[i]
       tb <- tables[i]
       #browser()
-      out <- i == length(tables) & has_option(table_options, "out")
+      out <- i == length(tables) & has_option(options, "out")
 
       crstab <- NULL
       chisq <- NULL
@@ -1091,7 +1091,7 @@ gen_report_freq <- function(data,
         }
 
         # Perform one-way frequency
-        result <- freq_oneway(dt, tb, weight, table_options, out)
+        result <- freq_oneway(dt, tb, weight, options, out)
 
       } else if (length(splt) == 2) {
 
@@ -1101,13 +1101,13 @@ gen_report_freq <- function(data,
         }
 
         # Perform two-way frequency
-        result <- freq_twoway(dt, splt[1], splt[2], weight, table_options,
+        result <- freq_twoway(dt, splt[1], splt[2], weight, options,
                               out = FALSE)
 
         # Perform cross tab by default
-        crstab <- cross_tab(result, table_options, splt[1], splt[2], bylbl)
+        crstab <- cross_tab(result, options, splt[1], splt[2], bylbl)
 
-        if (get_option(table_options, "fisher", FALSE)) {
+        if (get_option(options, "fisher", FALSE)) {
 
           if (!is.null(weight))
             fisher <- get_fisher(dt[[splt[1]]], dt[[splt[[2]]]], dt[[weight]],
@@ -1117,7 +1117,7 @@ gen_report_freq <- function(data,
                                  bylbl = bylbls[j])
         }
 
-        if (get_option(table_options, "chisq", FALSE)) {
+        if (get_option(options, "chisq", FALSE)) {
 
           if (!is.null(weight))
             chisq <- get_chisq(dt[[splt[1]]], dt[[splt[[2]]]], dt[[weight]],
@@ -1152,9 +1152,9 @@ gen_report_freq <- function(data,
 
         res[[get_name(nm, tb, bylbls[j])]] <- crstab
 
-        if ("out" %in% names(table_options) & i == length(tables)) {
+        if ("out" %in% names(options) & i == length(tables)) {
 
-          res[[get_name(table_options[["out"]], "", bylbls[j])]] <- result
+          res[[get_name(options[["out"]], "", bylbls[j])]] <- result
         }
 
       } else { # Otherwise add one-way to result
@@ -1207,7 +1207,7 @@ gen_report_freq <- function(data,
 gen_output_freq <- function(data,
                             by = NULL,
                             tables = NULL,
-                            table_options = NULL,
+                            options = NULL,
                             weight = NULL,
                             output = NULL) {
 
@@ -1263,11 +1263,11 @@ gen_output_freq <- function(data,
         if (length(splt) == 1) {
 
           if (length(byvals) >= j) {
-            result <- get_output_oneway(dt, tb, weight, table_options,
+            result <- get_output_oneway(dt, tb, weight, options,
                                       byvals[[j]], direction = outp$direction,
                                       stats = outp$stats)
           } else {
-            result <- get_output_oneway(dt, tb, weight, table_options,
+            result <- get_output_oneway(dt, tb, weight, options,
                                         NULL, direction = outp$direction,
                                         stats = outp$stats)
           }
@@ -1278,12 +1278,12 @@ gen_output_freq <- function(data,
 
           # Perform two-way frequency
           if (length(byvals) >= j) {
-            result <- get_output_twoway(dt, splt[1], splt[2], weight, table_options,
+            result <- get_output_twoway(dt, splt[1], splt[2], weight, options,
                                 byvals[[j]], direction = outp$direction,
                                 out = TRUE, stats = outp$stats)
           } else {
 
-            result <- get_output_twoway(dt, splt[1], splt[2], weight, table_options,
+            result <- get_output_twoway(dt, splt[1], splt[2], weight, options,
                                      NULL, direction = outp$direction,
                                      out = TRUE, stats = outp$stats)
           }

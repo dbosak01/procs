@@ -573,16 +573,19 @@ get_summaries <- function(data, var, stats, missing = FALSE,
 
 
 # Drivers --------------------------------------------------------------------
+mlbls <- list(MEAN = "Mean", STD = "Std Dev", MEDIAN = "Median", MIN = "Minimum",
+              MAX = "Maximum", VAR = "Variable", STDERR = "Std Err",
+              STAT = "Statistics", VARI = "Variance", QRANGE = "Quantile Range",
+              RANGE = "Range", MODE = "Mode", NMISS = "NMiss",
+              LCLM = "Lower Conf. Limit", UCLM = "Upper Conf. Limit")
 
-
+#' @import common
 gen_report_means <- function(data,
                             by = NULL,
                             class = NULL,
-                            #         class_options = NULL,
                             var = NULL,
                             stats = c("n", "mean", "std", "min", "max"),
-                            #         weight = NULL,
-                            #         weight_options = NULL,
+                            # weight = NULL,
                             view = TRUE,
                             titles = NULL) {
 
@@ -668,20 +671,9 @@ gen_report_means <- function(data,
       res[[nm]] <- smtbl
 
 
+    labels(res[[nm]]) <- mlbls
   }
 
-
-  # Create output reports if requested
-  # if (!is.null(report_type)) {
-  #
-  #   loc <- get_location("means", report_location)
-  #   out <- output_report(res, proc_type = 'means', dir_name = loc["dir_name"],
-  #                        file_name = loc["file_name"], out_type = report_type,
-  #                        style = report_style,
-  #                        titles = titles, margins = 1)
-  #
-  #
-  # }
 
 
   gv <- options("procs.view")[[1]]
@@ -798,6 +790,8 @@ gen_output_means <- function(data,
       }
 
       res[[nms[i]]]  <- tmpres
+
+      labels(res[[nms[i]]]) <- mlbls
 
     }
   }

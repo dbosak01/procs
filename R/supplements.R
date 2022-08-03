@@ -52,7 +52,21 @@ out <- function(stats = NULL,
 #' @export
 opts <- function(...) {
 
-  ret <- structure(list(...), class = c("opts", "list"))
+  ret <- tryCatch({
+          if (typeof(...) == "list")
+             structure(..., class = c("opts", "list"))
+
+         }, error = function(cond) {
+
+          structure(list(...), class = c("opts", "list"))
+        })
+
+  # if (typeof(...) == "list") {
+  #   ret <- structure(..., class = c("opts", "list"))
+  # } else {
+  #
+  #   ret <- structure(list(...), class = c("opts", "list"))
+  # }
 
 
   return(ret)

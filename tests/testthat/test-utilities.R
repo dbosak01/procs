@@ -225,3 +225,42 @@ test_that("utils10: has_report() function works.", {
 
 })
 
+
+test_that("utils11: opts() works with list.", {
+
+  lst <- list(A = 1, B = 2)
+
+  res <- opts(lst)
+
+  expect_equal(class(res), c("opts", "list"))
+  expect_equal(res$A, 1)
+  expect_equal(res$B, 2)
+
+  res2 <- opts(C = 3, D = 4)
+
+  expect_equal(class(res2), c("opts", "list"))
+  expect_equal(res2$C, 3)
+  expect_equal(res2$D, 4)
+
+
+  func1 <- function(mylist) {
+
+    ret <- opts(mylist)
+
+    return(ret)
+  }
+
+  res3 <- func1(lst)
+
+  expect_equal(class(res3), c("opts", "list"))
+  expect_equal(res3$A, 1)
+  expect_equal(res3$B, 2)
+
+
+  res4 <- opts()
+
+  expect_equal(class(res4), c("opts", "list"))
+  expect_equal(length(res4), 0)
+
+
+})
