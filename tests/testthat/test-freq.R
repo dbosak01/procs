@@ -173,7 +173,7 @@ test_that("freq6: Simple proc_freq with output long works.", {
   res <- proc_freq(dat, tables = c("Eyes"),
                    weight = "Count",
                    titles = "My first Frequency Table",
-                   out = out(direction = "long"))
+                   out = out(shape = "long"))
 
   res
 
@@ -967,7 +967,7 @@ test_that("freq38: get_output_specs works as expected.", {
   expect_equal(res2[[2]]$table, "B")
   expect_equal(res2[[3]]$table, "A * B")
 
-  ot <- list(out = out(stats = c("n", "pct"), direction = "wide"))
+  ot <- list(out = out(stats = c("n", "pct"), shape = "wide"))
   res3 <- get_output_specs(c(tab1 = "A", "B", tab3 = "A * B"), ot)
 
   res3
@@ -979,9 +979,9 @@ test_that("freq38: get_output_specs works as expected.", {
 
 
 
-  ot <- list(out1 = out(table = "A", stats = c("n", "pct"), direction = "wide"),
-             out2 = out(table = "B", stats = c("n", "pct"), direction = "wide"),
-             out3 = out(table = "A * B", stats = c("n", "pct"), direction = "wide")
+  ot <- list(out1 = out(table = "A", stats = c("n", "pct"), shape = "wide"),
+             out2 = out(table = "B", stats = c("n", "pct"), shape = "wide"),
+             out3 = out(table = "A * B", stats = c("n", "pct"), shape = "wide")
 
              )
   res4 <- get_output_specs(NULL, ot)
@@ -994,8 +994,8 @@ test_that("freq38: get_output_specs works as expected.", {
   expect_equal(res4[[3]]$table, "A * B")
 
 
-  ot <- list(out1 = out(stats = c("n", "pct"), direction = "wide"),
-             out2 = out(table = "A * B", stats = c("chisq"), direction = "wide")
+  ot <- list(out1 = out(stats = c("n", "pct"), shape = "wide"),
+             out2 = out(table = "A * B", stats = c("chisq"), shape = "wide")
 
   )
   res5 <- get_output_specs(c(tab1 = "A", "B", tab3 = "A * B"), ot)
@@ -1016,7 +1016,7 @@ test_that("freq39: get_output_oneway() works as expected.", {
 
 
   res1 <- get_output_oneway(prt, "internship", "count", NULL, by = c(am = 1),
-                            direction = "wide")
+                            shape = "wide")
 
   res1
 
@@ -1040,7 +1040,7 @@ test_that("freq40: get_output_oneway() long works as expected.", {
 
 
   res1 <- get_output_oneway(prt, "internship", "count", NULL, by = c(am = 1),
-                            direction = "long")
+                            shape = "long")
 
   res1
 
@@ -1049,7 +1049,7 @@ test_that("freq40: get_output_oneway() long works as expected.", {
   expect_equal(ncol(res1), 5)
 
   res2 <- get_output_oneway(prt, "internship", "count", NULL,
-                            by = c(am = "A", pm = "B"), direction = "long")
+                            by = c(am = "A", pm = "B"), shape = "long")
 
   res2
 
@@ -1063,7 +1063,7 @@ test_that("freq41: get_output_twoway() works as expected.", {
 
 
   res1 <- get_output_twoway(prt, "internship", "enrollment", "count", NULL,
-                            FALSE, by = c(by1 = 1), direction = "wide")
+                            FALSE, by = c(by1 = 1), shape = "wide")
 
   res1
 
@@ -1085,7 +1085,7 @@ test_that("freq42: get_output_twoway() long works as expected.", {
 
 
   res1 <- get_output_twoway(prt, "internship", "enrollment", "count", NULL,
-                            FALSE, by = c(by1 = 1), direction = "long")
+                            FALSE, by = c(by1 = 1), shape = "long")
 
   res1
 
@@ -1094,7 +1094,7 @@ test_that("freq42: get_output_twoway() long works as expected.", {
 
   res2 <- get_output_twoway(prt, "internship", "enrollment", "count",  NULL,
                             FALSE, by = c(by1 = "A", by2 = "B"),
-                            direction = "long")
+                            shape = "long")
 
   res2
 
@@ -1121,7 +1121,7 @@ test_that("freq43: oneway output statistics work.", {
                    out1 = out(table ="Eyes", stats = c("cnt", "pct", "n")),
                    out2 = out(table = "Hair",
                               stats = c("cumsum", "cnt", "pct"),
-                              direction = "long"))
+                              shape = "long"))
 
   res
 
@@ -1133,7 +1133,7 @@ test_that("freq43: oneway output statistics work.", {
 
 })
 
-test_that("freq44: twoway output statistics work.", {
+test_that("freq45: twoway output statistics work.", {
 
   library(common)
 
@@ -1149,7 +1149,7 @@ test_that("freq44: twoway output statistics work.", {
                    out1 = out(table ="Region * Eyes", stats = c("cnt", "pct", "n")),
                    out2 = out(table = "Region * Hair",
                               stats = c("cumsum", "cnt", "pct"),
-                              direction = "long"))
+                              shape = "long"))
 
   res
 
@@ -1161,7 +1161,7 @@ test_that("freq44: twoway output statistics work.", {
 
 })
 
-test_that("freq44: output parameter works.", {
+test_that("freq46: output parameter works.", {
 
   library(common)
 
@@ -1172,7 +1172,7 @@ test_that("freq44: output parameter works.", {
   myouts <- list(out1 = out(table ="Region * Eyes", stats = c("cnt", "pct", "n")),
                  out2 = out(table = "Region * Hair",
                              stats = c("cumsum", "cnt", "pct"),
-                             direction = "long"))
+                             shape = "long"))
 
   res <- proc_freq(dat,
                    tables = c("Eyes", "Region * Eyes", "Region"),
@@ -1193,7 +1193,7 @@ test_that("freq44: output parameter works.", {
 })
 
 
-test_that("freq44: output report works.", {
+test_that("freq47: output report works.", {
 
 
   library(common)
@@ -1217,6 +1217,41 @@ test_that("freq44: output report works.", {
   expect_equal(nms[1], "Region=1, Eyes")
   expect_equal(nms[4], "Region=2, Eyes")
 })
+
+
+test_that("freq48: output statistics works.", {
+
+
+  res <- proc_freq(prt,
+                   #tables = c("internship"),
+                   tables = c("internship * enrollment"),
+                   titles = "My title",
+                   by = c("sex"),
+                   view = TRUE,
+                   across = "ARM",
+                   weight = "count",
+                   options = opts(chisq = TRUE),
+                   out = out(stats = c("n", "cnt", "pct", "chisq"))
+                   #out2 = out(report = TRUE))
+                   # out3 = out(table = "internship", stats = c("n", "cnt", "pct", "cumsum", "cumpct")),
+                   # out4 = out(table = "enrollment", stats = c("n", "cnt", "pct"), shape = "long"),
+                   # out5 = out(table = "internship * enrollment", stats = c("n", "cnt", "pct", "chisq"))
+  )
+
+
+  res
+
+
+  expect_equal("data.frame" %in% class(res), TRUE)
+  nms <- names(res)
+  expect_equal(nms, c("BY", "VAR1", "VAR2", "CAT1", "CAT2",
+                      "N", "CNT", "PCT"))
+  # expect_equal(nms, c("BY", "VAR1", "VAR2", "CAT1", "CAT2",
+  #                     "N", "CNT", "PCT", "CHISQ", "CHISQ.DF", "CHISQ.P"))
+  #expect_equal(nms[4], "Region=2, Eyes")
+})
+
+
 
 
 # test_that("freq35: CMH works with weight.", {

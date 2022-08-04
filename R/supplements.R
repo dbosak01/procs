@@ -12,21 +12,21 @@
 #' @details Here is some details
 #' @param stats The requested statistics. The available statistics depend
 #' on the function the output parameter applies to.
-#' @param direction How the output dataset should be organized.  Valid
-#' values are "long" or "wide".  The default is "long".
+#' @param shape How the output dataset should be organized.  Valid
+#' values are "long", "wide", or "stacked".  The default is "long".
 #' @param report Whether to output the tables produced for the
 #' procedure report.
 #' @param ... Various options.
 #' @return The output specifications.
 #' @export
 out <- function(stats = NULL,
-                direction = NULL, report = FALSE, ...) {
+                shape = NULL, report = FALSE, ...) {
 
   ret <- structure(list(), class = c("out_req", "list"))
 
 
   ret$stats <- stats
-  ret$direction <- direction
+  ret$shape <- shape
 
   lst <- list(...)
   for (nm in names(lst)) {

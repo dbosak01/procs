@@ -190,13 +190,13 @@ test_that("utils9: out() function works as expected.", {
 
 
 
-  out <- out(stats = c("mean", "median", "min", "max"), direction = "wide",
+  out <- out(stats = c("mean", "median", "min", "max"), shape = "wide",
                 fork = "sammy", bork = c("one", "two", "three"), table = "A")
 
   out
 
   expect_equal(length(out$stats), 4)
-  expect_equal(out$direction, "wide")
+  expect_equal(out$shape, "wide")
   expect_equal(out$parameters$fork, "sammy")
   expect_equal(length(out$parameters$bork), 3)
   expect_equal(out$table, "A")
@@ -264,3 +264,27 @@ test_that("utils11: opts() works with list.", {
 
 
 })
+
+#
+# test_that("utils12: stackds() function works as expected.", {
+#
+#
+#   stats <- proc_means(datm, stats = v(n, mean, median),
+#                       by = Layers)
+#
+#   stats
+#
+#
+#   res2 <- proc_transpose(res1, by = v(VAR, Layers),
+#                          name = STAT)
+#
+#   res2
+#
+#   # expect_equal(nrow(res2), 9)
+#   # expect_equal(ncol(res2), 6)
+#   # expect_equal("Group" %in% names(res2), TRUE)
+#
+#
+#
+#
+# })

@@ -224,7 +224,7 @@ test_that("means10: proc_means with variable parameter values.", {
   res <- proc_means(datm, var = var1,
                     stats = var2,
                     titles = "My first title for Means",
-                    out = out(direction = "wide"))
+                    out = out(shape = "wide"))
 
   res
 
@@ -244,7 +244,7 @@ test_that("means10: proc_means with variable parameter values and v().", {
   res <- proc_means(datm, var = var1,
                     stats = var2,
                     titles = "My first title for Means",
-                    out = out(direction ="wide"))
+                    out = out(shape ="wide"))
 
   res
 
@@ -282,7 +282,7 @@ test_that("means12: check more stats options", {
 
   res <- proc_means(datm, var = v(PresentScore, TasteScore),
                     out1 = out(stats = v(nmiss, median, mode, clm, stderr),
-                               direction = "wide", type = FALSE, freq = FALSE),
+                               shape = "wide", type = FALSE, freq = FALSE),
                     titles = "My first title for Means")
 
   res
@@ -311,7 +311,7 @@ test_that("means13: check missing value works.", {
                     stats = c("n", "nmiss", "mean", "median", "mode", "clm", "std"),
                     titles = "My first title for Means",
                     out = out(stats = c("n", "nmiss", "mean", "median", "mode", "clm", "std"),
-                              direction = "wide", type = FALSE, freq = FALSE))
+                              shape = "wide", type = FALSE, freq = FALSE))
 
   res
 
@@ -348,7 +348,7 @@ test_that("means14: check missing parameter works.", {
                               "p75", "p80", "p90", "p95", "p99", "q1", "q3",
                               "qrange"),
                     titles = "My first title for Means",
-                    out = out(direction = "wide"))
+                    out = out(shape = "wide"))
 
 
   res
@@ -405,12 +405,12 @@ test_that("means15: default vars works.", {
 
 })
 
-test_that("means16: get_summaries direction long works as expected.", {
+test_that("means16: get_summaries shape long works as expected.", {
 
 
   res <- get_summaries(datm, var = c("PresentScore", "TasteScore"),
                        stats = c("n", "mean", "min", "max", "range", "median"),
-                       direction = "long")
+                       shape = "long")
 
   res
 
@@ -429,7 +429,7 @@ test_that("means17: get_output long works.", {
 
   res <- get_output(datm,  var = c("PresentScore", "TasteScore"),
                     stats = c("n", "mean", "min", "max", "range", "median"),
-                    direction = "long", type = 0, freq = TRUE,
+                    shape = "long", type = 0, freq = TRUE,
                     by = c(by1 = "By1"),
                     class = c(cls1 = "Class1", cls2 = "Class2"))
 
@@ -449,7 +449,7 @@ test_that("means18: get_output wide works.", {
 
   res <- get_output(datm,  var = c("PresentScore", "TasteScore"),
                     stats = c("n", "mean", "min", "max", "range", "median"),
-                    direction = "wide", type = 0, freq = TRUE,
+                    shape = "wide", type = 0, freq = TRUE,
                     by = c(by1 = "By1"),
                     class = c(cls1 = "Class1", cls2 = "Class2"))
 
@@ -469,7 +469,7 @@ test_that("means19: get_output wide no by or class works.", {
 
   res <- get_output(datm,  var = c("PresentScore", "TasteScore"),
                     stats = c("n", "mean", "min", "max", "range", "median"),
-                    direction = "wide", type = 0, freq = TRUE)
+                    shape = "wide", type = 0, freq = TRUE)
 
   res
 
@@ -484,7 +484,7 @@ test_that("means20: get_output wide no extra works.", {
 
   res <- get_output(datm,  var = c("PresentScore", "TasteScore"),
                     stats = c("n", "mean", "min", "max", "range", "median"),
-                    direction = "wide")
+                    shape = "wide")
 
   res
 
@@ -501,9 +501,9 @@ test_that("means21: gen_output_means works.", {
   res <- gen_output_means(datm,
                           var = c("PresentScore", "TasteScore"),
           output = list(out1 = out(stats = c("n", "mean", "min", "max"),
-                                   direction = "long"),
+                                   shape = "long"),
                         out2 = out(stats = c("n", "mean", "std"),
-                                   direction = "long")))
+                                   shape = "long")))
 
   res
 
@@ -527,7 +527,7 @@ test_that("means22: get_class works.", {
   res <- get_class(datm, var = c("PresentScore", "TasteScore"),
                    class = "Layers",
                    outp = out(stats = c("n", "mean", "min", "max"),
-                                 direction = "wide"))
+                                 shape = "wide"))
 
 
   res
@@ -544,9 +544,9 @@ test_that("means23: gen_output_means works.", {
                           var = c("PresentScore", "TasteScore"),
                           class = "Layers",
                           output = list(out1 = out(stats = c("n", "mean", "min", "max"),
-                                                   direction = "long"),
+                                                   shape = "long"),
                                         out2 = out(stats = c("n", "mean", "std"),
-                                                   direction = "long")))
+                                                   shape = "long")))
 
   res
 
@@ -683,14 +683,16 @@ test_that("means28: by and 2 class vars works.", {
   res <- proc_means(datm2, var = var1,
                     stats = var2,
                     by = "Group",
-                    class = c("Layers", "Flavor"),
+                    class = c("Flavor", "Layers"),
                     titles = "My first title for Means",
-                    out = out())
+                    view = TRUE,
+                    out = out(direction = "long"))
 
   res
 
   expect_equal(nrow(res), 72)
   expect_equal(ncol(res), 9)
+  expect_equal(all(c("BY") %in% names(res)), TRUE)
 
 })
 
@@ -711,6 +713,48 @@ test_that("means29: Default outputs work as expected.", {
   expect_equal(ncol(res2), 7)
 
   options("procs.view" = NULL)
+
+})
+
+
+test_that("means30: get_class works with empty data frame.", {
+
+  dftmp <- datm[datm$Layers == 42, ]
+
+  res <- get_class(dftmp, var = c("PresentScore", "TasteScore"),
+                   class = "Layers",
+                   outp = out(stats = c("n", "mean", "min", "max"),
+                              shape = "wide"))
+
+
+  res
+
+  expect_equal(nrow(res), 2)
+
+
+})
+
+
+test_that("means31: by and 2 class vars works.", {
+
+  var1 <- c("Age", "PresentScore", "TasteScore")
+  var2 <- c("n",  "mean", "std", "min", "max")
+  datm2 <- datm
+  datm2$Group <- c(rep("A", 10), rep("B", 10))
+
+  res <- proc_means(datm2, var = var1,
+                    stats = var2,
+                    by = c("Group", "Layers"),
+                    class = "Flavor",
+                    titles = "My first title for Means",
+                    view = TRUE,
+                    out = out(direction = "long"))
+
+  res
+
+  expect_equal(nrow(res), 82)
+  expect_equal(ncol(res), 9)
+  expect_equal(all(c("BY1", "BY2") %in% names(res)), TRUE)
 
 })
 

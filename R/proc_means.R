@@ -180,18 +180,18 @@ proc_means <- function(data,
 
             outreq[[nm]]$stats <- stats
           }
-          if (is.null(outreq[[nm]]$direction)) {
+          if (is.null(outreq[[nm]]$shape)) {
 
-            outreq[[nm]]$direction <- "long"
+            outreq[[nm]]$shape <- "long"
           }
         } else {
 
-          outreq[[nm]] <- out(direction = "long")
+          outreq[[nm]] <- out(shape = "long")
         }
       }
     } else {
 
-     outreq[["out"]] <- out(stats = stats, direction = "wide",
+     outreq[["out"]] <- out(stats = stats, shape = "wide",
                             type = FALSE, freq = FALSE)
 
     }
@@ -200,9 +200,11 @@ proc_means <- function(data,
   res <- NULL
 
 
-  rptres <- gen_report_means(data, by = by, var = var, class = class,
+  if (view == TRUE) {
+    rptres <- gen_report_means(data, by = by, var = var, class = class,
                             stats = stats, view = view,
                             titles = titles)
+  }
 
   if (length(outreq) > 0) {
     res <- gen_output_means(data,
@@ -224,14 +226,14 @@ proc_means <- function(data,
 
 
 get_output <- function(data, var, stats, missing = FALSE,
-                             direction = "long", type = NULL, freq = FALSE,
+                             shape = "long", type = NULL, freq = FALSE,
                              by = NULL, class = NULL) {
 
   if (is.null(stats))
     stats <- c("n", "mean", "std", "min", "max")
 
   ret <- get_summaries(data, var, stats, missing = missing,
-                       direction = direction)
+                       shape = shape)
 
   if (freq)
     ret <- cbind(data.frame(FREQ = nrow(data)), ret)
@@ -270,7 +272,7 @@ get_output <- function(data, var, stats, missing = FALSE,
 }
 
 get_summaries <- function(data, var, stats, missing = FALSE,
-                          direction = "wide") {
+                          shape = "wide") {
 
   narm <- TRUE
   ret <- NULL
@@ -556,8 +558,8 @@ get_summaries <- function(data, var, stats, missing = FALSE,
       ret <- rbind(ret, rw)
   }
 
-  if (!is.null(direction)) {
-    if (direction == "long") {
+  if (!is.null(shape)) {
+    if (shape == "long") {
 
       ret <- proc_transpose(ret, id = "VAR", name = "STAT", )
 
@@ -635,7 +637,7 @@ gen_report_means <- function(data,
 
     # data, var, class, outp, freq = TRUE,
     # type = NULL, byvals = NULL
-    outp <- out(stats = stats, direction = "wide")
+    outp <- out(stats = stats, shape = "wide")
     smtbl <- get_class(dt, var, class, outp, freq = FALSE)
 
     # Calculate summary statistics
@@ -645,7 +647,7 @@ gen_report_means <- function(data,
     nm <- length(res) + 1
 
     # Add spanning headers if there are by groups
-    if (!is.null(by)) {
+    if (!is.null(by) & !is.null(smtbl)) {
 
       # Add spanning headers
       spn <- span(1, ncol(smtbl), label = bylbls[j], level = 1)
@@ -746,6 +748,19 @@ gen_output_means <- function(data,
       }
       bynms <- names(bdat)
 
+      # Make up by variable names for output ds
+      byn <- NULL
+      bylbls <- NULL
+      if (!is.null(by)) {
+        if (length(by) == 1)
+          byn <- "BY"
+        else
+          byn <- paste0("BY", seq(1, length(by)))
+
+        bylbls <- by
+        names(bylbls) <- byn
+      }
+
       tmpres <- NULL
 
       for (j in seq_len(length(bdat))) {
@@ -755,8 +770,8 @@ gen_output_means <- function(data,
         # Deal with by variable values
         bynm <- NULL
         if (!is.null(bynms)) {
-          bynm <- strsplit(bynms[j], "|", fixed = TRUE)
-          names(bynm) <- by
+          bynm <- strsplit(bynms[j], "|", fixed = TRUE)[[1]]
+          names(bynm) <- byn
         }
 
         # Always add type 0
@@ -764,7 +779,7 @@ gen_output_means <- function(data,
                              by = bynm,
                              class = cls,
                              stats = outp$stats,
-                             direction = outp$direction,
+                             shape = outp$shape,
                              freq = frq,
                              type = tp)
 
@@ -791,7 +806,8 @@ gen_output_means <- function(data,
 
       res[[nms[i]]]  <- tmpres
 
-      labels(res[[nms[i]]]) <- mlbls
+
+      labels(res[[nms[i]]]) <- append(mlbls, bylbls)
 
     }
   }
@@ -816,7 +832,14 @@ get_class <- function(data, var, class, outp, freq = TRUE,
   if (!is.null(class)) {
     clslist <- split(data, data[ , class], sep = "|")
     cnms <- names(clslist)
+    if (length(clslist) == 0) {
+
+      clslist <- list(data)
+      cnms <- class
+
+    }
   }
+
 
   for (k in seq_len(length(clslist))) {
 
@@ -831,7 +854,7 @@ get_class <- function(data, var, class, outp, freq = TRUE,
                          by = byvals,
                          class = cnmv,
                          stats = outp$stats,
-                         direction = outp$direction,
+                         shape = outp$shape,
                          freq = freq,
                          type = type)
 

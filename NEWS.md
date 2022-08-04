@@ -1,7 +1,14 @@
+# procs 0.0.9005
+
+* Added across parameter.
+* Added ability to combine stats into a single column with "&" operator.
+* Added more options to `out()` function.
+
 # procs 0.0.9004
 
 * Big revision on return datasets.
 * Added attributes to reporter.
+* Added `proc_print()`.
 
 # procs 0.0.9003
 
@@ -14,8 +21,8 @@
 
 * Readme complete
 * Freq documentation complete.
-* proc_means basically working.
-* proc_transpose basically working.
+* `proc_means()` basically working.
+* `proc_transpose()` basically working.
 
 # procs 0.0.9001
 

@@ -813,7 +813,7 @@ cross_tab <- function(freqdata, options, var1, var2, bylbl = NULL) {
 }
 
 get_output_oneway <- function(data, tb, weight = NULL, options = NULL,
-                              by = NULL, direction = "wide", stats = NULL) {
+                              by = NULL, shape = "wide", stats = NULL) {
 
 
 
@@ -842,32 +842,8 @@ get_output_oneway <- function(data, tb, weight = NULL, options = NULL,
   nms <- names(ret)
 
 
-  # Rename stuff
-  if ("Category" %in% nms) {
-
-    names(ret)[which(nms == "Category")] <- "CAT"
-  }
-
-  if ("Frequency" %in% nms) {
-    names(ret)[which(nms == "Frequency")] <-  "COUNT"
-  }
-
-  if ("Percent" %in% nms) {
-    names(ret)[which(nms == "Percent")] <-  "PERCENT"
-  }
-
-
-  if ("Cum_Pct" %in% nms) {
-    names(ret)[which(nms == "Cum_Pct")] <-  "CUM_PCT"
-  }
-
-
-  if ("Cum_Freq" %in% nms) {
-    names(ret)[which(nms == "Cum_Freq")] <-  "CUM_FREQ"
-  }
-
-  if (!is.null(direction)) {
-    if (direction == "long") {
+  if (!is.null(shape)) {
+    if (shape == "long") {
 
       ret <- proc_transpose(ret, copy = c(names(by), "VAR"),
                             id = "CAT", name = "STAT")
@@ -879,7 +855,7 @@ get_output_oneway <- function(data, tb, weight = NULL, options = NULL,
 
 
 get_output_twoway <- function(data, tb1, tb2, weight, options, out = FALSE,
-                              by = NULL, direction = "wide", stats = NULL) {
+                              by = NULL, shape = "wide", stats = NULL) {
 
   ret <- freq_twoway(data = data, tb1 = tb1, tb2 = tb2, weight = weight,
                      options = options, out = out, stats = stats)
@@ -906,36 +882,9 @@ get_output_twoway <- function(data, tb1, tb2, weight, options, out = FALSE,
   nms <- names(ret)
 
 
-  # Rename stuff
-  if ("Category1" %in% nms) {
 
-    names(ret)[which(nms == "Category1")] <- "CAT1"
-  }
-
-  if ("Category2" %in% nms) {
-
-    names(ret)[which(nms == "Category2")] <- "CAT2"
-  }
-
-  if ("Frequency" %in% nms) {
-    names(ret)[which(nms == "Frequency")] <-  "COUNT"
-  }
-
-  if ("Percent" %in% nms) {
-    names(ret)[which(nms == "Percent")] <-  "PERCENT"
-  }
-
-  if ("Cum_Pct" %in% nms) {
-    names(ret)[which(nms == "Cum_Pct")] <-  "CUM_PCT"
-  }
-
-
-  if ("Cum_Freq" %in% nms) {
-    names(ret)[which(nms == "Cum_Freq")] <-  "CUM_FREQ"
-  }
-
-  if (!is.null(direction)) {
-    if (direction == "long") {
+  if (!is.null(shape)) {
+    if (shape == "long") {
 
       ret <- proc_transpose(ret, id = c("CAT1", "CAT2"),
                             copy = c(names(by), "VAR1", "VAR2"),
@@ -973,7 +922,7 @@ get_output_specs <- function(tbls, outs) {
               tnm <- tbls[[i]]
 
             ot$table <- tbls[[i]]
-            ot$direction <- "wide"
+            ot$shape <- "wide"
             ret[[tnm]] <- ot
 
           }
@@ -983,8 +932,8 @@ get_output_specs <- function(tbls, outs) {
         } else {
 
           ot <- outs[[nm]]
-          if (is.null(ot$direction))
-            ot$direction = "wide"
+          if (is.null(ot$shape))
+            ot$shape = "wide"
           ret[[nm]] <- ot
 
         }
@@ -1002,7 +951,7 @@ get_output_specs <- function(tbls, outs) {
       if (nm == "")
         nm <- tbls[[i]]
 
-      ret[[nm]] <- out(table = tbls[[i]], stats = sts, direction = "wide")
+      ret[[nm]] <- out(table = tbls[[i]], stats = sts, shape = "wide")
 
     }
 
@@ -1214,6 +1163,10 @@ gen_output_freq <- function(data,
 
   byvals <- list()
   if (!is.null(by)) {
+    if (length(by) == 1)
+      bynms <- "BY"
+    else
+      bynms <- paste0("BY", seq(1, length(by)))
 
     lst <- unclass(data)[by]
     for (nm in names(lst))
@@ -1225,7 +1178,7 @@ gen_output_freq <- function(data,
     for (k in seq_len(length(snms))) {
 
       byvals[[k]] <- snms[[k]]
-      names(byvals[[k]]) <- by
+      names(byvals[[k]]) <- bynms
     }
 
   } else {
@@ -1264,11 +1217,11 @@ gen_output_freq <- function(data,
 
           if (length(byvals) >= j) {
             result <- get_output_oneway(dt, tb, weight, options,
-                                      byvals[[j]], direction = outp$direction,
+                                      byvals[[j]], shape = outp$shape,
                                       stats = outp$stats)
           } else {
             result <- get_output_oneway(dt, tb, weight, options,
-                                        NULL, direction = outp$direction,
+                                        NULL, shape = outp$shape,
                                         stats = outp$stats)
           }
 
@@ -1279,12 +1232,12 @@ gen_output_freq <- function(data,
           # Perform two-way frequency
           if (length(byvals) >= j) {
             result <- get_output_twoway(dt, splt[1], splt[2], weight, options,
-                                byvals[[j]], direction = outp$direction,
+                                byvals[[j]], shape = outp$shape,
                                 out = TRUE, stats = outp$stats)
           } else {
 
             result <- get_output_twoway(dt, splt[1], splt[2], weight, options,
-                                     NULL, direction = outp$direction,
+                                     NULL, shape = outp$shape,
                                      out = TRUE, stats = outp$stats)
           }
 
