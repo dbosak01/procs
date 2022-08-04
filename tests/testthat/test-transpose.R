@@ -325,7 +325,8 @@ test_that("transpose14: copy parameter works with by groups", {
 test_that("transpose15: all vars eliminates by, copy, and id from transpose", {
 
   stats <- proc_means(datm, stats = c("n", "mean", "median"),
-                      by = "Layers")
+                      by = "Layers",
+                      out = out(freq = FALSE, type = FALSE, shape = "wide"))
 
   stats
 
@@ -366,7 +367,8 @@ test_that("tranpose16: get_output_twoway() works as expected.", {
 test_that("transpose15: NSE works on transpose", {
 
   stats <- proc_means(datm, stats = v(n, mean, median),
-                      by = Layers)
+                      by = Layers,
+                      out = out(freq = FALSE, type = FALSE, shape = "wide"))
 
   stats
 

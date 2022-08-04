@@ -847,7 +847,19 @@ get_output_oneway <- function(data, tb, weight = NULL, options = NULL,
 
       ret <- proc_transpose(ret, copy = c(names(by), "VAR"),
                             id = "CAT", name = "STAT")
+
+    } else if (all(shape == "stacked")) {
+
+      ret <- proc_transpose(ret, name = "STAT",
+                            by = c(names(by), "VAR", "CAT"))
+
+      rnms <- names(ret)
+      rnms[rnms %in% "COL1"] <- "VALUES"
+
+      names(ret) <- rnms
+
     }
+
   }
 
   return(ret)
@@ -889,6 +901,16 @@ get_output_twoway <- function(data, tb1, tb2, weight, options, out = FALSE,
       ret <- proc_transpose(ret, id = c("CAT1", "CAT2"),
                             copy = c(names(by), "VAR1", "VAR2"),
                             name = "STAT")
+    } else if (all(shape == "stacked")) {
+
+      ret <- proc_transpose(ret, name = "STAT",
+                            by = c(names(by), "VAR1", "VAR2", "CAT1", "CAT2"))
+
+      rnms <- names(ret)
+      rnms[rnms %in% "COL1"] <- "VALUES"
+
+      names(ret) <- rnms
+
     }
   }
 
@@ -922,7 +944,8 @@ get_output_specs <- function(tbls, outs) {
               tnm <- tbls[[i]]
 
             ot$table <- tbls[[i]]
-            ot$shape <- "wide"
+            if (is.null(ot$shape))
+              ot$shape <- "wide"
             ret[[tnm]] <- ot
 
           }

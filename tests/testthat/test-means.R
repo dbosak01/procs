@@ -187,8 +187,7 @@ test_that("means8: proc_means with unquoted parameter values.", {
 
   res <- proc_means(datm, var = PresentScore,
                     stats = mean,
-                    titles = "My first title for Means",
-                    out = out())
+                    titles = "My first title for Means")
 
   res
 
@@ -703,8 +702,10 @@ test_that("means29: Default outputs work as expected.", {
 
   res <- proc_means(datm)
 
+  res
+
   expect_equal(nrow(res), 4)
-  expect_equal(ncol(res), 6)
+  expect_equal(ncol(res), 8)
 
 
   res2 <- proc_means(datm, out = out())
@@ -758,14 +759,45 @@ test_that("means31: by and 2 class vars works.", {
 
 })
 
-# test_that("means?: output parameters work.", {
-#
-#   res <- proc_means(datm, out = output(c("n", "means", "std")))
-#
-#
-#
-#
-# })
+
+
+test_that("means32: Report output works.", {
+
+  var1 <- c("Age", "PresentScore", "TasteScore")
+
+  res <- proc_means(datm,
+                    by = "Layers",
+                    out = out(report = TRUE))
+
+  res
+
+  expect_equal(length(res), 3)
+  expect_equal(nrow(res[[1]]), 3)
+  expect_equal(ncol(res[[1]]), 6)
+  expect_equal(nrow(res[[2]]), 3)
+  expect_equal(ncol(res[[2]]), 6)
+  expect_equal(nrow(res[[3]]), 3)
+  expect_equal(ncol(res[[3]]), 6)
+
+})
+
+test_that("means33: Stacked output works.", {
+
+  var1 <- c("Age", "PresentScore", "TasteScore")
+
+  res <- proc_means(datm,
+                    by = "Layers",
+                    out = out(shape = "stacked"))
+
+  res
+
+  expect_equal(nrow(res), 45)
+  expect_equal(ncol(res), 6)
+
+})
+
+
+
 
 
 

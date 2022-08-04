@@ -167,12 +167,73 @@ proc_means <- function(data,
     }
   }
 
-  # Set default statistics for output parameters
-  if (!is.null(output)) {
-    outreq <- output  # need to check this
+  # Generate output specs
+  if (!is.null(output))
+    outreq <- get_output_specs_means(output, stats)
+  else
+    outreq <- get_output_specs_means(list(...), stats)
 
-  } else {
-    outreq <- list(...)
+  rptflg <- FALSE
+  rptnm <- ""
+  if (has_report(outreq)) {
+    rptflg <- TRUE
+    rptnm <- get_report_name(outreq)
+    outreq[[rptnm]] <- NULL
+  }
+
+  res <- NULL
+
+
+  # Get report
+  if (view == TRUE | rptflg) {
+    rptres <- gen_report_means(data, by = by, var = var, class = class,
+                            stats = stats, view = view,
+                            titles = titles)
+  }
+
+  # Get output
+  if (length(outreq) > 0) {
+    res <- gen_output_means(data,
+                           by = by,
+                           class = class,
+                           var = var,
+                           output = outreq
+                           )
+  }
+
+  # Add report to result if requested
+  if (rptflg & !is.null(rptres)) {
+
+    if (is.null(res))
+      res <- rptres
+    else
+      res[[rptnm]] <- rptres
+
+
+  }
+
+  # If only one dataset returned, remove list
+  if (length(res) == 1)
+    res <- res[[1]]
+
+
+  return(res)
+}
+
+
+# Stats ---------------------------------------------------------------
+
+
+get_output_specs_means <- function(outs, stats) {
+
+  # outreq <- NULL
+
+  # Set default statistics for output parameters
+  # if (!is.null(outs)) {
+  #   outreq <- outs  # need to check this
+  #
+  # } else {
+    outreq <- outs
     if (length(outreq) >= 1) {
       for (nm in names(outreq)) {
         if ("out_req" %in% class(outreq[[nm]])) {
@@ -191,37 +252,15 @@ proc_means <- function(data,
       }
     } else {
 
-     outreq[["out"]] <- out(stats = stats, shape = "wide",
-                            type = FALSE, freq = FALSE)
+      outreq[["out"]] <- out(stats = stats, shape = "wide",
+                             type = TRUE, freq = TRUE)
 
     }
-  }
+  # }
 
-  res <- NULL
+  return(outreq)
 
-
-  if (view == TRUE) {
-    rptres <- gen_report_means(data, by = by, var = var, class = class,
-                            stats = stats, view = view,
-                            titles = titles)
-  }
-
-  if (length(outreq) > 0) {
-    res <- gen_output_means(data,
-                           by = by,
-                           class = class,
-                           var = var,
-                           output = outreq
-                           )
-  }
-
-
-  return(res)
 }
-
-
-# Stats ---------------------------------------------------------------
-
 
 
 
@@ -559,10 +598,19 @@ get_summaries <- function(data, var, stats, missing = FALSE,
   }
 
   if (!is.null(shape)) {
-    if (shape == "long") {
+    if (all(shape == "long")) {
 
       ret <- proc_transpose(ret, id = "VAR", name = "STAT", )
 
+
+    } else if (all(shape == "stacked")) {
+
+      ret <- proc_transpose(ret, name = "STAT", by = "VAR")
+
+      rnms <- names(ret)
+      rnms[rnms %in% "COL1"] <- "VALUES"
+
+      names(ret) <- rnms
 
     }
   }
@@ -579,7 +627,8 @@ mlbls <- list(MEAN = "Mean", STD = "Std Dev", MEDIAN = "Median", MIN = "Minimum"
               MAX = "Maximum", VAR = "Variable", STDERR = "Std Err",
               STAT = "Statistics", VARI = "Variance", QRANGE = "Quantile Range",
               RANGE = "Range", MODE = "Mode", NMISS = "NMiss",
-              LCLM = "Lower Conf. Limit", UCLM = "Upper Conf. Limit")
+              LCLM = "Lower Conf. Limit", UCLM = "Upper Conf. Limit",
+              TYPE = "Type", FREQ = "Frequency")
 
 #' @import common
 gen_report_means <- function(data,

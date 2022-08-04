@@ -177,8 +177,8 @@ test_that("freq6: Simple proc_freq with output long works.", {
 
   res
 
-  expect_equal(nrow(res), 3)
-  expect_equal(ncol(res), 7)
+  expect_equal(nrow(res), 5)
+  expect_equal(ncol(res), 5)
 
 
 })
@@ -1252,6 +1252,42 @@ test_that("freq48: output statistics works.", {
 })
 
 
+
+test_that("freq49: oneway output stacked works.", {
+
+
+  res <- proc_freq(dat,
+                   tables = c("Eyes"),
+                   titles = "My first Frequency Table",
+                   by = "Region",
+                   view = TRUE,
+                   weight = "Count",
+                   report = out(stats = c("n", "cnt", "pct"), shape = "stacked"))
+
+
+  res
+
+  expect_equal(nrow(res), 18)
+  expect_equal(ncol(res), 5)
+})
+
+test_that("freq50: twoway output stacked works.", {
+
+
+  res <- proc_freq(dat,
+                   tables = c("Eyes * Hair"),
+                   titles = "My first Frequency Table",
+                   by = "Region",
+                   view = TRUE,
+                   weight = "Count",
+                   report = out(stats = c("n", "cnt", "pct"), shape = "stacked"))
+
+
+  res
+
+  expect_equal(nrow(res), 90)
+  expect_equal(ncol(res), 7)
+})
 
 
 # test_that("freq35: CMH works with weight.", {

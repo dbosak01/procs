@@ -357,9 +357,5 @@ get_name <- function(nm = NULL, var = NULL, bylbl = NULL) {
 # Other Utilities ---------------------------------------------------------
 
 
-stackds <- function(data) {
 
-
-
-}
 
