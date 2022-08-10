@@ -1117,6 +1117,7 @@ test_that("freq43: oneway output statistics work.", {
   res <- proc_freq(dat,
                    titles = "My first Frequency Table",
                    view = TRUE,
+                   across = "TRT",
                    weight = "Count",
                    out1 = out(table ="Eyes", stats = c("cnt", "pct", "n")),
                    out2 = out(table = "Hair",
@@ -1144,9 +1145,11 @@ test_that("freq45: twoway output statistics work.", {
   res <- proc_freq(dat,
                    tables = c("Eyes", "Region * Eyes", "Region"),
                    titles = "My first Frequency Table",
+                   across = "TRT",
                    view = TRUE,
                    weight = "Count",
-                   out1 = out(table ="Region * Eyes", stats = c("cnt", "pct", "n")),
+                   out1 = out(table ="Region * Eyes", stats = c("cnt", "pct", "n"),
+                              shape = "wide"),
                    out2 = out(table = "Region * Hair",
                               stats = c("cumsum", "cnt", "pct"),
                               shape = "long"))
@@ -1231,21 +1234,22 @@ test_that("freq48: output statistics works.", {
                    across = "ARM",
                    weight = "count",
                    options = opts(chisq = TRUE),
-                   out = out(stats = c("n", "cnt", "pct", "chisq"))
-                   #out2 = out(report = TRUE))
-                   # out3 = out(table = "internship", stats = c("n", "cnt", "pct", "cumsum", "cumpct")),
-                   # out4 = out(table = "enrollment", stats = c("n", "cnt", "pct"), shape = "long"),
-                   # out5 = out(table = "internship * enrollment", stats = c("n", "cnt", "pct", "chisq"))
+                   #out = out(stats = c("n", "cnt", "pct"))
+                   out2 = out(report = TRUE),
+                   out3 = out(table = "internship", stats = c("n", "cnt", "pct", "cumsum", "cumpct")),
+                   out4 = out(table = "enrollment", stats = c("n", "cnt", "pct"), shape = "long"),
+                   out5 = out(table = "internship * enrollment", stats = c("n", "cnt", "pct", "chisq"))
   )
 
 
   res
 
+  expect_equal(length(res), 4)
 
-  expect_equal("data.frame" %in% class(res), TRUE)
-  nms <- names(res)
-  expect_equal(nms, c("BY", "VAR1", "VAR2", "CAT1", "CAT2",
-                      "N", "CNT", "PCT"))
+  # expect_equal("data.frame" %in% class(res), TRUE)
+  # nms <- names(res)
+  # expect_equal(nms, c("BY", "VAR1", "VAR2", "CAT1", "CAT2",
+  #                     "N", "CNT", "PCT"))
   # expect_equal(nms, c("BY", "VAR1", "VAR2", "CAT1", "CAT2",
   #                     "N", "CNT", "PCT", "CHISQ", "CHISQ.DF", "CHISQ.P"))
   #expect_equal(nms[4], "Region=2, Eyes")
@@ -1271,23 +1275,42 @@ test_that("freq49: oneway output stacked works.", {
   expect_equal(ncol(res), 5)
 })
 
-test_that("freq50: twoway output stacked works.", {
+# test_that("freq50: twoway output stacked works.", {
+#
+#
+#   res <- proc_freq(dat,
+#                    tables = c("Eyes * Hair"),
+#                    titles = "My first Frequency Table",
+#                    by = "Region",
+#                    view = TRUE,
+#                    weight = "Count",
+#                    report = out(stats = c("n", "cnt", "pct"), shape = "stacked"))
+#
+#
+#   res
+#
+#   expect_equal(nrow(res), 90)
+#   expect_equal(ncol(res), 7)
+# })
 
 
-  res <- proc_freq(dat,
-                   tables = c("Eyes * Hair"),
-                   titles = "My first Frequency Table",
-                   by = "Region",
-                   view = TRUE,
-                   weight = "Count",
-                   report = out(stats = c("n", "cnt", "pct"), shape = "stacked"))
-
-
-  res
-
-  expect_equal(nrow(res), 90)
-  expect_equal(ncol(res), 7)
-})
+# test_that("freq51: twoway output chisq works.", {
+#
+#
+#   res <- proc_freq(dat,
+#                    tables = c("Eyes * Hair"),
+#                    titles = "My first Frequency Table",
+#                    by = "Region",
+#                    view = TRUE,
+#                    weight = "Count",
+#                    report = out(stats = c("n", "cnt", "pct", "chisq")))
+#
+#
+#   res
+#
+#   expect_equal(nrow(res), 90)
+#   expect_equal(ncol(res), 10)
+# })
 
 
 # test_that("freq35: CMH works with weight.", {

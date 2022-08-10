@@ -76,7 +76,7 @@ get_fisher <- function(x, y, wgt = NULL, bylbl = "") {
 
   names(val) <- NULL
 
-  ret <- data.frame(Measure = mes, Value = val)
+  ret <- data.frame(Measure = mes, Value = val, stringsAsFactors = FALSE)
 
   attr(ret$Value, "format") <- "%.4f"
 
@@ -88,7 +88,7 @@ get_fisher <- function(x, y, wgt = NULL, bylbl = "") {
 }
 
 
-get_chisq <- function(x, y, wgt = NULL, corrct = FALSE, bylbl = "") {
+get_chisq <- function(x, y, wgt = NULL, corrct = FALSE, bylbl = "", output = FALSE) {
 
 
   if (!is.null(wgt)) {
@@ -107,19 +107,26 @@ get_chisq <- function(x, y, wgt = NULL, corrct = FALSE, bylbl = "") {
 
   res <- suppressWarnings(chisq.test(tb, correct = corrct))
 
-
-  mes <- c("Chi-Square", "DF", "PR>ChiSq")
-  val <- c(res[["statistic"]], res[["parameter"]], res[["p.value"]])
-
-  names(val) <- NULL
-
-  ret <- data.frame(Measure = mes, Value = val)
-
-  attr(ret$Value, "format") <- "%.4f"
+  if (output) {
 
 
-  spn <- list(span(1, 2, paste0(bylbl, "Chi-Square Test"), level = 1))
-  attr(ret, "spans") <- spn
+
+
+  } else {
+
+    mes <- c("Chi-Square", "DF", "PR>ChiSq")
+    val <- c(res[["statistic"]], res[["parameter"]], res[["p.value"]])
+
+    names(val) <- NULL
+
+    ret <- data.frame(Measure = mes, Value = val, stringsAsFactors = FALSE)
+
+    attr(ret$Value, "format") <- "%.4f"
+
+
+    spn <- list(span(1, 2, paste0(bylbl, "Chi-Square Test"), level = 1))
+    attr(ret, "spans") <- spn
+  }
 
 
   return(ret)

@@ -1,4 +1,4 @@
-pandoc: 2.17.1.1
+pandoc: '2.18'
 pkgdown: 1.6.1
 pkgdown_sha: ~
 articles:
@@ -11,7 +11,7 @@ articles:
   procs-transpose: procs-transpose.html
   procs-validation: procs-validation.html
   procs: procs.html
-last_built: 2022-07-19T17:27Z
+last_built: 2022-08-10T18:47Z
 urls:
   reference: https://procs.r-sassy.org/reference
   article: https://procs.r-sassy.org/articles

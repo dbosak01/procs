@@ -1275,14 +1275,14 @@ gen_output_freq <- function(data,
 #                                    bylbl = bylbls[j])
 #           }
 #
-#           if (get_option(table_options, "chisq", FALSE)) {
-#
-#             if (!is.null(weight))
-#               chisq <- get_chisq(dt[[splt[1]]], dt[[splt[[2]]]], dt[[weight]],
-#                                  bylbl = bylbls[j])
-#             else
-#               chisq <- get_chisq(dt[[splt[1]]], dt[[splt[[2]]]], bylbl = bylbls[j])
-#           }
+          # if (get_option(table_options, "chisq", FALSE)) {
+          #
+          #   if (!is.null(weight))
+          #     chisq <- get_chisq(dt[[splt[1]]], dt[[splt[[2]]]], dt[[weight]],
+          #                        bylbl = bylbls[j])
+          #   else
+          #     chisq <- get_chisq(dt[[splt[1]]], dt[[splt[[2]]]], bylbl = bylbls[j])
+          # }
 
         } else {
 

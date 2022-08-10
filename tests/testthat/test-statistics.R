@@ -93,6 +93,7 @@ test_that("stat6: chisq works with weight uncorrected", {
 
   res <- get_chisq(prt$internship, prt$enrollment, prt$count)
 
+  res
 
   expect_equal(res[1, 2], 0.8189423)
   expect_equal(res[2, 2], 1)
@@ -153,7 +154,11 @@ test_that("stat9: fisher works with weight", {
 
 
 
-
+# test_that("stat10: Chisq works as output.", {
+#
+#
+#
+# })
 
 
 

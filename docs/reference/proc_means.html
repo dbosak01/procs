@@ -84,7 +84,7 @@ of tibbles." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">procs</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.9003</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.9005</span>
       </span>
     </div>
 
@@ -173,14 +173,14 @@ of tibbles.</p>
     <pre class="usage"><span><span class='fu'>proc_means</span><span class='op'>(</span></span>
 <span>  <span class='va'>data</span>,</span>
 <span>  by <span class='op'>=</span> <span class='cn'>NULL</span>,</span>
+<span>  class <span class='op'>=</span> <span class='cn'>NULL</span>,</span>
 <span>  var <span class='op'>=</span> <span class='cn'>NULL</span>,</span>
 <span>  stats <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"n"</span>, <span class='st'>"mean"</span>, <span class='st'>"std"</span>, <span class='st'>"min"</span>, <span class='st'>"max"</span><span class='op'>)</span>,</span>
 <span>  view <span class='op'>=</span> <span class='cn'>TRUE</span>,</span>
-<span>  report_type <span class='op'>=</span> <span class='cn'>NULL</span>,</span>
-<span>  report_location <span class='op'>=</span> <span class='cn'>NULL</span>,</span>
-<span>  report_style <span class='op'>=</span> <span class='cn'>NULL</span>,</span>
 <span>  titles <span class='op'>=</span> <span class='cn'>NULL</span>,</span>
-<span>  piped <span class='op'>=</span> <span class='cn'>FALSE</span></span>
+<span>  options <span class='op'>=</span> <span class='cn'>NULL</span>,</span>
+<span>  <span class='va'>...</span>,</span>
+<span>  output <span class='op'>=</span> <span class='cn'>NULL</span></span>
 <span><span class='op'>)</span></span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
@@ -193,13 +193,17 @@ of tibbles.</p>
     <tr>
       <th>by</th>
       <td><p>An optional by group. You may
-pass unquoted variable names to this parameter using the <code><a href='https://procs.r-sassy.org/reference/v.html'>v</a></code>
+pass unquoted variable names to this parameter using the <code><a href='https://rdrr.io/pkg/common/man/v.html'>v</a></code>
 function.</p></td>
+    </tr>
+    <tr>
+      <th>class</th>
+      <td><p>The variable or variables to perform frequency counts on.</p></td>
     </tr>
     <tr>
       <th>var</th>
       <td><p>The variable(s) to calculate summary statistics for. You may
-pass unquoted variable names to this parameter using the <code><a href='https://procs.r-sassy.org/reference/v.html'>v</a></code>
+pass unquoted variable names to this parameter using the <code><a href='https://rdrr.io/pkg/common/man/v.html'>v</a></code>
 function.</p></td>
     </tr>
     <tr>
@@ -211,7 +215,7 @@ keywords are: "css", "clm", "cv", "n", "lclm", "mean", "median", "mode",
 "q1", "q3", "p1", "p5", "p10", "p20", "p25", "p30", "p40",
 "p50", "p60", "p70", "p75", "p80", "p90",
 "p95", "p99", "qrange". You may
-pass unquoted variable names to this parameter using the <code><a href='https://procs.r-sassy.org/reference/v.html'>v</a></code>
+pass unquoted variable names to this parameter using the <code><a href='https://rdrr.io/pkg/common/man/v.html'>v</a></code>
 function.</p></td>
     </tr>
     <tr>
@@ -220,45 +224,40 @@ function.</p></td>
 values are TRUE and FALSE.  Default is TRUE.</p></td>
     </tr>
     <tr>
-      <th>report_type</th>
-      <td><p>The output type for any report output.  Valid values are
-'HTML', 'TXT', 'PDF', 'RTF', 'DOCX'.  Multiple outputs can be
-requested by passing a vector of output types.  If the report_location parameter
-is specified, the outputs will be written to that location.  Otherwise,
-they will be written to a temp directory.  The default value is NULL.</p></td>
-    </tr>
-    <tr>
-      <th>report_location</th>
-      <td><p>A path to write any report output requested by
-the print parameter. The path may be either a full path with file name,
-or a directory name.  If the file name is not specified, the procedure
-type will be used.  If no path is specified, files will be
-written to a temp directory.  Default is NULL.</p></td>
-    </tr>
-    <tr>
-      <th>report_style</th>
-      <td><p>A theme name or style object to use on the report output.
-See the <code><a href='https://reporter.r-sassy.org/reference/create_style.html'>create_style</a></code> in the <strong>reporter</strong>
-package for additional information on styles.</p></td>
-    </tr>
-    <tr>
       <th>titles</th>
       <td><p>A vector of one or more titles to use for the report output.</p></td>
     </tr>
     <tr>
-      <th>piped</th>
-      <td><p>Whether or not the <code>proc_freq</code> function is part of a data
-pipeline.  Set this parameter to TRUE if you want the function to return
-a single dataset instead of a list of datasets.  If there is more than one
-table requested, the function will return the last requested table.</p></td>
+      <th>options</th>
+      <td><p>An options object created with the <code><a href='opts.html'>opts</a></code>
+function. This parameter can accept a variety of options.</p></td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <td><p>One or more output requests. To request a dataset output,
+use the desired dataset name as the parameter name, and pass in the
+<code><a href='out.html'>out</a></code> function with the desired specifics.  If only one
+output dataset is requested, the function will return a single data frame.
+If more than one output dataset is requested, the function will return
+a list of data frames. If no statistics are specified in the <code><a href='out.html'>out</a></code>
+function, the procedure will default to the statistics assigned on
+the <code>stats</code> parameter above.  Note that this default behavior is different
+from SAS®.</p></td>
+    </tr>
+    <tr>
+      <th>output</th>
+      <td><p>A named list of output data requests.  The name of the list item
+will become the name of the item in the return list, if there is one.  The
+value of the list item is a output request created with the <code><a href='out.html'>out</a></code>
+function.  Output data requests may also be made on the <code>...</code> parameter
+for convenience.  This parameter is provided in case you need to generate
+output requests dynamically inside a function.</p></td>
     </tr>
     </table>
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>A list of datasets that contain the requested summary statistics.
-If the function is being used in a pipeline, set the
-<code>piped</code> parameter to TRUE, which will return only the last table.</p>
+    <p>The requested summary statistics.</p>
     <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
 
     <p>Some details about the sample function.</p>
