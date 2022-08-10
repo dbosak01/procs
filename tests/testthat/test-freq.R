@@ -182,29 +182,29 @@ test_that("freq6: Simple proc_freq with output long works.", {
 
 
 })
-#
-# test_that("freq7: Simple proc_freq with 2 way works.", {
-#
-#   library(common)
-#
-#
-#   labels(dat) <- list(Eyes = "Eye Color",
-#                       Hair = "Hair Color",
-#                       Region = "Geographic Region")
-#
-#   res <- proc_freq(dat, tables = v(Eyes * Hair),
-#                    weight = "Count",
-#                    view = TRUE,
-#                    titles = "My first Frequency Table")
-#
-#   res
-#
-#   expect_equal(nrow(res), 15)
-#   expect_equal(ncol(res), 9)
-#
-# })
-#
-#
+
+test_that("freq7: Simple proc_freq with 2 way works.", {
+
+  library(common)
+
+
+  labels(dat) <- list(Eyes = "Eye Color",
+                      Hair = "Hair Color",
+                      Region = "Geographic Region")
+
+  res <- proc_freq(dat, tables = c("Eyes * Hair"),
+                   weight = "Count",
+                   view = TRUE,
+                   titles = "My first Frequency Table")
+
+  res
+
+  expect_equal(nrow(res), 15)
+  expect_equal(ncol(res), 9)
+
+})
+
+
 # test_that("freq8: Simple proc_freq in multiple outputs works.", {
 #
 #   library(common)
