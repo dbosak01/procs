@@ -166,7 +166,18 @@ dataset.  The function is used as a parameter to multiple procedures in
 the <strong>procs</strong> package.</p>
     </div>
 
-    <pre class="usage"><span><span class='fu'>out</span><span class='op'>(</span>stats <span class='op'>=</span> <span class='cn'>NULL</span>, shape <span class='op'>=</span> <span class='cn'>NULL</span>, report <span class='op'>=</span> <span class='cn'>FALSE</span>, <span class='va'>...</span><span class='op'>)</span></span></pre>
+    <pre class="usage"><span><span class='fu'>out</span><span class='op'>(</span></span>
+<span>  stats <span class='op'>=</span> <span class='cn'>NULL</span>,</span>
+<span>  shape <span class='op'>=</span> <span class='cn'>NULL</span>,</span>
+<span>  report <span class='op'>=</span> <span class='cn'>FALSE</span>,</span>
+<span>  where <span class='op'>=</span> <span class='cn'>NULL</span>,</span>
+<span>  drop <span class='op'>=</span> <span class='cn'>NULL</span>,</span>
+<span>  keep <span class='op'>=</span> <span class='cn'>NULL</span>,</span>
+<span>  rename <span class='op'>=</span> <span class='cn'>NULL</span>,</span>
+<span>  format <span class='op'>=</span> <span class='cn'>NULL</span>,</span>
+<span>  label <span class='op'>=</span> <span class='cn'>NULL</span>,</span>
+<span>  <span class='va'>...</span></span>
+<span><span class='op'>)</span></span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -184,11 +195,45 @@ values are "long", "wide", or "stacked".  The default is "long".</p></td>
     <tr>
       <th>report</th>
       <td><p>Whether to output the tables produced for the
-procedure report.</p></td>
+procedure report.  Valid values are TRUE and FALSE.  Default is FALSE.
+If the parameter is TRUE, the function will output all datasets
+produced by the report functionality, and in the same order.  If the
+parameter is TRUE, all other output options will be ignored.</p></td>
+    </tr>
+    <tr>
+      <th>where</th>
+      <td><p>An expression used to filter the output dataset.  Use
+<code>expression</code> function to define the where clause.  The where
+clause will be applied prior to other output options such as drop, keep,
+or rename.</p></td>
+    </tr>
+    <tr>
+      <th>drop</th>
+      <td><p>A vector of variables to drop from the output dataset.</p></td>
+    </tr>
+    <tr>
+      <th>keep</th>
+      <td><p>A vector of variables to keep on the output dataset.
+This parameter can also be used to order the output columns.</p></td>
+    </tr>
+    <tr>
+      <th>rename</th>
+      <td><p>A named vector of columns to rename.  The name of the vector
+item should correspond to the original output column name.  The value
+of the vector should correspond to the new variable name.</p></td>
+    </tr>
+    <tr>
+      <th>format</th>
+      <td><p>A named list of formats to assign to the output dataset.</p></td>
+    </tr>
+    <tr>
+      <th>label</th>
+      <td><p>A named vector of labels to assign to the output dataset.</p></td>
     </tr>
     <tr>
       <th>...</th>
-      <td><p>Various options.</p></td>
+      <td><p>Various options.  When used with <code><a href='proc_freq.html'>proc_freq</a></code>,
+the <code>table</code> option is most frequently used.</p></td>
     </tr>
     </table>
 

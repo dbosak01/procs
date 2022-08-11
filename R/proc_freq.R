@@ -1221,6 +1221,7 @@ gen_output_freq <- function(data,
 
       outp <- output[[nm]]
       tb <- outp$table
+      tmpres <- NULL
 
       # Loop through by groups
       for (j in seq_len(length(dtlst))) {
@@ -1318,10 +1319,10 @@ gen_output_freq <- function(data,
         # } else { # Otherwise add one-way to result
 
 
-        if (!is.null(res[[nm]]))
-          res[[nm]] <- rbind(res[[nm]], result)
+        if (!is.null(tmpres))
+          tmpres <- rbind(tmpres, result)
         else
-          res[[nm]] <- result
+          tmpres <- result
 
         #}
 
@@ -1341,6 +1342,48 @@ gen_output_freq <- function(data,
         #     res[[nm]] <- result
         # }
       }
+
+
+
+      # Where
+      if (!is.null(outp$where)) {
+        tmpres <- subset(tmpres, eval(outp$where))
+
+      }
+
+      # Drop
+      if (!is.null(outp$drop)) {
+        tnms <- names(tmpres)
+        tmpres <- tmpres[ , !tnms %in% outp$drop]
+      }
+
+      # Keep
+      if (!is.null(outp$keep)) {
+        tnms <- names(tmpres)
+        tmpres <- tmpres[ , tnms %in% outp$keep]
+      }
+
+      # Rename
+      if (!is.null(outp$rename)) {
+        tnms <- names(tmpres)
+        rnm <- names(outp$rename)
+        nnms <- replace(tnms, match(rnm, tnms), outp$rename)
+        names(tmpres) <- nnms
+      }
+
+      # System Labels
+      #labels(tmpres) <- append(mlbls, bylbls)
+
+      # User labels
+      if (!is.null(outp$label))
+        labels(tmpres) <- outp$label
+
+      # Formats
+      if (!is.null(outp$format))
+        formats(tmpres) <- outp$format
+
+      # Assign to output
+      res[[nm]] <- tmpres
 
     }
   }

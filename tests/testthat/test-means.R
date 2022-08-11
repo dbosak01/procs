@@ -234,7 +234,7 @@ test_that("means10: proc_means with variable parameter values.", {
 })
 
 
-test_that("means10: proc_means with variable parameter values and v().", {
+test_that("means11: proc_means with variable parameter values and v().", {
 
   library(common)
   var1 <- "PresentScore"
@@ -253,7 +253,7 @@ test_that("means10: proc_means with variable parameter values and v().", {
 })
 
 
-test_that("means11: proc_means in function works.", {
+test_that("means12: proc_means in function works.", {
 
   var1 <- c("PresentScore", "TasteScore")
   var2 <- v(n, mean, min, max, median)
@@ -277,7 +277,7 @@ test_that("means11: proc_means in function works.", {
 
 
 
-test_that("means12: check more stats options", {
+test_that("means13: check more stats options", {
 
   res <- proc_means(datm, var = v(PresentScore, TasteScore),
                     out1 = out(stats = v(nmiss, median, mode, clm, stderr),
@@ -299,7 +299,7 @@ test_that("means12: check more stats options", {
 
 })
 
-test_that("means13: check missing value works.", {
+test_that("means14: check missing value works.", {
 
 
   datm2 <- datm
@@ -337,7 +337,7 @@ test_that("means13: check missing value works.", {
 })
 
 # These match SAS.
-test_that("means14: check missing parameter works.", {
+test_that("means15: check missing parameter works.", {
 
 
   res <- proc_means(datm, var = c("PresentScore", "TasteScore"),
@@ -393,7 +393,7 @@ test_that("means14: check missing parameter works.", {
 
 })
 
-test_that("means15: default vars works.", {
+test_that("means16: default vars works.", {
 
   res <- proc_means(datm, out = out())
 
@@ -404,7 +404,7 @@ test_that("means15: default vars works.", {
 
 })
 
-test_that("means16: get_summaries shape long works as expected.", {
+test_that("means17: get_summaries shape long works as expected.", {
 
 
   res <- get_summaries(datm, var = c("PresentScore", "TasteScore"),
@@ -424,7 +424,7 @@ test_that("means16: get_summaries shape long works as expected.", {
 })
 
 
-test_that("means17: get_output long works.", {
+test_that("means18: get_output long works.", {
 
   res <- get_output(datm,  var = c("PresentScore", "TasteScore"),
                     stats = c("n", "mean", "min", "max", "range", "median"),
@@ -444,7 +444,7 @@ test_that("means17: get_output long works.", {
 })
 
 
-test_that("means18: get_output wide works.", {
+test_that("means19: get_output wide works.", {
 
   res <- get_output(datm,  var = c("PresentScore", "TasteScore"),
                     stats = c("n", "mean", "min", "max", "range", "median"),
@@ -464,7 +464,7 @@ test_that("means18: get_output wide works.", {
 })
 
 
-test_that("means19: get_output wide no by or class works.", {
+test_that("means20: get_output wide no by or class works.", {
 
   res <- get_output(datm,  var = c("PresentScore", "TasteScore"),
                     stats = c("n", "mean", "min", "max", "range", "median"),
@@ -479,7 +479,7 @@ test_that("means19: get_output wide no by or class works.", {
 })
 
 
-test_that("means20: get_output wide no extra works.", {
+test_that("means21: get_output wide no extra works.", {
 
   res <- get_output(datm,  var = c("PresentScore", "TasteScore"),
                     stats = c("n", "mean", "min", "max", "range", "median"),
@@ -495,7 +495,7 @@ test_that("means20: get_output wide no extra works.", {
 
 
 
-test_that("means21: gen_output_means works.", {
+test_that("means22: gen_output_means works.", {
 
   res <- gen_output_means(datm,
                           var = c("PresentScore", "TasteScore"),
@@ -521,7 +521,7 @@ test_that("means21: gen_output_means works.", {
 })
 
 
-test_that("means22: get_class works.", {
+test_that("means23: get_class works.", {
 
   res <- get_class(datm, var = c("PresentScore", "TasteScore"),
                    class = "Layers",
@@ -537,7 +537,7 @@ test_that("means22: get_class works.", {
 
 
 
-test_that("means23: gen_output_means works.", {
+test_that("means24: gen_output_means works.", {
 
   res <- gen_output_means(datm,
                           var = c("PresentScore", "TasteScore"),
@@ -561,7 +561,7 @@ test_that("means23: gen_output_means works.", {
 })
 
 # Matches SAS
-test_that("means24: class parameter works.", {
+test_that("means25: class parameter works.", {
 
   var1 <- c("Age", "PresentScore", "TasteScore")
   var2 <- c("n", "min", "max", "mean", "std")
@@ -600,7 +600,7 @@ test_that("means24: class parameter works.", {
 })
 
 
-test_that("means24: get_output with by works", {
+test_that("means26: get_output with by works", {
   var2 <- c("n", "min", "max", "mean", "std")
 
   res <- get_output(datm, var = "PresentScore", stats = var2,
@@ -611,7 +611,7 @@ test_that("means24: get_output with by works", {
 
 })
 
-test_that("means25: by parameter works.", {
+test_that("means27: by parameter works.", {
 
   var1 <- c("Age", "PresentScore", "TasteScore")
   var2 <- c("n",  "mean", "std", "min", "max")
@@ -631,7 +631,7 @@ test_that("means25: by parameter works.", {
 })
 
 # Need to work on this
-test_that("means26: by with class works.", {
+test_that("means28: by with class works.", {
 
   var1 <- c("Age", "PresentScore", "TasteScore")
   var2 <- c("n",  "mean", "std", "min", "max")
@@ -651,7 +651,7 @@ test_that("means26: by with class works.", {
 })
 
 
-test_that("means27: 2 class vars works.", {
+test_that("means29: 2 class vars works.", {
 
   var1 <- c("Age", "PresentScore", "TasteScore")
   var2 <- c("n",  "mean", "std", "min", "max")
@@ -672,7 +672,7 @@ test_that("means27: 2 class vars works.", {
 
 
 
-test_that("means28: by and 2 class vars works.", {
+test_that("means30: by and 2 class vars works.", {
 
   var1 <- c("Age", "PresentScore", "TasteScore")
   var2 <- c("n",  "mean", "std", "min", "max")
@@ -696,7 +696,7 @@ test_that("means28: by and 2 class vars works.", {
 })
 
 
-test_that("means29: Default outputs work as expected.", {
+test_that("means31: Default outputs work as expected.", {
 
   options("procs.view" = FALSE)
 
@@ -718,7 +718,7 @@ test_that("means29: Default outputs work as expected.", {
 })
 
 
-test_that("means30: get_class works with empty data frame.", {
+test_that("means32: get_class works with empty data frame.", {
 
   dftmp <- datm[datm$Layers == 42, ]
 
@@ -736,7 +736,7 @@ test_that("means30: get_class works with empty data frame.", {
 })
 
 
-test_that("means31: by and 2 class vars works.", {
+test_that("means33: by and 2 class vars works.", {
 
   var1 <- c("Age", "PresentScore", "TasteScore")
   var2 <- c("n",  "mean", "std", "min", "max")
@@ -761,7 +761,7 @@ test_that("means31: by and 2 class vars works.", {
 
 
 
-test_that("means32: Report output works.", {
+test_that("means34: Report output works.", {
 
   var1 <- c("Age", "PresentScore", "TasteScore")
 
@@ -781,7 +781,7 @@ test_that("means32: Report output works.", {
 
 })
 
-test_that("means33: Stacked output works.", {
+test_that("means35: Stacked output works.", {
 
   var1 <- c("Age", "PresentScore", "TasteScore")
 
@@ -797,7 +797,81 @@ test_that("means33: Stacked output works.", {
 })
 
 
+test_that("means36: Drop, keep, and rename works.", {
+
+  res <- proc_means(datm,
+                    out = out(drop = "TYPE",
+                              keep = c("STAT", "PresentScore", "Age"),
+                              rename = c(STAT = "Statistics")))
+
+  res
+
+  expect_equal(nrow(res), 5)
+  expect_equal(ncol(res), 3)
+  expect_equal(names(res), c("Statistics", "Age", "PresentScore"))
+
+})
 
 
+test_that("means37: format works.", {
+
+  res <- proc_means(datm,
+                    out = out(drop = "TYPE",
+                              keep = c("STAT", "PresentScore", "Age"),
+                              rename = c(STAT = "Statistics"),
+                              format = list(Age = "%.2f",
+                                            PresentScore = "%.1f")))
+
+  res
+
+  a1 <- attributes(res$Age)
+  a2 <- attributes(res$PresentScore)
+
+  expect_equal(a1$format, "%.2f")
+  expect_equal(a2$format, "%.1f")
+
+})
 
 
+test_that("means38: where works.", {
+
+  res <- proc_means(datm,
+                    out = out(drop = "TYPE",
+                              keep = c("STAT", "PresentScore", "Age"),
+                              rename = c(STAT = "Statistics"),
+                    where = expression(STAT %in% c("N", "MEAN", "STD"))))
+
+  res
+
+
+  expect_equal(nrow(res), 3)
+  expect_equal(ncol(res), 3)
+  expect_equal(res$Statistics, c("N", "MEAN", "STD"))
+
+})
+
+test_that("means39: label works.", {
+
+  fst <- flist(MEAN = "%1.1f",
+               STD = "%.2f",
+               type = "row",
+               lookup = c("N", "MEAN", "STD", "MIN", "MIX"))
+
+  res <- proc_means(datm,
+                    out = out(drop = "TYPE",
+                              keep = c("STAT", "PresentScore", "Age"),
+                              rename = c(STAT = "Statistics"),
+                              label = c(Age = "Age at Screening",
+                                        PresentScore = "The Present Score"),
+                              format = list(Age = fst, PresentScore = fst)))
+
+  res
+  #proc_print(res)
+
+  a1 <- attributes(res$Age)
+  a2 <- attributes(res$PresentScore)
+
+  expect_equal(a1$label, "Age at Screening")
+  expect_equal(a2$label, "The Present Score")
+
+})

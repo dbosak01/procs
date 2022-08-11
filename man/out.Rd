@@ -4,7 +4,18 @@
 \alias{out}
 \title{Function to request an output dataset}
 \usage{
-out(stats = NULL, shape = NULL, report = FALSE, ...)
+out(
+  stats = NULL,
+  shape = NULL,
+  report = FALSE,
+  where = NULL,
+  drop = NULL,
+  keep = NULL,
+  rename = NULL,
+  format = NULL,
+  label = NULL,
+  ...
+)
 }
 \arguments{
 \item{stats}{The requested statistics. The available statistics depend
@@ -14,9 +25,31 @@ on the function the output parameter applies to.}
 values are "long", "wide", or "stacked".  The default is "long".}
 
 \item{report}{Whether to output the tables produced for the
-procedure report.}
+procedure report.  Valid values are TRUE and FALSE.  Default is FALSE.
+If the parameter is TRUE, the function will output all datasets
+produced by the report functionality, and in the same order.  If the
+parameter is TRUE, all other output options will be ignored.}
 
-\item{...}{Various options.}
+\item{where}{An expression used to filter the output dataset.  Use
+\code{expression} function to define the where clause.  The where
+clause will be applied prior to other output options such as drop, keep,
+or rename.}
+
+\item{drop}{A vector of variables to drop from the output dataset.}
+
+\item{keep}{A vector of variables to keep on the output dataset.
+This parameter can also be used to order the output columns.}
+
+\item{rename}{A named vector of columns to rename.  The name of the vector
+item should correspond to the original output column name.  The value
+of the vector should correspond to the new variable name.}
+
+\item{format}{A named list of formats to assign to the output dataset.}
+
+\item{label}{A named vector of labels to assign to the output dataset.}
+
+\item{...}{Various options.  When used with \code{\link{proc_freq}},
+the \code{table} option is most frequently used.}
 }
 \value{
 The output specifications.

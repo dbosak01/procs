@@ -68,27 +68,36 @@ test_that("freq1: Simple proc_freq test works.", {
 
 })
 
+test_that("freq2: proc_freq with label and format options works.", {
 
-# test_that("freq2: Simple proc_freq test with report_type html works.", {
-#
-#
-#
-#   fl <- file.path(base_path, "freq/freq2.html")
-#
-#
-#   res <- proc_freq(dat, tables = c("Eyes"),
-#                    titles = "My first Frequency Table",
-#                    report_type = "HTML",
-#                    report_location = fl)
-#
-#   res
-#   ex <- file.exists(fl)
-#
-#   expect_equal(nrow(res[[1]]), 3)
-#   expect_equal(ncol(res[[1]]), 5)
-#   expect_equal(ex, TRUE)
-#
-# })
+  library(common)
+
+  labels(dat) <- list(Eyes = "Eye Color",
+                      Hair = "Hair Color",
+                      Region = "Geographic Region")
+
+  res <- proc_freq(dat, tables = c("Eyes"),
+                   titles = "My first Frequency Table",
+                   view = TRUE,
+                   out = out(label = c(VAR = "Variable", CAT = "Category"),
+                             format = list(CUMPCT = "%.3f")))
+
+  res
+
+  # proc_print(res)
+
+  a1 <- attributes(res$VAR)
+  a2 <- attributes(res$CUMPCT)
+
+  expect_equal(nrow(res), 3)
+  expect_equal(ncol(res), 7)
+
+  expect_equal(a1$label, "Variable")
+  expect_equal(a2$format, "%.3f")
+
+})
+
+
 
 test_that("freq3: Two table proc_freq test with output works.", {
 
@@ -562,50 +571,53 @@ test_that("freq22: Crosstab option to turn off totals works.", {
 
 })
 
-# test_that("freq23: Piped option works as expected.", {
-#
-#   library(common)
-#
-#
-#   labels(dat) <- list(Eyes = "Eye Color",
-#                       Hair = "Hair Color",
-#                       Region = "Geographic Region")
-#
-#   res <- proc_freq(dat, tables = c("Eyes * Hair"),
-#                    options = opts(out = "FreqTbl"),
-#                    weight = "Count",
-#                    titles = "Eye and Hair Color of European Children",
-#                    piped = TRUE)
-#
-#   res
-#
-#   expect_equal("data.frame" %in% class(res), TRUE)
-#
-#
-# })
+test_that("freq23: proc_freq with drop, keep and rename options works.", {
+
+  library(common)
+
+  labels(dat) <- list(Eyes = "Eye Color",
+                      Hair = "Hair Color",
+                      Region = "Geographic Region")
+
+  res <- proc_freq(dat, tables = c("Eyes"),
+                   titles = "My first Frequency Table",
+                   view = TRUE,
+                   out = out(drop = "CUMPCT",
+                             keep = c("CAT", "VAR", "N", "CNT", "PCT"),
+                             rename = c(VAR = "BLOCK")))
+
+  res
+
+  # proc_print(res)
+
+  expect_equal(nrow(res), 3)
+  expect_equal(ncol(res), 5)
+  expect_equal(names(res), c("BLOCK", "CAT", "N", "CNT", "PCT"))
+
+})
+
+test_that("freq24: proc_freq with where output option works.", {
+
+  library(common)
+
+  labels(dat) <- list(Eyes = "Eye Color",
+                      Hair = "Hair Color",
+                      Region = "Geographic Region")
+
+  res <- proc_freq(dat, tables = c("Eyes"),
+                   titles = "My first Frequency Table",
+                   view = TRUE,
+                   out = out(where = expression(CAT == "green")))
+
+  res
+
+  # proc_print(res)
 
 
-# test_that("freq24: report_style parameter works as expected.", {
-#
-#   library(common)
-#
-#
-#   labels(dat) <- list(Eyes = "Eye Color",
-#                       Hair = "Hair Color",
-#                       Region = "Geographic Region")
-#
-#   res <- proc_freq(dat, tables = c("Eyes * Hair"),
-#                    options = list(out = "FreqTbl"),
-#                    weight = "Count",
-#                    titles = "Eye and Hair Color of European Children",
-#                    report_style = "MidnightBlue")
-#
-#   res
-#
-#   expect_equal(length(res), 2)
-#
-#
-# })
+  expect_equal(nrow(res), 1)
+  expect_equal(ncol(res), 7)
+
+})
 
 
 test_that("freq25: Single by group on single table works.", {

@@ -65,5 +65,5 @@ proc_print <- function(data, file_path = NULL, output_type = "HTML",
 
 
 
-  return(out)
+  invisible(out)
 }

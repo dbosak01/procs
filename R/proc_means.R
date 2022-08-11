@@ -750,7 +750,7 @@ gen_report_means <- function(data,
   return(res)
 
 }
-
+#' @import fmtr
 #' @import common
 gen_output_means <- function(data,
                             by = NULL,
@@ -853,10 +853,44 @@ gen_output_means <- function(data,
 
       }
 
+      # Where
+      if (!is.null(outp$where)) {
+        tmpres <- subset(tmpres, eval(outp$where))
+
+      }
+
+      # Drop
+      if (!is.null(outp$drop)) {
+        tnms <- names(tmpres)
+        tmpres <- tmpres[ , !tnms %in% outp$drop]
+      }
+
+      # Keep
+      if (!is.null(outp$keep)) {
+        tnms <- names(tmpres)
+        tmpres <- tmpres[ , tnms %in% outp$keep]
+      }
+
+      # Rename
+      if (!is.null(outp$rename)) {
+        tnms <- names(tmpres)
+        rnm <- names(outp$rename)
+        nnms <- replace(tnms, match(rnm, tnms), outp$rename)
+        names(tmpres) <- nnms
+      }
+
+      # System Labels
+      labels(tmpres) <- append(mlbls, bylbls)
+
+      # User labels
+      if (!is.null(outp$label))
+        labels(tmpres) <- outp$label
+
+      # Formats
+      if (!is.null(outp$format))
+        formats(tmpres) <- outp$format
+
       res[[nms[i]]]  <- tmpres
-
-
-      labels(res[[nms[i]]]) <- append(mlbls, bylbls)
 
     }
   }
