@@ -376,3 +376,11 @@ fill_missing <- function(ds, num) {
 
 }
 
+get_by_ds <- function(byvals) {
+
+  ret <- as.data.frame(I(byvals), stringsAsFactors = FALSE)
+  names(ret) <- names(byvals)
+  rownames(ret) <- NULL
+
+  return(ret)
+}

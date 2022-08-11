@@ -939,13 +939,18 @@ get_output_specs <- function(tbls, outs) {
             tnms <- tbls
 
           for (i in seq_len(length(tbls))) {
-            tnm <- tnms[[i]]
-            if (tnm == "")
-              tnm <- tbls[[i]]
+            if (length(tbls) == 1) {
+              tnm <- nm
+            } else {
+              tnm <- tnms[[i]]
+              if (tnm == "")
+                tnm <- tbls[[i]]
+            }
 
             ot$table <- tbls[[i]]
             if (is.null(ot$shape))
               ot$shape <- "wide"
+
             ret[[tnm]] <- ot
 
           }
@@ -1279,7 +1284,21 @@ gen_output_freq <- function(data,
                 fisher <- get_fisher(dt[[splt[1]]], dt[[splt[[2]]]],
                                      bylbl = byvals[j], output = TRUE)
 
-              result <- cbind(result, fill_missing(fisher, nrow(result)))
+              if (all(outp$stats == 'fisher')) {
+
+                # Prepare ds with vars
+                result <- data.frame(VAR1 = splt[[1]], VAR2 = splt[[2]],
+                                     stringsAsFactors = FALSE)
+
+                if (length(byvals) > 0) {
+                  result <- cbind(get_by_ds(byvals[[j]]), result, fisher)
+                } else {
+                  result <- cbind(result, fisher)
+                }
+
+              } else {
+                result <- cbind(result, fill_missing(fisher, nrow(result)))
+              }
             }
 
             if ("chisq" %in% outp$stats) {
@@ -1291,8 +1310,21 @@ gen_output_freq <- function(data,
                 chisq <- get_chisq(dt[[splt[1]]], dt[[splt[[2]]]],
                                    bylbl = byvals[j], output = TRUE)
 
+              if (all(outp$stats == "chisq")) {
 
-              result <- cbind(result, fill_missing(chisq, nrow(result)))
+                # Prepare ds with vars
+                result <- data.frame(VAR1 = splt[[1]], VAR2 = splt[[2]],
+                                     stringsAsFactors = FALSE)
+
+                if (length(byvals) > 0) {
+                  result <- cbind(get_by_ds(byvals[[j]]), result, chisq)
+                } else {
+                  result <- cbind(result, chisq)
+                }
+
+              } else {
+                result <- cbind(result, fill_missing(chisq, nrow(result)))
+              }
 
             }
           }

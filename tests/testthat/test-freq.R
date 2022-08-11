@@ -1289,14 +1289,18 @@ test_that("freq50: chisq output statistics works.", {
                    weight = "count",
                    options = opts(chisq = TRUE),
                    out5 = out(table = "internship * enrollment",
-                              stats = c("n", "cnt", "pct", "chisq"))
+                              stats = c("n", "cnt", "pct", "chisq")),
+                   out6 = out(stats = "chisq")
   )
 
 
   res
 
-  expect_equal(nrow(res), 8)
-  expect_equal(ncol(res), 11)
+  expect_equal(length(res), 2)
+  expect_equal(nrow(res[["out5"]]), 8)
+  expect_equal(ncol(res[["out5"]]), 11)
+  expect_equal(nrow(res[["out6"]]), 2)
+  expect_equal(ncol(res[["out6"]]), 6)
 
 })
 
@@ -1313,13 +1317,16 @@ test_that("freq51: fisher output statistics works.", {
                    weight = "count",
                    options = opts(fisher = TRUE),
                    out5 = out(table = "internship * enrollment",
-                              stats = c("n", "cnt", "pct", "fisher"))
+                              stats = c("n", "cnt", "pct", "fisher")),
+                   out6 = out(stats = "fisher")
   )
 
   res
 
-  expect_equal(nrow(res), 8)
-  expect_equal(ncol(res), 12)
+  expect_equal(nrow(res[[1]]), 8)
+  expect_equal(ncol(res[[1]]), 12)
+  expect_equal(nrow(res[[2]]), 2)
+  expect_equal(ncol(res[[2]]), 7)
 
 })
 

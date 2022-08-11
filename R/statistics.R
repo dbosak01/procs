@@ -77,6 +77,8 @@ get_fisher <- function(x, y, wgt = NULL, bylbl = "", output = FALSE) {
                       FISHER.2S = tres[["p.value"]],
                       stringsAsFactors = FALSE)
 
+    rownames(ret) <- NULL
+
   } else {
 
     mes <- c("Cell1.1", "Left.Sided", "Right.Sided", "Two.Sided")
@@ -127,7 +129,7 @@ get_chisq <- function(x, y, wgt = NULL, corrct = FALSE, bylbl = "", output = FAL
                       CHISQ.P = res[["p.value"]],
                       stringsAsFactors = FALSE)
 
-
+    rownames(ret) <- NULL
 
   } else {
 
