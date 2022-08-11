@@ -1311,11 +1311,10 @@ test_that("freq51: fisher output statistics works.", {
                    view = TRUE,
                    across = "ARM",
                    weight = "count",
-                   options = opts(chisq = TRUE),
+                   options = opts(fisher = TRUE),
                    out5 = out(table = "internship * enrollment",
                               stats = c("n", "cnt", "pct", "fisher"))
   )
-
 
   res
 

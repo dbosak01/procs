@@ -71,7 +71,7 @@ get_fisher <- function(x, y, wgt = NULL, bylbl = "", output = FALSE) {
   if (output) {
 
 
-    ret <- data.frame(FISHER = tb[2, 2],
+    ret <- data.frame(FISHER.1.1 = tb[2, 2],
                       FISHER.LS = lres[["p.value"]],
                       FISHER.RS =  gres[["p.value"]],
                       FISHER.2S = tres[["p.value"]],
