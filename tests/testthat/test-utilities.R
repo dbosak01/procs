@@ -265,6 +265,23 @@ test_that("utils11: opts() works with list.", {
 
 })
 
+test_that("fill_missing() function works as expected.", {
+
+
+  df <- data.frame(one = 1, two = 2, three = "3", stringsAsFactors = FALSE)
+
+  expect_equal(nrow(df), 1)
+  expect_equal(ncol(df), 3)
+
+  res <- fill_missing(df, 4)
+
+  res
+
+  expect_equal(nrow(res), 4)
+  expect_equal(ncol(res), 3)
+
+})
+
 #
 # test_that("utils12: stackds() function works as expected.", {
 #

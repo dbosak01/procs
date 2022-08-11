@@ -1234,42 +1234,10 @@ test_that("freq47: output report works.", {
 })
 
 
-test_that("freq48: output statistics works.", {
-
-
-  res <- proc_freq(prt,
-                   #tables = c("internship"),
-                   tables = c("internship * enrollment"),
-                   titles = "My title",
-                   by = c("sex"),
-                   view = TRUE,
-                   across = "ARM",
-                   weight = "count",
-                   options = opts(chisq = TRUE),
-                   #out = out(stats = c("n", "cnt", "pct"))
-                   out2 = out(report = TRUE),
-                   out3 = out(table = "internship", stats = c("n", "cnt", "pct", "cumsum", "cumpct")),
-                   out4 = out(table = "enrollment", stats = c("n", "cnt", "pct"), shape = "long"),
-                   out5 = out(table = "internship * enrollment", stats = c("n", "cnt", "pct", "chisq"))
-  )
-
-
-  res
-
-  expect_equal(length(res), 4)
-
-  # expect_equal("data.frame" %in% class(res), TRUE)
-  # nms <- names(res)
-  # expect_equal(nms, c("BY", "VAR1", "VAR2", "CAT1", "CAT2",
-  #                     "N", "CNT", "PCT"))
-  # expect_equal(nms, c("BY", "VAR1", "VAR2", "CAT1", "CAT2",
-  #                     "N", "CNT", "PCT", "CHISQ", "CHISQ.DF", "CHISQ.P"))
-  #expect_equal(nms[4], "Region=2, Eyes")
-})
 
 
 
-test_that("freq49: oneway output stacked works.", {
+test_that("freq48: oneway output stacked works.", {
 
 
   res <- proc_freq(dat,
@@ -1287,7 +1255,7 @@ test_that("freq49: oneway output stacked works.", {
   expect_equal(ncol(res), 5)
 })
 
-# test_that("freq50: twoway output stacked works.", {
+# test_that("freq49: twoway output stacked works.", {
 #
 #
 #   res <- proc_freq(dat,
@@ -1304,6 +1272,57 @@ test_that("freq49: oneway output stacked works.", {
 #   expect_equal(nrow(res), 90)
 #   expect_equal(ncol(res), 7)
 # })
+
+
+
+
+# This is huge
+test_that("freq50: chisq output statistics works.", {
+
+
+  res <- proc_freq(prt,
+                   tables = c("internship * enrollment"),
+                   titles = "My title",
+                   by = c("sex"),
+                   view = TRUE,
+                   across = "ARM",
+                   weight = "count",
+                   options = opts(chisq = TRUE),
+                   out5 = out(table = "internship * enrollment",
+                              stats = c("n", "cnt", "pct", "chisq"))
+  )
+
+
+  res
+
+  expect_equal(nrow(res), 8)
+  expect_equal(ncol(res), 11)
+
+})
+
+
+test_that("freq51: fisher output statistics works.", {
+
+
+  res <- proc_freq(prt,
+                   tables = c("internship * enrollment"),
+                   titles = "My title",
+                   by = c("sex"),
+                   view = TRUE,
+                   across = "ARM",
+                   weight = "count",
+                   options = opts(chisq = TRUE),
+                   out5 = out(table = "internship * enrollment",
+                              stats = c("n", "cnt", "pct", "fisher"))
+  )
+
+
+  res
+
+  expect_equal(nrow(res), 8)
+  expect_equal(ncol(res), 12)
+
+})
 
 
 # test_that("freq51: twoway output chisq works.", {

@@ -1265,25 +1265,37 @@ gen_output_freq <- function(data,
                                      out = TRUE, stats = outp$stats)
           }
 
-#
-#           if (get_option(table_options, "fisher", FALSE)) {
-#
-#             if (!is.null(weight))
-#               fisher <- get_fisher(dt[[splt[1]]], dt[[splt[[2]]]], dt[[weight]],
-#                                    bylbl = bylbls[j])
-#             else
-#               fisher <- get_fisher(dt[[splt[1]]], dt[[splt[[2]]]],
-#                                    bylbl = bylbls[j])
-#           }
-#
-          # if (get_option(table_options, "chisq", FALSE)) {
-          #
-          #   if (!is.null(weight))
-          #     chisq <- get_chisq(dt[[splt[1]]], dt[[splt[[2]]]], dt[[weight]],
-          #                        bylbl = bylbls[j])
-          #   else
-          #     chisq <- get_chisq(dt[[splt[1]]], dt[[splt[[2]]]], bylbl = bylbls[j])
-          # }
+
+
+          if (!is.null(outp$stats)) {
+
+
+            if ("fisher" %in% outp$stats) {
+
+              if (!is.null(weight))
+                fisher <- get_fisher(dt[[splt[1]]], dt[[splt[[2]]]], dt[[weight]],
+                                     bylbl = byvals[j], output = TRUE)
+              else
+                fisher <- get_fisher(dt[[splt[1]]], dt[[splt[[2]]]],
+                                     bylbl = byvals[j], output = TRUE)
+
+              result <- cbind(result, fill_missing(fisher, nrow(result)))
+            }
+
+            if ("chisq" %in% outp$stats) {
+
+              if (!is.null(weight))
+                chisq <- get_chisq(dt[[splt[1]]], dt[[splt[[2]]]], dt[[weight]],
+                                   bylbl = byvals[j], output = TRUE)
+              else
+                chisq <- get_chisq(dt[[splt[1]]], dt[[splt[[2]]]],
+                                   bylbl = byvals[j], output = TRUE)
+
+
+              result <- cbind(result, fill_missing(chisq, nrow(result)))
+
+            }
+          }
 
         } else {
 
@@ -1292,31 +1304,13 @@ gen_output_freq <- function(data,
 
         # Cast to tibble if incoming data was a tibble
         if ("tbl_df" %in% class(data)) {
-          # if (!is.null(crstab))
-          #   crstab <- as_tibble(crstab)
+
 
           if (!is.null(result))
             result <- as_tibble(result)
 
-          # if (!is.null(fisher))
-          #   fisher <- as_tibble(fisher)
-          #
-          # if (!is.null(chisq))
-          #   chisq <- as_tibble(chisq)
 
         }
-
-        # If a cross tab was produced, add it to result
-        # if (!is.null(crstab)) {
-        #
-        #   res[[get_name(nm, tb, bylbls[j])]] <- crstab
-        #
-        #   if ("out" %in% names(table_options) & i == length(tables)) {
-        #
-        #     res[[get_name(table_options[["out"]], "", bylbls[j])]] <- result
-        #   }
-        #
-        # } else { # Otherwise add one-way to result
 
 
         if (!is.null(tmpres))

@@ -357,5 +357,22 @@ get_name <- function(nm = NULL, var = NULL, bylbl = NULL) {
 # Other Utilities ---------------------------------------------------------
 
 
+fill_missing <- function(ds, num) {
 
+  nas <- rep(NA, num - 1)
+  nw <- list()
+
+  for (nm in names(ds)) {
+
+    nw[[nm]] <- nas
+  }
+
+  dfn <- as.data.frame(nw, stringsAsFactors = FALSE)
+
+  ret <- rbind(ds, nw)
+
+
+  return(ret)
+
+}
 

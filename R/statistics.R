@@ -46,7 +46,7 @@ get_mode <- function(x) {
 }
 
 
-get_fisher <- function(x, y, wgt = NULL, bylbl = "") {
+get_fisher <- function(x, y, wgt = NULL, bylbl = "", output = FALSE) {
 
 
   if (!is.null(wgt)) {
@@ -68,20 +68,33 @@ get_fisher <- function(x, y, wgt = NULL, bylbl = "") {
   lres <-  fisher.test(tb, alternative = "less")
 
 
-  mes <- c("Cell1.1", "Left.Sided", "Right.Sided", "Two.Sided")
-  val <- c(tb[2, 2],
-           lres[["p.value"]],
-           gres[["p.value"]],
-           tres[["p.value"]])
+  if (output) {
 
-  names(val) <- NULL
 
-  ret <- data.frame(Measure = mes, Value = val, stringsAsFactors = FALSE)
+    ret <- data.frame(FISHER = tb[2, 2],
+                      FISHER.LS = lres[["p.value"]],
+                      FISHER.RS =  gres[["p.value"]],
+                      FISHER.2S = tres[["p.value"]],
+                      stringsAsFactors = FALSE)
 
-  attr(ret$Value, "format") <- "%.4f"
+  } else {
 
-  spn <- list(span(1, 2, paste0(bylbl, "Fisher's Exact Test"), level = 1))
-  attr(ret, "spans") <- spn
+    mes <- c("Cell1.1", "Left.Sided", "Right.Sided", "Two.Sided")
+    val <- c(tb[2, 2],
+             lres[["p.value"]],
+             gres[["p.value"]],
+             tres[["p.value"]])
+
+    names(val) <- NULL
+
+    ret <- data.frame(Measure = mes, Value = val, stringsAsFactors = FALSE)
+
+    attr(ret$Value, "format") <- "%.4f"
+
+    spn <- list(span(1, 2, paste0(bylbl, "Fisher's Exact Test"), level = 1))
+    attr(ret, "spans") <- spn
+
+  }
 
   return(ret)
 
@@ -109,6 +122,10 @@ get_chisq <- function(x, y, wgt = NULL, corrct = FALSE, bylbl = "", output = FAL
 
   if (output) {
 
+    ret <- data.frame(CHISQ = res[["statistic"]],
+                      CHISQ.DF = res[["parameter"]],
+                      CHISQ.P = res[["p.value"]],
+                      stringsAsFactors = FALSE)
 
 
 
