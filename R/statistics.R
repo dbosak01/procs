@@ -153,6 +153,55 @@ get_chisq <- function(x, y, wgt = NULL, corrct = FALSE, bylbl = "", output = FAL
 
 }
 
+# get_cmh <- function(x, y, wgt = NULL, corrct = FALSE, bylbl = "", output = FALSE) {
+#
+#
+#   if (!is.null(wgt)) {
+#
+#     tb <- xtabs(wgt~x + y)
+#
+#
+#
+#   } else {
+#
+#     cnt <- rep(1, length(x))
+#
+#     tb <- xtabs(cnt~x + y)
+#
+#   }
+#
+#   res <- suppressWarnings(mantelhaen.test(tb, correct = corrct))
+#
+#   if (output) {
+#
+#     ret <- data.frame(CHISQ = res[["statistic"]],
+#                       CHISQ.DF = res[["parameter"]],
+#                       CHISQ.P = res[["p.value"]],
+#                       stringsAsFactors = FALSE)
+#
+#     rownames(ret) <- NULL
+#
+#   } else {
+#
+#     mes <- c("Chi-Square", "DF", "PR>ChiSq")
+#     val <- c(res[["statistic"]], res[["parameter"]], res[["p.value"]])
+#
+#     names(val) <- NULL
+#
+#     ret <- data.frame(Measure = mes, Value = val, stringsAsFactors = FALSE)
+#
+#     attr(ret$Value, "format") <- "%.4f"
+#
+#
+#     spn <- list(span(1, 2, paste0(bylbl, "Chi-Square Test"), level = 1))
+#     attr(ret, "spans") <- spn
+#   }
+#
+#
+#   return(ret)
+#
+#
+# }
 
 
 

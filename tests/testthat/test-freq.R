@@ -48,6 +48,18 @@ prt <- read.table(header = TRUE, text = '
   8 girls         no         no    23')
 
 
+prt2 <- read.table(header = TRUE, text = '
+      sex internship enrollment count  group
+  1  boys        yes        yes    35      1
+  2  boys         no        yes    14      1
+  3 girls        yes        yes    32      1
+  4 girls         no        yes    53      1
+  5  boys        yes         no    29      2
+  6  boys         no         no    27      2
+  7 girls        yes         no    10      2
+  8 girls         no         no    23      2')
+
+
 
 test_that("freq1: Simple proc_freq test works.", {
 
@@ -1274,8 +1286,6 @@ test_that("freq48: oneway output stacked works.", {
 # })
 
 
-
-
 # This is huge
 test_that("freq50: chisq output statistics works.", {
 
@@ -1285,7 +1295,6 @@ test_that("freq50: chisq output statistics works.", {
                    titles = "My title",
                    by = c("sex"),
                    view = TRUE,
-                   across = "ARM",
                    weight = "count",
                    options = opts(chisq = TRUE),
                    out5 = out(table = "internship * enrollment",
@@ -1313,7 +1322,6 @@ test_that("freq51: fisher output statistics works.", {
                    titles = "My title",
                    by = c("sex"),
                    view = TRUE,
-                   across = "ARM",
                    weight = "count",
                    options = opts(fisher = TRUE),
                    out5 = out(table = "internship * enrollment",
@@ -1329,25 +1337,180 @@ test_that("freq51: fisher output statistics works.", {
   expect_equal(ncol(res[[2]]), 7)
 
 })
-
-
-# test_that("freq51: twoway output chisq works.", {
+#
+# test_that("freq52: oneway across works.", {
 #
 #
-#   res <- proc_freq(dat,
-#                    tables = c("Eyes * Hair"),
-#                    titles = "My first Frequency Table",
-#                    by = "Region",
+#   res <- proc_freq(prt2,
+#                    tables = c("internship"),
+#                    titles = "My title",
+#                    by = "group",
 #                    view = TRUE,
-#                    weight = "Count",
-#                    report = out(stats = c("n", "cnt", "pct", "chisq")))
-#
+#                    across = "group",
+#                    weight = "count",
+#                    out5 = out(table = "internship",
+#                               stats = c("n", "cnt", "pct"),
+#                               shape = "wide"))
 #
 #   res
 #
-#   expect_equal(nrow(res), 90)
-#   expect_equal(ncol(res), 10)
+#   res$CNTPCT <- fapply2(res$CNT, res$PCT, "%d", "(%.1f%%)", " ")
+#   res$CNT <- NULL
+#   res$PCT <- NULL
+#
+#   proc_transpose(res, id = "BY", by = "CAT", copy = "VAR", var = c("N", "CNTPCT"))
+#
+#   # expect_equal(nrow(res[[1]]), 8)
+#   # expect_equal(ncol(res[[1]]), 12)
+#   # expect_equal(nrow(res[[2]]), 2)
+#   # expect_equal(ncol(res[[2]]), 7)
+#
 # })
+#
+# test_that("freq53: twoway across works.", {
+#
+#
+#   res <- proc_freq(prt,
+#                    tables = c("internship * enrollment"),
+#                    titles = "My title",
+#                    view = TRUE,
+#                    across = "group",
+#                    weight = "count",
+#                    out5 = out(table = "internship * enrollment",
+#                               stats = c("n", "cnt", "pct")),
+#   )
+#
+#   res
+#
+#   # expect_equal(nrow(res[[1]]), 8)
+#   # expect_equal(ncol(res[[1]]), 12)
+#   # expect_equal(nrow(res[[2]]), 2)
+#   # expect_equal(ncol(res[[2]]), 7)
+#
+# })
+#
+#
+# test_that("freq54: oneway across with by works.", {
+#
+#
+#   res <- proc_freq(prt,
+#                    tables = c("internship"),
+#                    titles = "My title",
+#                    by = c("sex"),
+#                    view = TRUE,
+#                    across = "group",
+#                    weight = "count",
+#                    options = opts(fisher = TRUE),
+#                    out5 = out(table = "internship",
+#                               stats = c("n", "cnt", "pct"))
+#   )
+#
+#   res
+#
+#   # expect_equal(nrow(res[[1]]), 8)
+#   # expect_equal(ncol(res[[1]]), 12)
+#   # expect_equal(nrow(res[[2]]), 2)
+#   # expect_equal(ncol(res[[2]]), 7)
+#
+# })
+#
+# test_that("freq55: twoway across with by works.", {
+#
+#
+#   res <- proc_freq(prt,
+#                    tables = c("internship * enrollement"),
+#                    titles = "My title",
+#                    by = c("sex"),
+#                    view = TRUE,
+#                    across = "group",
+#                    weight = "count",
+#                    options = opts(fisher = TRUE),
+#                    out5 = out(table = "internship * enrollment",
+#                               stats = c("n", "cnt", "pct", "fisher"))
+#   )
+#
+#   res
+#
+#   # expect_equal(nrow(res[[1]]), 8)
+#   # expect_equal(ncol(res[[1]]), 12)
+#   # expect_equal(nrow(res[[2]]), 2)
+#   # expect_equal(ncol(res[[2]]), 7)
+#
+# })
+#
+#
+# test_that("freq56: twoway across with statistics works.", {
+#
+#
+#   res <- proc_freq(prt,
+#                    tables = c("internship * enrollement"),
+#                    titles = "My title",
+#                    view = TRUE,
+#                    across = "group",
+#                    weight = "count",
+#                    options = opts(fisher = TRUE),
+#                    out5 = out(table = "internship * enrollment",
+#                               stats = c("n", "cnt", "pct", "chisq"))
+#   )
+#
+#   res
+#
+#   # expect_equal(nrow(res[[1]]), 8)
+#   # expect_equal(ncol(res[[1]]), 12)
+#   # expect_equal(nrow(res[[2]]), 2)
+#   # expect_equal(ncol(res[[2]]), 7)
+#
+# })
+#
+# test_that("freq57: twoway across with by and statistics works.", {
+#
+#
+#   res <- proc_freq(prt,
+#                    tables = c("internship"),
+#                    titles = "My title",
+#                    by = c("sex"),
+#                    view = TRUE,
+#                    across = "group",
+#                    weight = "count",
+#                    options = opts(fisher = TRUE),
+#                    out5 = out(table = "internship * enrollment",
+#                               stats = c("n", "cnt", "pct", "chisq"))
+#   )
+#
+#   res
+#
+#   # expect_equal(nrow(res[[1]]), 8)
+#   # expect_equal(ncol(res[[1]]), 12)
+#   # expect_equal(nrow(res[[2]]), 2)
+#   # expect_equal(ncol(res[[2]]), 7)
+#
+# })
+#
+#
+# test_that("freq52: combine stats works.", {
+#
+#
+#   res <- proc_freq(prt2,
+#                    tables = c("internship"),
+#                    titles = "My title",
+#                    by = "group",
+#                    view = TRUE,
+#                    across = "group",
+#                    weight = "count",
+#                    out5 = out(table = "internship",
+#                               stats = c("n", "cnt & pct")))
+#
+#   res
+#
+#
+#   # expect_equal(nrow(res[[1]]), 8)
+#   # expect_equal(ncol(res[[1]]), 12)
+#   # expect_equal(nrow(res[[2]]), 2)
+#   # expect_equal(ncol(res[[2]]), 7)
+#
+# })
+
+
 
 
 # test_that("freq35: CMH works with weight.", {

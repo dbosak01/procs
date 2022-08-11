@@ -151,8 +151,51 @@ test_that("stat9: fisher works with weight", {
 
 })
 
-
-
+#
+# # Matches SAS?
+# test_that("stat10: cmh works no weight uncorrected", {
+#
+#
+#   res <- get_cmh(prt$enrollment, prt$internship)
+#
+#   res
+#
+#   # expect_equal(res[1, 2], 0)
+#   # expect_equal(res[2, 2], 1)
+#   # expect_equal(res[3, 2], 1)
+#
+# })
+#
+#
+# # Matches SAS?
+# test_that("stat11: cmh works with weight uncorrected", {
+#
+#   res <- get_chisq(prt$internship, prt$enrollment, prt$count)
+#
+#   res
+#
+#   # expect_equal(res[1, 2], 0.8189423)
+#   # expect_equal(res[2, 2], 1)
+#   # expect_equal(res[3, 2], 0.365489592)
+#
+#
+#
+# })
+#
+#
+# test_that("stat12: chisq works with weight corrected", {
+#
+#   res <- get_chisq(prt$internship, prt$enrollment, prt$count, TRUE)
+#
+#   res
+#
+#   # expect_equal(res[1, 2], 0.58989261)
+#   # expect_equal(res[2, 2], 1)
+#   # expect_equal(res[3, 2], 0.44246065)
+#
+#
+#
+# })
 
 # test_that("stat10: Chisq works as output.", {
 #
