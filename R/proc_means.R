@@ -49,7 +49,7 @@
 #' "nmiss", "nobs", "range", "std", "stderr", "sum", "uclm", "var",
 #' "q1", "q3", "p1", "p5", "p10", "p20", "p25", "p30", "p40",
 #' "p50", "p60", "p70", "p75", "p80", "p90",
-#' "p95", "p99", "qrange". You may
+#' "p95", "p99", "qrange", "aov". You may
 #' pass unquoted variable names to this parameter using the \code{\link{v}}
 #' function.
 # @param weight An optional weight parameter.
@@ -160,7 +160,7 @@ proc_means <- function(data,
              "lclm","mode", "q1", "q3", "p1", "p5", "p10", "p20",
              "p25", "p30", "p40",
              "p50", "p60", "p70", "p75", "p80", "p90",
-             "p95", "p99", "qrange")
+             "p95", "p99", "qrange", "aov")
     if (!all(tolower(stats) %in% st)) {
 
       stop(paste("Invalid stat name: ", stats[!tolower(stats) %in% st], "\n"))

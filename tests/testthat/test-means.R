@@ -875,3 +875,56 @@ test_that("means39: label works.", {
   expect_equal(a2$label, "The Present Score")
 
 })
+
+
+test_that("means40: aov statistic works.", {
+
+  var1 <- c("Age", "PresentScore", "TasteScore")
+  var2 <- c("n", "min", "max", "mean", "std", "aov")
+
+  res <- proc_means(datm, var = var1,
+                    stats = var2,
+                    titles = "My first title for Means",
+                    out = out())
+
+  res
+
+  expect_equal(1, 1)
+
+})
+
+
+test_that("means41: aov statistic works with class.", {
+
+  var1 <- c("Age", "PresentScore", "TasteScore")
+  var2 <- c("n", "min", "max", "mean", "std", "aov")
+
+  res <- proc_means(datm, var = var1,
+                    stats = var2,
+                    class = Layers,
+                    titles = "My first title for Means",
+                    out = out())
+
+  res
+
+  expect_equal(1, 1)
+
+})
+
+
+test_that("means41: aov statistic works with by.", {
+
+  var1 <- c("Age", "PresentScore", "TasteScore")
+  var2 <- c("n", "min", "max", "mean", "std", "aov")
+
+  res <- proc_means(datm, var = var1,
+                    stats = var2,
+                    by = Layers,
+                    titles = "My first title for Means",
+                    out = out())
+
+  res
+
+  expect_equal(1, 1)
+
+})

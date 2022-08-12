@@ -253,7 +253,6 @@ proc_freq <- function(data,
                       tables = NULL,
                       options = NULL,
                       weight = NULL,
-                   #   weight_options = NULL,
                       view = TRUE,
                       titles = NULL,
                       ...,
@@ -1297,7 +1296,7 @@ gen_output_freq <- function(data,
                 }
 
               } else {
-                result <- cbind(result, fill_missing(fisher, nrow(result)))
+                result <- cbind(result, fisher)
               }
             }
 
@@ -1323,7 +1322,7 @@ gen_output_freq <- function(data,
                 }
 
               } else {
-                result <- cbind(result, fill_missing(chisq, nrow(result)))
+                result <- cbind(result, chisq)
               }
 
             }
