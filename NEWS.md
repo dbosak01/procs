@@ -1,7 +1,5 @@
 # procs 0.0.9005
 
-* Added across parameter.
-* Added ability to combine stats into a single column with "&" operator.
 * Added more options to `out()` function.
 
 # procs 0.0.9004

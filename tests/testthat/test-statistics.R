@@ -12,6 +12,27 @@ prt <- read.table(header = TRUE, text = '
   8 girls         no         no    23')
 
 
+adsl <- read.table(header = TRUE, text = '
+  SUBJID ARM    SEX RACE   AGE AGEGR1
+  "001"   "ARM A" "F"  "WHITE" 19   "18-29 years"
+  "002"   "ARM B" "F"  "WHITE" 21   "18-29 years"
+  "003"   "ARM C" "F"  "WHITE" 23   "18-29 years"
+  "004"   "ARM D" "F"  "BLACK OR AFRICAN AMERICAN" 28   "18-29 years"
+  "005"   "ARM A" "M"  "WHITE" 37   "30-39 years"
+  "006"   "ARM B" "M"  "WHITE" 34   "30-39 years"
+  "007"   "ARM C" "M"  "WHITE" 36   "30-39 years"
+  "008"   "ARM D" "M"  "WHITE" 30   "30-39 years"
+  "009"   "ARM A" "F"  "WHITE" 39   "30-39 years"
+  "010"   "ARM B" "F"  "WHITE" 31   "30-39 years"
+  "011"   "ARM C" "F"  "BLACK OR AFRICAN AMERICAN" 33   "30-39 years"
+  "012"   "ARM D" "F"  "WHITE" 38   "30-39 years"
+  "013"   "ARM A" "M"  "BLACK OR AFRICAN AMERICAN" 37   "30-39 years"
+  "014"   "ARM B" "M"  "WHITE" 34   "30-39 years"
+  "015"   "ARM C" "M"  "WHITE" 36   "30-39 years"
+  "016"   "ARM A" "M"  "WHITE" 40   "40-49 years"')
+
+
+
 test_that("stats1: Standard error works.", {
 
 
@@ -150,6 +171,57 @@ test_that("stat9: fisher works with weight", {
 
 
 })
+
+
+test_that("stat10: aov works with one class without weight", {
+
+
+
+  res <- get_aov(adsl, "AGE", "ARM", output = TRUE)
+
+
+  res
+
+  expect_equal(res$AOV.F[1], 0.29836512)
+  expect_equal(res$AOV.P[1], 0.82594862)
+
+  res <- get_aov(adsl, "AGE", "ARM", output = FALSE)
+
+
+  res
+
+  # proc_print(res)
+
+  expect_equal(res$AOV.F[1], 0.29836512)
+  expect_equal(res$AOV.P[1], 0.82594862)
+
+
+})
+
+test_that("stat11: aov works with 2 classes without weight", {
+
+
+
+  res <- get_aov(adsl, "AGE", c("SEX", "ARM"), output = TRUE)
+
+
+  expect_equal(res$AOV.F[1], 4.3420586)
+  expect_equal(res$AOV.P[1], 0.061298422)
+
+
+  res <- get_aov(adsl, "AGE", c("SEX", "ARM"), output = FALSE)
+
+
+  res
+
+  # proc_print(res)
+
+  expect_equal(res$AOV.F[1], 4.3420586)
+  expect_equal(res$AOV.P[1], 0.061298422)
+
+
+})
+
 
 #
 # # Matches SAS?

@@ -877,54 +877,125 @@ test_that("means39: label works.", {
 })
 
 
-test_that("means40: aov statistic works.", {
+test_that("means43: aov statistic option works.", {
 
-  var1 <- c("Age", "PresentScore", "TasteScore")
-  var2 <- c("n", "min", "max", "mean", "std", "aov")
-
-  res <- proc_means(datm, var = var1,
-                    stats = var2,
-                    titles = "My first title for Means",
-                    out = out())
-
-  res
-
-  expect_equal(1, 1)
-
-})
-
-
-test_that("means41: aov statistic works with class.", {
-
-  var1 <- c("Age", "PresentScore", "TasteScore")
-  var2 <- c("n", "min", "max", "mean", "std", "aov")
+  var1 <- c("Age")
+  var2 <- c("n", "min", "max", "mean", "std")
 
   res <- proc_means(datm, var = var1,
                     stats = var2,
-                    class = Layers,
+                    class = v(Flavor),
+                    options = opts(aov = TRUE),
                     titles = "My first title for Means",
-                    out = out())
+                    out = out(report = TRUE))
 
   res
 
-  expect_equal(1, 1)
+  expect_equal(length(res), 2)
+  expect_equal(nrow(res[[1]]), 4)
+  expect_equal(nrow(res[[2]]), 2)
 
 })
 
+test_that("means44: aov statistic option with by works.", {
 
-test_that("means41: aov statistic works with by.", {
-
-  var1 <- c("Age", "PresentScore", "TasteScore")
-  var2 <- c("n", "min", "max", "mean", "std", "aov")
+  var1 <- c("Age")
+  var2 <- c("n", "min", "max", "mean", "std")
 
   res <- proc_means(datm, var = var1,
                     stats = var2,
                     by = Layers,
+                    class = Flavor,
+                    options = opts(aov = TRUE),
                     titles = "My first title for Means",
-                    out = out())
+                    out = out(report = TRUE))
 
   res
+  # print(res)
 
-  expect_equal(1, 1)
+  expect_equal(length(res), 6)
+  expect_equal(nrow(res[[1]]), 2)
+  expect_equal(nrow(res[[2]]), 2)
+
+  expect_equal(nrow(res[[3]]), 4)
+  expect_equal(nrow(res[[4]]), 2)
+
+  expect_equal(nrow(res[[5]]), 3)
+  expect_equal(nrow(res[[6]]), 1)
+
 
 })
+
+
+
+
+
+# test_that("means45: aov statistic works.", {
+#
+#   var1 <- c("Age", "PresentScore", "TasteScore")
+#   var2 <- c("n", "min", "max", "mean", "std", "aov")
+#
+#   res <- proc_means(datm, var = var1,
+#                     stats = var2,
+#                     titles = "My first title for Means",
+#                     out = out())
+#
+#   res
+#
+#   expect_equal(1, 1)
+#
+# })
+#
+#
+# test_that("means46: aov statistic works with class.", {
+#
+#   var1 <- c("Age", "PresentScore", "TasteScore")
+#   var2 <- c("n", "min", "max", "mean", "std", "aov")
+#
+#   res <- proc_means(datm, var = var1,
+#                     stats = var2,
+#                     class = Layers,
+#                     titles = "My first title for Means",
+#                     out = out())
+#
+#   res
+#
+#   expect_equal(1, 1)
+#
+# })
+#
+#
+# test_that("means47: aov statistic works with by.", {
+#
+#   var1 <- c("Age", "PresentScore", "TasteScore")
+#   var2 <- c("n", "min", "max", "mean", "std", "aov")
+#
+#   res <- proc_means(datm, var = var1,
+#                     stats = var2,
+#                     by = Layers,
+#                     titles = "My first title for Means",
+#                     out = out())
+#
+#   res
+#
+#   expect_equal(1, 1)
+#
+# })
+#
+#
+#
+# test_that("means48: aov statistic on output works.", {
+#
+#
+#   res <- proc_means(datm, var = var1,
+#                     class = Layers,
+#                     titles = "My first title for Means",
+#                     out1 = out(stats = var2),
+#                     out2 = out(stats = "aov"))
+#
+#   res
+#
+#   expect_equal(1, 1)
+#
+# })
+

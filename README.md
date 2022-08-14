@@ -15,13 +15,12 @@
 The purpose of the **procs** package is to recreate some SAS® statistical
 procedures in R.  The first version of the package will attempt to recreate
 PROC FREQ and PROC MEANS. 
-Subsequent versions of the package will add additional options
-to these two procedures.  
+Subsequent versions of the package will add more statistical procedures.  
 
-This first version of the package will also include a recreation of PROC TRANSPOSE,
+The package will also include a recreation of PROC TRANSPOSE,
 PROC SORT, and PROC COMPARE.
 The reason these procedures are included is because they are frequently used
-in conjunction with PROC FREQ and PROC MEANS to prepare data for reporting.  
+in conjunction with the statistical procedures to prepare results for reporting.  
 
 There are three motivations for recreating SAS® statistical procedures in R:
 

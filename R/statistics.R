@@ -1,6 +1,74 @@
 
 # Custom Statistics Functions ---------------------------------------------
 
+#' @import stats
+get_aov <- function(data, var1, byvars, wgt = NULL,
+                    bylbl = NULL, output = FALSE) {
+
+
+  bv <- paste(byvars, sep = "", collapse = "+")
+
+  if (is.null(wgt)) {
+    res <- aov(as.formula(paste(var1, "~", bv)),
+               data = data, weights = wgt)
+    ret <- summary(res)[[1]]
+
+  } else {
+
+    res <- aov(as.formula(paste(var1, "~", bv)), data = data)
+
+    ret <- summary(res)[[1]]
+
+  }
+
+
+  nms <- c("AOV.DF", "AOV.SUMSQ", "AOV.MEANSQ", "AOV.F", "AOV.P")
+  if (ncol(ret) != length(nms))
+    nms <- nms[seq(1, ncol(ret))]
+
+  if (output) {
+
+    ret <- as.data.frame(ret[1, ])
+    names(ret) <- nms
+    rownames(ret) <- NULL
+
+
+  } else {
+
+    lbls <- names(ret)
+    ret <- data.frame(NAME = rownames(ret), ret)
+
+
+    names(ret) <- c("NAME", nms)
+    rownames(ret) <- NULL
+    lblsl <- as.list(c("Name", lbls))
+    names(lblsl) <- c("NAME", nms)
+    labels(ret) <- lblsl
+
+
+
+    spns <- list()
+    if (!is.null(bylbl)) {
+      spns[[1]] <- span(1, ncol(ret),
+                        bylbl,
+                        level = 1)
+    }
+
+    spns[[length(spns) + 1]] <- span(1, ncol(ret),
+                      paste0("Analysis Of Variance - ", var1),
+                      level = length(spns) + 1)
+
+    attr(ret, "spans") <- spns
+
+    formats(ret) <- list(AOV.SUMSQ = "%.4f",
+                         AOV.MEANSQ = "%.4f",
+                         AOV.F = "%.4f",
+                         AOV.P = "%.4f")
+
+  }
+
+  return(ret)
+}
 
 
 #' Include missing values

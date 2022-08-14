@@ -1286,7 +1286,6 @@ test_that("freq48: oneway output stacked works.", {
 # })
 
 
-# This is huge
 test_that("freq50: chisq output statistics works.", {
 
 
@@ -1299,8 +1298,7 @@ test_that("freq50: chisq output statistics works.", {
                    options = opts(chisq = TRUE),
                    out5 = out(table = "internship * enrollment",
                               stats = c("n", "cnt", "pct", "chisq")),
-                   out6 = out(stats = "chisq")
-  )
+                   out6 = out(stats = "chisq"))
 
 
   res

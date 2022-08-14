@@ -52,7 +52,7 @@
 #' "p95", "p99", "qrange", "aov". You may
 #' pass unquoted variable names to this parameter using the \code{\link{v}}
 #' function.
-# @param weight An optional weight parameter.
+#' @param weight An optional weight parameter.
 #' @param view Whether to display the report in the interactive viewer.  Valid
 #' values are TRUE and FALSE.  Default is TRUE.
 #' @param titles A vector of one or more titles to use for the report output.
@@ -83,7 +83,7 @@ proc_means <- function(data,
                        var = NULL,
                        stats = c("n", "mean", "std", "min", "max"),
               #        ways = NULL,   # Hold off for now
-              #         weight = NULL,
+                       weight = NULL,
                        view = TRUE,
                        titles = NULL,
                        options = NULL,
@@ -188,7 +188,8 @@ proc_means <- function(data,
   if (view == TRUE | rptflg) {
     rptres <- gen_report_means(data, by = by, var = var, class = class,
                             stats = stats, view = view,
-                            titles = titles)
+                            titles = titles, weight = weight,
+                            options = options)
   }
 
   # Get output
@@ -636,7 +637,8 @@ gen_report_means <- function(data,
                             class = NULL,
                             var = NULL,
                             stats = c("n", "mean", "std", "min", "max"),
-                            # weight = NULL,
+                            weight = NULL,
+                            options = NULL,
                             view = TRUE,
                             titles = NULL) {
 
@@ -689,7 +691,20 @@ gen_report_means <- function(data,
     outp <- out(stats = stats, shape = "wide")
     smtbl <- get_class(dt, var, class, outp, freq = FALSE)
 
-    # Calculate summary statistics
+    aov <- NULL
+    # Get aov if requested
+    if (get_option(options, "aov", FALSE) & !is.null(class)) {
+
+      bylbl <- NULL
+      if (!is.null(by))
+        bylbl <- bylbls[j]
+
+      if (is.null(weight))
+        aov <- get_aov(dt, var, class, bylbl = bylbl )
+      else
+        aov <- get_aov(dt, var, class, weight, bylbl = bylbl)
+
+    }
     #smtbl <- get_summaries(dt, var, stats, missing)
 
 
@@ -715,17 +730,27 @@ gen_report_means <- function(data,
 
     }
 
+    # Assign labels
+    labels(smtbl) <- mlbls
+
     # Convert to tibble if incoming data is a tibble
-    if ("tbl_df" %in% class(data))
+    if ("tbl_df" %in% class(data)) {
       res[[nm]] <- as_tibble(smtbl)
-    else
+      if (!is.null(aov)) {
+
+        res[[paste0(nm, " aov")]] <- as_tibble(aov)
+      }
+    } else {
       res[[nm]] <- smtbl
 
+      if (!is.null(aov)) {
+        res[[paste0(nm, " aov")]] <- as_tibble(aov)
+      }
+    }
 
-    labels(res[[nm]]) <- mlbls
+
+
   }
-
-
 
   gv <- options("procs.view")[[1]]
   if (is.null(gv))

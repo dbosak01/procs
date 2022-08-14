@@ -11,6 +11,7 @@ proc_means(
   class = NULL,
   var = NULL,
   stats = c("n", "mean", "std", "min", "max"),
+  weight = NULL,
   view = TRUE,
   titles = NULL,
   options = NULL,
@@ -40,6 +41,8 @@ keywords are: "css", "clm", "cv", "n", "lclm", "mean", "median", "mode",
 "p95", "p99", "qrange", "aov". You may
 pass unquoted variable names to this parameter using the \code{\link{v}}
 function.}
+
+\item{weight}{An optional weight parameter.}
 
 \item{view}{Whether to display the report in the interactive viewer.  Valid
 values are TRUE and FALSE.  Default is TRUE.}
