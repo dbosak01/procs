@@ -9,6 +9,7 @@ articles:
   - procs-transpose
   - procs-sort
   - procs-compare
+  - procs-print
   - procs-example1
 
 reference:
@@ -20,6 +21,13 @@ reference:
   - proc_transpose
   - proc_sort
   - proc_compare
+  - proc_print
+
+- titles: Supporting Functions
+  desc: Functions that support procedure calls.
+  contents:
+  - out
+  - opts
 
 navbar:
   type: inverse

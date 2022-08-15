@@ -23,7 +23,7 @@ than existing R statistical functions.
 
 ### Key Functions
 
-The package includes the following major functions:
+The package includes the following procedure functions:
 
 * `proc_freq()`: A function to simulate the FREQ procedure.
 * `proc_means()`: A function to simulate the MEANS or SUMMARY procedure.
@@ -32,6 +32,8 @@ TRANSPOSE procedure.
 * `proc_sort()`: A function to sort and dedupe datasets.
 * `proc_compare()`: A function to compare two datasets and report on 
 the differences between them.
+* `proc_print()`: A quick-print function to send procedure results to the viewer
+or a report.
 
 
 ### How to Use
@@ -47,7 +49,6 @@ similar to SAS® PROC FREQ.
 
 ```{r eval=FALSE, echo=TRUE} 
 library(procs)
-library(fmtr)
 
 dt <- as.data.frame(HairEyeColor, stringsAsFactors = FALSE)
 
@@ -56,16 +57,45 @@ labels(dt) <- list(Hair = "Hair Color",
 
 res <- proc_freq(dt, tables = c("Hair", "Eye", "Hair * Eye"),
                  weight = "Freq",
-                 titles = "Hair and Eye Frequency Statistics")
+                 options = opts(chisq = TRUE),
+                 titles = "Hair and Eye Frequency Statistics",
+                 out1 = out(table = "Hair * Eye"),
+                 out2 = out(table = "Hair * Eye", stats = "chisq"))
 
 ```
 By default, the following report will be shown in the viewer:
 <img src="../man/images/freq1.png"/>
 
-Also note that the `proc_freq()` function returned a list of data frames
-in the variable 'res'.  This variable contains the 
-results of the analysis, and the data values within these data frames are
-un-rounded.  This data can be used in additional analysis or for custom reporting.
+Also note that the `proc_freq()` function returned a list of two data frames
+in the variable 'res', according to the output requests. The value of 'res'
+is as follows:
+```{r eval=FALSE, echo=TRUE} 
+# View output datasets
+res
+# $out1
+#    VAR1 VAR2  CAT1  CAT2   N CNT        PCT CUMSUM     CUMPCT
+# 1  Hair  Eye Black  Blue 592  20  3.3783784     20   3.378378
+# 2  Hair  Eye Black Brown 592  68 11.4864865     88  14.864865
+# 3  Hair  Eye Black Green 592   5  0.8445946     93  15.709459
+# 4  Hair  Eye Black Hazel 592  15  2.5337838    108  18.243243
+# 5  Hair  Eye Blond  Blue 592  94 15.8783784    202  34.121622
+# 6  Hair  Eye Blond Brown 592   7  1.1824324    209  35.304054
+# 7  Hair  Eye Blond Green 592  16  2.7027027    225  38.006757
+# 8  Hair  Eye Blond Hazel 592  10  1.6891892    235  39.695946
+# 9  Hair  Eye Brown  Blue 592  84 14.1891892    319  53.885135
+# 10 Hair  Eye Brown Brown 592 119 20.1013514    438  73.986486
+# 11 Hair  Eye Brown Green 592  29  4.8986486    467  78.885135
+# 12 Hair  Eye Brown Hazel 592  54  9.1216216    521  88.006757
+# 13 Hair  Eye   Red  Blue 592  17  2.8716216    538  90.878378
+# 14 Hair  Eye   Red Brown 592  26  4.3918919    564  95.270270
+# 15 Hair  Eye   Red Green 592  14  2.3648649    578  97.635135
+# 16 Hair  Eye   Red Hazel 592  14  2.3648649    592 100.000000
+# 
+# $out2
+#   VAR1 VAR2    CHISQ CHISQ.DF      CHISQ.P
+# 1 Hair  Eye 138.2898        9 2.325287e-25
+
+```
 
 #### The `proc_means()` Function
 
@@ -78,12 +108,19 @@ some summary statistics on the frequencies using `proc_means()`:
 ```{r eval=FALSE, echo=TRUE} 
 library(procs)
 
-# Get Hair frequencies
-dt <- res$Hair
+dt <- as.data.frame(HairEyeColor, stringsAsFactors = FALSE)
+
+statlst <- c("n", "mean", "std", "median", "min", "max", "Q1", "Q3")
 
 # Perform calculations
-res2 <- proc_means(dt, var = "Frequency", 
-                   stats = c("n", "mean", "std", "min", "max"))
+res2 <- proc_means(dt, var = Freq, 
+                   stats = statlst,
+                   class = Sex,
+                   options = opts(aov = TRUE),
+                   titles = "Hair and Eye Summary Statistics by Sex",
+                   out1 = out(stats = statlst, 
+                              shape = "wide"))
+                   #out2 = out(stats = "aov"))
 
 # View the summary statistics
 res2
@@ -142,6 +179,9 @@ res3
 #### The `proc_compare()` Function
 
 
+#### The `proc_print()` Function
+
+
 ### Next Steps
 
 For next steps, please review the examples provided in the vignette articles. 
@@ -152,6 +192,7 @@ Those articles include:
 * [The Transpose Function](procs-transpose.html)
 * [The Sort Function](procs-sort.html)
 * [The Compare Function](procs-compare.html)
+* [The Print Function](procs-print.html)
 * [Package Validation](procs-validation.html)
 * [Complete Example](procs-example1.html)
 

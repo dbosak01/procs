@@ -284,10 +284,10 @@ test_that("transpose13: copy parameter works recycle smaller", {
   mns
 
   res <- proc_transpose(mns, var = c("N", "MEAN", "MEDIAN", "MIN", "MAX"),
-                        copy = "VAR", name = "Stat", id = "Flavor")
+                        copy = "VAR", name = "STAT", id = "CLASS")
 
   res
-  res <- res[, c("VAR", "Stat", "Chocolate", "Rum", "Spice", "Vanilla", "Total")]
+  res <- res[, c("VAR", "STAT", "Chocolate", "Rum", "Spice", "Vanilla", "Total")]
 
   res
 

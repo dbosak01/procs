@@ -1,6 +1,9 @@
 
 # Custom Statistics Functions ---------------------------------------------
 
+pfmt <- value(condition(x < .0001, "<.0001"),
+              condition(TRUE, "%.4f"))
+
 #' @import stats
 get_aov <- function(data, var1, byvars, wgt = NULL,
                     bylbl = NULL, output = FALSE) {
@@ -23,49 +26,73 @@ get_aov <- function(data, var1, byvars, wgt = NULL,
 
 
   nms <- c("AOV.DF", "AOV.SUMSQ", "AOV.MEANSQ", "AOV.F", "AOV.P")
-  if (ncol(ret) != length(nms))
-    nms <- nms[seq(1, ncol(ret))]
 
+
+  # if (length(class) == 1) {
+  #   cdf <- data.frame("CLASS" = rownames(ret), stringsAsFactors = FALSE)
+  # } else {
+  #   clslst <- list()
+  #   for(cls in class) {
+  #     clslst[[length(clslst) + 1]] <- cls
+  #
+  #   }
+  #   names(clslst) <- paste0("CLASS", seq(1, length(class)))
+  #   cdf <- as.data.frame(clslst)
+  #
+  # }
+
+
+
+  lbls <- names(ret)
   if (output) {
 
-    ret <- as.data.frame(ret[1, ])
-    names(ret) <- nms
+    if (ncol(ret) == 3) {
+      ret <- data.frame("VAR" = var1, "CLASS" = trimws(rownames(ret)), ret,
+                        AOV.F = NA, AOV.P = NA,
+                        stringsAsFactors = FALSE)
+    } else {
+      ret <- data.frame("VAR" = var1, "CLASS" = trimws(rownames(ret)), ret,
+                        stringsAsFactors = FALSE)
+    }
+    names(ret) <- c("VAR", "CLASS", nms)
     rownames(ret) <- NULL
-
+    lblsl <- as.list(c("Variable", "Class", lbls))
+    names(lblsl) <- c("VAR", "CLASS", nms)
+    labels(ret) <- lblsl
 
   } else {
 
-    lbls <- names(ret)
-    ret <- data.frame(NAME = rownames(ret), ret)
+    if (ncol(ret) == length(nms))
+      nms <- nms[seq(1, ncol(ret))]
 
-
-    names(ret) <- c("NAME", nms)
+    ret <- data.frame("CLASS" = trimws(rownames(ret)), ret, stringsAsFactors = FALSE)
+    names(ret) <- c("CLASS", nms)
     rownames(ret) <- NULL
-    lblsl <- as.list(c("Name", lbls))
-    names(lblsl) <- c("NAME", nms)
+    lblsl <- as.list(c("Class", lbls))
+    names(lblsl) <- c("CLASS", nms)
     labels(ret) <- lblsl
 
-
-
-    spns <- list()
-    if (!is.null(bylbl)) {
-      spns[[1]] <- span(1, ncol(ret),
-                        bylbl,
-                        level = 1)
-    }
-
-    spns[[length(spns) + 1]] <- span(1, ncol(ret),
-                      paste0("Analysis Of Variance - ", var1),
-                      level = length(spns) + 1)
-
-    attr(ret, "spans") <- spns
-
-    formats(ret) <- list(AOV.SUMSQ = "%.4f",
-                         AOV.MEANSQ = "%.4f",
-                         AOV.F = "%.4f",
-                         AOV.P = "%.4f")
-
   }
+
+  spns <- list()
+  if (!is.null(bylbl)) {
+    spns[[1]] <- span(1, ncol(ret),
+                      bylbl,
+                      level = 1)
+  }
+
+  spns[[length(spns) + 1]] <- span(1, ncol(ret),
+                    paste0("Analysis Of Variance - ", var1),
+                    level = length(spns) + 1)
+
+  attr(ret, "spans") <- spns
+
+  formats(ret) <- list(AOV.SUMSQ = "%.4f",
+                       AOV.MEANSQ = "%.4f",
+                       AOV.F = pfmt,
+                       AOV.P = pfmt)
+
+
 
   return(ret)
 }
@@ -208,7 +235,9 @@ get_chisq <- function(x, y, wgt = NULL, corrct = FALSE, bylbl = "", output = FAL
 
     ret <- data.frame(Measure = mes, Value = val, stringsAsFactors = FALSE)
 
-    attr(ret$Value, "format") <- "%.4f"
+    fmt <- flist("%.4f", "%d", pfmt, type = "row")
+
+    attr(ret$Value, "format") <- fmt
 
 
     spn <- list(span(1, 2, paste0(bylbl, "Chi-Square Test"), level = 1))

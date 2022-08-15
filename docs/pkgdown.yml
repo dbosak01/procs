@@ -7,11 +7,12 @@ articles:
   procs-faq: procs-faq.html
   procs-freq: procs-freq.html
   procs-means: procs-means.html
+  procs-print: procs-print.html
   procs-sort: procs-sort.html
   procs-transpose: procs-transpose.html
   procs-validation: procs-validation.html
   procs: procs.html
-last_built: 2022-08-14T19:38Z
+last_built: 2022-08-14T22:06Z
 urls:
   reference: https://procs.r-sassy.org/reference
   article: https://procs.r-sassy.org/articles

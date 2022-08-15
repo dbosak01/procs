@@ -266,7 +266,7 @@ get_output_specs_means <- function(outs, stats) {
 
 
 get_output <- function(data, var, stats, missing = FALSE,
-                             shape = "long", type = NULL, freq = FALSE,
+                             shape = "wide", type = NULL, freq = FALSE,
                              by = NULL, class = NULL) {
 
   if (is.null(stats))
@@ -283,22 +283,49 @@ get_output <- function(data, var, stats, missing = FALSE,
     ret <- cbind(data.frame(TYPE = type), ret)
 
   if (!is.null(class)) {
+
+    # Create a new vector of class names and values
+    cv <- class
+
+    if (length(cv) == 1)
+      cnms <- "CLASS"
+    else
+      cnms <- paste0("CLASS", seq(1, length(cv)))
+
+    names(cv) <- cnms
+
+    # Put class names and values in a list so it
+    # can be easily turned into a data frame.
     tmp <- list()
-    for(nm in names(class)) {
-      tmp[[nm]] <- class[nm]
+    for(nm in cnms) {
+      tmp[[nm]] <- cv[nm]
     }
 
+    # Convert to data frame
     df <- as.data.frame(tmp, stringsAsFactors = FALSE)
 
+    # Clear out rownames
     rownames(df) <- NULL
 
+    # Bind class columns to statistics
     ret <- cbind(df, ret)
   }
 
   if (!is.null(by)) {
+
+    # Create a new vector of class names and values
+    bv <- by
+
+    if (length(bv) == 1)
+      bnms <- "BY"
+    else
+      bnms <- paste0("BY", seq(1, length(bv)))
+
+    names(bv) <- bnms
+
     tmp <- list()
-    for(nm in names(by)) {
-      tmp[[nm]] <- by[nm]
+    for(nm in names(bv)) {
+      tmp[[nm]] <- bv[nm]
     }
 
     df <- as.data.frame(tmp, stringsAsFactors = FALSE)
@@ -778,15 +805,11 @@ gen_report_means <- function(data,
 #' @import fmtr
 #' @import common
 gen_output_means <- function(data,
-                            by = NULL,
-                            class = NULL,
-                            #         class_options = NULL,
-                            var = NULL,
-                            #         weight = NULL,
-                            #         weight_options = NULL,
-                            output = NULL
-                            # missing = FALSE
-                            ) {
+                             by = NULL,
+                             class = NULL,
+                             var = NULL,
+                             weight = NULL,
+                             output = NULL) {
 
   res <- list()
   if (length(output) > 0) {
@@ -848,31 +871,75 @@ gen_output_means <- function(data,
           names(bynm) <- byn
         }
 
-        # Always add type 0
-        tmpby <- get_output(dat, var = var,
-                             by = bynm,
-                             class = cls,
-                             stats = outp$stats,
-                             shape = outp$shape,
-                             freq = frq,
-                             type = tp)
+        if (!all(outp$stats == "aov")) {
+          # Always add type 0
+          tmpby <- get_output(dat, var = var,
+                               by = bynm,
+                               class = cls,
+                               stats = outp$stats,
+                               shape = outp$shape,
+                               freq = frq,
+                               type = tp)
 
-        if (is.null(tmpres))
-          tmpres <- tmpby
-        else
-          tmpres <- rbind(tmpres, tmpby)
-
+          if (is.null(tmpres))
+            tmpres <- tmpby
+          else
+            tmpres <- rbind(tmpres, tmpby)
+        }
 
         if (!is.null(class)) {
 
           if (!is.null(tp))
             tp <- 1
 
-          tmpcls <- get_class(dat, var = var,
-                              class = class, outp = outp,
-                              freq = frq, type = tp, byvals = bynm)
+          if (all(outp$stats == "aov")) {
 
-          tmpres <- rbind(tmpres, tmpcls)
+
+            bylbl <- NULL
+            if (!is.null(by))
+              bylbl <- bylbls[j]
+
+            for (vr in var) {
+              if (is.null(weight)) {
+                tmpaov <- get_aov(dat, vr, class, bylbl = bylbl, output = TRUE)
+              } else {
+                tmpaov <- get_aov(dat, vr, class, weight, bylbl = bylbl,
+                                  output = TRUE)
+              }
+
+              tmpres <- rbind(tmpres, tmpaov)
+
+            }
+
+          } else {
+            tmpcls <- get_class(dat, var = var,
+                                class = class, outp = outp,
+                                freq = frq, type = tp, byvals = bynm)
+
+            if (any(outp$stats == "aov")) {
+
+              # Append aov stats here
+              bylbl <- NULL
+              if (!is.null(by))
+                bylbl <- bylbls[j]
+
+              for (vr in var) {
+                if (is.null(weight)) {
+                  tmpaov <- get_aov(dat, vr, class, bylbl = bylbl, output = TRUE)
+                } else {
+                  tmpaov <- get_aov(dat, vr, class, weight, bylbl = bylbl,
+                                    output = TRUE)
+                }
+
+                tmpcls <- cbind(tmpcls, tmpaov)
+
+              }
+
+
+            }
+
+            tmpres <- rbind(tmpres, tmpcls)
+          }
 
         }
 
@@ -914,6 +981,9 @@ gen_output_means <- function(data,
       # Formats
       if (!is.null(outp$format))
         formats(tmpres) <- outp$format
+
+      # Reset rownames
+      rownames(tmpres) <- NULL
 
       res[[nms[i]]]  <- tmpres
 

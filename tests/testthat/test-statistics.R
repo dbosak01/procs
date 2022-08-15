@@ -204,7 +204,7 @@ test_that("stat11: aov works with 2 classes without weight", {
 
   res <- get_aov(adsl, "AGE", c("SEX", "ARM"), output = TRUE)
 
-
+  res
   expect_equal(res$AOV.F[1], 4.3420586)
   expect_equal(res$AOV.P[1], 0.061298422)
 
@@ -221,6 +221,8 @@ test_that("stat11: aov works with 2 classes without weight", {
 
 
 })
+
+
 
 
 #
