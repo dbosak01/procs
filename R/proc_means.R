@@ -264,7 +264,9 @@ get_output_specs_means <- function(outs, stats) {
 }
 
 
-
+# Purpose of this function is to prepare data for output.
+# It will append the by, class, type, and freq columns to the subset df.
+# These subsets will get stacked up in the driver function.
 get_output <- function(data, var, stats, missing = FALSE,
                              shape = "wide", type = NULL, freq = FALSE,
                              by = NULL, class = NULL) {
@@ -338,6 +340,7 @@ get_output <- function(data, var, stats, missing = FALSE,
   return(ret)
 }
 
+# This is where most of the summary statistics get calculated.
 get_summaries <- function(data, var, stats, missing = FALSE,
                           shape = "wide") {
 
@@ -758,7 +761,21 @@ gen_report_means <- function(data,
     }
 
     # Assign labels
-    labels(smtbl) <- mlbls
+    if (is.null(class))
+      labels(smtbl) <- mlbls
+    else {
+
+      cv <- class
+      if (length(class) == 1)
+        cnms <- "CLASS"
+      else
+        cnms <- paste0("CLASS", seq(1, length(class)))
+
+      names(cv) <- cnms
+
+      labels(smtbl) <- append(as.list(cv), mlbls)
+
+    }
 
     # Convert to tibble if incoming data is a tibble
     if ("tbl_df" %in% class(data)) {
@@ -973,6 +990,20 @@ gen_output_means <- function(data,
 
       # System Labels
       labels(tmpres) <- append(mlbls, bylbls)
+
+      # Class labels
+      clbls <- NULL
+      if (!is.null(class)) {
+        if (length(class) == 1)
+          cnms <- "CLASS"
+        else {
+          cnms <- paste0("CLASS", seq(1, length(class)))
+        }
+        clbls <- as.list(class)
+        names(clbls) <- cnms
+
+        labels(tmpres) <- clbls
+      }
 
       # User labels
       if (!is.null(outp$label))
