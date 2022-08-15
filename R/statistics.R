@@ -6,7 +6,7 @@ pfmt <- value(condition(x < .0001, "<.0001"),
 
 #' @import stats
 get_aov <- function(data, var1, byvars, wgt = NULL,
-                    bylbl = NULL, output = FALSE) {
+                    bylbl = NULL, output = FALSE, resid = TRUE) {
 
 
   bv <- paste(byvars, sep = "", collapse = "+")
@@ -55,6 +55,11 @@ get_aov <- function(data, var1, byvars, wgt = NULL,
                         stringsAsFactors = FALSE)
     }
     names(ret) <- c("VAR", "CLASS", nms)
+
+    if (resid == FALSE) {
+      ret <- subset(ret, CLASS != "Residuals")
+    }
+
     rownames(ret) <- NULL
     lblsl <- as.list(c("Variable", "Class", lbls))
     names(lblsl) <- c("VAR", "CLASS", nms)
@@ -66,7 +71,13 @@ get_aov <- function(data, var1, byvars, wgt = NULL,
       nms <- nms[seq(1, ncol(ret))]
 
     ret <- data.frame("CLASS" = trimws(rownames(ret)), ret, stringsAsFactors = FALSE)
+
     names(ret) <- c("CLASS", nms)
+
+    if (resid == FALSE) {
+      ret <- subset(ret, CLASS != "Residuals")
+    }
+
     rownames(ret) <- NULL
     lblsl <- as.list(c("Class", lbls))
     names(lblsl) <- c("CLASS", nms)

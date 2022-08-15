@@ -629,14 +629,28 @@ get_summaries <- function(data, var, stats, missing = FALSE,
   }
 
   if (!is.null(shape)) {
+    ret <- shape_means_data(ret, shape)
+  }
+
+
+  return(ret)
+
+}
+
+shape_means_data <- function(ds, shape, copy = NULL) {
+
+  # Assumed to be wide
+  ret <- ds
+
+  if (!is.null(shape)) {
     if (all(shape == "long")) {
 
-      ret <- proc_transpose(ret, id = "VAR", name = "STAT", )
+      ret <- proc_transpose(ret, id = "VAR", name = "STAT", copy = copy)
 
 
     } else if (all(shape == "stacked")) {
 
-      ret <- proc_transpose(ret, name = "STAT", by = "VAR")
+      ret <- proc_transpose(ret, name = "STAT", by = "VAR", copy = copy)
 
       rnms <- names(ret)
       rnms[rnms %in% "COL1"] <- "VALUES"
@@ -645,7 +659,6 @@ get_summaries <- function(data, var, stats, missing = FALSE,
 
     }
   }
-
 
   return(ret)
 
@@ -928,38 +941,40 @@ gen_output_means <- function(data,
 
             }
 
+          } else if (any(outp$stats == "aov")) {
+
+              tmpcls <- get_class(dat, var = var,
+                                  class = class, outp = outp,
+                                  freq = frq, type = tp, byvals = bynm)
+
+              # # Append aov stats here
+              # bylbl <- NULL
+              # if (!is.null(by))
+              #   bylbl <- bylbls[j]
+              #
+              # for (vr in var) {
+              #   if (is.null(weight)) {
+              #     tmpaov <- get_aov(dat, vr, class, bylbl = bylbl, output = TRUE)
+              #   } else {
+              #     tmpaov <- get_aov(dat, vr, class, weight, bylbl = bylbl,
+              #                       output = TRUE)
+              #   }
+              #
+              #   tmpcls <- cbind(tmpcls, tmpaov)
+              #
+              # }
+              #
+              tmpres <- rbind(tmpres, tmpcls)
+
+
           } else {
             tmpcls <- get_class(dat, var = var,
                                 class = class, outp = outp,
                                 freq = frq, type = tp, byvals = bynm)
 
-            if (any(outp$stats == "aov")) {
-
-              # Append aov stats here
-              bylbl <- NULL
-              if (!is.null(by))
-                bylbl <- bylbls[j]
-
-              for (vr in var) {
-                if (is.null(weight)) {
-                  tmpaov <- get_aov(dat, vr, class, bylbl = bylbl, output = TRUE)
-                } else {
-                  tmpaov <- get_aov(dat, vr, class, weight, bylbl = bylbl,
-                                    output = TRUE)
-                }
-
-                tmpcls <- cbind(tmpcls, tmpaov)
-
-              }
-
-
-            }
-
             tmpres <- rbind(tmpres, tmpcls)
           }
-
         }
-
       }
 
       # Where
@@ -1031,10 +1046,11 @@ gen_output_means <- function(data,
 
 
 get_class <- function(data, var, class, outp, freq = TRUE,
-                      type = NULL, byvals = NULL) {
+                      type = NULL, byvals = NULL, weight = NULL) {
 
 
   res <- NULL
+  aovds <- NULL
 
   clslist <- list(data)
   cnms <- NULL
@@ -1047,7 +1063,30 @@ get_class <- function(data, var, class, outp, freq = TRUE,
       cnms <- class
 
     }
+
+    # Append aov stats here
+    # AOV requires all the class variables, therefore
+    # they can't be calculated in get_summaries.
+    if (any("aov" %in% outp$stats)) {
+      for (vr in var) {
+        if (is.null(weight)) {
+          tmpaov <- get_aov(data, vr, class, bylbl = byvals,
+                            output = TRUE, resid = FALSE)
+        } else {
+          tmpaov <- get_aov(data, vr, class, weight, bylbl = byvals,
+                            output = TRUE, resid = FALSE)
+        }
+
+        if (is.null(aovds))
+          aovds <- tmpaov
+        else
+          aovds <- rbind(aovds, tmpaov)
+
+      }
+    }
   }
+
+
 
 
   for (k in seq_len(length(clslist))) {
@@ -1059,13 +1098,40 @@ get_class <- function(data, var, class, outp, freq = TRUE,
 
     }
 
-    tmpres <- get_output(clslist[[k]], var = var,
-                         by = byvals,
-                         class = cnmv,
-                         stats = outp$stats,
-                         shape = outp$shape,
-                         freq = freq,
-                         type = type)
+    if (!is.null(aovds)) {
+
+      tmpres <- get_output(clslist[[k]], var = var,
+                           by = byvals,
+                           class = cnmv,
+                           stats = outp$stats,
+                           shape = "wide",
+                           freq = freq,
+                           type = type)
+
+      tmpres <- cbind(tmpres, aovds[ , c("AOV.DF", "AOV.SUMSQ",
+                                         "AOV.MEANSQ", "AOV.F", "AOV.P")])
+
+      cpvars <- c("CLASS")
+      if (!is.null(type))
+        cpvars[length(cpvars) + 1] <- "TYPE"
+
+      if (freq == TRUE)
+        cpvars[length(cpvars) + 1] <- "FREQ"
+
+      tmpres <- shape_means_data(tmpres, outp$shape, cpvars)
+
+
+    } else {
+      tmpres <- get_output(clslist[[k]], var = var,
+                           by = byvals,
+                           class = cnmv,
+                           stats = outp$stats,
+                           shape = outp$shape,
+                           freq = freq,
+                           type = type)
+    }
+
+
 
     if (!is.null(res))
       res <- rbind(res, tmpres)

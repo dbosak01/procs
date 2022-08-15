@@ -131,7 +131,7 @@ provide much nicer output than existing R statistical functions.</p>
 <div id="key-functions" class="section level3">
 <h3 class="hasAnchor">
 <a href="#key-functions" class="anchor"></a>Key Functions</h3>
-<p>The package includes the following major functions:</p>
+<p>The package includes the following procedure functions:</p>
 <ul>
 <li>
 <code><a href="../reference/proc_freq.html">proc_freq()</a></code>: A function to simulate the FREQ
@@ -148,6 +148,9 @@ datasets.</li>
 <li>
 <code><a href="../reference/proc_compare.html">proc_compare()</a></code>: A function to compare two datasets and
 report on the differences between them.</li>
+<li>
+<code><a href="../reference/proc_print.html">proc_print()</a></code>: A quick-print function to send procedure
+results to the viewer or a report.</li>
 </ul>
 </div>
 <div id="how-to-use" class="section level3">
@@ -162,7 +165,6 @@ the above three functions:</p>
 in a manner similar to SAS® PROC FREQ.</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://procs.r-sassy.org">procs</a></span><span class="op">)</span></span>
-<span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://fmtr.r-sassy.org">fmtr</a></span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">dt</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/as.data.frame.html">as.data.frame</a></span><span class="op">(</span><span class="va">HairEyeColor</span>, stringsAsFactors <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
 <span></span>
@@ -171,14 +173,40 @@ in a manner similar to SAS® PROC FREQ.</p>
 <span></span>
 <span><span class="va">res</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/proc_freq.html">proc_freq</a></span><span class="op">(</span><span class="va">dt</span>, tables <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"Hair"</span>, <span class="st">"Eye"</span>, <span class="st">"Hair * Eye"</span><span class="op">)</span>,</span>
 <span>                 weight <span class="op">=</span> <span class="st">"Freq"</span>,</span>
-<span>                 titles <span class="op">=</span> <span class="st">"Hair and Eye Frequency Statistics"</span><span class="op">)</span></span></code></pre></div>
+<span>                 options <span class="op">=</span> <span class="fu"><a href="../reference/opts.html">opts</a></span><span class="op">(</span>chisq <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>,</span>
+<span>                 titles <span class="op">=</span> <span class="st">"Hair and Eye Frequency Statistics"</span>,</span>
+<span>                 out1 <span class="op">=</span> <span class="fu"><a href="../reference/out.html">out</a></span><span class="op">(</span>table <span class="op">=</span> <span class="st">"Hair * Eye"</span><span class="op">)</span>,</span>
+<span>                 out2 <span class="op">=</span> <span class="fu"><a href="../reference/out.html">out</a></span><span class="op">(</span>table <span class="op">=</span> <span class="st">"Hair * Eye"</span>, stats <span class="op">=</span> <span class="st">"chisq"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <p>By default, the following report will be shown in the viewer:
 <img src="../man/images/freq1.png"></p>
 <p>Also note that the <code><a href="../reference/proc_freq.html">proc_freq()</a></code> function returned a list
-of data frames in the variable ‘res’. This variable contains the results
-of the analysis, and the data values within these data frames are
-un-rounded. This data can be used in additional analysis or for custom
-reporting.</p>
+of two data frames in the variable ‘res’, according to the output
+requests. The value of ‘res’ is as follows:</p>
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># View output datasets</span></span>
+<span><span class="va">res</span></span>
+<span><span class="co"># $out1</span></span>
+<span><span class="co">#    VAR1 VAR2  CAT1  CAT2   N CNT        PCT CUMSUM     CUMPCT</span></span>
+<span><span class="co"># 1  Hair  Eye Black  Blue 592  20  3.3783784     20   3.378378</span></span>
+<span><span class="co"># 2  Hair  Eye Black Brown 592  68 11.4864865     88  14.864865</span></span>
+<span><span class="co"># 3  Hair  Eye Black Green 592   5  0.8445946     93  15.709459</span></span>
+<span><span class="co"># 4  Hair  Eye Black Hazel 592  15  2.5337838    108  18.243243</span></span>
+<span><span class="co"># 5  Hair  Eye Blond  Blue 592  94 15.8783784    202  34.121622</span></span>
+<span><span class="co"># 6  Hair  Eye Blond Brown 592   7  1.1824324    209  35.304054</span></span>
+<span><span class="co"># 7  Hair  Eye Blond Green 592  16  2.7027027    225  38.006757</span></span>
+<span><span class="co"># 8  Hair  Eye Blond Hazel 592  10  1.6891892    235  39.695946</span></span>
+<span><span class="co"># 9  Hair  Eye Brown  Blue 592  84 14.1891892    319  53.885135</span></span>
+<span><span class="co"># 10 Hair  Eye Brown Brown 592 119 20.1013514    438  73.986486</span></span>
+<span><span class="co"># 11 Hair  Eye Brown Green 592  29  4.8986486    467  78.885135</span></span>
+<span><span class="co"># 12 Hair  Eye Brown Hazel 592  54  9.1216216    521  88.006757</span></span>
+<span><span class="co"># 13 Hair  Eye   Red  Blue 592  17  2.8716216    538  90.878378</span></span>
+<span><span class="co"># 14 Hair  Eye   Red Brown 592  26  4.3918919    564  95.270270</span></span>
+<span><span class="co"># 15 Hair  Eye   Red Green 592  14  2.3648649    578  97.635135</span></span>
+<span><span class="co"># 16 Hair  Eye   Red Hazel 592  14  2.3648649    592 100.000000</span></span>
+<span><span class="co"># </span></span>
+<span><span class="co"># $out2</span></span>
+<span><span class="co">#   VAR1 VAR2    CHISQ CHISQ.DF      CHISQ.P</span></span>
+<span><span class="co"># 1 Hair  Eye 138.2898        9 2.325287e-25</span></span></code></pre></div>
 </div>
 <div id="the-proc_means-function" class="section level4">
 <h4 class="hasAnchor">
@@ -188,15 +216,22 @@ functionality to the SAS® PROC MEANS procedure.</p>
 <p>The below example takes the Hair frequencies calculated above and
 performs some summary statistics on the frequencies using
 <code><a href="../reference/proc_means.html">proc_means()</a></code>:</p>
-<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://procs.r-sassy.org">procs</a></span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># Get Hair frequencies</span></span>
-<span><span class="va">dt</span> <span class="op">&lt;-</span> <span class="va">res</span><span class="op">$</span><span class="va">Hair</span></span>
+<span><span class="va">dt</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/as.data.frame.html">as.data.frame</a></span><span class="op">(</span><span class="va">HairEyeColor</span>, stringsAsFactors <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">statlst</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"n"</span>, <span class="st">"mean"</span>, <span class="st">"std"</span>, <span class="st">"median"</span>, <span class="st">"min"</span>, <span class="st">"max"</span>, <span class="st">"Q1"</span>, <span class="st">"Q3"</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Perform calculations</span></span>
-<span><span class="va">res2</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/proc_means.html">proc_means</a></span><span class="op">(</span><span class="va">dt</span>, var <span class="op">=</span> <span class="st">"Frequency"</span>, </span>
-<span>                   stats <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"n"</span>, <span class="st">"mean"</span>, <span class="st">"std"</span>, <span class="st">"min"</span>, <span class="st">"max"</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="va">res2</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/proc_means.html">proc_means</a></span><span class="op">(</span><span class="va">dt</span>, var <span class="op">=</span> <span class="va">Freq</span>, </span>
+<span>                   stats <span class="op">=</span> <span class="va">statlst</span>,</span>
+<span>                   class <span class="op">=</span> <span class="va">Sex</span>,</span>
+<span>                   options <span class="op">=</span> <span class="fu"><a href="../reference/opts.html">opts</a></span><span class="op">(</span>aov <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>,</span>
+<span>                   titles <span class="op">=</span> <span class="st">"Hair and Eye Summary Statistics by Sex"</span>,</span>
+<span>                   out1 <span class="op">=</span> <span class="fu"><a href="../reference/out.html">out</a></span><span class="op">(</span>stats <span class="op">=</span> <span class="va">statlst</span>, </span>
+<span>                              shape <span class="op">=</span> <span class="st">"wide"</span><span class="op">)</span><span class="op">)</span></span>
+<span>                   <span class="co">#out2 = out(stats = "aov"))</span></span>
 <span></span>
 <span><span class="co"># View the summary statistics</span></span>
 <span><span class="va">res2</span></span>
@@ -220,7 +255,7 @@ R.</p>
 <p>The following example takes the “Hair” frequencies from the
 <code><a href="../reference/proc_freq.html">proc_freq()</a></code> example above, and transposes the rows and
 columns:</p>
-<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://procs.r-sassy.org">procs</a></span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Get Hair frequencies</span></span>
@@ -257,6 +292,10 @@ columns:</p>
 <h4 class="hasAnchor">
 <a href="#the-proc_compare-function" class="anchor"></a>The <code>proc_compare()</code> Function</h4>
 </div>
+<div id="the-proc_print-function" class="section level4">
+<h4 class="hasAnchor">
+<a href="#the-proc_print-function" class="anchor"></a>The <code>proc_print()</code> Function</h4>
+</div>
 </div>
 <div id="next-steps" class="section level3">
 <h3 class="hasAnchor">
@@ -269,6 +308,7 @@ articles. Those articles include:</p>
 <li><a href="procs-transpose.html">The Transpose Function</a></li>
 <li><a href="procs-sort.html">The Sort Function</a></li>
 <li><a href="procs-compare.html">The Compare Function</a></li>
+<li><a href="procs-print.html">The Print Function</a></li>
 <li><a href="procs-validation.html">Package Validation</a></li>
 <li><a href="procs-example1.html">Complete Example</a></li>
 </ul>

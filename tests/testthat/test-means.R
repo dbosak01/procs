@@ -987,11 +987,11 @@ test_that("means44: aov statistic on output works with two classes with where.",
 test_that("means46: aov statistic on stats works.", {
 
   var1 <- c("Age", "PresentScore", "TasteScore")
-  var2 <- c("n", "min", "max", "mean", "std")
+  var2 <- c("n", "min", "max", "mean", "std", "aov")
 
   res <- proc_means(datm, var = var1,
                     stats = var2,
-                    class = v(Layers, Flavor),
+                    class = Layers,
                     titles = "My first title for Means",
                     out = out())
 
