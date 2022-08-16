@@ -350,15 +350,62 @@ proc_freq <- function(data,
       res[[rptnm]] <- rptres
   }
 
-  # If only one dataset returned, remove list
-  if (length(res) == 1)
-    res <- res[[1]]
+  log_freq(data = data, by = by, tables = tables, options = options,
+           weight = weight, view = view, titles = titles, outcnt = length(res))
 
+
+  # If only one dataset returned, remove list
+  if (length(res) == 1) {
+    res <- res[[1]]
+  }
 
   return(res)
 
 }
 
+log_freq <- function(data,
+                     by = NULL,
+                     tables = NULL,
+                     options = NULL,
+                     weight = NULL,
+                     view = TRUE,
+                     titles = NULL,
+                     outcnt = NULL) {
+
+  indt <- "           "
+
+  str <- paste0("proc_freq: input data set ", nrow(data),
+                " rows and ", ncol(data), " columns\n")
+
+  if (!is.null(tables))
+    str <- paste0(str, indt, "tables: ", paste(tables, collapse = ""), "\n")
+
+
+  if (!is.null(by))
+    str <- paste0(str, indt, "by: ", paste(by, collapse = ""), "\n")
+
+
+  if (!is.null(weight))
+    str <- paste0(str, indt, "weight: ", paste(weight, collapse = ""), "\n")
+
+  if (!is.null(view))
+    str <- paste0(str, indt, "view: ", paste(view, collapse = ""), "\n")
+
+  if (!is.null(titles))
+    str <- paste0(str, indt, "titles: ", paste(titles, collapse = ""), "\n")
+
+
+  if (!is.null(outcnt))
+    str <- paste0(str, indt, "output: ", outcnt, "datasets", "\n")
+
+
+  log_logr(str)
+
+#  transmute: dropped 3 variables (LBCAT, LBTESTCD, PARAMCD)
+#             new variable 'Name' (character) with one unique value and 0% NA
+#             new variable 'Type' (character) with one unique value and 0% NA
+#             new variable 'Expression' (character) with 40 unique values and 0% NA
+}
 
 # Sub Procedures ----------------------------------------------------------
 

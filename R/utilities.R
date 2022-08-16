@@ -128,7 +128,7 @@ output_report <- function(lst,
     pth <- file.path(targetDir, fl)
 
 
-    res <- write_report(rpt, file_path = pth, output_type = ot)
+    res <- write_report(rpt, file_path = pth, output_type = ot, log = !viewer)
 
     ret[length(ret) + 1] <- res$modified_path
 
@@ -383,4 +383,15 @@ get_by_ds <- function(byvals) {
   rownames(ret) <- NULL
 
   return(ret)
+}
+
+
+#' @noRd
+log_logr <- function(x) {
+
+  if (length(find.package('logr', quiet=TRUE)) > 0) {
+    if (utils::packageVersion("logr") >= "1.2.0") {
+      logr::log_hook(x)
+    }
+  }
 }
