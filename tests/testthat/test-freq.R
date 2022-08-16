@@ -1335,6 +1335,19 @@ test_that("freq51: fisher output statistics works.", {
   expect_equal(ncol(res[[2]]), 7)
 
 })
+
+test_that("freq52: Logging function works.", {
+
+  res <- log_freq(mtcars, tables = c("mpg", "cyl"),
+                  weight = "count",
+                  by = "cyl", outcnt = 6)
+
+  res
+
+  expect_equal(length(res), 6)
+
+})
+
 #
 # test_that("freq52: oneway across works.", {
 #

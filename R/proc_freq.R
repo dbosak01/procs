@@ -372,34 +372,37 @@ log_freq <- function(data,
                      titles = NULL,
                      outcnt = NULL) {
 
+  ret <- c()
+
   indt <- "           "
 
-  str <- paste0("proc_freq: input data set ", nrow(data),
-                " rows and ", ncol(data), " columns\n")
+  ret <- paste0("proc_freq: input data set ", nrow(data),
+                " rows and ", ncol(data), " columns")
 
   if (!is.null(tables))
-    str <- paste0(str, indt, "tables: ", paste(tables, collapse = ""), "\n")
+    ret[length(ret) + 1] <- paste0(indt, "tables: ",
+                                   paste(tables, collapse = ""))
 
 
   if (!is.null(by))
-    str <- paste0(str, indt, "by: ", paste(by, collapse = ""), "\n")
+    ret[length(ret) + 1] <- paste0(indt, "by: ", paste(by, collapse = ""))
 
 
   if (!is.null(weight))
-    str <- paste0(str, indt, "weight: ", paste(weight, collapse = ""), "\n")
+    ret[length(ret) + 1] <- paste0(indt, "weight: ", paste(weight, collapse = ""))
 
   if (!is.null(view))
-    str <- paste0(str, indt, "view: ", paste(view, collapse = ""), "\n")
+    ret[length(ret) + 1]<- paste0(indt, "view: ", paste(view, collapse = ""))
 
   if (!is.null(titles))
-    str <- paste0(str, indt, "titles: ", paste(titles, collapse = ""), "\n")
+    ret[length(ret) + 1] <- paste0(indt, "titles: ", paste(titles, collapse = ""))
 
 
   if (!is.null(outcnt))
-    str <- paste0(str, indt, "output: ", outcnt, "datasets", "\n")
+    ret[length(ret) + 1] <- paste0(indt, "output: ", outcnt, " datasets")
 
 
-  log_logr(str)
+  log_logr(ret)
 
 #  transmute: dropped 3 variables (LBCAT, LBTESTCD, PARAMCD)
 #             new variable 'Name' (character) with one unique value and 0% NA
