@@ -947,23 +947,6 @@ gen_output_means <- function(data,
                                   class = class, outp = outp,
                                   freq = frq, type = tp, byvals = bynm)
 
-              # # Append aov stats here
-              # bylbl <- NULL
-              # if (!is.null(by))
-              #   bylbl <- bylbls[j]
-              #
-              # for (vr in var) {
-              #   if (is.null(weight)) {
-              #     tmpaov <- get_aov(dat, vr, class, bylbl = bylbl, output = TRUE)
-              #   } else {
-              #     tmpaov <- get_aov(dat, vr, class, weight, bylbl = bylbl,
-              #                       output = TRUE)
-              #   }
-              #
-              #   tmpcls <- cbind(tmpcls, tmpaov)
-              #
-              # }
-              #
               tmpres <- rbind(tmpres, tmpcls)
 
 

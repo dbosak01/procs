@@ -16,7 +16,8 @@ proc_transpose(
   namelabel = NULL,
   prefix = NULL,
   delimiter = ".",
-  suffix = NULL
+  suffix = NULL,
+  where = NULL
 )
 }
 \arguments{
@@ -50,6 +51,10 @@ of column names.}
 
 \item{suffix}{Contains a suffix to be used in the construction of
 column names.}
+
+\item{where}{An expression to filter the rows after the transform
+is complete.  Use the \code{\link{expression}} function to define
+the where clause.}
 }
 \value{
 A data frame that contains the transposed data. If a data frame

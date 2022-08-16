@@ -997,7 +997,9 @@ test_that("means46: aov statistic on stats works.", {
 
   res
 
-  expect_equal(1, 1)
+  expect_equal(nrow(res), 35)
+  expect_equal(ncol(res), 7)
+
 
 })
 

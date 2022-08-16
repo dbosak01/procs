@@ -30,6 +30,9 @@
 #' of column names.
 #' @param suffix Contains a suffix to be used in the construction of
 #' column names.
+#' @param where An expression to filter the rows after the transform
+#' is complete.  Use the \code{\link{expression}} function to define
+#' the where clause.
 #' @return A data frame that contains the transposed data. If a data frame
 #' is input, a data frame will be output.  If a tibble is input, a tibble
 #' will be output.
@@ -61,7 +64,8 @@ proc_transpose <- function(data,
                            namelabel = NULL,
                            prefix = NULL,
                            delimiter = ".",
-                           suffix = NULL
+                           suffix = NULL,
+                           where = NULL
                            ) {
 
   if (!"data.frame" %in% class(data)) {
@@ -294,6 +298,19 @@ proc_transpose <- function(data,
 
      }
 
+     # Retain original column order for by and copy variables
+     if (!is.null(by) & !is.null(copy)) {
+       rnms <- names(data)
+       nnms <- names(ret)
+       ret <- ret[ , c(rnms[rnms %in% c(by, copy)], nnms[!nnms %in% c(by, copy)])]
+     }
+
+     # Where
+     if (!is.null(where)) {
+       ret <- subset(ret, eval(where))
+
+     }
+
      # Assign name label
      if (!is.null(namelabel)) {
 
@@ -308,6 +325,8 @@ proc_transpose <- function(data,
        labels(ret) <- lbls
 
      }
+
+     rownames(ret) <- NULL
 
      retlst[[length(retlst) + 1]] <- ret
    }

@@ -57,7 +57,7 @@ get_aov <- function(data, var1, byvars, wgt = NULL,
     names(ret) <- c("VAR", "CLASS", nms)
 
     if (resid == FALSE) {
-      ret <- subset(ret, CLASS != "Residuals")
+      ret <- subset(ret, ret[["CLASS"]] != "Residuals")
     }
 
     rownames(ret) <- NULL
@@ -75,7 +75,7 @@ get_aov <- function(data, var1, byvars, wgt = NULL,
     names(ret) <- c("CLASS", nms)
 
     if (resid == FALSE) {
-      ret <- subset(ret, CLASS != "Residuals")
+      ret <- subset(ret, ret[["CLASS"]] != "Residuals")
     }
 
     rownames(ret) <- NULL

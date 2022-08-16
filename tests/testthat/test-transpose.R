@@ -364,7 +364,7 @@ test_that("tranpose16: get_output_twoway() works as expected.", {
 })
 
 
-test_that("transpose15: NSE works on transpose", {
+test_that("transpose16: NSE works on transpose", {
 
   stats <- proc_means(datm, stats = v(n, mean, median),
                       by = Layers,
@@ -382,8 +382,30 @@ test_that("transpose15: NSE works on transpose", {
   expect_equal(nrow(res2), 9)
   expect_equal(ncol(res2), 6)
   expect_equal("Group" %in% names(res2), TRUE)
+  expect_equal(names(res2), c("Group", "BY", "STAT", "Age",
+                              "PresentScore", "TasteScore"))
 
 
+})
+
+test_that("transpose17: Where clause works as expected.", {
+
+  stats <- proc_means(datm, stats = v(n, mean, median),
+                      by = Layers,
+                      out = out(freq = FALSE, type = FALSE, shape = "wide"))
+
+  stats
+
+  res1 <- data.frame(Group = "Group1", stats)
+
+  res2 <- proc_transpose(res1, copy = Group, by = BY,
+                         name = STAT, id = VAR,
+                         where = expression(!BY %in% c(2, 3) | STAT != "N"))
+
+  res2
+
+  expect_equal(nrow(res2), 7)
+  expect_equal(ncol(res2), 6)
 
 })
 
