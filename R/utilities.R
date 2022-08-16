@@ -128,7 +128,14 @@ output_report <- function(lst,
     pth <- file.path(targetDir, fl)
 
 
-    res <- write_report(rpt, file_path = pth, output_type = ot, log = !viewer)
+    if (utils::packageVersion("reporter") >= "1.3.6") {
+
+      res <- write_report(rpt, file_path = pth,
+                          output_type = ot, log = !viewer)
+    } else {
+      res <- write_report(rpt, file_path = pth, output_type = ot)
+
+    }
 
     ret[length(ret) + 1] <- res$modified_path
 
