@@ -130,7 +130,22 @@ test_that("sort8: proc_sort returns tibble.", {
 
 })
 
+test_that("sort9: log_sort() works as expected.", {
 
+
+  # data,  by = NULL, keep = NULL, order = "ascending",
+  # nodupkey = FALSE
+
+  res <- log_sort(mtcars, by = c("mpg", "cyl"),
+                       keep = c("n", "mean", "median"),
+                       order = "ascending",
+                       nodupkey = FALSE, outdata = mtcars)
+
+  res
+
+  expect_equal(length(res), 6)
+
+})
 
 
 

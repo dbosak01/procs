@@ -342,6 +342,76 @@ proc_transpose <- function(data,
     }
    }
 
+   log_transpose(data,
+                 by = by,
+                 var = var,
+                 id = id,
+                 idlabel = idlabel,
+                 copy = copy,
+                 name = name,
+                 namelabel = namelabel,
+                 where = where,
+                 outdata = res)
+
  return(res)
 
 }
+
+
+log_transpose <- function(data,
+                      by = NULL,
+                      var = NULL,
+                      id = NULL,
+                      idlabel = NULL,
+                      copy = NULL,
+                      name = "NAME",
+                      namelabel = NULL,
+                      where = NULL,
+                      outdata = NULL) {
+
+  ret <- c()
+
+  indt <- paste0(rep(" ", 16), collapse = "")
+
+  ret <- paste0("proc_transpose: input data set ", nrow(data),
+                " rows and ", ncol(data), " columns")
+
+  if (!is.null(by))
+    ret[length(ret) + 1] <- paste0(indt, "by: ", paste(by, collapse = " "))
+
+
+  if (!is.null(var))
+    ret[length(ret) + 1] <- paste0(indt, "var: ",
+                                   paste(var, collapse = " "))
+
+  if (!is.null(id))
+    ret[length(ret) + 1] <- paste0(indt, "id: ",
+                                   paste(id, collapse = " "))
+
+  if (!is.null(idlabel))
+    ret[length(ret) + 1] <- paste0(indt, "idlabel: ",
+                                   paste(idlabel, collapse = " "))
+
+
+  if (!is.null(copy))
+    ret[length(ret) + 1] <- paste0(indt, "copy: ", paste(copy, collapse = " "))
+
+  if (!is.null(name))
+    ret[length(ret) + 1]<- paste0(indt, "name: ", paste(name, collapse = " "))
+
+  if (!is.null(namelabel))
+    ret[length(ret) + 1]<- paste0(indt, "namelabel: ", paste(namelabel, collapse = " "))
+
+  if (!is.null(where))
+    ret[length(ret) + 1] <- paste0(indt, "where: ", paste(as.character(where), collapse = "\n"))
+
+
+  if (!is.null(outdata))
+    ret[length(ret) + 1] <- paste0(indt, "output dataset ", nrow(outdata),
+                                   " rows and ", ncol(outdata), " columns")
+
+
+  log_logr(ret)
+
+}
+

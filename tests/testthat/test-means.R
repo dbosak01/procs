@@ -1003,6 +1003,21 @@ test_that("means46: aov statistic on stats works.", {
 
 })
 
+test_that("means47: log_means() works as expected.", {
+
+
+  res <- log_means(mtcars, var = c("mpg", "cyl"),
+                   stats = c("n", "mean", "median"),
+                  weight = "count", titles = c("here is my big long title",
+                                               "Here is another title"),
+                  by = "cyl", class="disp", outcnt = 6)
+
+  res
+
+  expect_equal(length(res), 9)
+
+})
+
 #
 # test_that("means47: aov statistic works with by.", {
 #

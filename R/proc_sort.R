@@ -83,7 +83,53 @@ proc_sort <- function(data,  by = NULL, keep = NULL, order = "ascending",
 
   # unique(prt[, c("sex", "internship")])
 
+  log_sort(data,
+           by = by,
+           keep = keep,
+           order = order,
+           nodupkey = nodupkey,
+           outdata = ret)
+
   return(ret)
 
 }
 
+
+
+log_sort <- function(data,
+                     by = NULL,
+                     keep = NULL,
+                     order = "ascending",
+                     nodupkey = FALSE,
+                     outdata = NULL) {
+
+  ret <- c()
+
+  indt <- paste0(rep(" ", 11), collapse = "")
+
+  ret <- paste0("proc_sort: input data set ", nrow(data),
+                " rows and ", ncol(data), " columns")
+
+  if (!is.null(by))
+    ret[length(ret) + 1] <- paste0(indt, "by: ", paste(by, collapse = " "))
+
+  if (!is.null(keep))
+    ret[length(ret) + 1] <- paste0(indt, "keep: ",
+                                   paste(keep, collapse = " "))
+
+  if (!is.null(order))
+    ret[length(ret) + 1] <- paste0(indt, "order: ",
+                                   paste(order, collapse = " "))
+
+  if (!is.null(nodupkey))
+    ret[length(ret) + 1] <- paste0(indt, "nodupkey: ",
+                                   paste(nodupkey, collapse = " "))
+
+  if (!is.null(outdata))
+    ret[length(ret) + 1]  <- paste0(indt, "output data set ", nrow(outdata),
+                " rows and ", ncol(outdata), " columns")
+
+
+  log_logr(ret)
+
+}

@@ -213,6 +213,16 @@ proc_means <- function(data,
 
   }
 
+  log_means(data,
+            by = by,
+            class = class,
+            var = var,
+            stats = stats,
+            weight = weight,
+            view = view,
+            titles = titles,
+            outcnt = length(res))
+
   # If only one dataset returned, remove list
   if (length(res) == 1)
     res <- res[[1]]
@@ -221,6 +231,58 @@ proc_means <- function(data,
   return(res)
 }
 
+
+log_means <- function(data,
+                      by = NULL,
+                      class = NULL,
+                      var = NULL,
+                      stats = NULL,
+                      weight = NULL,
+                      view = TRUE,
+                      titles = NULL,
+                      options = NULL,
+                      outcnt = NULL) {
+
+  ret <- c()
+
+  indt <- paste0(rep(" ", 12), collapse = "")
+
+  ret <- paste0("proc_means: input data set ", nrow(data),
+                " rows and ", ncol(data), " columns")
+
+  if (!is.null(by))
+    ret[length(ret) + 1] <- paste0(indt, "by: ", paste(by, collapse = " "))
+
+  if (!is.null(class))
+    ret[length(ret) + 1] <- paste0(indt, "class: ",
+                                   paste(class, collapse = " "))
+
+  if (!is.null(var))
+    ret[length(ret) + 1] <- paste0(indt, "var: ",
+                                   paste(var, collapse = " "))
+
+  if (!is.null(stats))
+    ret[length(ret) + 1] <- paste0(indt, "stats: ",
+                                   paste(stats, collapse = " "))
+
+
+  if (!is.null(weight))
+    ret[length(ret) + 1] <- paste0(indt, "weight: ", paste(weight, collapse = " "))
+
+  if (!is.null(view))
+    ret[length(ret) + 1]<- paste0(indt, "view: ", paste(view, collapse = " "))
+
+  if (!is.null(titles))
+    ret[length(ret) + 1] <- paste0(indt, "titles: ", paste(titles, collapse = "\n"))
+
+
+  if (!is.null(outcnt))
+    ret[length(ret) + 1] <- paste0(indt, "output: ", outcnt, " datasets")
+
+
+  log_logr(ret)
+
+}
 
 # Stats ---------------------------------------------------------------
 

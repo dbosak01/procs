@@ -184,3 +184,21 @@ test_that("print8: Print freq report works.", {
 
 })
 
+test_that("print9: log_print() works as expected.", {
+
+
+  # data, file_path = NULL, output_type = "HTML",
+  # titles = NULL, style = NULL, view = TRUE
+
+
+  res <- log_print(mtcars, file_path = "c:/mypath",
+                  output_type = "HTML",
+                  titles = c("Title1 ", "Title 2"),
+                  style = "default", view = TRUE)
+
+  res
+
+  expect_equal(length(res), 6)
+
+})
+

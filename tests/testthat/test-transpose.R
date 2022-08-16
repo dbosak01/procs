@@ -453,3 +453,20 @@ test_that("transpose18: Factor with unused level works.", {
 
 })
 
+
+test_that("transpose19: log_transpose() works as expected.", {
+
+
+  res <- log_transpose(mtcars, var = c("mpg", "cyl"),
+                   id = c("n", "mean", "median"),
+                   idlabel = c("n", "mean", "median"),
+                   copy = "count", name = "sam", namelabel = "fork",
+                   where = expression(x == 1),
+                   by = "cyl", outdata = mtcars)
+
+  res
+
+  expect_equal(length(res), 10)
+
+})
+

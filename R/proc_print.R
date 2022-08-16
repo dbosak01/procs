@@ -62,8 +62,54 @@ proc_print <- function(data, file_path = NULL, output_type = "HTML",
   }
 
 
+  log_print(data, file_path = file_path, output_type = output_type,
+            titles = titles, style = style, view = view)
 
 
 
   invisible(out)
 }
+
+
+
+log_print <- function(data, file_path = NULL, output_type = NULL,
+                      titles = NULL, style = NULL, view = NULL) {
+
+  ret <- c()
+
+  indt <- paste0(rep(" ", 12), collapse = "")
+
+  if ("data.frame" %in% class(data))
+    dscnt <- 1
+  else
+    dscnt <- length(data)
+
+
+  ret <- paste0("proc_print: printed ", dscnt, ifelse(dscnt == 1, " dataset", "datasets"))
+
+
+  if (!is.null(file_path))
+    ret[length(ret) + 1] <- paste0(indt, "file_path: ", paste(file_path, collapse = " "))
+
+  if (!is.null(output_type))
+    ret[length(ret) + 1] <- paste0(indt, "output_type: ",
+                                   paste(output_type, collapse = " "))
+
+  if (!is.null(titles))
+    ret[length(ret) + 1] <- paste0(indt, "titles: ",
+                                   paste(titles, collapse = " \n"))
+
+  if (!is.null(style))
+    ret[length(ret) + 1] <- paste0(indt, "style: ",
+                                   paste(style, collapse = " "))
+
+  if (!is.null(view))
+    ret[length(ret) + 1] <- paste0(indt, "view: ",
+                                   paste(view, collapse = " "))
+
+
+  log_logr(ret)
+
+}
+
+

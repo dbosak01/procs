@@ -381,21 +381,21 @@ log_freq <- function(data,
 
   if (!is.null(tables))
     ret[length(ret) + 1] <- paste0(indt, "tables: ",
-                                   paste(tables, collapse = ""))
+                                   paste(tables, collapse = " "))
 
 
   if (!is.null(by))
-    ret[length(ret) + 1] <- paste0(indt, "by: ", paste(by, collapse = ""))
+    ret[length(ret) + 1] <- paste0(indt, "by: ", paste(by, collapse = " "))
 
 
   if (!is.null(weight))
-    ret[length(ret) + 1] <- paste0(indt, "weight: ", paste(weight, collapse = ""))
+    ret[length(ret) + 1] <- paste0(indt, "weight: ", paste(weight, collapse = " "))
 
   if (!is.null(view))
     ret[length(ret) + 1]<- paste0(indt, "view: ", paste(view, collapse = ""))
 
   if (!is.null(titles))
-    ret[length(ret) + 1] <- paste0(indt, "titles: ", paste(titles, collapse = ""))
+    ret[length(ret) + 1] <- paste0(indt, "titles: ", paste(titles, collapse = "\n"))
 
 
   if (!is.null(outcnt))
@@ -404,10 +404,6 @@ log_freq <- function(data,
 
   log_logr(ret)
 
-#  transmute: dropped 3 variables (LBCAT, LBTESTCD, PARAMCD)
-#             new variable 'Name' (character) with one unique value and 0% NA
-#             new variable 'Type' (character) with one unique value and 0% NA
-#             new variable 'Expression' (character) with 40 unique values and 0% NA
 }
 
 # Sub Procedures ----------------------------------------------------------
