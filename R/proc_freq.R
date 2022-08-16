@@ -1012,7 +1012,7 @@ gen_report_freq <- function(data,
     lst <- unclass(data)[by]
     for (nm in names(lst))
       lst[[nm]] <- as.factor(lst[[nm]])
-    dtlst <- split(data, lst, sep = "|")
+    dtlst <- split(data, lst, sep = "|", drop = TRUE)
 
     snms <- strsplit(names(dtlst), "|", fixed = TRUE)
 
@@ -1198,7 +1198,7 @@ gen_output_freq <- function(data,
     lst <- unclass(data)[by]
     for (nm in names(lst))
       lst[[nm]] <- as.factor(lst[[nm]])
-    dtlst <- split(data, lst, sep = "|")
+    dtlst <- split(data, lst, sep = "|", drop = TRUE)
 
     snms <- strsplit(names(dtlst), "|", fixed = TRUE)
 

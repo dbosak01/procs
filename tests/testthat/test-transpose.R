@@ -65,6 +65,26 @@ prt <- read.table(header = TRUE, text = '
   8 girls         no         no    23')
 
 
+ageg <- read.table(header = TRUE, text = '
+      VAR    LABEL  CAT2  N      CNTPCT
+1  AGECAT "18 to 24" "ARM A" 85  "0 (  0.0%)"
+2  AGECAT "18 to 24" "ARM B" 85  "1 (  1.2%)"
+3  AGECAT "18 to 24" "ARM C" 85  "3 (  3.5%)"
+4  AGECAT "18 to 24" "ARM D" 85  "1 (  1.2%)"
+5  AGECAT "25 to 44" "ARM A" 85  "4 (  4.7%)"
+6  AGECAT "25 to 44" "ARM B" 85  "8 (  9.4%)"
+7  AGECAT "25 to 44" "ARM C" 85  "4 (  4.7%)"
+8  AGECAT "25 to 44" "ARM D" 85  "7 (  8.2%)"
+9  AGECAT "45 to 64" "ARM A" 85 "13 ( 15.3%)"
+10 AGECAT "45 to 64" "ARM B" 85  "7 (  8.2%)"
+11 AGECAT "45 to 64" "ARM C" 85 "12 ( 14.1%)"
+12 AGECAT "45 to 64" "ARM D" 85 "12 ( 14.1%)"
+13 AGECAT    ">= 65" "ARM A" 85  "3 (  3.5%)"
+14 AGECAT    ">= 65" "ARM B" 85  "5 (  5.9%)"
+15 AGECAT    ">= 65" "ARM C" 85  "2 (  2.4%)"
+16 AGECAT    ">= 65" "ARM D" 85  "3 (  3.5%)"')
+
+
 test_that("transpose1: basic var works without error.", {
 
   res <- proc_transpose(score, var = c("Test1", "Test2", "Final"))
@@ -406,6 +426,30 @@ test_that("transpose17: Where clause works as expected.", {
 
   expect_equal(nrow(res2), 7)
   expect_equal(ncol(res2), 6)
+
+})
+
+
+test_that("transpose18: Factor with unused level works.", {
+
+  ageg2 <- ageg
+
+
+  ageg2$LABEL <- factor(ageg2$LABEL, levels = c("18 to 24", "25 to 44",
+                                                "45 to 64", ">= 65",
+                                                "Out of range"))
+
+
+  res <- proc_transpose(ageg2,
+                       var = v(N, CNTPCT),
+                       copy = VAR,
+                       id = CAT2,
+                       by = LABEL)
+
+  res
+
+  expect_equal(nrow(res), 8)
+  expect_equal(ncol(res), 7)
 
 })
 

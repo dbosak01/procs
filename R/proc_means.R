@@ -696,7 +696,7 @@ gen_report_means <- function(data,
     lst <- unclass(data)[by]
     for (nm in names(lst))
       lst[[nm]] <- as.factor(lst[[nm]])
-    dtlst <- split(data, lst, sep = "|")
+    dtlst <- split(data, lst, sep = "|", drop = TRUE)
 
     snms <- strsplit(names(dtlst), "|", fixed = TRUE)
 
@@ -870,7 +870,7 @@ gen_output_means <- function(data,
       bdat <- list(data)
       if (!is.null(by)) {
 
-        bdat <- split(data, data[ , by], sep = "|")
+        bdat <- split(data, data[ , by], sep = "|", drop = TRUE)
 
       }
       bynms <- names(bdat)
@@ -1038,7 +1038,7 @@ get_class <- function(data, var, class, outp, freq = TRUE,
   clslist <- list(data)
   cnms <- NULL
   if (!is.null(class)) {
-    clslist <- split(data, data[ , class], sep = "|")
+    clslist <- split(data, data[ , class], sep = "|", drop = TRUE)
     cnms <- names(clslist)
     if (length(clslist) == 0) {
 

@@ -141,7 +141,7 @@ test_that("means5: gen_report_means with two variables and two by groups.", {
 
   res
 
-  expect_equal(length(res), 12)
+  expect_equal(length(res), 9)
   expect_equal(nrow(res[[1]]), 2)
   expect_equal(ncol(res[[1]]), 8)
 
@@ -665,7 +665,7 @@ test_that("means29: 2 class vars works.", {
 
   res
 
-  expect_equal(nrow(res), 53)
+  expect_equal(nrow(res), 50)
   expect_equal(ncol(res), 8)
 
 })
@@ -689,7 +689,7 @@ test_that("means30: by and 2 class vars works.", {
 
   res
 
-  expect_equal(nrow(res), 72)
+  expect_equal(nrow(res), 65)
   expect_equal(ncol(res), 9)
   expect_equal(all(c("BY") %in% names(res)), TRUE)
 
@@ -753,7 +753,7 @@ test_that("means33: 2 by and 1 class vars works.", {
 
   res
 
-  expect_equal(nrow(res), 82)
+  expect_equal(nrow(res), 80)
   expect_equal(ncol(res), 9)
   expect_equal(all(c("BY1", "BY2") %in% names(res)), TRUE)
 
