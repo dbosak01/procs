@@ -707,12 +707,14 @@ shape_means_data <- function(ds, shape, copy = NULL) {
   if (!is.null(shape)) {
     if (all(shape == "long")) {
 
-      ret <- proc_transpose(ret, id = "VAR", name = "STAT", copy = copy)
+      ret <- proc_transpose(ret, id = "VAR", name = "STAT",
+                            copy = copy, log = FALSE)
 
 
     } else if (all(shape == "stacked")) {
 
-      ret <- proc_transpose(ret, name = "STAT", by = "VAR", copy = copy)
+      ret <- proc_transpose(ret, name = "STAT", by = "VAR",
+                            copy = copy, log = FALSE)
 
       rnms <- names(ret)
       rnms[rnms %in% "COL1"] <- "VALUES"

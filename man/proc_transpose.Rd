@@ -17,7 +17,8 @@ proc_transpose(
   prefix = NULL,
   delimiter = ".",
   suffix = NULL,
-  where = NULL
+  where = NULL,
+  log = TRUE
 )
 }
 \arguments{
@@ -55,6 +56,9 @@ column names.}
 \item{where}{An expression to filter the rows after the transform
 is complete.  Use the \code{\link{expression}} function to define
 the where clause.}
+
+\item{log}{Whether or not to log the procedure.  Default is TRUE.
+This parameter is used internally.}
 }
 \value{
 A data frame that contains the transposed data. If a data frame

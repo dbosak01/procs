@@ -891,12 +891,12 @@ get_output_oneway <- function(data, tb, weight = NULL, options = NULL,
     if (shape == "long") {
 
       ret <- proc_transpose(ret, copy = c(names(by), "VAR"),
-                            id = "CAT", name = "STAT")
+                            id = "CAT", name = "STAT", log = FALSE)
 
     } else if (all(shape == "stacked")) {
 
       ret <- proc_transpose(ret, name = "STAT",
-                            by = c(names(by), "VAR", "CAT"))
+                            by = c(names(by), "VAR", "CAT"), log = FALSE)
 
       rnms <- names(ret)
       rnms[rnms %in% "COL1"] <- "VALUES"
@@ -945,11 +945,12 @@ get_output_twoway <- function(data, tb1, tb2, weight, options, out = FALSE,
 
       ret <- proc_transpose(ret, id = c("CAT1", "CAT2"),
                             copy = c(names(by), "VAR1", "VAR2"),
-                            name = "STAT")
+                            name = "STAT", log = FALSE)
     } else if (all(shape == "stacked")) {
 
       ret <- proc_transpose(ret, name = "STAT",
-                            by = c(names(by), "VAR1", "VAR2", "CAT1", "CAT2"))
+                            by = c(names(by), "VAR1", "VAR2", "CAT1", "CAT2"),
+                            log = FALSE)
 
       rnms <- names(ret)
       rnms[rnms %in% "COL1"] <- "VALUES"

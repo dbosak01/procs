@@ -33,6 +33,8 @@
 #' @param where An expression to filter the rows after the transform
 #' is complete.  Use the \code{\link{expression}} function to define
 #' the where clause.
+#' @param log Whether or not to log the procedure.  Default is TRUE.
+#' This parameter is used internally.
 #' @return A data frame that contains the transposed data. If a data frame
 #' is input, a data frame will be output.  If a tibble is input, a tibble
 #' will be output.
@@ -65,7 +67,8 @@ proc_transpose <- function(data,
                            prefix = NULL,
                            delimiter = ".",
                            suffix = NULL,
-                           where = NULL
+                           where = NULL,
+                           log = TRUE
                            ) {
 
   if (!"data.frame" %in% class(data)) {
@@ -342,16 +345,18 @@ proc_transpose <- function(data,
     }
    }
 
-   log_transpose(data,
-                 by = by,
-                 var = var,
-                 id = id,
-                 idlabel = idlabel,
-                 copy = copy,
-                 name = name,
-                 namelabel = namelabel,
-                 where = where,
-                 outdata = res)
+   if (log) {
+     log_transpose(data,
+                   by = by,
+                   var = var,
+                   id = id,
+                   idlabel = idlabel,
+                   copy = copy,
+                   name = name,
+                   namelabel = namelabel,
+                   where = where,
+                   outdata = res)
+   }
 
  return(res)
 
