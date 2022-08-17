@@ -1018,6 +1018,21 @@ test_that("means47: log_means() works as expected.", {
 
 })
 
+
+test_that("means48: warning on unknown parameter works.", {
+
+  var1 <- c("Age", "PresentScore", "TasteScore")
+  var2 <- c("n", "min", "max", "mean", "std")
+
+  expect_warning(proc_means(datm, var = var1,
+                    stats = var2,
+                    class = Layers,
+                    fork = TRUE,
+                    titles = "My first title for Means",
+                    out = out()))
+
+})
+
 #
 # test_that("means47: aov statistic works with by.", {
 #

@@ -311,6 +311,7 @@ get_output_specs_means <- function(outs, stats) {
           }
         } else {
 
+          warning("proc_means: Unknown parameter '" %p% nm %p% "'")
           outreq[[nm]] <- out(shape = "long")
         }
       }
