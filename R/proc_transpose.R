@@ -10,7 +10,19 @@
 #' The \code{proc_tranpose} function takes an input data frame or tibble
 #' and transposes the columns and rows.
 #'
-#' @param data The input data frame for which will be transposed.
+#' Talk about vars
+#'
+#' Talk about ID
+#'
+#' Talk about by groups
+#'
+#' Talk about copy
+#'
+#' Talk about column naming
+#'
+#' Talk about where clause
+#'
+#' @param data The input data to transpose.
 #' @param by An optional by group.  Parameter accepts a vector of one or more
 #' quoted variable names. If the by group is requested, the data will be subset
 #' by that variable and the transpose function will
@@ -40,19 +52,30 @@
 #' will be output.
 # @import stats
 #' @examples
-#' # Create data
-#' dt <- data.frame(names = rownames(mtcars), mtcars, stringsAsFactors = FALSE)[1:5,]
+#' # Prepare data
+#' dat <- data.frame(CAT = rownames(USPersonalExpenditure),
+#'                   USPersonalExpenditure, stringsAsFactors = FALSE,
+#'                   row.names = NULL)[1:4, ]
 #'
-#' # Transpose data
-#' tdt <- proc_transpose(dt, var = c("mpg", "cyl", "disp"),
-#'                           id = "names", name = "Variable")
+#' # View data
+#' dat
+#' #                   CAT X1940 X1945 X1950 X1955 X1960
+#' # 1    Food and Tobacco 22.20 44.50 59.60  73.2  86.8
+#' # 2 Household Operation 10.50 15.50 29.00  36.5  46.2
+#' # 3  Medical and Health  3.53  5.76  9.71  14.0  21.1
+#' # 4       Personal Care  1.04  1.98  2.45   3.4   5.4
 #'
-#' # View transposed data
-#' tdt
-#' #   Variable Mazda RX4 Mazda RX4 Wag Datsun 710 Hornet 4 Drive Hornet Sportabout
-#' # 1      mpg        21            21       22.8           21.4              18.7
-#' # 2      cyl         6             6        4.0            6.0               8.0
-#' # 3     disp       160           160      108.0          258.0             360.0
+#' # Transpose Data
+#' tdat <-  proc_transpose(dat, id = "CAT", name = "Year")
+#'
+#' # View results
+#' tdat
+#' #   Year Food and Tobacco Household Operation Medical and Health Personal Care
+#' # 1 X1940             22.2                10.5               3.53          1.04
+#' # 2 X1945             44.5                15.5               5.76          1.98
+#' # 3 X1950             59.6                29.0               9.71          2.45
+#' # 4 X1955             73.2                36.5              14.00          3.40
+#' # 5 X1960             86.8                46.2              21.10          5.40
 #' @import tibble
 #' @import fmtr
 #' @export
@@ -308,28 +331,7 @@ proc_transpose <- function(data,
        ret <- ret[ , c(rnms[rnms %in% c(by, copy)], nnms[!nnms %in% c(by, copy)])]
      }
 
-     # Where
-     if (!is.null(where)) {
-       ret <- subset(ret, eval(where))
 
-     }
-
-     # Assign name label
-     if (!is.null(namelabel)) {
-
-       attr(ret[[name]], "label") <-  namelabel
-     }
-
-     # Assign ID labels
-     if (!is.null(idlabel)) {
-
-       lbls <- dt[[idlabel]]
-       names(lbls) <- nms_new
-       labels(ret) <- lbls
-
-     }
-
-     rownames(ret) <- NULL
 
      retlst[[length(retlst) + 1]] <- ret
    }
@@ -340,10 +342,43 @@ proc_transpose <- function(data,
 
    # Append by groups if necessary
    if (!is.null(by)) {
+    bnms <- names(res)
     for (p in seq(2, length(retlst))) {
-      res <- rbind(res, retlst[[p]])
+      #res <- rbind(res, retlst[[p]])   # Old way
+
+      # Get names of widest by group
+      if (ncol(retlst[[p]]) > length(bnms))
+        bnms <- names(retlst[[p]])
+
+      res <- merge(res, retlst[[p]], all = TRUE, sort = FALSE)
     }
+    # Use widest by group as final column order
+    if (ncol(res) == length(bnms))
+      res <- res[ , bnms]
    }
+
+   # Where
+   if (!is.null(where)) {
+     res <- subset(res, eval(where))
+
+   }
+
+   # Assign name label
+   if (!is.null(namelabel)) {
+
+     attr(res[[name]], "label") <-  namelabel
+   }
+
+   # Assign ID labels
+   if (!is.null(idlabel)) {
+
+     lbls <- dt[[idlabel]]
+     names(lbls) <- nms_new
+     labels(res) <- lbls
+
+   }
+
+   rownames(res) <- NULL
 
    if (log) {
      log_transpose(data,

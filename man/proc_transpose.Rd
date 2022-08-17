@@ -22,7 +22,7 @@ proc_transpose(
 )
 }
 \arguments{
-\item{data}{The input data frame for which will be transposed.}
+\item{data}{The input data to transpose.}
 
 \item{by}{An optional by group.  Parameter accepts a vector of one or more
 quoted variable names. If the by group is requested, the data will be subset
@@ -75,19 +75,42 @@ how variables are named in the transposed data set.
 \details{
 The \code{proc_tranpose} function takes an input data frame or tibble
 and transposes the columns and rows.
+
+Talk about vars
+
+Talk about ID
+
+Talk about by groups
+
+Talk about copy
+
+Talk about column naming
+
+Talk about where clause
 }
 \examples{
-# Create data
-dt <- data.frame(names = rownames(mtcars), mtcars, stringsAsFactors = FALSE)[1:5,]
+# Prepare data
+dat <- data.frame(CAT = rownames(USPersonalExpenditure),
+                  USPersonalExpenditure, stringsAsFactors = FALSE,
+                  row.names = NULL)[1:4, ]
 
-# Transpose data
-tdt <- proc_transpose(dt, var = c("mpg", "cyl", "disp"),
-                          id = "names", name = "Variable")
+# View data
+dat
+#                   CAT X1940 X1945 X1950 X1955 X1960
+# 1    Food and Tobacco 22.20 44.50 59.60  73.2  86.8
+# 2 Household Operation 10.50 15.50 29.00  36.5  46.2
+# 3  Medical and Health  3.53  5.76  9.71  14.0  21.1
+# 4       Personal Care  1.04  1.98  2.45   3.4   5.4
 
-# View transposed data
-tdt
-#   Variable Mazda RX4 Mazda RX4 Wag Datsun 710 Hornet 4 Drive Hornet Sportabout
-# 1      mpg        21            21       22.8           21.4              18.7
-# 2      cyl         6             6        4.0            6.0               8.0
-# 3     disp       160           160      108.0          258.0             360.0
+# Transpose Data
+tdat <-  proc_transpose(dat, id = "CAT", name = "Year")
+
+# View results
+tdat
+#   Year Food and Tobacco Household Operation Medical and Health Personal Care
+# 1 X1940             22.2                10.5               3.53          1.04
+# 2 X1945             44.5                15.5               5.76          1.98
+# 3 X1950             59.6                29.0               9.71          2.45
+# 4 X1955             73.2                36.5              14.00          3.40
+# 5 X1960             86.8                46.2              21.10          5.40
 }

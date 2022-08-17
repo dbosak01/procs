@@ -64,6 +64,17 @@ prt <- read.table(header = TRUE, text = '
   7 girls        yes         no    10
   8 girls         no         no    23')
 
+prt2 <- read.table(header = TRUE, text = '
+      sex internship enrollment count  group
+  1  boys        yes        yes    35      1
+  2  boys         no        yes    14      1
+  3 girls        yes        yes    32      1
+  4 girls         no        yes    53      1
+  5  boys        yes         no    29      2
+  6  boys         no         no    27      2
+  7 girls        yes         no    10      2
+  8 girls         no         no    23      2')
+
 
 ageg <- read.table(header = TRUE, text = '
       VAR    LABEL  CAT2  N      CNTPCT
@@ -384,7 +395,7 @@ test_that("tranpose16: get_output_twoway() works as expected.", {
 })
 
 
-test_that("transpose16: NSE works on transpose", {
+test_that("transpose17: NSE works on transpose", {
 
   stats <- proc_means(datm, stats = v(n, mean, median),
                       by = Layers,
@@ -408,7 +419,7 @@ test_that("transpose16: NSE works on transpose", {
 
 })
 
-test_that("transpose17: Where clause works as expected.", {
+test_that("transpose18: Where clause works as expected.", {
 
   stats <- proc_means(datm, stats = v(n, mean, median),
                       by = Layers,
@@ -430,7 +441,7 @@ test_that("transpose17: Where clause works as expected.", {
 })
 
 
-test_that("transpose18: Factor with unused level works.", {
+test_that("transpose19: Factor with unused level works.", {
 
   ageg2 <- ageg
 
@@ -454,7 +465,7 @@ test_that("transpose18: Factor with unused level works.", {
 })
 
 
-test_that("transpose19: log_transpose() works as expected.", {
+test_that("transpose20: log_transpose() works as expected.", {
 
 
   res <- log_transpose(mtcars, var = c("mpg", "cyl"),
@@ -469,4 +480,63 @@ test_that("transpose19: log_transpose() works as expected.", {
   expect_equal(length(res), 10)
 
 })
+
+
+test_that("transpose21: transposing two id variables.", {
+
+  sp <- prt2
+
+  sp[1, 2] <- "no"
+
+
+
+  res <- proc_freq(sp,
+                   tables = c("internship"),
+                   titles = "My first Frequency Table",
+                   by = c("sex"),
+                   view = TRUE,
+                   weight = "count",
+                   out = out(shape = "wide"))
+
+  res
+
+  res1 <- proc_transpose(res, id = c("BY", "CAT"), copy = c("VAR"))
+  res1
+
+  expect_equal(ncol(res1), 6)
+  expect_equal(nrow(res1), 5)
+
+})
+
+
+test_that("transpose22: transposing inconsistent categories.", {
+
+  sp <- prt2
+
+  sp[1, 2] <- "no"
+
+
+
+  res <- proc_freq(sp,
+                   tables = c("internship"),
+                   titles = "My first Frequency Table",
+                   by = c("sex", "enrollment"),
+                   view = TRUE,
+                   weight = "count",
+                   out = out(stats = c("n", "cnt", "pct"),
+                             shape = "wide"))
+
+  res
+
+  res1 <- proc_transpose(res, id = c("BY1", "CAT"), copy = c("VAR"),
+                         by = "BY2")
+  res1
+
+  expect_equal(ncol(res1), 7)
+  expect_equal(nrow(res1), 6)
+
+})
+
+
+
 

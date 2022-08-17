@@ -1012,6 +1012,9 @@ get_output_specs <- function(tbls, outs) {
 
         }
 
+      } else {
+
+       warning("proc_freq: Unknown parameter '" %p% nm %p% "'")
       }
     }
   } else {
@@ -1414,7 +1417,6 @@ gen_output_freq <- function(data,
         #     res[[nm]] <- result
         # }
       }
-
 
 
       # Where

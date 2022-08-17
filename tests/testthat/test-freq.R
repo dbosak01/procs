@@ -1141,7 +1141,6 @@ test_that("freq43: oneway output statistics work.", {
   res <- proc_freq(dat,
                    titles = "My first Frequency Table",
                    view = TRUE,
-                   across = "TRT",
                    weight = "Count",
                    out1 = out(table ="Eyes", stats = c("cnt", "pct", "n")),
                    out2 = out(table = "Hair",
@@ -1169,7 +1168,6 @@ test_that("freq45: twoway output statistics work.", {
   res <- proc_freq(dat,
                    tables = c("Eyes", "Region * Eyes", "Region"),
                    titles = "My first Frequency Table",
-                   across = "TRT",
                    view = TRUE,
                    weight = "Count",
                    out1 = out(table ="Region * Eyes", stats = c("cnt", "pct", "n"),
@@ -1347,6 +1345,48 @@ test_that("freq52: Logging function works.", {
   expect_equal(length(res), 6)
 
 })
+
+
+# Finish this
+test_that("freq52: zero count categories appear.", {
+
+  sp <- prt2
+
+  sp[1, 2] <- "no"
+
+
+
+  res <- proc_freq(sp,
+                   tables = c("internship"),
+                   titles = "My first Frequency Table",
+                   by = c("sex", "enrollment"),
+                   view = TRUE,
+                   weight = "count",
+                   out = out())
+
+  res
+
+  # expect_equal(ncol(res), 7)
+  # expect_equal(nrow(res), 8)
+
+  expect_equal(1, 1)
+
+})
+
+
+test_that("freq53: error on unknown parameter.", {
+
+
+  expect_warning(proc_freq(prt2,
+                   tables = c("internship"),
+                   titles = "My first Frequency Table",
+                   by = c("sex", "enrollment"),
+                   view = TRUE,
+                   fork = TRUE,
+                   weight = "count",
+                   out = out()))
+})
+
 
 #
 # test_that("freq52: oneway across works.", {
