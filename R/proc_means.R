@@ -221,7 +221,8 @@ proc_means <- function(data,
             weight = weight,
             view = view,
             titles = titles,
-            outcnt = length(res))
+            outcnt = ifelse("data.frame" %in% class(res),
+                            1, length(res)))
 
   # If only one dataset returned, remove list
   if (length(res) == 1)
