@@ -1422,6 +1422,49 @@ test_that("freq54: where works before and after rename.", {
 
 })
 
+test_that("freq55: get_nway_zero_fills() works as expected.", {
+
+  dt <- data.frame(x = c("A", "A", "B", "B"),
+                   y = c("C", "C", "C", "D"),
+                   z = c("E", "F", "F", "F"),
+                   w = c(25, 39, 18, 4))
+
+  dt
+
+  res <- get_nway_zero_fills(dt, "x", "y")
+
+  res
+
+  expect_equal(nrow(res), 8)
+  expect_equal(ncol(res), 5)
+
+  res <- get_nway_zero_fills(dt, "x", c("y", "z"))
+
+  res
+
+  expect_equal(nrow(res), 12)
+  expect_equal(ncol(res), 5)
+
+
+
+  res <- get_nway_zero_fills(dt, "x", c("y", "z"), weight = "w")
+
+  res
+
+  expect_equal(nrow(res), 12)
+  expect_equal(ncol(res), 5)
+
+  res <- get_nway_zero_fills(dt, c("x", "y"), "z", weight = "w")
+
+  res
+
+  expect_equal(nrow(res), 12)
+  expect_equal(ncol(res), 5)
+
+
+
+})
+
 
 #
 # test_that("freq52: oneway across works.", {

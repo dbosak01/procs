@@ -860,8 +860,7 @@ cross_tab <- function(freqdata, options, var1, var2, bylbl = NULL) {
 get_output_oneway <- function(data, tb, weight = NULL, options = NULL,
                               by = NULL, shape = "wide", stats = NULL) {
 
-
-
+  # Get frequencies
   ret <- freq_oneway(data = data, tb = tb, weight = weight,
                      options = options, stats = stats)
 
@@ -1036,6 +1035,45 @@ get_output_specs <- function(tbls, outs) {
 
 
   return(ret)
+}
+
+# Appends missing combination to data frame and
+# adds a variable __cnt by which you can count correctly.
+get_nway_zero_fills <- function(data, tb, by, weight = NULL) {
+
+  # Set count value on existing records
+  if (is.null(weight)) {
+
+    data[["__cnt"]] <- 1
+  } else {
+    data[["__cnt"]] <- data[[weight]]
+  }
+
+  v1 <- list()
+  # Get unique values of target var
+  for (i in seq_len(length(tb))) {
+    v1[[tb[i]]] <- names(sort(table(as.character(data[[tb[i]]]))))
+  }
+
+  # Get unique by values
+  if (!is.null(by)) {
+    for (i in seq_len(length(by))) {
+
+      v1[[by[i]]] <- names(sort(table(as.character(data[[by[i]]]))))
+    }
+  }
+
+  # Expand combinations
+  ex <- expand.grid(v1, stringsAsFactors = FALSE)
+
+  # Zero fill combinations
+  ex[["__cnt"]] <- 0
+
+  # Merge combinations onto original data
+  ret <- merge(data, ex, sort = FALSE, all = TRUE)
+
+  return(ret)
+
 }
 
 # Drivers -----------------------------------------------------------------
@@ -1236,7 +1274,6 @@ gen_output_freq <- function(data,
                             options = NULL,
                             weight = NULL,
                             output = NULL) {
-
 
   byvals <- list()
   if (!is.null(by)) {
