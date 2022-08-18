@@ -542,7 +542,8 @@ freq_twoway <- function(data, tb1, tb2, weight, options,
     stats <- c("n", "cnt", "pct", "cumsum", "cumpct")
 
   # Assign 1 to count column
-  data[["__cnt"]] <- 1
+  if (is.null(weight) | weight != "__cnt")
+    data[["__cnt"]] <- 1
 
   # Get target variables into vectors
   if (is.factor(data[[tb1]]))
@@ -1037,9 +1038,24 @@ get_output_specs <- function(tbls, outs) {
   return(ret)
 }
 
+
+
+# Zero Fill -------------------------------------------------------------
+
+
+
 # Appends missing combination to data frame and
 # adds a variable __cnt by which you can count correctly.
-get_nway_zero_fills <- function(data, tb, by, weight = NULL) {
+get_nway_zero_fills <- function(data, outs, by, weight = NULL) {
+
+  # Get table variable vectors
+  if ("list" %in% class(outs))
+    ots <- get_output_tables(outs)
+  else
+    ots <- outs
+
+  # Split into vectors
+  tbls <- get_table_list(ots)
 
   # Set count value on existing records
   if (is.null(weight)) {
@@ -1049,30 +1065,72 @@ get_nway_zero_fills <- function(data, tb, by, weight = NULL) {
     data[["__cnt"]] <- data[[weight]]
   }
 
-  v1 <- list()
-  # Get unique values of target var
-  for (i in seq_len(length(tb))) {
-    v1[[tb[i]]] <- names(sort(table(as.character(data[[tb[i]]]))))
+  ret <- data
+
+  for (i in seq_len(length(tbls))) {
+
+    tb <- tbls[[i]]
+
+    v1 <- list()
+    # Get unique values of target var
+    for (i in seq_len(length(tb))) {
+      v1[[tb[i]]] <- names(sort(table(as.character(data[[tb[i]]]))))
+    }
+
+    # Get unique by values
+    if (!is.null(by)) {
+      for (i in seq_len(length(by))) {
+
+        v1[[by[i]]] <- names(sort(table(as.character(data[[by[i]]]))))
+      }
+    }
+
+    # Expand combinations
+    ex <- expand.grid(v1, stringsAsFactors = FALSE)
+
+    # Zero fill combinations
+    ex[["__cnt"]] <- 0
+
+    # Merge combinations onto original data
+    ret <- merge(ret, ex, sort = FALSE, all = TRUE)
   }
 
-  # Get unique by values
-  if (!is.null(by)) {
-    for (i in seq_len(length(by))) {
+  return(ret)
 
-      v1[[by[i]]] <- names(sort(table(as.character(data[[by[i]]]))))
+}
+
+get_table_list <- function(tbls) {
+
+  ret <- NULL
+  if (!is.null(tbls)) {
+
+
+    ret <- strsplit(tbls, "*", fixed = TRUE)
+
+
+    for (i in seq_len(length(ret))) {
+
+      ret[[i]] <- trimws(ret[[i]])
     }
   }
 
-  # Expand combinations
-  ex <- expand.grid(v1, stringsAsFactors = FALSE)
-
-  # Zero fill combinations
-  ex[["__cnt"]] <- 0
-
-  # Merge combinations onto original data
-  ret <- merge(data, ex, sort = FALSE, all = TRUE)
-
   return(ret)
+
+}
+
+get_output_tables <- function(outs) {
+
+ ret <- c()
+
+ if (!is.null(outs)) {
+   for (ot in outs) {
+
+     ret[length(ret) +  1] <- ot[["table"]]
+
+   }
+ }
+
+ return(ret)
 
 }
 
@@ -1084,9 +1142,7 @@ gen_report_freq <- function(data,
                             tables = NULL,
                             options = NULL,
                             weight = NULL,
-                            #   weight_options = NULL,
                             view = TRUE,
-                            #   output = NULL,
                             titles = NULL ) {
 
   res <- list()
@@ -1094,13 +1150,25 @@ gen_report_freq <- function(data,
   # print(print_location)
   # browser()
 
+  dta <- data
+  # Deal with sparse option
+  if (get_option(options, "sparse", TRUE) & !is.null(by)) {
+    dta <- get_nway_zero_fills(data, tables, by, weight)
+  } else {
+    if (is.null(weight))
+      dta[["__cnt"]] <- 1
+    else
+      dta[["__cnt"]] <- dta[[weight]]
+  }
+  wgt <- "__cnt"
+
   bylbls <- c()
   if (!is.null(by)) {
 
-    lst <- unclass(data)[by]
+    lst <- unclass(dta)[by]
     for (nm in names(lst))
       lst[[nm]] <- as.factor(lst[[nm]])
-    dtlst <- split(data, lst, sep = "|", drop = TRUE)
+    dtlst <- split(dta, lst, sep = "|", drop = TRUE)
 
     snms <- strsplit(names(dtlst), "|", fixed = TRUE)
 
@@ -1119,7 +1187,7 @@ gen_report_freq <- function(data,
 
   } else {
 
-    dtlst <- list(data)
+    dtlst <- list(dta)
   }
 
   # Loop through by groups
@@ -1155,7 +1223,7 @@ gen_report_freq <- function(data,
         }
 
         # Perform one-way frequency
-        result <- freq_oneway(dt, tb, weight, options, out)
+        result <- freq_oneway(dt, tb, wgt, options, out)
 
       } else if (length(splt) == 2) {
 
@@ -1165,7 +1233,7 @@ gen_report_freq <- function(data,
         }
 
         # Perform two-way frequency
-        result <- freq_twoway(dt, splt[1], splt[2], weight, options,
+        result <- freq_twoway(dt, splt[1], splt[2], wgt, options,
                               out = FALSE)
 
         # Perform cross tab by default
@@ -1173,8 +1241,8 @@ gen_report_freq <- function(data,
 
         if (get_option(options, "fisher", FALSE)) {
 
-          if (!is.null(weight))
-            fisher <- get_fisher(dt[[splt[1]]], dt[[splt[[2]]]], dt[[weight]],
+          if (!is.null(wgt))
+            fisher <- get_fisher(dt[[splt[1]]], dt[[splt[[2]]]], dt[[wgt]],
                                  bylbl = bylbls[j])
           else
             fisher <- get_fisher(dt[[splt[1]]], dt[[splt[[2]]]],
@@ -1183,8 +1251,8 @@ gen_report_freq <- function(data,
 
         if (get_option(options, "chisq", FALSE)) {
 
-          if (!is.null(weight))
-            chisq <- get_chisq(dt[[splt[1]]], dt[[splt[[2]]]], dt[[weight]],
+          if (!is.null(wgt))
+            chisq <- get_chisq(dt[[splt[1]]], dt[[splt[[2]]]], dt[[wgt]],
                                bylbl = bylbls[j])
           else
             chisq <- get_chisq(dt[[splt[1]]], dt[[splt[[2]]]], bylbl = bylbls[j])
@@ -1275,6 +1343,18 @@ gen_output_freq <- function(data,
                             weight = NULL,
                             output = NULL) {
 
+  dta <- data
+  # Deal with sparse option
+  if (get_option(options, "sparse", TRUE) & !is.null(by)) {
+    dta <- get_nway_zero_fills(data, output, by, weight)
+  } else {
+   if (is.null(weight))
+     dta[["__cnt"]] <- 1
+   else
+     dta[["__cnt"]] <- dta[[weight]]
+  }
+  wgt <- "__cnt"
+
   byvals <- list()
   if (!is.null(by)) {
     if (length(by) == 1)
@@ -1282,10 +1362,10 @@ gen_output_freq <- function(data,
     else
       bynms <- paste0("BY", seq(1, length(by)))
 
-    lst <- unclass(data)[by]
+    lst <- unclass(dta)[by]
     for (nm in names(lst))
       lst[[nm]] <- as.factor(lst[[nm]])
-    dtlst <- split(data, lst, sep = "|")
+    dtlst <- split(dta, lst, sep = "|")
 
     snms <- strsplit(names(dtlst), "|", fixed = TRUE)
 
@@ -1297,7 +1377,7 @@ gen_output_freq <- function(data,
 
   } else {
 
-    dtlst <- list(data)
+    dtlst <- list(dta)
   }
 
 
@@ -1331,11 +1411,11 @@ gen_output_freq <- function(data,
         if (length(splt) == 1) {
 
           if (length(byvals) >= j) {
-            result <- get_output_oneway(dt, tb, weight, options,
+            result <- get_output_oneway(dt, tb, wgt, options,
                                       byvals[[j]], shape = outp$shape,
                                       stats = outp$stats)
           } else {
-            result <- get_output_oneway(dt, tb, weight, options,
+            result <- get_output_oneway(dt, tb, wgt, options,
                                         NULL, shape = outp$shape,
                                         stats = outp$stats)
           }
@@ -1346,12 +1426,12 @@ gen_output_freq <- function(data,
 
           # Perform two-way frequency
           if (length(byvals) >= j) {
-            result <- get_output_twoway(dt, splt[1], splt[2], weight, options,
+            result <- get_output_twoway(dt, splt[1], splt[2], wgt, options,
                                 byvals[[j]], shape = outp$shape,
                                 out = TRUE, stats = outp$stats)
           } else {
 
-            result <- get_output_twoway(dt, splt[1], splt[2], weight, options,
+            result <- get_output_twoway(dt, splt[1], splt[2], wgt, options,
                                      NULL, shape = outp$shape,
                                      out = TRUE, stats = outp$stats)
           }
@@ -1363,8 +1443,8 @@ gen_output_freq <- function(data,
 
             if ("fisher" %in% outp$stats) {
 
-              if (!is.null(weight))
-                fisher <- get_fisher(dt[[splt[1]]], dt[[splt[[2]]]], dt[[weight]],
+              if (!is.null(wgt))
+                fisher <- get_fisher(dt[[splt[1]]], dt[[splt[[2]]]], dt[[wgt]],
                                      bylbl = byvals[j], output = TRUE)
               else
                 fisher <- get_fisher(dt[[splt[1]]], dt[[splt[[2]]]],
@@ -1389,8 +1469,8 @@ gen_output_freq <- function(data,
 
             if ("chisq" %in% outp$stats) {
 
-              if (!is.null(weight))
-                chisq <- get_chisq(dt[[splt[1]]], dt[[splt[[2]]]], dt[[weight]],
+              if (!is.null(wgt))
+                chisq <- get_chisq(dt[[splt[1]]], dt[[splt[[2]]]], dt[[wgt]],
                                    bylbl = byvals[j], output = TRUE)
               else
                 chisq <- get_chisq(dt[[splt[1]]], dt[[splt[[2]]]],

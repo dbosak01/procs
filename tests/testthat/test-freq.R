@@ -693,6 +693,7 @@ test_that("freq27: Double by group on double table works.", {
 
   res <- proc_freq(spdat, tables = c("Eyes", "Hair"), by = c("Sex", "Region"),
                    weight = "Count",
+                   options = opts(sparse = FALSE),
                    titles = "Eye and Hair Color of European Children")
 
   res
@@ -700,6 +701,21 @@ test_that("freq27: Double by group on double table works.", {
   expect_equal(length(res), 2)
   expect_equal(nrow(res[[1]]), 12)
   expect_equal(nrow(res[[2]]), 17)
+  expect_equal(sum(spdat$Count), sum(res$Eyes$CNT))
+  expect_equal(sum(spdat$Count), sum(res$Hair$CNT))
+
+
+  res <- proc_freq(spdat, tables = c("Eyes", "Hair"), by = c("Sex", "Region"),
+                   weight = "Count",
+                   titles = "Eye and Hair Color of European Children")
+
+  res
+
+  expect_equal(length(res), 2)
+  expect_equal(nrow(res[[1]]), 12)
+  expect_equal(nrow(res[[2]]), 20)
+  expect_equal(sum(spdat$Count), sum(res$Eyes$CNT))
+  expect_equal(sum(spdat$Count), sum(res$Hair$CNT))
 
 
 })
@@ -725,7 +741,7 @@ test_that("freq28: Double by group on double table with table names works.", {
 
   expect_equal(length(res), 2)
   expect_equal(nrow(res[[1]]), 12)
-  expect_equal(nrow(res[[2]]), 17)
+  expect_equal(nrow(res[[2]]), 20)
   expect_equal(names(res)[1], "EyeTbl")
   expect_equal(names(res)[2], "HairTbl")
 
@@ -752,7 +768,7 @@ test_that("freq29: Double by group on double table no labels works.", {
 
   expect_equal(length(res), 2)
   expect_equal(nrow(res[[1]]), 12)
-  expect_equal(nrow(res[[2]]), 17)
+  expect_equal(nrow(res[[2]]), 20)
   expect_equal(names(res)[1], "EyeTbl")
   expect_equal(names(res)[2], "HairTbl")
 
@@ -1347,33 +1363,6 @@ test_that("freq52: Logging function works.", {
 })
 
 
-# Finish this
-test_that("freq52: zero count categories appear.", {
-
-  sp <- prt2
-
-  sp[1, 2] <- "no"
-
-
-
-  res <- proc_freq(sp,
-                   tables = c("internship"),
-                   titles = "My first Frequency Table",
-                   by = c("sex", "enrollment"),
-                   view = TRUE,
-                   weight = "count",
-                   out = out())
-
-  res
-
-  # expect_equal(ncol(res), 7)
-  # expect_equal(nrow(res), 8)
-
-  expect_equal(1, 1)
-
-})
-
-
 test_that("freq53: error on unknown parameter.", {
 
 
@@ -1422,7 +1411,45 @@ test_that("freq54: where works before and after rename.", {
 
 })
 
+
+
+test_that("freq56: get_table_list() works as expected.", {
+
+  vars <- c("A", "B", "A * B", "A * C")
+
+  res <- get_table_list(vars)
+
+  res
+  expect_equal(length(res), 4)
+  expect_equal(res[[3]], c("A", "B"))
+
+})
+
+
+test_that("freq56: get_output_tables() works as expected.", {
+
+  lst <- list(out1 = out(table = "A"),
+              out2 = out(table = "B"),
+              out3 = out(table = "A * B"),
+              out4 = out(table = "A * C"))
+
+  res <- get_output_tables(lst)
+
+  res
+
+  expect_equal(length(res), 4)
+  expect_equal(res[[3]], "A * B")
+
+
+})
+
+
 test_that("freq55: get_nway_zero_fills() works as expected.", {
+
+  lst <- list(out1 = out(table = "x"),
+              out2 = out(table = "y"),
+              out3 = out(table = "x * y"))
+
 
   dt <- data.frame(x = c("A", "A", "B", "B"),
                    y = c("C", "C", "C", "D"),
@@ -1431,39 +1458,105 @@ test_that("freq55: get_nway_zero_fills() works as expected.", {
 
   dt
 
-  res <- get_nway_zero_fills(dt, "x", "y")
+  res <- get_nway_zero_fills(dt, lst, "z", NULL)
 
   res
 
-  expect_equal(nrow(res), 8)
+  expect_equal(nrow(res), 20)
   expect_equal(ncol(res), 5)
 
-  res <- get_nway_zero_fills(dt, "x", c("y", "z"))
+  res <- get_nway_zero_fills(dt, lst, "z", "w")
 
   res
 
-  expect_equal(nrow(res), 12)
+  expect_equal(nrow(res), 20)
   expect_equal(ncol(res), 5)
 
 
+  lst2 <- list(out1 = out(table = "x"))
 
-  res <- get_nway_zero_fills(dt, "x", c("y", "z"), weight = "w")
-
-  res
-
-  expect_equal(nrow(res), 12)
-  expect_equal(ncol(res), 5)
-
-  res <- get_nway_zero_fills(dt, c("x", "y"), "z", weight = "w")
+  res <- get_nway_zero_fills(dt, lst2, c("y", "z"), weight = "w")
 
   res
 
   expect_equal(nrow(res), 12)
   expect_equal(ncol(res), 5)
-
 
 
 })
+
+test_that("freq52: zero count categories appear on oneway tables.", {
+
+  sp <- prt2
+
+  sp[1, 2] <- "no"
+
+  res <- proc_freq(sp,
+                   tables = c("internship"),
+                   titles = "My first Frequency Table",
+                   by = c("sex", "enrollment"),
+                   view = TRUE,
+                   weight = "count",
+                   out = out())
+
+  res
+
+  expect_equal(ncol(res), 9)
+  expect_equal(nrow(res), 8)
+
+
+  res <- proc_freq(sp,
+                   tables = c("internship"),
+                   titles = "My first Frequency Table",
+                   by = c("sex", "enrollment"),
+                   view = TRUE,
+                   weight = "count",
+                   out = out(report = TRUE))
+
+  res
+
+  expect_equal(length(res), 4)
+  expect_equal(ncol(res[[3]]), 6)
+  expect_equal(nrow(res[[3]]), 2)
+
+})
+
+test_that("freq52: zero count categories appear on twoway tables.", {
+
+  sp <- prt2
+
+  sp[1, 2] <- "no"
+
+  res <- proc_freq(sp,
+                   tables = c("internship * enrollment"),
+                   titles = "My first Frequency Table",
+                   by = c("sex"),
+                   view = TRUE,
+                   weight = "count",
+                   out = out())
+
+  res
+
+  expect_equal(ncol(res), 10)
+  expect_equal(nrow(res), 8)
+
+
+  res <- proc_freq(sp,
+                   tables = c("internship * enrollment"),
+                   titles = "My first Frequency Table",
+                   by = c("sex"),
+                   view = TRUE,
+                   weight = "count",
+                   out = out(report = TRUE))
+
+  res
+
+  expect_equal(length(res), 2)
+  expect_equal(ncol(res[[2]]), 5)
+  expect_equal(nrow(res[[2]]), 10)
+
+})
+
 
 
 #
