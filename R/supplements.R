@@ -31,6 +31,8 @@
 #' of the vector should correspond to the new variable name.
 #' @param format A named list of formats to assign to the output dataset.
 #' @param label A named vector of labels to assign to the output dataset.
+#' @param table A table request.  This parameter is used only for the
+#' \code{\link{proc_freq}} function.
 #' @param ... Various options.  When used with \code{\link{proc_freq}},
 #' the \code{table} option is most frequently used.
 #' @return The output specifications.
@@ -38,24 +40,33 @@
 out <- function(stats = NULL,
                 shape = NULL, report = FALSE, where = NULL,
                 drop = NULL, keep = NULL, rename = NULL,
-                format = NULL, label = NULL,
+                format = NULL, label = NULL, table = NULL,
                 ...) {
 
   ret <- structure(list(), class = c("out_req", "list"))
 
+  # Single var NSE
+  ostats <- deparse(substitute(stats, env = environment()))
+  stats <- tryCatch({if (typeof(stats) %in% c("character", "NULL")) stats else ostats},
+                 error = function(cond) {ostats})
+
+  odrop <- deparse(substitute(drop, env = environment()))
+  drop <- tryCatch({if (typeof(drop) %in% c("character", "NULL")) drop else odrop},
+                 error = function(cond) {odrop})
+
+  okeep <- deparse(substitute(keep, env = environment()))
+  keep <- tryCatch({if (typeof(keep) %in% c("character", "NULL")) keep else okeep},
+                   error = function(cond) {okeep})
+
+  otable <- deparse(substitute(table, env = environment()))
+  table <- tryCatch({if (typeof(table) %in% c("character", "NULL")) table else otable},
+                   error = function(cond) {otable})
+
 
   ret$stats <- stats
   ret$shape <- shape
-
-  lst <- list(...)
-  for (nm in names(lst)) {
-    if (nm == "table") {
-      ret$table <- lst[[nm]]
-      lst[[nm]] <- NULL
-    }
-  }
-
-  ret$parameters <-  lst
+  ret$table <- table
+  ret$parameters <- list(...)
   ret$report <- report
   ret$drop <- drop
   ret$keep <- keep

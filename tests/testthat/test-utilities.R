@@ -265,7 +265,7 @@ test_that("utils11: opts() works with list.", {
 
 })
 
-test_that("fill_missing() function works as expected.", {
+test_that("utils12: fill_missing() function works as expected.", {
 
 
   df <- data.frame(one = 1, two = 2, three = "3", stringsAsFactors = FALSE)
@@ -279,6 +279,24 @@ test_that("fill_missing() function works as expected.", {
 
   expect_equal(nrow(res), 4)
   expect_equal(ncol(res), 3)
+
+})
+
+
+test_that("utils13: out() NSE works as expected.", {
+
+
+  res <- out(table = flork, stats = bork, drop = sam,
+             keep = fred, sammy = TRUE)
+
+
+  res
+
+  expect_equal(res$table, "flork")
+  expect_equal(res$stats, "bork")
+  expect_equal(res$keep, "fred")
+  expect_equal(res$parameters$sammy, TRUE)
+  expect_equal(res$drop, "sam")
 
 })
 
