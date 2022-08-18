@@ -1033,6 +1033,25 @@ test_that("means48: warning on unknown parameter works.", {
 
 })
 
+
+
+test_that("means49: view can be FALSE without error.", {
+
+  var1 <- c("Age", "PresentScore", "TasteScore")
+  var2 <- c("n", "min", "max", "mean", "std")
+
+  res <- proc_means(datm, var = var1,
+                    stats = var2,
+                    class = Layers,
+                    view = FALSE,
+                    titles = "My first title for Means",
+                    out = out())
+
+
+  expect_equal(is.null(res), FALSE)
+
+})
+
 #
 # test_that("means47: aov statistic works with by.", {
 #

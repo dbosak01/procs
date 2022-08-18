@@ -175,6 +175,10 @@ proc_means <- function(data,
 
   rptflg <- FALSE
   rptnm <- ""
+  rptres <- NULL
+
+  # Kill output request for report
+  # Otherwise, this will mess up gen_output_means
   if (has_report(outreq)) {
     rptflg <- TRUE
     rptnm <- get_report_name(outreq)
@@ -184,7 +188,7 @@ proc_means <- function(data,
   res <- NULL
 
 
-  # Get report
+  # Get report if requested
   if (view == TRUE | rptflg) {
     rptres <- gen_report_means(data, by = by, var = var, class = class,
                             stats = stats, view = view,
@@ -192,7 +196,7 @@ proc_means <- function(data,
                             options = options)
   }
 
-  # Get output
+  # Get output datasets if requested
   if (length(outreq) > 0) {
     res <- gen_output_means(data,
                            by = by,
@@ -213,6 +217,7 @@ proc_means <- function(data,
 
   }
 
+  # Log the means function
   log_means(data,
             by = by,
             class = class,
