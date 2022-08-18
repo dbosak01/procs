@@ -1248,7 +1248,7 @@ gen_output_freq <- function(data,
     lst <- unclass(data)[by]
     for (nm in names(lst))
       lst[[nm]] <- as.factor(lst[[nm]])
-    dtlst <- split(data, lst, sep = "|", drop = TRUE)
+    dtlst <- split(data, lst, sep = "|")
 
     snms <- strsplit(names(dtlst), "|", fixed = TRUE)
 
@@ -1419,9 +1419,10 @@ gen_output_freq <- function(data,
       }
 
 
-      # Where
+      # Where Before
       if (!is.null(outp$where)) {
-        tmpres <- subset(tmpres, eval(outp$where))
+        tmpres <- tryCatch({subset(tmpres, eval(outp$where))},
+                           error = function(cond){tmpres})
 
       }
 
@@ -1443,6 +1444,13 @@ gen_output_freq <- function(data,
         rnm <- names(outp$rename)
         nnms <- replace(tnms, match(rnm, tnms), outp$rename)
         names(tmpres) <- nnms
+      }
+
+      # Where After
+      if (!is.null(outp$where)) {
+        tmpres <- tryCatch({subset(tmpres, eval(outp$where))},
+                           error = function(cond){tmpres})
+
       }
 
       # System Labels

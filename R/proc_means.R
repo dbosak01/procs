@@ -1031,10 +1031,10 @@ gen_output_means <- function(data,
         }
       }
 
-      # Where
+      # Where Before
       if (!is.null(outp$where)) {
-        tmpres <- subset(tmpres, eval(outp$where))
-
+        tmpres <- tryCatch({subset(tmpres, eval(outp$where))},
+                           error = function(cond){tmpres})
       }
 
       # Drop
@@ -1055,6 +1055,13 @@ gen_output_means <- function(data,
         rnm <- names(outp$rename)
         nnms <- replace(tnms, match(rnm, tnms), outp$rename)
         names(tmpres) <- nnms
+      }
+
+      # Where After
+      if (!is.null(outp$where)) {
+        tmpres <- tryCatch({subset(tmpres, eval(outp$where))},
+                           error = function(cond){tmpres})
+
       }
 
       # System Labels

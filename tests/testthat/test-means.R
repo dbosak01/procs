@@ -1052,6 +1052,40 @@ test_that("means49: view can be FALSE without error.", {
 
 })
 
+
+test_that("means50: where works before and after rename.", {
+
+  var1 <- c("Age", "PresentScore", "TasteScore")
+  var2 <- c("n", "min", "max", "mean", "std")
+
+  res <- proc_means(datm, var = var1,
+                    stats = var2,
+                    class = Layers,
+                    view = FALSE,
+                    titles = "My first title for Means",
+                    out = out(shape = "wide",
+                              rename = list(CLASS = "Layers"),
+                              where = expression(Layers == 2)))
+  res
+
+  expect_equal(nrow(res), 3)
+
+  res <- proc_means(datm, var = var1,
+                    stats = var2,
+                    class = Layers,
+                    view = FALSE,
+                    titles = "My first title for Means",
+                    out = out(shape = "wide",
+                              rename = list(CLASS = "Layers"),
+                              where = expression(CLASS == 2)))
+  res
+
+  expect_equal(nrow(res), 3)
+
+})
+
+
+
 #
 # test_that("means47: aov statistic works with by.", {
 #

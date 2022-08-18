@@ -1388,6 +1388,41 @@ test_that("freq53: error on unknown parameter.", {
 })
 
 
+
+test_that("freq54: where works before and after rename.", {
+
+
+  res <- proc_freq(prt2,
+                   tables = c("internship"),
+                   titles = "My first Frequency Table",
+                   by = c("sex", "enrollment"),
+                   view = TRUE,
+                   weight = "count",
+                   out = out(rename = list(BY2 = "Enrollment"),
+                             where = expression(Enrollment == "no")))
+
+  res
+
+  expect_equal(nrow(res), 4)
+
+  res <- proc_freq(prt2,
+                   tables = c("internship"),
+                   titles = "My first Frequency Table",
+                   by = c("sex", "enrollment"),
+                   view = TRUE,
+                   weight = "count",
+                   out = out(rename = list(BY2 = "Enrollment"),
+                             where = expression(BY2 == "no")))
+
+  res
+
+  expect_equal(nrow(res), 4)
+
+
+
+})
+
+
 #
 # test_that("freq52: oneway across works.", {
 #
