@@ -1,7 +1,7 @@
 # procs 0.0.9005
 
 * Added more options to `out()` function.
-* Added aov statistic to `proc_means()`.
+* Wrote documentation.
 
 # procs 0.0.9004
 

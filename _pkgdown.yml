@@ -6,9 +6,7 @@ articles:
   contents:
   - procs-freq
   - procs-means
-  - procs-transpose
-  - procs-sort
-  - procs-print
+  - procs-other
   - procs-example1
 
 reference:

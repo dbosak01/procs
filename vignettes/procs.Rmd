@@ -30,19 +30,13 @@ The package includes the following procedure functions:
 * `proc_transpose()`: A function to pivot data similar in syntax to the 
 TRANSPOSE procedure.
 * `proc_sort()`: A function to sort and dedupe datasets.
-* `proc_compare()`: A function to compare two datasets and report on 
-the differences between them.
 * `proc_print()`: A quick-print function to send procedure results to the viewer
 or a report.
 
 
 ### How to Use
 
-
-The following examples illustrate the basic functionality of each of the 
-above three functions:
-
-#### The `proc_freq()` Function
+#### Frequency Statistics
 
 The `proc_freq()` function generates frequency statistics in a manner
 similar to SAS® PROC FREQ.  
@@ -50,137 +44,201 @@ similar to SAS® PROC FREQ.
 ```{r eval=FALSE, echo=TRUE} 
 library(procs)
 
+# Prepare sample data
 dt <- as.data.frame(HairEyeColor, stringsAsFactors = FALSE)
 
+# Assign labels
 labels(dt) <- list(Hair = "Hair Color",
                    Eye = "Eye Color")
 
-res <- proc_freq(dt, tables = c("Hair", "Eye", "Hair * Eye"),
-                 weight = "Freq",
-                 options = opts(chisq = TRUE),
+# Produce frequency statistics
+res <- proc_freq(dt, tables = v(Hair, Eye, Hair * Eye),
+                 weight = Freq,
+                 options = opts(chisq = TRUE, 
+                                cumsum = FALSE, cumpct = FALSE),
                  titles = "Hair and Eye Frequency Statistics",
-                 out1 = out(table = "Hair * Eye"),
-                 out2 = out(table = "Hair * Eye", stats = "chisq"))
+                 out = out(report = TRUE))
 
 ```
 By default, the following report will be shown in the viewer:
 <img src="../man/images/freq1.png"/>
 
-Also note that the `proc_freq()` function returned a list of two data frames
-in the variable 'res', according to the output requests. The value of 'res'
-is as follows:
-```{r eval=FALSE, echo=TRUE} 
+The function call requested that all the report datasets
+be output in a list.  These datasets can be seen below:
+```{r eval=FALSE, echo = TRUE}
 # View output datasets
 res
-# $out1
-#    VAR1 VAR2  CAT1  CAT2   N CNT        PCT CUMSUM     CUMPCT
-# 1  Hair  Eye Black  Blue 592  20  3.3783784     20   3.378378
-# 2  Hair  Eye Black Brown 592  68 11.4864865     88  14.864865
-# 3  Hair  Eye Black Green 592   5  0.8445946     93  15.709459
-# 4  Hair  Eye Black Hazel 592  15  2.5337838    108  18.243243
-# 5  Hair  Eye Blond  Blue 592  94 15.8783784    202  34.121622
-# 6  Hair  Eye Blond Brown 592   7  1.1824324    209  35.304054
-# 7  Hair  Eye Blond Green 592  16  2.7027027    225  38.006757
-# 8  Hair  Eye Blond Hazel 592  10  1.6891892    235  39.695946
-# 9  Hair  Eye Brown  Blue 592  84 14.1891892    319  53.885135
-# 10 Hair  Eye Brown Brown 592 119 20.1013514    438  73.986486
-# 11 Hair  Eye Brown Green 592  29  4.8986486    467  78.885135
-# 12 Hair  Eye Brown Hazel 592  54  9.1216216    521  88.006757
-# 13 Hair  Eye   Red  Blue 592  17  2.8716216    538  90.878378
-# 14 Hair  Eye   Red Brown 592  26  4.3918919    564  95.270270
-# 15 Hair  Eye   Red Green 592  14  2.3648649    578  97.635135
-# 16 Hair  Eye   Red Hazel 592  14  2.3648649    592 100.000000
+# $Hair
+#     CAT   N CNT      PCT
+# 1 Black 592 108 18.24324
+# 2 Blond 592 127 21.45270
+# 3 Brown 592 286 48.31081
+# 4   Red 592  71 11.99324
 # 
-# $out2
-#   VAR1 VAR2    CHISQ CHISQ.DF      CHISQ.P
-# 1 Hair  Eye 138.2898        9 2.325287e-25
+# $Eye
+#     CAT   N CNT      PCT
+# 1  Blue 592 215 36.31757
+# 2 Brown 592 220 37.16216
+# 3 Green 592  64 10.81081
+# 4 Hazel 592  93 15.70946
+# 
+# $`Hair * Eye`
+#      CAT Statistic       Blue      Brown      Green     Hazel     Total
+# 1  Black Frequency  20.000000  68.000000  5.0000000 15.000000 108.00000
+# 2  Black   Percent   3.378378  11.486486  0.8445946  2.533784  18.24324
+# 3  Black   Row Pct  18.518519  62.962963  4.6296296 13.888889        NA
+# 4  Black   Col Pct   9.302326  30.909091  7.8125000 16.129032        NA
+# 5  Blond Frequency  94.000000   7.000000 16.0000000 10.000000 127.00000
+# 6  Blond   Percent  15.878378   1.182432  2.7027027  1.689189  21.45270
+# 7  Blond   Row Pct  74.015748   5.511811 12.5984252  7.874016        NA
+# 8  Blond   Col Pct  43.720930   3.181818 25.0000000 10.752688        NA
+# 9  Brown Frequency  84.000000 119.000000 29.0000000 54.000000 286.00000
+# 10 Brown   Percent  14.189189  20.101351  4.8986486  9.121622  48.31081
+# 11 Brown   Row Pct  29.370629  41.608392 10.1398601 18.881119        NA
+# 12 Brown   Col Pct  39.069767  54.090909 45.3125000 58.064516        NA
+# 13   Red Frequency  17.000000  26.000000 14.0000000 14.000000  71.00000
+# 14   Red   Percent   2.871622   4.391892  2.3648649  2.364865  11.99324
+# 15   Red   Row Pct  23.943662  36.619718 19.7183099 19.718310        NA
+# 16   Red   Col Pct   7.906977  11.818182 21.8750000 15.053763        NA
+# 17 Total Frequency 215.000000 220.000000 64.0000000 93.000000 592.00000
+# 18 Total   Percent  36.317568  37.162162 10.8108108 15.709459 100.00000
+# 
+# $Chisq
+#      Measure        Value
+# 1 Chi-Square 1.382898e+02
+# 2         DF 9.000000e+00
+# 3   PR>ChiSq 2.325287e-25
 
 ```
 
-#### The `proc_means()` Function
+#### Summary Statistics
 
-The `proc_means()` function attempts to provide similar functionality to 
+The `proc_means()` function calculates summary statistics, similar to 
 the SAS® PROC MEANS procedure.
-
-The below example takes the Hair frequencies calculated above and performs
-some summary statistics on the frequencies using `proc_means()`:
 
 ```{r eval=FALSE, echo=TRUE} 
 library(procs)
 
-dt <- as.data.frame(HairEyeColor, stringsAsFactors = FALSE)
-
-statlst <- c("n", "mean", "std", "median", "min", "max", "Q1", "Q3")
 
 # Perform calculations
 res2 <- proc_means(dt, var = Freq, 
-                   stats = statlst,
-                   class = Sex,
-                   options = opts(aov = TRUE),
+                   class = Hair,
+                   by = Sex,
                    titles = "Hair and Eye Summary Statistics by Sex",
-                   out1 = out(stats = statlst, 
-                              shape = "wide"))
-                   #out2 = out(stats = "aov"))
+                   out1 = out(where = expression(TYPE == 1),
+                              drop = v(TYPE, FREQ, VAR)))
 
-# View the summary statistics
-res2
-# [[1]]
-# # A tibble: 1 × 6
-#   Variable      N  Mean Std_Dev Minimum Maximum
-#   <chr>     <int> <dbl>   <dbl>   <dbl>   <dbl>
-# 1 Frequency     4   148    94.9      71     286
 ```
 
-#### The `proc_transpose()` Function
+The following is sent to the viewer:
+
+<img src="../man/images/means1.png"/>
+
+And here is the output dataset:
+
+```{r eval=FALSE, echo = TRUE}
+# View the summary statistics
+res2
+#       BY CLASS N  MEAN       STD MIN MAX
+# 1 Female Black 4 13.00 15.599145   2  36
+# 2 Female Blond 4 20.25 29.216149   4  64
+# 3 Female Brown 4 35.75 21.884165  14  66
+# 4 Female   Red 4  9.25  4.500000   7  16
+# 5   Male Black 4 14.00 12.516656   3  32
+# 6   Male Blond 4 11.50 12.503333   3  30
+# 7   Male Brown 4 35.75 18.679311  15  53
+# 8   Male   Red 4  8.50  1.732051   7  10
+```
+
+Note that both `proc_freq()` and `proc_means()` follow the convention of naming
+columns according to the statistic or parameter they represent.  This convention
+is somewhat different from SAS®, but makes it easier when you need to manipulate
+the output dataset.
+
+Also observe that there are some additional parameters on the `out()` request
+that allow you to do shaping of the output dataset.  These same 
+shaping parameters are available on `proc_freq()` as well.
+
+#### Other Functions
 
 While the main purpose of the **procs** package is to replicate SAS® statistical
 procedures, the output from these procedures is often manipulated to
-produce a more desirable result.  While R and Tidyverse do contain sufficient
-data manipulation functions, the TRANSPOSE procedure from SAS® provides a 
-somewhat different conceptual model that SAS® programmers like.  The aim
-of the `proc_transpose()` function is to offer a similar model in R.
+produce a more desirable result. Some additional functions have been added
+to the **procs** package that SAS programmers will be familiar with:
+`proc_transpose()`, `proc_sort()`, and `proc_print()`.
 
-The following example takes the "Hair" frequencies from the `proc_freq()`
-example above, and transposes the rows and columns:
+Continuing from the example above, let's take some additional steps
+to produce a little report:
 
 ```{r eval=FALSE, echo=TRUE} 
 library(procs)
 
-# Get Hair frequencies
-dt <- res$Hair
-
-# View Hair frequencies
-dt
-# # A tibble: 4 × 5
-#   Category Frequency Percent Cum_Freq Cum_Pct
-#   <chr>        <dbl>   <dbl>    <dbl>   <dbl>
-# 1 Black          108    18.2      108    18.2
-# 2 Blond          127    21.5      235    39.7
-# 3 Brown          286    48.3      521    88.0
-# 4 Red             71    12.0      592   100 
-
-res3 <- proc_transpose(dt, var = c("Frequency", "Percent", "Cum_Freq", "Cum_Pct"),
-                       id = "Category", name = "Statistic")
+# Tranpose statistics to rows
+res3 <- proc_transpose(res2, id = CLASS, by = BY, name = Statistic)
 
 # View transformed data
 res3
-# # A tibble: 4 × 5
-#   Statistic Black Blond Brown   Red
-#   <chr>     <dbl> <dbl> <dbl> <dbl>
-# 1 Frequency 108   127   286    71  
-# 2 Percent    18.2  21.5  48.3  12.0
-# 3 Cum_Freq  108   235   521   592  
-# 4 Cum_Pct    18.2  39.7  88.0 100  
+#        BY Statistic    Black    Blond    Brown       Red
+# 1  Female         N  4.00000  4.00000  4.00000  4.000000
+# 2  Female      MEAN 13.00000 20.25000 35.75000  9.250000
+# 3  Female       STD 15.59915 29.21615 21.88416  4.500000
+# 4  Female       MIN  2.00000  4.00000 14.00000  7.000000
+# 5  Female       MAX 36.00000 64.00000 66.00000 16.000000
+# 6    Male         N  4.00000  4.00000  4.00000  4.000000
+# 7    Male      MEAN 14.00000 11.50000 35.75000  8.500000
+# 8    Male       STD 12.51666 12.50333 18.67931  1.732051
+# 9    Male       MIN  3.00000  3.00000 15.00000  7.000000
+# 10   Male       MAX 32.00000 30.00000 53.00000 10.000000
+
+# Assign factor to BY so we can sort
+res3$BY <- factor(res3$BY, levels = c("Male", "Female"))
+
+# Sort male to top
+res4 <- proc_sort(res3, by = BY)
+#        BY Statistic    Black    Blond    Brown       Red
+# 6    Male         N  4.00000  4.00000  4.00000  4.000000
+# 7    Male      MEAN 14.00000 11.50000 35.75000  8.500000
+# 8    Male       STD 12.51666 12.50333 18.67931  1.732051
+# 9    Male       MIN  3.00000  3.00000 15.00000  7.000000
+# 10   Male       MAX 32.00000 30.00000 53.00000 10.000000
+# 1  Female         N  4.00000  4.00000  4.00000  4.000000
+# 2  Female      MEAN 13.00000 20.25000 35.75000  9.250000
+# 3  Female       STD 15.59915 29.21615 21.88416  4.500000
+# 4  Female       MIN  2.00000  4.00000 14.00000  7.000000
+# 5  Female       MAX 36.00000 64.00000 66.00000 16.000000
+
+# Create formatting list
+fmt <- flist(STD = "%.3f", type = "row", lookup = res4$Statistic)
+
+# Create vector lookup
+vf <- c(MEAN = "Mean", STD = "Std", MEDIAN = "Median", 
+        MIN = "Min", MAX = "Max")
+
+# Assign formats 
+formats(res4) <- list(Statistic = vf,
+                      Black = fmt,
+                      Blond = fmt,
+                      Brown = fmt,
+                      Red = fmt)
+
+# Reassign first column name
+names(res4)[1] <- "stub"
+
+# Assign labels
+labels(res4) <- list(stub = "Sex")
+
+# Create list for reporting
+prnt <- list(res$`Hair * Eye`, res$Chisq, res4)
+
+# Print result
+proc_print(prnt, 
+           titles = "Analysis of Hair and Eyes Dataset")
+
 ```
+<img src="../man/images/print1.png"/>
 
-#### The `proc_sort()` Function
-
-
-#### The `proc_compare()` Function
-
-
-#### The `proc_print()` Function
-
+If desired, we could print this report to the file system using 
+the "file_path" and "output_type" parameters on `proc_print()`.
 
 ### Next Steps
 
@@ -189,11 +247,7 @@ Those articles include:
 
 * [The Frequency Function](procs-freq.html)
 * [The Means Function](procs-means.html)
-* [The Transpose Function](procs-transpose.html)
-* [The Sort Function](procs-sort.html)
-* [The Compare Function](procs-compare.html)
-* [The Print Function](procs-print.html)
-* [Package Validation](procs-validation.html)
+* [Other Functions](procs-other.html)
 * [Complete Example](procs-example1.html)
 
 

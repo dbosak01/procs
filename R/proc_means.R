@@ -965,6 +965,9 @@ gen_output_means <- function(data,
 
         dat <- bdat[[j]]
 
+        if (!is.null(tp))
+          tp <- 0
+
         # Deal with by variable values
         bynm <- NULL
         if (!is.null(bynms)) {
@@ -972,21 +975,21 @@ gen_output_means <- function(data,
           names(bynm) <- byn
         }
 
-        if (!all(outp$stats == "aov")) {
-          # Always add type 0
-          tmpby <- get_output(dat, var = var,
-                               by = bynm,
-                               class = cls,
-                               stats = outp$stats,
-                               shape = outp$shape,
-                               freq = frq,
-                               type = tp)
 
-          if (is.null(tmpres))
-            tmpres <- tmpby
-          else
-            tmpres <- rbind(tmpres, tmpby)
-        }
+        # Always add type 0
+        tmpby <- get_output(dat, var = var,
+                             by = bynm,
+                             class = cls,
+                             stats = outp$stats,
+                             shape = outp$shape,
+                             freq = frq,
+                             type = tp)
+
+        if (is.null(tmpres))
+          tmpres <- tmpby
+        else
+          tmpres <- rbind(tmpres, tmpby)
+
 
         if (!is.null(class)) {
 

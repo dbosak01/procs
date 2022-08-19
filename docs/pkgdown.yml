@@ -2,17 +2,13 @@ pandoc: '2.18'
 pkgdown: 1.6.1
 pkgdown_sha: ~
 articles:
-  procs-compare: procs-compare.html
   procs-example1: procs-example1.html
   procs-faq: procs-faq.html
   procs-freq: procs-freq.html
   procs-means: procs-means.html
-  procs-print: procs-print.html
-  procs-sort: procs-sort.html
-  procs-transpose: procs-transpose.html
-  procs-validation: procs-validation.html
+  procs-other: procs-other.html
   procs: procs.html
-last_built: 2022-08-19T00:55Z
+last_built: 2022-08-19T19:05Z
 urls:
   reference: https://procs.r-sassy.org/reference
   article: https://procs.r-sassy.org/articles

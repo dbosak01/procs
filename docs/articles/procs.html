@@ -68,13 +68,7 @@
       <a href="../articles/procs-means.html">The Means Function</a>
     </li>
     <li>
-      <a href="../articles/procs-transpose.html">The Transpose Function</a>
-    </li>
-    <li>
-      <a href="../articles/procs-sort.html">The Sort Function</a>
-    </li>
-    <li>
-      <a href="../articles/procs-print.html">The Print Function</a>
+      <a href="../articles/procs-other.html">Other Functions</a>
     </li>
     <li>
       <a href="../articles/procs-example1.html">Complete Example</a>
@@ -143,9 +137,6 @@ syntax to the TRANSPOSE procedure.</li>
 <code><a href="../reference/proc_sort.html">proc_sort()</a></code>: A function to sort and dedupe
 datasets.</li>
 <li>
-<code><a href="../reference/proc_compare.html">proc_compare()</a></code>: A function to compare two datasets and
-report on the differences between them.</li>
-<li>
 <code><a href="../reference/proc_print.html">proc_print()</a></code>: A quick-print function to send procedure
 results to the viewer or a report.</li>
 </ul>
@@ -153,145 +144,195 @@ results to the viewer or a report.</li>
 <div id="how-to-use" class="section level3">
 <h3 class="hasAnchor">
 <a href="#how-to-use" class="anchor"></a>How to Use</h3>
-<p>The following examples illustrate the basic functionality of each of
-the above three functions:</p>
-<div id="the-proc_freq-function" class="section level4">
+<div id="frequency-statistics" class="section level4">
 <h4 class="hasAnchor">
-<a href="#the-proc_freq-function" class="anchor"></a>The <code>proc_freq()</code> Function</h4>
+<a href="#frequency-statistics" class="anchor"></a>Frequency Statistics</h4>
 <p>The <code><a href="../reference/proc_freq.html">proc_freq()</a></code> function generates frequency statistics
 in a manner similar to SAS® PROC FREQ.</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://procs.r-sassy.org">procs</a></span><span class="op">)</span></span>
 <span></span>
+<span><span class="co"># Prepare sample data</span></span>
 <span><span class="va">dt</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/as.data.frame.html">as.data.frame</a></span><span class="op">(</span><span class="va">HairEyeColor</span>, stringsAsFactors <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
 <span></span>
+<span><span class="co"># Assign labels</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/labels.html">labels</a></span><span class="op">(</span><span class="va">dt</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span>Hair <span class="op">=</span> <span class="st">"Hair Color"</span>,</span>
 <span>                   Eye <span class="op">=</span> <span class="st">"Eye Color"</span><span class="op">)</span></span>
 <span></span>
-<span><span class="va">res</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/proc_freq.html">proc_freq</a></span><span class="op">(</span><span class="va">dt</span>, tables <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"Hair"</span>, <span class="st">"Eye"</span>, <span class="st">"Hair * Eye"</span><span class="op">)</span>,</span>
-<span>                 weight <span class="op">=</span> <span class="st">"Freq"</span>,</span>
-<span>                 options <span class="op">=</span> <span class="fu"><a href="../reference/opts.html">opts</a></span><span class="op">(</span>chisq <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>,</span>
+<span><span class="co"># Produce frequency statistics</span></span>
+<span><span class="va">res</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/proc_freq.html">proc_freq</a></span><span class="op">(</span><span class="va">dt</span>, tables <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/common/man/v.html">v</a></span><span class="op">(</span><span class="va">Hair</span>, <span class="va">Eye</span>, <span class="va">Hair</span> <span class="op">*</span> <span class="va">Eye</span><span class="op">)</span>,</span>
+<span>                 weight <span class="op">=</span> <span class="va">Freq</span>,</span>
+<span>                 options <span class="op">=</span> <span class="fu"><a href="../reference/opts.html">opts</a></span><span class="op">(</span>chisq <span class="op">=</span> <span class="cn">TRUE</span>, </span>
+<span>                                cumsum <span class="op">=</span> <span class="cn">FALSE</span>, cumpct <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span>,</span>
 <span>                 titles <span class="op">=</span> <span class="st">"Hair and Eye Frequency Statistics"</span>,</span>
-<span>                 out1 <span class="op">=</span> <span class="fu"><a href="../reference/out.html">out</a></span><span class="op">(</span>table <span class="op">=</span> <span class="st">"Hair * Eye"</span><span class="op">)</span>,</span>
-<span>                 out2 <span class="op">=</span> <span class="fu"><a href="../reference/out.html">out</a></span><span class="op">(</span>table <span class="op">=</span> <span class="st">"Hair * Eye"</span>, stats <span class="op">=</span> <span class="st">"chisq"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<span>                 out <span class="op">=</span> <span class="fu"><a href="../reference/out.html">out</a></span><span class="op">(</span>report <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <p>By default, the following report will be shown in the viewer:
 <img src="../man/images/freq1.png"></p>
-<p>Also note that the <code><a href="../reference/proc_freq.html">proc_freq()</a></code> function returned a list
-of two data frames in the variable ‘res’, according to the output
-requests. The value of ‘res’ is as follows:</p>
+<p>The function call requested that all the report datasets be output in
+a list. These datasets can be seen below:</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># View output datasets</span></span>
 <span><span class="va">res</span></span>
-<span><span class="co"># $out1</span></span>
-<span><span class="co">#    VAR1 VAR2  CAT1  CAT2   N CNT        PCT CUMSUM     CUMPCT</span></span>
-<span><span class="co"># 1  Hair  Eye Black  Blue 592  20  3.3783784     20   3.378378</span></span>
-<span><span class="co"># 2  Hair  Eye Black Brown 592  68 11.4864865     88  14.864865</span></span>
-<span><span class="co"># 3  Hair  Eye Black Green 592   5  0.8445946     93  15.709459</span></span>
-<span><span class="co"># 4  Hair  Eye Black Hazel 592  15  2.5337838    108  18.243243</span></span>
-<span><span class="co"># 5  Hair  Eye Blond  Blue 592  94 15.8783784    202  34.121622</span></span>
-<span><span class="co"># 6  Hair  Eye Blond Brown 592   7  1.1824324    209  35.304054</span></span>
-<span><span class="co"># 7  Hair  Eye Blond Green 592  16  2.7027027    225  38.006757</span></span>
-<span><span class="co"># 8  Hair  Eye Blond Hazel 592  10  1.6891892    235  39.695946</span></span>
-<span><span class="co"># 9  Hair  Eye Brown  Blue 592  84 14.1891892    319  53.885135</span></span>
-<span><span class="co"># 10 Hair  Eye Brown Brown 592 119 20.1013514    438  73.986486</span></span>
-<span><span class="co"># 11 Hair  Eye Brown Green 592  29  4.8986486    467  78.885135</span></span>
-<span><span class="co"># 12 Hair  Eye Brown Hazel 592  54  9.1216216    521  88.006757</span></span>
-<span><span class="co"># 13 Hair  Eye   Red  Blue 592  17  2.8716216    538  90.878378</span></span>
-<span><span class="co"># 14 Hair  Eye   Red Brown 592  26  4.3918919    564  95.270270</span></span>
-<span><span class="co"># 15 Hair  Eye   Red Green 592  14  2.3648649    578  97.635135</span></span>
-<span><span class="co"># 16 Hair  Eye   Red Hazel 592  14  2.3648649    592 100.000000</span></span>
+<span><span class="co"># $Hair</span></span>
+<span><span class="co">#     CAT   N CNT      PCT</span></span>
+<span><span class="co"># 1 Black 592 108 18.24324</span></span>
+<span><span class="co"># 2 Blond 592 127 21.45270</span></span>
+<span><span class="co"># 3 Brown 592 286 48.31081</span></span>
+<span><span class="co"># 4   Red 592  71 11.99324</span></span>
 <span><span class="co"># </span></span>
-<span><span class="co"># $out2</span></span>
-<span><span class="co">#   VAR1 VAR2    CHISQ CHISQ.DF      CHISQ.P</span></span>
-<span><span class="co"># 1 Hair  Eye 138.2898        9 2.325287e-25</span></span></code></pre></div>
+<span><span class="co"># $Eye</span></span>
+<span><span class="co">#     CAT   N CNT      PCT</span></span>
+<span><span class="co"># 1  Blue 592 215 36.31757</span></span>
+<span><span class="co"># 2 Brown 592 220 37.16216</span></span>
+<span><span class="co"># 3 Green 592  64 10.81081</span></span>
+<span><span class="co"># 4 Hazel 592  93 15.70946</span></span>
+<span><span class="co"># </span></span>
+<span><span class="co"># $`Hair * Eye`</span></span>
+<span><span class="co">#      CAT Statistic       Blue      Brown      Green     Hazel     Total</span></span>
+<span><span class="co"># 1  Black Frequency  20.000000  68.000000  5.0000000 15.000000 108.00000</span></span>
+<span><span class="co"># 2  Black   Percent   3.378378  11.486486  0.8445946  2.533784  18.24324</span></span>
+<span><span class="co"># 3  Black   Row Pct  18.518519  62.962963  4.6296296 13.888889        NA</span></span>
+<span><span class="co"># 4  Black   Col Pct   9.302326  30.909091  7.8125000 16.129032        NA</span></span>
+<span><span class="co"># 5  Blond Frequency  94.000000   7.000000 16.0000000 10.000000 127.00000</span></span>
+<span><span class="co"># 6  Blond   Percent  15.878378   1.182432  2.7027027  1.689189  21.45270</span></span>
+<span><span class="co"># 7  Blond   Row Pct  74.015748   5.511811 12.5984252  7.874016        NA</span></span>
+<span><span class="co"># 8  Blond   Col Pct  43.720930   3.181818 25.0000000 10.752688        NA</span></span>
+<span><span class="co"># 9  Brown Frequency  84.000000 119.000000 29.0000000 54.000000 286.00000</span></span>
+<span><span class="co"># 10 Brown   Percent  14.189189  20.101351  4.8986486  9.121622  48.31081</span></span>
+<span><span class="co"># 11 Brown   Row Pct  29.370629  41.608392 10.1398601 18.881119        NA</span></span>
+<span><span class="co"># 12 Brown   Col Pct  39.069767  54.090909 45.3125000 58.064516        NA</span></span>
+<span><span class="co"># 13   Red Frequency  17.000000  26.000000 14.0000000 14.000000  71.00000</span></span>
+<span><span class="co"># 14   Red   Percent   2.871622   4.391892  2.3648649  2.364865  11.99324</span></span>
+<span><span class="co"># 15   Red   Row Pct  23.943662  36.619718 19.7183099 19.718310        NA</span></span>
+<span><span class="co"># 16   Red   Col Pct   7.906977  11.818182 21.8750000 15.053763        NA</span></span>
+<span><span class="co"># 17 Total Frequency 215.000000 220.000000 64.0000000 93.000000 592.00000</span></span>
+<span><span class="co"># 18 Total   Percent  36.317568  37.162162 10.8108108 15.709459 100.00000</span></span>
+<span><span class="co"># </span></span>
+<span><span class="co"># $Chisq</span></span>
+<span><span class="co">#      Measure        Value</span></span>
+<span><span class="co"># 1 Chi-Square 1.382898e+02</span></span>
+<span><span class="co"># 2         DF 9.000000e+00</span></span>
+<span><span class="co"># 3   PR&gt;ChiSq 2.325287e-25</span></span></code></pre></div>
 </div>
-<div id="the-proc_means-function" class="section level4">
+<div id="summary-statistics" class="section level4">
 <h4 class="hasAnchor">
-<a href="#the-proc_means-function" class="anchor"></a>The <code>proc_means()</code> Function</h4>
-<p>The <code><a href="../reference/proc_means.html">proc_means()</a></code> function attempts to provide similar
-functionality to the SAS® PROC MEANS procedure.</p>
-<p>The below example takes the Hair frequencies calculated above and
-performs some summary statistics on the frequencies using
-<code><a href="../reference/proc_means.html">proc_means()</a></code>:</p>
+<a href="#summary-statistics" class="anchor"></a>Summary Statistics</h4>
+<p>The <code><a href="../reference/proc_means.html">proc_means()</a></code> function calculates summary statistics,
+similar to the SAS® PROC MEANS procedure.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://procs.r-sassy.org">procs</a></span><span class="op">)</span></span>
 <span></span>
-<span><span class="va">dt</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/as.data.frame.html">as.data.frame</a></span><span class="op">(</span><span class="va">HairEyeColor</span>, stringsAsFactors <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
-<span></span>
-<span><span class="va">statlst</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"n"</span>, <span class="st">"mean"</span>, <span class="st">"std"</span>, <span class="st">"median"</span>, <span class="st">"min"</span>, <span class="st">"max"</span>, <span class="st">"Q1"</span>, <span class="st">"Q3"</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Perform calculations</span></span>
 <span><span class="va">res2</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/proc_means.html">proc_means</a></span><span class="op">(</span><span class="va">dt</span>, var <span class="op">=</span> <span class="va">Freq</span>, </span>
-<span>                   stats <span class="op">=</span> <span class="va">statlst</span>,</span>
-<span>                   class <span class="op">=</span> <span class="va">Sex</span>,</span>
-<span>                   options <span class="op">=</span> <span class="fu"><a href="../reference/opts.html">opts</a></span><span class="op">(</span>aov <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>,</span>
+<span>                   class <span class="op">=</span> <span class="va">Hair</span>,</span>
+<span>                   by <span class="op">=</span> <span class="va">Sex</span>,</span>
 <span>                   titles <span class="op">=</span> <span class="st">"Hair and Eye Summary Statistics by Sex"</span>,</span>
-<span>                   out1 <span class="op">=</span> <span class="fu"><a href="../reference/out.html">out</a></span><span class="op">(</span>stats <span class="op">=</span> <span class="va">statlst</span>, </span>
-<span>                              shape <span class="op">=</span> <span class="st">"wide"</span><span class="op">)</span><span class="op">)</span></span>
-<span>                   <span class="co">#out2 = out(stats = "aov"))</span></span>
-<span></span>
-<span><span class="co"># View the summary statistics</span></span>
+<span>                   out1 <span class="op">=</span> <span class="fu"><a href="../reference/out.html">out</a></span><span class="op">(</span>where <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/expression.html">expression</a></span><span class="op">(</span><span class="va">TYPE</span> <span class="op">==</span> <span class="fl">1</span><span class="op">)</span>,</span>
+<span>                              drop <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/common/man/v.html">v</a></span><span class="op">(</span><span class="va">TYPE</span>, <span class="va">FREQ</span>, <span class="va">VAR</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<p>The following is sent to the viewer:</p>
+<p><img src="../man/images/means1.png"></p>
+<p>And here is the output dataset:</p>
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># View the summary statistics</span></span>
 <span><span class="va">res2</span></span>
-<span><span class="co"># [[1]]</span></span>
-<span><span class="co"># # A tibble: 1 × 6</span></span>
-<span><span class="co">#   Variable      N  Mean Std_Dev Minimum Maximum</span></span>
-<span><span class="co">#   &lt;chr&gt;     &lt;int&gt; &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;</span></span>
-<span><span class="co"># 1 Frequency     4   148    94.9      71     286</span></span></code></pre></div>
+<span><span class="co">#       BY CLASS N  MEAN       STD MIN MAX</span></span>
+<span><span class="co"># 1 Female Black 4 13.00 15.599145   2  36</span></span>
+<span><span class="co"># 2 Female Blond 4 20.25 29.216149   4  64</span></span>
+<span><span class="co"># 3 Female Brown 4 35.75 21.884165  14  66</span></span>
+<span><span class="co"># 4 Female   Red 4  9.25  4.500000   7  16</span></span>
+<span><span class="co"># 5   Male Black 4 14.00 12.516656   3  32</span></span>
+<span><span class="co"># 6   Male Blond 4 11.50 12.503333   3  30</span></span>
+<span><span class="co"># 7   Male Brown 4 35.75 18.679311  15  53</span></span>
+<span><span class="co"># 8   Male   Red 4  8.50  1.732051   7  10</span></span></code></pre></div>
+<p>Note that both <code><a href="../reference/proc_freq.html">proc_freq()</a></code> and <code><a href="../reference/proc_means.html">proc_means()</a></code>
+follow the convention of naming columns according to the statistic or
+parameter they represent. This convention is somewhat different from
+SAS®, but makes it easier when you need to manipulate the output
+dataset.</p>
+<p>Also observe that there are some additional parameters on the
+<code><a href="../reference/out.html">out()</a></code> request that allow you to do shaping of the output
+dataset. These same shaping parameters are available on
+<code><a href="../reference/proc_freq.html">proc_freq()</a></code> as well.</p>
 </div>
-<div id="the-proc_transpose-function" class="section level4">
+<div id="other-functions" class="section level4">
 <h4 class="hasAnchor">
-<a href="#the-proc_transpose-function" class="anchor"></a>The <code>proc_transpose()</code> Function</h4>
+<a href="#other-functions" class="anchor"></a>Other Functions</h4>
 <p>While the main purpose of the <strong>procs</strong> package is to
 replicate SAS® statistical procedures, the output from these procedures
-is often manipulated to produce a more desirable result. While R and
-Tidyverse do contain sufficient data manipulation functions, the
-TRANSPOSE procedure from SAS® provides a somewhat different conceptual
-model that SAS® programmers like. The aim of the
-<code><a href="../reference/proc_transpose.html">proc_transpose()</a></code> function is to offer a similar model in
-R.</p>
-<p>The following example takes the “Hair” frequencies from the
-<code><a href="../reference/proc_freq.html">proc_freq()</a></code> example above, and transposes the rows and
-columns:</p>
-<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+is often manipulated to produce a more desirable result. Some additional
+functions have been added to the <strong>procs</strong> package that SAS
+programmers will be familiar with: <code><a href="../reference/proc_transpose.html">proc_transpose()</a></code>,
+<code><a href="../reference/proc_sort.html">proc_sort()</a></code>, and <code><a href="../reference/proc_print.html">proc_print()</a></code>.</p>
+<p>Continuing from the example above, let’s take some additional steps
+to produce a little report:</p>
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://procs.r-sassy.org">procs</a></span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># Get Hair frequencies</span></span>
-<span><span class="va">dt</span> <span class="op">&lt;-</span> <span class="va">res</span><span class="op">$</span><span class="va">Hair</span></span>
-<span></span>
-<span><span class="co"># View Hair frequencies</span></span>
-<span><span class="va">dt</span></span>
-<span><span class="co"># # A tibble: 4 × 5</span></span>
-<span><span class="co">#   Category Frequency Percent Cum_Freq Cum_Pct</span></span>
-<span><span class="co">#   &lt;chr&gt;        &lt;dbl&gt;   &lt;dbl&gt;    &lt;dbl&gt;   &lt;dbl&gt;</span></span>
-<span><span class="co"># 1 Black          108    18.2      108    18.2</span></span>
-<span><span class="co"># 2 Blond          127    21.5      235    39.7</span></span>
-<span><span class="co"># 3 Brown          286    48.3      521    88.0</span></span>
-<span><span class="co"># 4 Red             71    12.0      592   100 </span></span>
-<span></span>
-<span><span class="va">res3</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/proc_transpose.html">proc_transpose</a></span><span class="op">(</span><span class="va">dt</span>, var <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"Frequency"</span>, <span class="st">"Percent"</span>, <span class="st">"Cum_Freq"</span>, <span class="st">"Cum_Pct"</span><span class="op">)</span>,</span>
-<span>                       id <span class="op">=</span> <span class="st">"Category"</span>, name <span class="op">=</span> <span class="st">"Statistic"</span><span class="op">)</span></span>
+<span><span class="co"># Tranpose statistics to rows</span></span>
+<span><span class="va">res3</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/proc_transpose.html">proc_transpose</a></span><span class="op">(</span><span class="va">res2</span>, id <span class="op">=</span> <span class="va">CLASS</span>, by <span class="op">=</span> <span class="va">BY</span>, name <span class="op">=</span> <span class="va">Statistic</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># View transformed data</span></span>
 <span><span class="va">res3</span></span>
-<span><span class="co"># # A tibble: 4 × 5</span></span>
-<span><span class="co">#   Statistic Black Blond Brown   Red</span></span>
-<span><span class="co">#   &lt;chr&gt;     &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;</span></span>
-<span><span class="co"># 1 Frequency 108   127   286    71  </span></span>
-<span><span class="co"># 2 Percent    18.2  21.5  48.3  12.0</span></span>
-<span><span class="co"># 3 Cum_Freq  108   235   521   592  </span></span>
-<span><span class="co"># 4 Cum_Pct    18.2  39.7  88.0 100  </span></span></code></pre></div>
-</div>
-<div id="the-proc_sort-function" class="section level4">
-<h4 class="hasAnchor">
-<a href="#the-proc_sort-function" class="anchor"></a>The <code>proc_sort()</code> Function</h4>
-</div>
-<div id="the-proc_compare-function" class="section level4">
-<h4 class="hasAnchor">
-<a href="#the-proc_compare-function" class="anchor"></a>The <code>proc_compare()</code> Function</h4>
-</div>
-<div id="the-proc_print-function" class="section level4">
-<h4 class="hasAnchor">
-<a href="#the-proc_print-function" class="anchor"></a>The <code>proc_print()</code> Function</h4>
+<span><span class="co">#        BY Statistic    Black    Blond    Brown       Red</span></span>
+<span><span class="co"># 1  Female         N  4.00000  4.00000  4.00000  4.000000</span></span>
+<span><span class="co"># 2  Female      MEAN 13.00000 20.25000 35.75000  9.250000</span></span>
+<span><span class="co"># 3  Female       STD 15.59915 29.21615 21.88416  4.500000</span></span>
+<span><span class="co"># 4  Female       MIN  2.00000  4.00000 14.00000  7.000000</span></span>
+<span><span class="co"># 5  Female       MAX 36.00000 64.00000 66.00000 16.000000</span></span>
+<span><span class="co"># 6    Male         N  4.00000  4.00000  4.00000  4.000000</span></span>
+<span><span class="co"># 7    Male      MEAN 14.00000 11.50000 35.75000  8.500000</span></span>
+<span><span class="co"># 8    Male       STD 12.51666 12.50333 18.67931  1.732051</span></span>
+<span><span class="co"># 9    Male       MIN  3.00000  3.00000 15.00000  7.000000</span></span>
+<span><span class="co"># 10   Male       MAX 32.00000 30.00000 53.00000 10.000000</span></span>
+<span></span>
+<span><span class="co"># Assign factor to BY so we can sort</span></span>
+<span><span class="va">res3</span><span class="op">$</span><span class="va">BY</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html">factor</a></span><span class="op">(</span><span class="va">res3</span><span class="op">$</span><span class="va">BY</span>, levels <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"Male"</span>, <span class="st">"Female"</span><span class="op">)</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Sort male to top</span></span>
+<span><span class="va">res4</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/proc_sort.html">proc_sort</a></span><span class="op">(</span><span class="va">res3</span>, by <span class="op">=</span> <span class="va">BY</span><span class="op">)</span></span>
+<span><span class="co">#        BY Statistic    Black    Blond    Brown       Red</span></span>
+<span><span class="co"># 6    Male         N  4.00000  4.00000  4.00000  4.000000</span></span>
+<span><span class="co"># 7    Male      MEAN 14.00000 11.50000 35.75000  8.500000</span></span>
+<span><span class="co"># 8    Male       STD 12.51666 12.50333 18.67931  1.732051</span></span>
+<span><span class="co"># 9    Male       MIN  3.00000  3.00000 15.00000  7.000000</span></span>
+<span><span class="co"># 10   Male       MAX 32.00000 30.00000 53.00000 10.000000</span></span>
+<span><span class="co"># 1  Female         N  4.00000  4.00000  4.00000  4.000000</span></span>
+<span><span class="co"># 2  Female      MEAN 13.00000 20.25000 35.75000  9.250000</span></span>
+<span><span class="co"># 3  Female       STD 15.59915 29.21615 21.88416  4.500000</span></span>
+<span><span class="co"># 4  Female       MIN  2.00000  4.00000 14.00000  7.000000</span></span>
+<span><span class="co"># 5  Female       MAX 36.00000 64.00000 66.00000 16.000000</span></span>
+<span></span>
+<span><span class="co"># Create formatting list</span></span>
+<span><span class="va">fmt</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://fmtr.r-sassy.org/reference/flist.html">flist</a></span><span class="op">(</span>STD <span class="op">=</span> <span class="st">"%.3f"</span>, type <span class="op">=</span> <span class="st">"row"</span>, lookup <span class="op">=</span> <span class="va">res4</span><span class="op">$</span><span class="va">Statistic</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Create vector lookup</span></span>
+<span><span class="va">vf</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span>MEAN <span class="op">=</span> <span class="st">"Mean"</span>, STD <span class="op">=</span> <span class="st">"Std"</span>, MEDIAN <span class="op">=</span> <span class="st">"Median"</span>, </span>
+<span>        MIN <span class="op">=</span> <span class="st">"Min"</span>, MAX <span class="op">=</span> <span class="st">"Max"</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Assign formats </span></span>
+<span><span class="fu"><a href="https://fmtr.r-sassy.org/reference/formats.html">formats</a></span><span class="op">(</span><span class="va">res4</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span>Statistic <span class="op">=</span> <span class="va">vf</span>,</span>
+<span>                      Black <span class="op">=</span> <span class="va">fmt</span>,</span>
+<span>                      Blond <span class="op">=</span> <span class="va">fmt</span>,</span>
+<span>                      Brown <span class="op">=</span> <span class="va">fmt</span>,</span>
+<span>                      Red <span class="op">=</span> <span class="va">fmt</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Reassign first column name</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/names.html">names</a></span><span class="op">(</span><span class="va">res4</span><span class="op">)</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="st">"stub"</span></span>
+<span></span>
+<span><span class="co"># Assign labels</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/labels.html">labels</a></span><span class="op">(</span><span class="va">res4</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span>stub <span class="op">=</span> <span class="st">"Sex"</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Create list for reporting</span></span>
+<span><span class="va">prnt</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span><span class="va">res</span><span class="op">$</span><span class="va">`Hair * Eye`</span>, <span class="va">res</span><span class="op">$</span><span class="va">Chisq</span>, <span class="va">res4</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Print result</span></span>
+<span><span class="fu"><a href="../reference/proc_print.html">proc_print</a></span><span class="op">(</span><span class="va">prnt</span>, </span>
+<span>           titles <span class="op">=</span> <span class="st">"Analysis of Hair and Eyes Dataset"</span><span class="op">)</span></span></code></pre></div>
+<p><img src="../man/images/print1.png"></p>
+<p>If desired, we could print this report to the file system using the
+“file_path” and “output_type” parameters on
+<code><a href="../reference/proc_print.html">proc_print()</a></code>.</p>
 </div>
 </div>
 <div id="next-steps" class="section level3">
@@ -302,11 +343,7 @@ articles. Those articles include:</p>
 <ul>
 <li><a href="procs-freq.html">The Frequency Function</a></li>
 <li><a href="procs-means.html">The Means Function</a></li>
-<li><a href="procs-transpose.html">The Transpose Function</a></li>
-<li><a href="procs-sort.html">The Sort Function</a></li>
-<li><a href="procs-compare.html">The Compare Function</a></li>
-<li><a href="procs-print.html">The Print Function</a></li>
-<li><a href="procs-validation.html">Package Validation</a></li>
+<li><a href="procs-other.html">Other Functions</a></li>
 <li><a href="procs-example1.html">Complete Example</a></li>
 </ul>
 </div>

@@ -69,6 +69,13 @@ output_report <- function(lst,
         names(dt) <- gsub("CAT", "stub", nms, fixed = TRUE)
       }
 
+      if ("stub" %in% names(dt)) {
+       lbl <- attr(dt$stub, "label")
+       if (is.null(lbl))
+         lbl <- ""
+
+      }
+
       # Create table
       tbl <- create_table(dt, borders = c("all"))
 
