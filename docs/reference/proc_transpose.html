@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Transposes a Data Frame — proc_transpose • procs</title>
+<title>Transposes a Dataset — proc_transpose • procs</title>
 
 <!-- favicons -->
 <link rel="icon" type="image/png" sizes="16x16" href="../favicon-16x16.png">
@@ -46,12 +46,13 @@
 
 
 
-<meta property="og:title" content="Transposes a Data Frame — proc_transpose" />
+<meta property="og:title" content="Transposes a Dataset — proc_transpose" />
 <meta property="og:description" content="A function to pivot or transpose a data frame. In the default
 usage, the variables identified by the parameter var are transposed
 to become rows. The variable values in the parameter id become
-the new column names.  The function has several more parameters to control
-how variables are named in the transposed data set." />
+the new columns. The function has several more parameters to control
+how variables are named in the transposed data set. Parameters will
+accept quoted or unquoted values." />
 <meta property="og:image" content="https://procs.r-sassy.org/logo.png" />
 
 
@@ -122,9 +123,6 @@ how variables are named in the transposed data set." />
       <a href="../articles/procs-sort.html">The Sort Function</a>
     </li>
     <li>
-      <a href="../articles/procs-compare.html">The Compare Function</a>
-    </li>
-    <li>
       <a href="../articles/procs-print.html">The Print Function</a>
     </li>
     <li>
@@ -160,7 +158,7 @@ how variables are named in the transposed data set." />
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Transposes a Data Frame</h1>
+    <h1>Transposes a Dataset</h1>
     <small class="dont-index">Source: <a href='https://github.com/dbosak01/procs/blob/master/R/proc_transpose.R'><code>R/proc_transpose.R</code></a></small>
     <div class="hidden name"><code>proc_transpose.Rd</code></div>
     </div>
@@ -169,8 +167,9 @@ how variables are named in the transposed data set." />
     <p>A function to pivot or transpose a data frame. In the default
 usage, the variables identified by the parameter <code>var</code> are transposed
 to become rows. The variable values in the parameter <code>id</code> become
-the new column names.  The function has several more parameters to control
-how variables are named in the transposed data set.</p>
+the new columns. The function has several more parameters to control
+how variables are named in the transposed data set. Parameters will
+accept quoted or unquoted values.</p>
     </div>
 
     <pre class="usage"><span><span class='fu'>proc_transpose</span><span class='op'>(</span></span>
@@ -184,7 +183,9 @@ how variables are named in the transposed data set.</p>
 <span>  namelabel <span class='op'>=</span> <span class='cn'>NULL</span>,</span>
 <span>  prefix <span class='op'>=</span> <span class='cn'>NULL</span>,</span>
 <span>  delimiter <span class='op'>=</span> <span class='st'>"."</span>,</span>
-<span>  suffix <span class='op'>=</span> <span class='cn'>NULL</span></span>
+<span>  suffix <span class='op'>=</span> <span class='cn'>NULL</span>,</span>
+<span>  where <span class='op'>=</span> <span class='cn'>NULL</span>,</span>
+<span>  log <span class='op'>=</span> <span class='cn'>TRUE</span></span>
 <span><span class='op'>)</span></span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
@@ -192,7 +193,7 @@ how variables are named in the transposed data set.</p>
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
       <th>data</th>
-      <td><p>The input data frame for which will be transposed.</p></td>
+      <td><p>The input data to transpose.</p></td>
     </tr>
     <tr>
       <th>by</th>
@@ -204,7 +205,7 @@ transpose each group and stack them together in a single table.</p></td>
     <tr>
       <th>var</th>
       <td><p>The variable or variables to transpose.  Parameter accepts a vector
-of quoted variable names.</p></td>
+of variable names.  By default, all numeric variables will be transposed.</p></td>
     </tr>
     <tr>
       <th>id</th>
@@ -217,7 +218,8 @@ of quoted variable names.</p></td>
     <tr>
       <th>copy</th>
       <td><p>A vector of variables to retain in the output data
-without transposition.</p></td>
+without transposition.  Values will be truncated or recycled to fit
+the number of output rows.</p></td>
     </tr>
     <tr>
       <th>name</th>
@@ -243,32 +245,102 @@ of column names.</p></td>
       <td><p>Contains a suffix to be used in the construction of
 column names.</p></td>
     </tr>
+    <tr>
+      <th>where</th>
+      <td><p>An expression to filter the rows after the transform
+is complete.  Use the <code><a href='https://rdrr.io/r/base/expression.html'>expression</a></code> function to define
+the where clause.</p></td>
+    </tr>
+    <tr>
+      <th>log</th>
+      <td><p>Whether or not to log the procedure.  Default is TRUE.
+This parameter is used internally.</p></td>
+    </tr>
     </table>
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>A data frame that contains the transposed data. If a data frame
+    <p>The transposed dataset. If a data frame
 is input, a data frame will be output.  If a tibble is input, a tibble
 will be output.</p>
     <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
 
     <p>The <code>proc_tranpose</code> function takes an input data frame or tibble
 and transposes the columns and rows.</p>
+<p>Talk about vars</p>
+<p>Talk about ID</p>
+<p>Talk about by groups</p>
+<p>Talk about copy</p>
+<p>Talk about column naming</p>
+<p>Talk about where clause</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><span><span class='co'># Create data</span></span>
-<span><span class='va'>dt</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/data.frame.html'>data.frame</a></span><span class='op'>(</span>names <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/colnames.html'>rownames</a></span><span class='op'>(</span><span class='va'>mtcars</span><span class='op'>)</span>, <span class='va'>mtcars</span>, stringsAsFactors <span class='op'>=</span> <span class='cn'>FALSE</span><span class='op'>)</span><span class='op'>[</span><span class='fl'>1</span><span class='op'>:</span><span class='fl'>5</span>,<span class='op'>]</span></span>
+    <pre class="examples"><span><span class='co'># Prepare data</span></span>
+<span><span class='va'>dat</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/data.frame.html'>data.frame</a></span><span class='op'>(</span>CAT <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/colnames.html'>rownames</a></span><span class='op'>(</span><span class='va'>USPersonalExpenditure</span><span class='op'>)</span>,</span>
+<span>                  <span class='va'>USPersonalExpenditure</span>, stringsAsFactors <span class='op'>=</span> <span class='cn'>FALSE</span>,</span>
+<span>                  row.names <span class='op'>=</span> <span class='cn'>NULL</span><span class='op'>)</span><span class='op'>[</span><span class='fl'>1</span><span class='op'>:</span><span class='fl'>4</span>, <span class='op'>]</span></span>
 <span></span>
-<span><span class='co'># Transpose data</span></span>
-<span><span class='va'>tdt</span> <span class='op'>&lt;-</span> <span class='fu'>proc_transpose</span><span class='op'>(</span><span class='va'>dt</span>, var <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"mpg"</span>, <span class='st'>"cyl"</span>, <span class='st'>"disp"</span><span class='op'>)</span>,</span>
-<span>                          id <span class='op'>=</span> <span class='st'>"names"</span>, name <span class='op'>=</span> <span class='st'>"Variable"</span><span class='op'>)</span></span>
+<span><span class='co'># View data</span></span>
+<span><span class='va'>dat</span></span>
+<span><span class='co'>#                   CAT X1940 X1945 X1950 X1955 X1960</span></span>
+<span><span class='co'># 1    Food and Tobacco 22.20 44.50 59.60  73.2  86.8</span></span>
+<span><span class='co'># 2 Household Operation 10.50 15.50 29.00  36.5  46.2</span></span>
+<span><span class='co'># 3  Medical and Health  3.53  5.76  9.71  14.0  21.1</span></span>
+<span><span class='co'># 4       Personal Care  1.04  1.98  2.45   3.4   5.4</span></span>
 <span></span>
-<span><span class='co'># View transposed data</span></span>
-<span><span class='va'>tdt</span></span>
-<span><span class='co'>#   Variable Mazda RX4 Mazda RX4 Wag Datsun 710 Hornet 4 Drive Hornet Sportabout</span></span>
-<span><span class='co'># 1      mpg        21            21       22.8           21.4              18.7</span></span>
-<span><span class='co'># 2      cyl         6             6        4.0            6.0               8.0</span></span>
-<span><span class='co'># 3     disp       160           160      108.0          258.0             360.0</span></span></pre>
+<span><span class='co'># Default transpose</span></span>
+<span><span class='va'>tdat1</span> <span class='op'>&lt;-</span> <span class='fu'>proc_transpose</span><span class='op'>(</span><span class='va'>dat</span><span class='op'>)</span></span>
+<span></span>
+<span><span class='co'># View results</span></span>
+<span><span class='va'>tdat1</span></span>
+<span><span class='co'>#    NAME COL1 COL2  COL3 COL4</span></span>
+<span><span class='co'># 1 X1940 22.2 10.5  3.53 1.04</span></span>
+<span><span class='co'># 2 X1945 44.5 15.5  5.76 1.98</span></span>
+<span><span class='co'># 3 X1950 59.6 29.0  9.71 2.45</span></span>
+<span><span class='co'># 4 X1955 73.2 36.5 14.00 3.40</span></span>
+<span><span class='co'># 5 X1960 86.8 46.2 21.10 5.40</span></span>
+<span></span>
+<span><span class='co'># Transpose with ID and Name</span></span>
+<span><span class='va'>tdat2</span> <span class='op'>&lt;-</span>  <span class='fu'>proc_transpose</span><span class='op'>(</span><span class='va'>dat</span>, id <span class='op'>=</span> <span class='va'>CAT</span>, name <span class='op'>=</span> <span class='va'>Year</span><span class='op'>)</span></span>
+<span></span>
+<span><span class='co'># View results</span></span>
+<span><span class='va'>tdat2</span></span>
+<span><span class='co'>#   Year Food and Tobacco Household Operation Medical and Health Personal Care</span></span>
+<span><span class='co'># 1 X1940             22.2                10.5               3.53          1.04</span></span>
+<span><span class='co'># 2 X1945             44.5                15.5               5.76          1.98</span></span>
+<span><span class='co'># 3 X1950             59.6                29.0               9.71          2.45</span></span>
+<span><span class='co'># 4 X1955             73.2                36.5              14.00          3.40</span></span>
+<span><span class='co'># 5 X1960             86.8                46.2              21.10          5.40</span></span>
+<span></span>
+<span><span class='co'># Transpose only some of the variables</span></span>
+<span><span class='va'>tdat3</span> <span class='op'>&lt;-</span> <span class='fu'>proc_transpose</span><span class='op'>(</span><span class='va'>dat</span>, var <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/pkg/common/man/v.html'>v</a></span><span class='op'>(</span><span class='va'>X1940</span>, <span class='va'>X1950</span>, <span class='va'>X1960</span><span class='op'>)</span>, id <span class='op'>=</span> <span class='va'>CAT</span>, name <span class='op'>=</span> <span class='va'>Year</span><span class='op'>)</span></span>
+<span></span>
+<span><span class='co'># View results</span></span>
+<span><span class='va'>tdat3</span></span>
+<span><span class='co'>#    Year Food and Tobacco Household Operation Medical and Health Personal Care</span></span>
+<span><span class='co'># 1 X1940             22.2                10.5               3.53          1.04</span></span>
+<span><span class='co'># 2 X1950             59.6                29.0               9.71          2.45</span></span>
+<span><span class='co'># 3 X1960             86.8                46.2              21.10          5.40</span></span>
+<span></span>
+<span><span class='co'># By with a where clause</span></span>
+<span><span class='va'>tdat4</span> <span class='op'>&lt;-</span> <span class='fu'>proc_transpose</span><span class='op'>(</span><span class='va'>dat</span>, by <span class='op'>=</span> <span class='va'>CAT</span>, name <span class='op'>=</span> <span class='va'>Year</span>,</span>
+<span>                        where <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/expression.html'>expression</a></span><span class='op'>(</span><span class='va'>Year</span> <span class='op'><a href='https://rdrr.io/r/base/match.html'>%in%</a></span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"X1940"</span>, <span class='st'>"X1950"</span>, <span class='st'>"X1960"</span><span class='op'>)</span><span class='op'>)</span><span class='op'>)</span></span>
+<span></span>
+<span><span class='co'># View Results</span></span>
+<span><span class='va'>tdat4</span></span>
+<span><span class='co'>#                    CAT  Year  COL1</span></span>
+<span><span class='co'># 1     Food and Tobacco X1940 22.20</span></span>
+<span><span class='co'># 2     Food and Tobacco X1950 59.60</span></span>
+<span><span class='co'># 3     Food and Tobacco X1960 86.80</span></span>
+<span><span class='co'># 4  Household Operation X1940 10.50</span></span>
+<span><span class='co'># 5  Household Operation X1950 29.00</span></span>
+<span><span class='co'># 6  Household Operation X1960 46.20</span></span>
+<span><span class='co'># 7   Medical and Health X1940  3.53</span></span>
+<span><span class='co'># 8   Medical and Health X1950  9.71</span></span>
+<span><span class='co'># 9   Medical and Health X1960 21.10</span></span>
+<span><span class='co'># 10       Personal Care X1940  1.04</span></span>
+<span><span class='co'># 11       Personal Care X1950  2.45</span></span>
+<span><span class='co'># 12       Personal Care X1960  5.40</span></span></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">

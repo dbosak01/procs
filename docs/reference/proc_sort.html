@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Sorts a data frame or tibble — proc_sort • procs</title>
+<title>Sorts a dataset — proc_sort • procs</title>
 
 <!-- favicons -->
 <link rel="icon" type="image/png" sizes="16x16" href="../favicon-16x16.png">
@@ -46,8 +46,14 @@
 
 
 
-<meta property="og:title" content="Sorts a data frame or tibble — proc_sort" />
-<meta property="og:description" content="Here is a description" />
+<meta property="og:title" content="Sorts a dataset — proc_sort" />
+<meta property="og:description" content="The proc_sort function sorts a dataset according to
+the variables passed on the by parameter.  If no parameters are
+passed on the by parameter, it will sort by all variables. The
+direction of the sort is controlled with the order parameter.
+Use the nodupkey parameter to eliminate duplicate rows from
+the dataset, and the keep parameter to subset columns.
+The parameters will accept either quoted or unquoted values." />
 <meta property="og:image" content="https://procs.r-sassy.org/logo.png" />
 
 
@@ -118,9 +124,6 @@
       <a href="../articles/procs-sort.html">The Sort Function</a>
     </li>
     <li>
-      <a href="../articles/procs-compare.html">The Compare Function</a>
-    </li>
-    <li>
       <a href="../articles/procs-print.html">The Print Function</a>
     </li>
     <li>
@@ -156,13 +159,19 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Sorts a data frame or tibble</h1>
+    <h1>Sorts a dataset</h1>
     <small class="dont-index">Source: <a href='https://github.com/dbosak01/procs/blob/master/R/proc_sort.R'><code>R/proc_sort.R</code></a></small>
     <div class="hidden name"><code>proc_sort.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>Here is a description</p>
+    <p>The <code>proc_sort</code> function sorts a dataset according to
+the variables passed on the <code>by</code> parameter.  If no parameters are
+passed on the <code>by</code> parameter, it will sort by all variables. The
+direction of the sort is controlled with the <code>order</code> parameter.
+Use the <code>nodupkey</code> parameter to eliminate duplicate rows from
+the dataset, and the <code>keep</code> parameter to subset columns.
+The parameters will accept either quoted or unquoted values.</p>
     </div>
 
     <pre class="usage"><span><span class='fu'>proc_sort</span><span class='op'>(</span><span class='va'>data</span>, by <span class='op'>=</span> <span class='cn'>NULL</span>, keep <span class='op'>=</span> <span class='cn'>NULL</span>, order <span class='op'>=</span> <span class='st'>"ascending"</span>, nodupkey <span class='op'>=</span> <span class='cn'>FALSE</span><span class='op'>)</span></span></pre>
@@ -176,11 +185,12 @@
     </tr>
     <tr>
       <th>by</th>
-      <td><p>The variables to sort by.</p></td>
+      <td><p>A vector of variables to sort by.</p></td>
     </tr>
     <tr>
       <th>keep</th>
-      <td><p>The variables on the output data to keep.</p></td>
+      <td><p>A vector of variables on the output data to keep.  All other
+variables will be dropped.</p></td>
     </tr>
     <tr>
       <th>order</th>
@@ -194,8 +204,8 @@ parameter.  Default is 'ascending' for all by variables.</p></td>
       <th>nodupkey</th>
       <td><p>Whether to remove duplicates.  Valid values are
 TRUE or FALSE. Duplicate rows will be identified by the variables listed on
-the by parameter.  Other variables not listed on the by parameter will
-be ignored.</p></td>
+the by parameter if passed.  Otherwise, the function will dedupe on
+all variables returned.</p></td>
     </tr>
     </table>
 
@@ -204,10 +214,67 @@ be ignored.</p></td>
     <p>The sorted dataset.  If a data frame was input, a
 data frame will be output.  If a tibble was input, a tibble will
 be output.</p>
-    <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
 
-    <p>Here is some details</p>
-
+    <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
+    <pre class="examples"><span><span class='co'># Prepare data subset</span></span>
+<span><span class='va'>dat</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/data.frame.html'>data.frame</a></span><span class='op'>(</span><span class='va'>HairEyeColor</span>, stringsAsFactors <span class='op'>=</span> <span class='cn'>FALSE</span><span class='op'>)</span><span class='op'>[</span><span class='fl'>1</span><span class='op'>:</span><span class='fl'>32</span> <span class='op'><a href='https://rdrr.io/r/base/Arithmetic.html'>%%</a></span> <span class='fl'>4</span> <span class='op'>==</span> <span class='fl'>1</span>, <span class='op'>]</span></span>
+<span></span>
+<span><span class='co'># View data</span></span>
+<span><span class='va'>dat</span></span>
+<span><span class='co'>#     Hair   Eye    Sex Freq</span></span>
+<span><span class='co'># 1  Black Brown   Male   32</span></span>
+<span><span class='co'># 5  Black  Blue   Male   11</span></span>
+<span><span class='co'># 9  Black Hazel   Male   10</span></span>
+<span><span class='co'># 13 Black Green   Male    3</span></span>
+<span><span class='co'># 17 Black Brown Female   36</span></span>
+<span><span class='co'># 21 Black  Blue Female    9</span></span>
+<span><span class='co'># 25 Black Hazel Female    5</span></span>
+<span><span class='co'># 29 Black Green Female    2</span></span>
+<span></span>
+<span><span class='co'># Sort by Frequency</span></span>
+<span><span class='va'>res1</span> <span class='op'>&lt;-</span> <span class='fu'>proc_sort</span><span class='op'>(</span><span class='va'>dat</span>, by <span class='op'>=</span> <span class='va'>Freq</span><span class='op'>)</span></span>
+<span></span>
+<span><span class='co'># View results</span></span>
+<span><span class='va'>res1</span></span>
+<span><span class='co'>#    Hair   Eye    Sex Freq</span></span>
+<span><span class='co'># 29 Black Green Female    2</span></span>
+<span><span class='co'># 13 Black Green   Male    3</span></span>
+<span><span class='co'># 25 Black Hazel Female    5</span></span>
+<span><span class='co'># 21 Black  Blue Female    9</span></span>
+<span><span class='co'># 9  Black Hazel   Male   10</span></span>
+<span><span class='co'># 5  Black  Blue   Male   11</span></span>
+<span><span class='co'># 1  Black Brown   Male   32</span></span>
+<span><span class='co'># 17 Black Brown Female   36</span></span>
+<span></span>
+<span><span class='co'># Sort by Frequency descending</span></span>
+<span><span class='va'>res2</span> <span class='op'>&lt;-</span> <span class='fu'>proc_sort</span><span class='op'>(</span><span class='va'>dat</span>, by <span class='op'>=</span> <span class='va'>Freq</span>, order <span class='op'>=</span> <span class='va'>d</span><span class='op'>)</span></span>
+<span></span>
+<span><span class='co'># View results</span></span>
+<span><span class='va'>res2</span></span>
+<span><span class='co'>#     Hair   Eye    Sex Freq</span></span>
+<span><span class='co'># 17 Black Brown Female   36</span></span>
+<span><span class='co'># 1  Black Brown   Male   32</span></span>
+<span><span class='co'># 5  Black  Blue   Male   11</span></span>
+<span><span class='co'># 9  Black Hazel   Male   10</span></span>
+<span><span class='co'># 21 Black  Blue Female    9</span></span>
+<span><span class='co'># 25 Black Hazel Female    5</span></span>
+<span><span class='co'># 13 Black Green   Male    3</span></span>
+<span><span class='co'># 29 Black Green Female    2</span></span>
+<span></span>
+<span><span class='co'># Get unique combinations of Eye and Sex</span></span>
+<span><span class='va'>res3</span> <span class='op'>&lt;-</span> <span class='fu'>proc_sort</span><span class='op'>(</span><span class='va'>dat</span>, keep <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/pkg/common/man/v.html'>v</a></span><span class='op'>(</span><span class='va'>Eye</span>, <span class='va'>Sex</span><span class='op'>)</span>, nodupkey <span class='op'>=</span> <span class='cn'>TRUE</span><span class='op'>)</span></span>
+<span></span>
+<span><span class='co'># View results</span></span>
+<span><span class='va'>res3</span></span>
+<span><span class='co'>#      Eye    Sex</span></span>
+<span><span class='co'># 1  Brown   Male</span></span>
+<span><span class='co'># 17 Brown Female</span></span>
+<span><span class='co'># 5   Blue   Male</span></span>
+<span><span class='co'># 21  Blue Female</span></span>
+<span><span class='co'># 9  Hazel   Male</span></span>
+<span><span class='co'># 25 Hazel Female</span></span>
+<span><span class='co'># 13 Green   Male</span></span>
+<span><span class='co'># 29 Green Female</span></span></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">

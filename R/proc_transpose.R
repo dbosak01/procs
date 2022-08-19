@@ -4,8 +4,9 @@
 #' @description A function to pivot or transpose a data frame. In the default
 #' usage, the variables identified by the parameter \code{var} are transposed
 #' to become rows. The variable values in the parameter \code{id} become
-#' the new column names.  The function has several more parameters to control
-#' how variables are named in the transposed data set.
+#' the new columns. The function has several more parameters to control
+#' how variables are named in the transposed data set. Parameters will
+#' accept quoted or unquoted values.
 #' @details
 #' The \code{proc_tranpose} function takes an input data frame or tibble
 #' and transposes the columns and rows.
@@ -28,11 +29,12 @@
 #' by that variable and the transpose function will
 #' transpose each group and stack them together in a single table.
 #' @param var The variable or variables to transpose.  Parameter accepts a vector
-#' of quoted variable names.
+#' of variable names.  By default, all numeric variables will be transposed.
 #' @param id The variable or variables to use for the transposed column names.
 #' @param idlabel The variable to use for the transposed column labels.
 #' @param copy A vector of variables to retain in the output data
-#' without transposition.
+#' without transposition.  Values will be truncated or recycled to fit
+#' the number of output rows.
 #' @param name Specifies the name of the variable to be used for the
 #' var values.
 #' @param namelabel The label to use for the name variable.
@@ -47,10 +49,9 @@
 #' the where clause.
 #' @param log Whether or not to log the procedure.  Default is TRUE.
 #' This parameter is used internally.
-#' @return A data frame that contains the transposed data. If a data frame
+#' @return The transposed dataset. If a data frame
 #' is input, a data frame will be output.  If a tibble is input, a tibble
 #' will be output.
-# @import stats
 #' @examples
 #' # Prepare data
 #' dat <- data.frame(CAT = rownames(USPersonalExpenditure),
@@ -65,17 +66,59 @@
 #' # 3  Medical and Health  3.53  5.76  9.71  14.0  21.1
 #' # 4       Personal Care  1.04  1.98  2.45   3.4   5.4
 #'
-#' # Transpose Data
-#' tdat <-  proc_transpose(dat, id = "CAT", name = "Year")
+#' # Default transpose
+#' tdat1 <- proc_transpose(dat)
 #'
 #' # View results
-#' tdat
+#' tdat1
+#' #    NAME COL1 COL2  COL3 COL4
+#' # 1 X1940 22.2 10.5  3.53 1.04
+#' # 2 X1945 44.5 15.5  5.76 1.98
+#' # 3 X1950 59.6 29.0  9.71 2.45
+#' # 4 X1955 73.2 36.5 14.00 3.40
+#' # 5 X1960 86.8 46.2 21.10 5.40
+#'
+#' # Transpose with ID and Name
+#' tdat2 <-  proc_transpose(dat, id = CAT, name = Year)
+#'
+#' # View results
+#' tdat2
 #' #   Year Food and Tobacco Household Operation Medical and Health Personal Care
 #' # 1 X1940             22.2                10.5               3.53          1.04
 #' # 2 X1945             44.5                15.5               5.76          1.98
 #' # 3 X1950             59.6                29.0               9.71          2.45
 #' # 4 X1955             73.2                36.5              14.00          3.40
 #' # 5 X1960             86.8                46.2              21.10          5.40
+#'
+#' # Transpose only some of the variables
+#' tdat3 <- proc_transpose(dat, var = v(X1940, X1950, X1960), id = CAT, name = Year)
+#'
+#' # View results
+#' tdat3
+#' #    Year Food and Tobacco Household Operation Medical and Health Personal Care
+#' # 1 X1940             22.2                10.5               3.53          1.04
+#' # 2 X1950             59.6                29.0               9.71          2.45
+#' # 3 X1960             86.8                46.2              21.10          5.40
+#'
+#' # By with a where clause
+#' tdat4 <- proc_transpose(dat, by = CAT, name = Year,
+#'                         where = expression(Year %in% c("X1940", "X1950", "X1960")))
+#'
+#' # View Results
+#' tdat4
+#' #                    CAT  Year  COL1
+#' # 1     Food and Tobacco X1940 22.20
+#' # 2     Food and Tobacco X1950 59.60
+#' # 3     Food and Tobacco X1960 86.80
+#' # 4  Household Operation X1940 10.50
+#' # 5  Household Operation X1950 29.00
+#' # 6  Household Operation X1960 46.20
+#' # 7   Medical and Health X1940  3.53
+#' # 8   Medical and Health X1950  9.71
+#' # 9   Medical and Health X1960 21.10
+#' # 10       Personal Care X1940  1.04
+#' # 11       Personal Care X1950  2.45
+#' # 12       Personal Care X1960  5.40
 #' @import tibble
 #' @import fmtr
 #' @export

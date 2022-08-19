@@ -120,9 +120,6 @@ the procs package." />
       <a href="../articles/procs-sort.html">The Sort Function</a>
     </li>
     <li>
-      <a href="../articles/procs-compare.html">The Compare Function</a>
-    </li>
-    <li>
       <a href="../articles/procs-print.html">The Print Function</a>
     </li>
     <li>
@@ -179,6 +176,7 @@ the <strong>procs</strong> package.</p>
 <span>  rename <span class='op'>=</span> <span class='cn'>NULL</span>,</span>
 <span>  format <span class='op'>=</span> <span class='cn'>NULL</span>,</span>
 <span>  label <span class='op'>=</span> <span class='cn'>NULL</span>,</span>
+<span>  table <span class='op'>=</span> <span class='cn'>NULL</span>,</span>
 <span>  <span class='va'>...</span></span>
 <span><span class='op'>)</span></span></pre>
 
@@ -232,6 +230,11 @@ of the vector should correspond to the new variable name.</p></td>
     <tr>
       <th>label</th>
       <td><p>A named vector of labels to assign to the output dataset.</p></td>
+    </tr>
+    <tr>
+      <th>table</th>
+      <td><p>A table request.  This parameter is used only for the
+<code><a href='proc_freq.html'>proc_freq</a></code> function.</p></td>
     </tr>
     <tr>
       <th>...</th>
