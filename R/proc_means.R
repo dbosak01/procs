@@ -49,7 +49,7 @@
 #' "nmiss", "nobs", "range", "std", "stderr", "sum", "uclm", "var",
 #' "q1", "q3", "p1", "p5", "p10", "p20", "p25", "p30", "p40",
 #' "p50", "p60", "p70", "p75", "p80", "p90",
-#' "p95", "p99", "qrange", "aov". You may
+#' "p95", "p99", "qrange". You may
 #' pass unquoted variable names to this parameter using the \code{\link{v}}
 #' function.
 #' @param weight An optional weight parameter.
@@ -160,7 +160,7 @@ proc_means <- function(data,
              "lclm","mode", "q1", "q3", "p1", "p5", "p10", "p20",
              "p25", "p30", "p40",
              "p50", "p60", "p70", "p75", "p80", "p90",
-             "p95", "p99", "qrange", "aov")
+             "p95", "p99", "qrange")
     if (!all(tolower(stats) %in% st)) {
 
       stop(paste("Invalid stat name: ", stats[!tolower(stats) %in% st], "\n"))
@@ -312,12 +312,12 @@ get_output_specs_means <- function(outs, stats) {
           }
           if (is.null(outreq[[nm]]$shape)) {
 
-            outreq[[nm]]$shape <- "long"
+            outreq[[nm]]$shape <- "wide"
           }
         } else {
 
           warning("proc_means: Unknown parameter '" %p% nm %p% "'")
-          outreq[[nm]] <- out(shape = "long")
+          outreq[[nm]] <- out(shape = "wide")
         }
       }
     } else {
@@ -807,18 +807,18 @@ gen_report_means <- function(data,
 
     aov <- NULL
     # Get aov if requested
-    if (get_option(options, "aov", FALSE) & !is.null(class)) {
-
-      bylbl <- NULL
-      if (!is.null(by))
-        bylbl <- bylbls[j]
-
-      if (is.null(weight))
-        aov <- get_aov(dt, var, class, bylbl = bylbl )
-      else
-        aov <- get_aov(dt, var, class, weight, bylbl = bylbl)
-
-    }
+    # if (get_option(options, "aov", FALSE) & !is.null(class)) {
+    #
+    #   bylbl <- NULL
+    #   if (!is.null(by))
+    #     bylbl <- bylbls[j]
+    #
+    #   if (is.null(weight))
+    #     aov <- get_aov(dt, var, class, bylbl = bylbl )
+    #   else
+    #     aov <- get_aov(dt, var, class, weight, bylbl = bylbl)
+    #
+    # }
     #smtbl <- get_summaries(dt, var, stats, missing)
 
 
@@ -993,41 +993,41 @@ gen_output_means <- function(data,
           if (!is.null(tp))
             tp <- 1
 
-          if (all(outp$stats == "aov")) {
-
-
-            bylbl <- NULL
-            if (!is.null(by))
-              bylbl <- bylbls[j]
-
-            for (vr in var) {
-              if (is.null(weight)) {
-                tmpaov <- get_aov(dat, vr, class, bylbl = bylbl, output = TRUE)
-              } else {
-                tmpaov <- get_aov(dat, vr, class, weight, bylbl = bylbl,
-                                  output = TRUE)
-              }
-
-              tmpres <- rbind(tmpres, tmpaov)
-
-            }
-
-          } else if (any(outp$stats == "aov")) {
-
-              tmpcls <- get_class(dat, var = var,
-                                  class = class, outp = outp,
-                                  freq = frq, type = tp, byvals = bynm)
-
-              tmpres <- rbind(tmpres, tmpcls)
-
-
-          } else {
+          # if (all(outp$stats == "aov")) {
+          #
+          #
+          #   bylbl <- NULL
+          #   if (!is.null(by))
+          #     bylbl <- bylbls[j]
+          #
+          #   for (vr in var) {
+          #     if (is.null(weight)) {
+          #       tmpaov <- get_aov(dat, vr, class, bylbl = bylbl, output = TRUE)
+          #     } else {
+          #       tmpaov <- get_aov(dat, vr, class, weight, bylbl = bylbl,
+          #                         output = TRUE)
+          #     }
+          #
+          #     tmpres <- rbind(tmpres, tmpaov)
+          #
+          #   }
+          #
+          # } else if (any(outp$stats == "aov")) {
+          #
+          #     tmpcls <- get_class(dat, var = var,
+          #                         class = class, outp = outp,
+          #                         freq = frq, type = tp, byvals = bynm)
+          #
+          #     tmpres <- rbind(tmpres, tmpcls)
+          #
+          #
+          # } else {
             tmpcls <- get_class(dat, var = var,
                                 class = class, outp = outp,
                                 freq = frq, type = tp, byvals = bynm)
 
             tmpres <- rbind(tmpres, tmpcls)
-          }
+          #}
         }
       }
 

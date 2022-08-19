@@ -24,23 +24,7 @@ get_aov <- function(data, var1, byvars, wgt = NULL,
 
   }
 
-
   nms <- c("AOV.DF", "AOV.SUMSQ", "AOV.MEANSQ", "AOV.F", "AOV.P")
-
-
-  # if (length(class) == 1) {
-  #   cdf <- data.frame("CLASS" = rownames(ret), stringsAsFactors = FALSE)
-  # } else {
-  #   clslst <- list()
-  #   for(cls in class) {
-  #     clslst[[length(clslst) + 1]] <- cls
-  #
-  #   }
-  #   names(clslst) <- paste0("CLASS", seq(1, length(class)))
-  #   cdf <- as.data.frame(clslst)
-  #
-  # }
-
 
 
   lbls <- names(ret)
