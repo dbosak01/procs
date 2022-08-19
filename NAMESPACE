@@ -2,7 +2,6 @@
 
 export(opts)
 export(out)
-export(proc_compare)
 export(proc_freq)
 export(proc_means)
 export(proc_print)

@@ -6,16 +6,33 @@
 #' parameter in a list.
 #' By default, the function prints to the viewer. It may also be used
 #' to print to the file system using the \code{output_type} and
-#' \code{file_path} parameters.
-#' @details Here are some details
+#' \code{file_path} parameters.  This print function has limited options,
+#' and is meant to quickly view your data or dump it out to a file.
+#' For more reporting options, use the \strong{\link{reporter}} package.
 #' @param data The data to print.  Can be either a single dataset, or
 #' a list of datasets.
 #' @param file_path The path of the report to print.
-#' @param output_type The type of report to create.
+#' @param output_type The type of report to create.  Valid values are
+#' "TXT", "RTF", "PDF", "HTML", and "DOCX".  Default is "HTML".
 #' @param titles A vector of titles.
-#' @param style A style object.
+#' @param style A style object, as defined by the \strong{\link{reporter}}
+#' package.  See that package for details.
 #' @param view Whether to send the print output to the viewer.  Valid
-#' values are TRUE and FALSE.
+#' values are TRUE and FALSE. Default is TRUE.
+#' @return If a file report was produced, the full path of the report.
+#' Otherwise, a NULL.  In either case, the value will be returned invisibly.
+#' @examples
+#' # Print mtcars to the viewer
+#' proc_print(mtcars)
+#'
+#' # Print mtcars to a PDF
+#' pth <- proc_print(mtcars,
+#'                   file_path = tempfile(fileext = ".pdf"),
+#'                   titles = "MTCARS Proc Print Example",
+#'                   output_type = "PDF")
+#'
+#' # View file
+#' # file.show(pth)
 #' @import reporter
 #' @export
 proc_print <- function(data, file_path = NULL, output_type = "HTML",

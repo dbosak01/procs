@@ -1,5 +1,5 @@
 
-#' @title Transposes a Data Frame
+#' @title Transposes a Dataset
 #' @encoding UTF-8
 #' @description A function to pivot or transpose a data frame. In the default
 #' usage, the variables identified by the parameter \code{var} are transposed

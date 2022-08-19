@@ -10,7 +10,6 @@
 #' are 'TXT', 'PDF', 'RTF', 'HTML' and 'DOCX'.
 #' @param report_location The the output path for the comparison report.
 #' @return A list of datasets describing the results of the comparison.
-#' @export
 proc_compare <- function(data1, data2, precision = NULL,
                          report_type = NULL, report_location = NULL) {
 

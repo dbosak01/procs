@@ -2,16 +2,17 @@
 % Please edit documentation in R/proc_sort.R
 \name{proc_sort}
 \alias{proc_sort}
-\title{Sorts a data frame or tibble}
+\title{Sorts a dataset}
 \usage{
 proc_sort(data, by = NULL, keep = NULL, order = "ascending", nodupkey = FALSE)
 }
 \arguments{
 \item{data}{The input data to sort.}
 
-\item{by}{The variables to sort by.}
+\item{by}{A vector of variables to sort by.}
 
-\item{keep}{The variables on the output data to keep.}
+\item{keep}{A vector of variables on the output data to keep.  All other
+variables will be dropped.}
 
 \item{order}{The sort order of the variables on the by parameter.
 Valid values are 'ascending' or 'descending'.  These values may
@@ -21,8 +22,8 @@ parameter.  Default is 'ascending' for all by variables.}
 
 \item{nodupkey}{Whether to remove duplicates.  Valid values are
 TRUE or FALSE. Duplicate rows will be identified by the variables listed on
-the by parameter.  Other variables not listed on the by parameter will
-be ignored.}
+the by parameter if passed.  Otherwise, the function will dedupe on
+all variables returned.}
 }
 \value{
 The sorted dataset.  If a data frame was input, a
@@ -30,8 +31,72 @@ data frame will be output.  If a tibble was input, a tibble will
 be output.
 }
 \description{
-Here is a description
+The \code{proc_sort} function sorts a dataset according to
+the variables passed on the \code{by} parameter.  If no parameters are
+passed on the \code{by} parameter, it will sort by all variables. The
+direction of the sort is controlled with the \code{order} parameter.
+Use the \code{nodupkey} parameter to eliminate duplicate rows from
+the dataset, and the \code{keep} parameter to subset columns.
+The parameters will accept either quoted or unquoted values.
 }
-\details{
-Here is some details
+\examples{
+# Prepare data subset
+dat <- data.frame(HairEyeColor, stringsAsFactors = FALSE)[1:32 \%\% 4 == 1, ]
+
+# View data
+dat
+#     Hair   Eye    Sex Freq
+# 1  Black Brown   Male   32
+# 5  Black  Blue   Male   11
+# 9  Black Hazel   Male   10
+# 13 Black Green   Male    3
+# 17 Black Brown Female   36
+# 21 Black  Blue Female    9
+# 25 Black Hazel Female    5
+# 29 Black Green Female    2
+
+# Sort by Frequency
+res1 <- proc_sort(dat, by = Freq)
+
+# View results
+res1
+#    Hair   Eye    Sex Freq
+# 29 Black Green Female    2
+# 13 Black Green   Male    3
+# 25 Black Hazel Female    5
+# 21 Black  Blue Female    9
+# 9  Black Hazel   Male   10
+# 5  Black  Blue   Male   11
+# 1  Black Brown   Male   32
+# 17 Black Brown Female   36
+
+# Sort by Frequency descending
+res2 <- proc_sort(dat, by = Freq, order = d)
+
+# View results
+res2
+#     Hair   Eye    Sex Freq
+# 17 Black Brown Female   36
+# 1  Black Brown   Male   32
+# 5  Black  Blue   Male   11
+# 9  Black Hazel   Male   10
+# 21 Black  Blue Female    9
+# 25 Black Hazel Female    5
+# 13 Black Green   Male    3
+# 29 Black Green Female    2
+
+# Get unique combinations of Eye and Sex
+res3 <- proc_sort(dat, keep = v(Eye, Sex), nodupkey = TRUE)
+
+# View results
+res3
+#      Eye    Sex
+# 1  Brown   Male
+# 17 Brown Female
+# 5   Blue   Male
+# 21  Blue Female
+# 9  Hazel   Male
+# 25 Hazel Female
+# 13 Green   Male
+# 29 Green Female
 }

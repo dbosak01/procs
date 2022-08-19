@@ -3,7 +3,7 @@
 \encoding{UTF-8}
 \name{proc_transpose}
 \alias{proc_transpose}
-\title{Transposes a Data Frame}
+\title{Transposes a Dataset}
 \usage{
 proc_transpose(
   data,

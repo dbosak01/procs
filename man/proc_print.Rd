@@ -19,14 +19,20 @@ a list of datasets.}
 
 \item{file_path}{The path of the report to print.}
 
-\item{output_type}{The type of report to create.}
+\item{output_type}{The type of report to create.  Valid values are
+"TXT", "RTF", "PDF", "HTML", and "DOCX".  Default is "HTML".}
 
 \item{titles}{A vector of titles.}
 
-\item{style}{A style object.}
+\item{style}{A style object, as defined by the \strong{\link{reporter}}
+package.  See that package for details.}
 
 \item{view}{Whether to send the print output to the viewer.  Valid
-values are TRUE and FALSE.}
+values are TRUE and FALSE. Default is TRUE.}
+}
+\value{
+If a file report was produced, the full path of the report.
+Otherwise, a NULL.  In either case, the value will be returned invisibly.
 }
 \description{
 The \code{proc_print} function is used to print a dataset
@@ -34,8 +40,20 @@ or datasets.  To print multiple datasets, pass them to the \code{data}
 parameter in a list.
 By default, the function prints to the viewer. It may also be used
 to print to the file system using the \code{output_type} and
-\code{file_path} parameters.
+\code{file_path} parameters.  This print function has limited options,
+and is meant to quickly view your data or dump it out to a file.
+For more reporting options, use the \strong{\link{reporter}} package.
 }
-\details{
-Here are some details
+\examples{
+# Print mtcars to the viewer
+proc_print(mtcars)
+
+# Print mtcars to a PDF
+pth <- proc_print(mtcars,
+                  file_path = tempfile(fileext = ".pdf"),
+                  titles = "MTCARS Proc Print Example",
+                  output_type = "PDF")
+
+# View file
+# file.show(pth)
 }

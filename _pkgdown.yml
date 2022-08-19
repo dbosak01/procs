@@ -8,7 +8,6 @@ articles:
   - procs-means
   - procs-transpose
   - procs-sort
-  - procs-compare
   - procs-print
   - procs-example1
 
@@ -20,7 +19,6 @@ reference:
   - proc_means
   - proc_transpose
   - proc_sort
-  - proc_compare
   - proc_print
 
 - titles: Supporting Functions

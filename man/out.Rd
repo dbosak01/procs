@@ -14,6 +14,7 @@ out(
   rename = NULL,
   format = NULL,
   label = NULL,
+  table = NULL,
   ...
 )
 }
@@ -47,6 +48,9 @@ of the vector should correspond to the new variable name.}
 \item{format}{A named list of formats to assign to the output dataset.}
 
 \item{label}{A named vector of labels to assign to the output dataset.}
+
+\item{table}{A table request.  This parameter is used only for the
+\code{\link{proc_freq}} function.}
 
 \item{...}{Various options.  When used with \code{\link{proc_freq}},
 the \code{table} option is most frequently used.}
