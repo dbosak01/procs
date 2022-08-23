@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Means Function Options — ProcMeansOptions • procs</title>
+<title>procs: Simulates Procedures from SAS® — procs • procs</title>
 
 <!-- favicons -->
 <link rel="icon" type="image/png" sizes="16x16" href="../favicon-16x16.png">
@@ -46,8 +46,12 @@
 
 
 
-<meta property="og:title" content="Means Function Options — ProcMeansOptions" />
-<meta property="og:description" content="Here is a description of the proc_means() statistics options." />
+<meta property="og:title" content="procs: Simulates Procedures from SAS® — procs" />
+<meta property="og:description" content="The procs package contains functions to
+simulate procedures from SAS® software. The intention of the package is
+to ease transition to R
+adoption by providing SAS® programmers a familiar conceptual framework and
+functions that produce nearly identical output." />
 <meta property="og:image" content="https://procs.r-sassy.org/logo.png" />
 
 
@@ -147,29 +151,44 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Means Function Options</h1>
-    <small class="dont-index">Source: <a href='https://github.com/dbosak01/procs/blob/master/R/documentation.R'><code>R/documentation.R</code></a></small>
-    <div class="hidden name"><code>ProcMeansOptions.Rd</code></div>
+    <h1>procs: Simulates Procedures from SAS®</h1>
+    <small class="dont-index">Source: <a href='https://github.com/dbosak01/procs/blob/master/R/procs.R'><code>R/procs.R</code></a></small>
+    <div class="hidden name"><code>procs.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>Here is a description of the proc_means() statistics options.</p>
+    <p>The <strong>procs</strong> package contains functions to
+simulate procedures from SAS® software. The intention of the package is
+to ease transition to R
+adoption by providing SAS® programmers a familiar conceptual framework and
+functions that produce nearly identical output.</p>
     </div>
 
 
 
     <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
 
-    <p>Here is some details.</p>
-    <h2 class="hasAnchor" id="statistics-options"><a class="anchor" href="#statistics-options"></a>Statistics Options</h2>
+    <p>Despite having similar analytical capabilities, SAS® and R are very different
+languages.  The <strong>procs</strong> package helps SAS® users become productive
+in R by offering functions that mimic SAS® procedures.  The functions
+have a similar syntax, and produce similar output. Most importantly,
+the functions aim to match SAS® statistical results to a high precision.
+This achievement will foster smoother transitions from one language to
+another, and reduce delays in explaining the differences in statistical
+output.</p>
+    <h2 class="hasAnchor" id="available-functions"><a class="anchor" href="#available-functions"></a>Available Functions</h2>
 
     
 
-<ul>
-<li><p><strong>CSS</strong>: Corrected Sum of Squares.</p></li>
-<li><p><strong>CV</strong>: Coefficient of Variation.</p></li>
+<p>The <strong>procs</strong> package contains the following major functions:</p><ul>
+<li><p><code><a href='proc_freq.html'>proc_freq</a></code>: Performs frequency  counts and statistics.</p></li>
+<li><p><code><a href='proc_means.html'>proc_means</a></code>: Generates summary statistics.</p></li>
+<li><p><code><a href='proc_transpose.html'>proc_transpose</a></code>: A function to pivot datasets.</p></li>
+<li><p><code><a href='proc_sort.html'>proc_sort</a></code>: Sorts and dedupes a dataset.</p></li>
+<li><p><code><a href='proc_print.html'>proc_print</a></code>: An easy dataset print function.</p></li>
 </ul>
 
+<p>See function documentation for additional details.</p>
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">

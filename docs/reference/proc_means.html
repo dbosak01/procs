@@ -48,10 +48,10 @@
 
 <meta property="og:title" content="Calculates Summary Statistics — proc_means" />
 <meta property="og:description" content="The proc_means function generates summary statistics
-for selected variable on the input dataset.  The variables are identified
+for selected variables on the input dataset.  The variables are identified
 on the var parameter.  The statistics to perform are identified
-on the stats parameter.  By default, results are returned as a list,
-of tibbles." />
+on the stats parameter.  By default, results are displayed in
+the viewer interactively, and returned as a dataset or a list of datasets." />
 <meta property="og:image" content="https://procs.r-sassy.org/logo.png" />
 
 
@@ -158,10 +158,10 @@ of tibbles." />
 
     <div class="ref-description">
     <p>The <code>proc_means</code> function generates summary statistics
-for selected variable on the input dataset.  The variables are identified
+for selected variables on the input dataset.  The variables are identified
 on the <code>var</code> parameter.  The statistics to perform are identified
-on the <code>stats</code> parameter.  By default, results are returned as a list,
-of tibbles.</p>
+on the <code>stats</code> parameter.  By default, results are displayed in
+the viewer interactively, and returned as a dataset or a list of datasets.</p>
     </div>
 
     <pre class="usage"><span><span class='fu'>proc_means</span><span class='op'>(</span></span>
@@ -193,7 +193,11 @@ function.</p></td>
     </tr>
     <tr>
       <th>class</th>
-      <td><p>The variable or variables to perform frequency counts on.</p></td>
+      <td><p>The <code>class</code> parameter is similar to the <code>by</code>
+parameter, but the output is different.  By groups will create completely
+separate tables, while class groups will be continued in the same table.
+When a <code>by</code> and a <code>class</code> are both specified, the <code>class</code>
+will be nested in the <code>by</code>.</p></td>
     </tr>
     <tr>
       <th>var</th>
@@ -211,7 +215,8 @@ keywords are: "css", "clm", "cv", "n", "lclm", "mean", "median", "mode",
 "p50", "p60", "p70", "p75", "p80", "p90",
 "p95", "p99", "qrange". You may
 pass unquoted variable names to this parameter using the <code><a href='https://rdrr.io/pkg/common/man/v.html'>v</a></code>
-function.</p></td>
+function. See the <a href='ProcMeansOptions.html'>ProcMeansOptions</a> page for details on
+the available options.</p></td>
     </tr>
     <tr>
       <th>weight</th>
@@ -240,7 +245,7 @@ output dataset is requested, the function will return a single data frame.
 If more than one output dataset is requested, the function will return
 a list of data frames. If no statistics are specified in the <code><a href='out.html'>out</a></code>
 function, the procedure will default to the statistics assigned on
-the <code>stats</code> parameter above.  Note that this default behavior is different
+the <code>stats</code> parameter.  Note that this default behavior is different
 from SAS®.</p></td>
     </tr>
     <tr>
@@ -262,7 +267,7 @@ output requests dynamically inside a function.</p></td>
     <p>Some details about the sample function.</p>
 <p>All statistics remove missing values by default.  Should there be an
 option to include them?</p>
-    <h2 class="hasAnchor" id="statistics-options"><a class="anchor" href="#statistics-options"></a>Statistics Options</h2>
+    <h2 class="hasAnchor" id="options"><a class="anchor" href="#options"></a>Options</h2>
 
     
 

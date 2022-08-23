@@ -10,7 +10,7 @@
 <!-- badges: end -->
 
 # Introduction to **procs**
-<img src='man/images/procs.png' align="left" height="138" style="margin-right:10px"/>
+<img src='man/images/procs_new.png' align="left" height="138" style="margin-right:10px"/>
 
 The purpose of the **procs** package is to recreate some SAS® statistical
 procedures in R.  The first version of the package will attempt to recreate
@@ -18,7 +18,7 @@ PROC FREQ and PROC MEANS.
 Subsequent versions of the package will add more statistical procedures.  
 
 The package will also include a recreation of PROC TRANSPOSE,
-PROC SORT, and PROC COMPARE.
+PROC SORT, and PROC PRINT.
 The reason these procedures are included is because they are frequently used
 in conjunction with the statistical procedures to prepare results for reporting.  
 
@@ -46,11 +46,16 @@ it makes it much easier to rewrite
 SAS® programs in R. This pre-validation will
 ultimately save the industry tens of thousands of hours of effort.
 
-**3) Ease of Adoption:** A final goal of the package is to 
+**3) Ease of Adoption:** Another important aspect of the package is to 
 facilitate the adoption of R by SAS® programmers.
 SAS® programmers will easily understand and be comfortable with the functions
 in this package.  They will become productive in R much faster than with
 Base R functions, or statistical functions from other packages.
+
+**4) Stability:** A final goal of the **procs** package is to create a set
+of functions with intense concern for backward compatibility.  The package 
+aims to avoid breaking changes at all costs.  The dream is that programs
+written with these functions will still work years from now.
 
 ### Call for Contributors
 

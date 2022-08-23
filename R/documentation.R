@@ -19,5 +19,16 @@ NULL
 #' @details
 #' Here is some details.
 #'
+#'
+#' @section Statistics Options:
+#' \itemize{
+#'   \item{\strong{CSS}: Corrected Sum of Squares.
+#'
+#'   }
+#'   \item{\strong{CV}: Coefficient of Variation.
+#'
+#'   }
+#' }
+#'
 #' @name ProcMeansOptions
 NULL

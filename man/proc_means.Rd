@@ -26,7 +26,11 @@ proc_means(
 pass unquoted variable names to this parameter using the \code{\link{v}}
 function.}
 
-\item{class}{The variable or variables to perform frequency counts on.}
+\item{class}{The \code{class} parameter is similar to the \code{by}
+parameter, but the output is different.  By groups will create completely
+separate tables, while class groups will be continued in the same table.
+When a \code{by} and a \code{class} are both specified, the \code{class}
+will be nested in the \code{by}.}
 
 \item{var}{The variable(s) to calculate summary statistics for. You may
 pass unquoted variable names to this parameter using the \code{\link{v}}
@@ -40,7 +44,8 @@ keywords are: "css", "clm", "cv", "n", "lclm", "mean", "median", "mode",
 "p50", "p60", "p70", "p75", "p80", "p90",
 "p95", "p99", "qrange". You may
 pass unquoted variable names to this parameter using the \code{\link{v}}
-function.}
+function. See the \link{ProcMeansOptions} page for details on
+the available options.}
 
 \item{weight}{An optional weight parameter.}
 
@@ -59,7 +64,7 @@ output dataset is requested, the function will return a single data frame.
 If more than one output dataset is requested, the function will return
 a list of data frames. If no statistics are specified in the \code{\link{out}}
 function, the procedure will default to the statistics assigned on
-the \code{stats} parameter above.  Note that this default behavior is different
+the \code{stats} parameter.  Note that this default behavior is different
 from SAS®.}
 
 \item{output}{A named list of output data requests.  The name of the list item
@@ -74,10 +79,10 @@ The requested summary statistics.
 }
 \description{
 The \code{proc_means} function generates summary statistics
-for selected variable on the input dataset.  The variables are identified
+for selected variables on the input dataset.  The variables are identified
 on the \code{var} parameter.  The statistics to perform are identified
-on the \code{stats} parameter.  By default, results are returned as a list,
-of tibbles.
+on the \code{stats} parameter.  By default, results are displayed in
+the viewer interactively, and returned as a dataset or a list of datasets.
 }
 \details{
 Some details about the sample function.
@@ -85,7 +90,7 @@ Some details about the sample function.
 All statistics remove missing values by default.  Should there be an
 option to include them?
 }
-\section{Statistics Options}{
+\section{Options}{
 
 \itemize{
 \item{\strong{CSS}: Corrected Sum of Squares.
