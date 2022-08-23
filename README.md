@@ -52,8 +52,9 @@ SAS® programmers will easily understand and be comfortable with the functions
 in this package.  They will become productive in R much faster than with
 Base R functions, or statistical functions from other packages.
 
-**4) Stability:** A final goal of the **procs** package is to create a set
-of functions with intense concern for backward compatibility.  The package 
+**4) Stability:** SAS® software is renowned for its backwards compatibility. 
+A final goal of the **procs** package is to create a set
+of functions with a similarly intense concern for stability.  The package 
 aims to avoid breaking changes at all costs.  The dream is that programs
 written with these functions will still work years from now.
 
