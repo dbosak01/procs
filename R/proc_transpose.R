@@ -434,6 +434,9 @@ proc_transpose <- function(data,
                    namelabel = namelabel,
                    where = where,
                    outdata = res)
+
+     if (log_output())
+       log_logr(res)
    }
 
  return(res)

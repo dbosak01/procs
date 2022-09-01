@@ -156,6 +156,9 @@ proc_sort <- function(data,  by = NULL, keep = NULL, order = "ascending",
            nodupkey = nodupkey,
            outdata = ret)
 
+  if (log_output())
+    log_logr(ret)
+
   return(ret)
 
 }

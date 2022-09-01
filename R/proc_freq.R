@@ -359,6 +359,9 @@ proc_freq <- function(data,
     res <- res[[1]]
   }
 
+  if (log_output())
+    log_logr(res)
+
   return(res)
 
 }

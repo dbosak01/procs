@@ -96,7 +96,7 @@ proc_means <- function(data,
                        output = NULL) {
 
   # SAS seems to always ignore these
-  # Not sure why R as an option to keep them
+  # Not sure why R has an option to keep them
   missing <- FALSE
 
 
@@ -238,6 +238,8 @@ proc_means <- function(data,
   if (length(res) == 1)
     res <- res[[1]]
 
+  if (log_output())
+    log_logr(res)
 
   return(res)
 }
