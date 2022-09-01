@@ -60,6 +60,7 @@ prt2 <- read.table(header = TRUE, text = '
   8 girls         no         no    23      2')
 
 
+options("logr.output" = FALSE)
 
 test_that("freq1: Simple proc_freq test works.", {
 

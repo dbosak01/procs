@@ -438,8 +438,10 @@ proc_transpose <- function(data,
                    where = where,
                    outdata = res)
 
-     if (log_output())
+     if (log_output()) {
        log_logr(res)
+       print(res)
+     }
    }
 
  return(res)
