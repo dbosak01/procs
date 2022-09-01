@@ -538,5 +538,17 @@ test_that("transpose22: transposing inconsistent categories.", {
 })
 
 
+test_that("transpose23: tranpose retains original class.", {
 
+  library(tibble)
+
+  tmp <- as_tibble(prt)
+
+  res <- proc_transpose(tmp, by = sex)
+
+  res
+
+  expect_equal("tbl_df" %in% class(res), TRUE)
+
+})
 

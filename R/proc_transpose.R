@@ -423,6 +423,9 @@ proc_transpose <- function(data,
 
    rownames(res) <- NULL
 
+   # Restore original class
+   class(res) <- class(data)
+
    if (log) {
      log_transpose(data,
                    by = by,
