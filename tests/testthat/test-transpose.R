@@ -96,6 +96,8 @@ ageg <- read.table(header = TRUE, text = '
 16 AGECAT    ">= 65" "ARM D" 85  "3 (  3.5%)"')
 
 
+
+
 test_that("transpose1: basic var works without error.", {
 
   res <- proc_transpose(score, var = c("Test1", "Test2", "Final"))
@@ -552,3 +554,14 @@ test_that("transpose23: tranpose retains original class.", {
 
 })
 
+
+test_that("transpose24: Transpose with single by var works", {
+
+  ageg
+
+  res <- proc_transpose(ageg, by = VAR, id = CAT2, var = v(N, CNTPCT))
+
+  expect_equal(nrow(res), 2)  # And gets no error
+
+
+})

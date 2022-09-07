@@ -11,6 +11,7 @@ prt <- read.table(header = TRUE, text = '
   8 girls         no         no    23')
 
 
+options("logr.output" = FALSE)
 
 test_that("compare1: Simple proc_compare test works.", {
 

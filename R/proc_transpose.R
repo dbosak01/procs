@@ -386,18 +386,23 @@ proc_transpose <- function(data,
    # Append by groups if necessary
    if (!is.null(by)) {
     bnms <- names(res)
-    for (p in seq(2, length(retlst))) {
-      #res <- rbind(res, retlst[[p]])   # Old way
 
-      # Get names of widest by group
-      if (ncol(retlst[[p]]) > length(bnms))
-        bnms <- names(retlst[[p]])
+     if (length(retlst) > 1) {
+        for (p in seq(2, length(retlst))) {
+          #res <- rbind(res, retlst[[p]])   # Old way
 
-      res <- merge(res, retlst[[p]], all = TRUE, sort = FALSE)
-    }
+          # Get names of widest by group
+          if (ncol(retlst[[p]]) > length(bnms))
+            bnms <- names(retlst[[p]])
+
+          res <- merge(res, retlst[[p]], all = TRUE, sort = FALSE)
+        }
+     }
+
     # Use widest by group as final column order
-    if (ncol(res) == length(bnms))
-      res <- res[ , bnms]
+    if (ncol(res) == length(bnms)) {
+      res <- tryCatch({res[ , bnms]}, error = function(cond){res})
+    }
    }
 
    # Where

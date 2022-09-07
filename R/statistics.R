@@ -2,7 +2,7 @@
 # Custom Statistics Functions ---------------------------------------------
 
 pfmt <- value(condition(x < .0001, "<.0001"),
-              condition(TRUE, "%.4f"))
+              condition(TRUE, "%.4f"), log = FALSE)
 
 #' @import stats
 get_aov <- function(data, var1, byvars, wgt = NULL,
