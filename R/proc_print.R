@@ -29,7 +29,7 @@
 #' pth <- proc_print(mtcars,
 #'                   file_path = tempfile(fileext = ".pdf"),
 #'                   titles = "MTCARS Proc Print Example",
-#'                   output_type = "PDF")
+#'                   output_type = "PDF", view = FALSE)
 #'
 #' # View file
 #' # file.show(pth)

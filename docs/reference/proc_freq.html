@@ -85,7 +85,7 @@ directly to a report, or show them in the viewer." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">procs</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.9005</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.9006</span>
       </span>
     </div>
 
@@ -168,14 +168,13 @@ directly to a report, or show them in the viewer.</p>
 
     <pre class="usage"><span><span class='fu'>proc_freq</span><span class='op'>(</span></span>
 <span>  <span class='va'>data</span>,</span>
-<span>  by <span class='op'>=</span> <span class='cn'>NULL</span>,</span>
 <span>  tables <span class='op'>=</span> <span class='cn'>NULL</span>,</span>
 <span>  options <span class='op'>=</span> <span class='cn'>NULL</span>,</span>
+<span>  by <span class='op'>=</span> <span class='cn'>NULL</span>,</span>
 <span>  weight <span class='op'>=</span> <span class='cn'>NULL</span>,</span>
-<span>  view <span class='op'>=</span> <span class='cn'>TRUE</span>,</span>
-<span>  titles <span class='op'>=</span> <span class='cn'>NULL</span>,</span>
-<span>  <span class='va'>...</span>,</span>
-<span>  output <span class='op'>=</span> <span class='cn'>NULL</span></span>
+<span>  order <span class='op'>=</span> <span class='cn'>NULL</span>,</span>
+<span>  plots <span class='op'>=</span> <span class='cn'>NULL</span>,</span>
+<span>  titles <span class='op'>=</span> <span class='cn'>NULL</span></span>
 <span><span class='op'>)</span></span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
@@ -187,33 +186,33 @@ directly to a report, or show them in the viewer.</p>
 Input data as the first parameter makes this function pipe-friendly.</p></td>
     </tr>
     <tr>
+      <th>tables</th>
+      <td><p>The variable or variables to perform frequency counts on.
+The table specifications are passed as a vector of quoted strings. You may
+also use the <code>v()</code> function to pass unquoted strings.  If the
+strings are named, the name will be used as the list item name on the return
+list of tables.  For one-way frequencies, simply pass the variable name.
+For two-way tables, pass the desired combination of variables separated by a
+star (*) operator.  The parameter does not accept SAS® style grouping syntax.
+All cross combinations should be listed explicitly.</p></td>
+    </tr>
+    <tr>
+      <th>options</th>
+      <td><p>The options desired for the function.
+Table options are passed to the parameter as a vector of quoted strings. You may
+also use the <code>v()</code> function to pass unquoted strings.
+The following options are available on <code>proc_freq</code>:
+"colpct", "cumsum", "cumpct",
+"freq", "format", "out", "outcum", "pct", "rowpct", "sparse", "totcol"
+and "totrow". See
+the <strong>Options</strong> section for a description of these options.</p></td>
+    </tr>
+    <tr>
       <th>by</th>
       <td><p>An optional by group. Parameter accepts a vector of one or more
 quoted variable names. When this parameter is set, data
 will be subset for each by group, and tables will be generated for
 each subset.</p></td>
-    </tr>
-    <tr>
-      <th>tables</th>
-      <td><p>The variable or variables to perform frequency counts on.
-The table specifications are passed as a vector of quoted strings. If the
-strings are named, the name will be used as the list item name on the return
-list of tables.  For one-way frequencies, simply pass the variable name.
-For two-way tables, pass the desired combination of variables separated by a
-star (*) operator.</p></td>
-    </tr>
-    <tr>
-      <th>options</th>
-      <td><p>The options desired for the function.
-Table options are passed to the parameter as a <code><a href='opts.html'>opts</a></code> object
-or a named list.  The name
-of each option should correspond to the option you wish to set.  The
-value of the list item should be the value you wish to set the option
-to.  The following options are available on <code>proc_freq</code>:
-"colpct", "cumsum", "cumpct",
-"freq", "format", "out", "outcum", "pct", "rowpct", "sparse", "totcol"
-and "totrow". See
-the <strong>Options</strong> section for a description of these options.</p></td>
     </tr>
     <tr>
       <th>weight</th>
@@ -223,41 +222,26 @@ indicated, the weighted value will be summed to calculate the frequency
 counts.</p></td>
     </tr>
     <tr>
-      <th>view</th>
-      <td><p>Whether to display procedure results in the viewer.  Valid values
-are TRUE and FALSE.  Default is TRUE.</p></td>
+      <th>order</th>
+      <td><p>How to order the output.</p></td>
+    </tr>
+    <tr>
+      <th>plots</th>
+      <td><p>Any plots to produce.</p></td>
     </tr>
     <tr>
       <th>titles</th>
-      <td><p>A vector of one or more titles to use for the report output.</p></td>
-    </tr>
-    <tr>
-      <th>...</th>
-      <td><p>One or more output dataset requests.  Use the <code><a href='out.html'>out</a></code>
-function to make these requests.</p></td>
-    </tr>
-    <tr>
-      <th>output</th>
-      <td><p>A named list of output data requests.  The name of the list item
-will become the name of the item in the return list, if there is one.  The
-value of the list item is a output request created with the <code><a href='out.html'>out</a></code>
-function.  Output data requests may also be made on the <code>...</code> parameter
-for convenience.  This parameter is provided in case you need to generate
-output requests dynamically inside a function.</p></td>
+      <td><p>A vector of titles to assign to the report.</p></td>
     </tr>
     </table>
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>By default the function returns a list of tibbles
+    <p>By default the function returns a list of datasets
 that contains the requested frequency tables.
 The tables are named according to the variable or variables
 that were requested, and the output tables are in the same order as requested
-in the <code>tables</code> parameter. If the
-<code>proc_freq</code> function is being used in a data pipeline, you may wish to return
-the results as a single dataset instead of a list.  To get a single dataset,
-set the <code>piped</code> parameter to TRUE. This option will return only the last
-table requested.</p>
+in the <code>tables</code> parameter.</p>
     <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
 
     <p>The <code>proc_freq</code> function generates frequency statistics
@@ -333,10 +317,9 @@ must be a valid format from the <strong><a href='https://fmtr.r-sassy.org/refere
 the format is passed as a formatting string.
 For example, the formatting string "%.1f%%" indicates that the
 data should be rounded to a single decimal place and include a percent sign.</p></li>
-<li><p><strong>out</strong>: The "out" option tells the procedure to output
-a frequency table, and allows you to name it.  This name will be used
-as the list item name.  If more than one table is requested, the "out"
-option will apply to the last table requested.</p></li>
+<li><p><strong>out</strong>: Normally, the <code>proc_freq</code> function is an interactive
+procedure and does not return data. The "out" option is to request
+return data.</p></li>
 <li><p><strong>outcum</strong>: Whether to include the cumulative frequency and
 cumulative percent on the output table specified on the "out" parameter.
 Valid values are TRUE and FALSE.  The default is TRUE.</p></li>
@@ -362,10 +345,6 @@ see <code><a href='proc_transpose.html'>proc_transpose</a></code>.</p></div>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><span><span class='kw'><a href='https://rdrr.io/r/base/library.html'>library</a></span><span class='op'>(</span><span class='va'><a href='https://procs.r-sassy.org'>procs</a></span><span class='op'>)</span></span>
-<span><span class='kw'><a href='https://rdrr.io/r/base/library.html'>library</a></span><span class='op'>(</span><span class='va'><a href='https://fmtr.r-sassy.org'>fmtr</a></span><span class='op'>)</span></span>
-<span></span>
-<span><span class='co'># Get temp directory for output</span></span>
-<span><span class='va'>tmp</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/tempfile.html'>tempdir</a></span><span class='op'>(</span><span class='op'>)</span></span>
 <span></span>
 <span><span class='co'># Create sample data</span></span>
 <span><span class='va'>df</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/as.data.frame.html'>as.data.frame</a></span><span class='op'>(</span><span class='va'>HairEyeColor</span>, stringsAsFactors <span class='op'>=</span> <span class='cn'>FALSE</span><span class='op'>)</span></span>
@@ -376,26 +355,31 @@ see <code><a href='proc_transpose.html'>proc_transpose</a></code>.</p></div>
 <span>                   Sex <span class='op'>=</span> <span class='st'>"Sex at Birth"</span><span class='op'>)</span></span>
 <span></span>
 <span><span class='co'># Example #1: One way frequencies on Hair and Eye color with weight option.</span></span>
-<span><span class='va'>res</span> <span class='op'>&lt;-</span> <span class='fu'>proc_freq</span><span class='op'>(</span><span class='va'>df</span>, tables <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"Hair"</span>, <span class='st'>"Eye"</span><span class='op'>)</span>, weight <span class='op'>=</span> <span class='st'>"Freq"</span><span class='op'>)</span></span>
+<span><span class='va'>res</span> <span class='op'>&lt;-</span> <span class='fu'>proc_freq</span><span class='op'>(</span><span class='va'>df</span>,</span>
+<span>                 tables <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/pkg/common/man/v.html'>v</a></span><span class='op'>(</span><span class='va'>Hair</span>, <span class='va'>Eye</span><span class='op'>)</span>,</span>
+<span>                 options <span class='op'>=</span> <span class='va'>out</span>,</span>
+<span>                 weight <span class='op'>=</span> <span class='va'>Freq</span><span class='op'>)</span></span>
 <span></span>
 <span><span class='co'># View result data</span></span>
 <span><span class='va'>res</span></span>
-<span><span class='co'>#$Hair</span></span>
-<span><span class='co'>#  Category Frequency  Percent Cum_Freq   Cum_Pct</span></span>
-<span><span class='co'>#1    Black       108 18.24324      108  18.24324</span></span>
-<span><span class='co'>#2    Brown       286 48.31081      394  66.55405</span></span>
-<span><span class='co'>#3      Red        71 11.99324      465  78.54730</span></span>
-<span><span class='co'>#4    Blond       127 21.45270      592 100.00000</span></span>
+<span><span class='co'># $Hair</span></span>
+<span><span class='co'>#    VAR   CAT   N CNT      PCT CUMSUM    CUMPCT</span></span>
+<span><span class='co'># 1 Hair Black 592 108 18.24324    108  18.24324</span></span>
+<span><span class='co'># 2 Hair Blond 592 127 21.45270    235  39.69595</span></span>
+<span><span class='co'># 3 Hair Brown 592 286 48.31081    521  88.00676</span></span>
+<span><span class='co'># 4 Hair   Red 592  71 11.99324    592 100.00000</span></span>
 <span><span class='co'>#</span></span>
-<span><span class='co'>#$Eye</span></span>
-<span><span class='co'>#  Category Frequency  Percent Cum_Freq   Cum_Pct</span></span>
-<span><span class='co'>#1    Brown       220 37.16216      220  37.16216</span></span>
-<span><span class='co'>#2     Blue       215 36.31757      435  73.47973</span></span>
-<span><span class='co'>#3    Hazel        93 15.70946      528  89.18919</span></span>
-<span><span class='co'>#4    Green        64 10.81081      592 100.00000</span></span>
+<span><span class='co'># $Eye</span></span>
+<span><span class='co'>#   VAR   CAT   N CNT      PCT CUMSUM    CUMPCT</span></span>
+<span><span class='co'># 1 Eye  Blue 592 215 36.31757    215  36.31757</span></span>
+<span><span class='co'># 2 Eye Brown 592 220 37.16216    435  73.47973</span></span>
+<span><span class='co'># 3 Eye Green 592  64 10.81081    499  84.29054</span></span>
+<span><span class='co'># 4 Eye Hazel 592  93 15.70946    592 100.00000</span></span>
 <span></span>
-<span><span class='co'># Example #2: Crosstab table</span></span>
-<span><span class='va'>res</span> <span class='op'>&lt;-</span> <span class='fu'>proc_freq</span><span class='op'>(</span><span class='va'>df</span>, tables <span class='op'>=</span> <span class='st'>"Hair * Eye"</span>, weight <span class='op'>=</span> <span class='st'>"Freq"</span><span class='op'>)</span></span>
+<span><span class='co'># Example #2: 2 x 2 table</span></span>
+<span><span class='va'>res</span> <span class='op'>&lt;-</span> <span class='fu'>proc_freq</span><span class='op'>(</span><span class='va'>df</span>, tables <span class='op'>=</span> <span class='va'>Hair</span> <span class='op'>*</span> <span class='va'>Eye</span>,</span>
+<span>                     weight <span class='op'>=</span> <span class='va'>Freq</span>,</span>
+<span>                     options <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/pkg/common/man/v.html'>v</a></span><span class='op'>(</span><span class='va'>list</span>, <span class='va'>nocum</span><span class='op'>)</span><span class='op'>)</span></span>
 <span></span>
 <span><span class='co'># View result data</span></span>
 <span><span class='va'>res</span></span>
@@ -420,13 +404,10 @@ see <code><a href='proc_transpose.html'>proc_transpose</a></code>.</p></div>
 <span><span class='co'>#17    Total Frequency 215.000000 220.000000 64.0000000 93.000000 592.00000</span></span>
 <span><span class='co'>#18    Total   Percent  36.317568  37.162162 10.8108108 15.709459 100.00000</span></span>
 <span></span>
-<span><span class='co'>#' # Example #3: Crosstab table with totrow, totcol, rowpct, and colpct turned off</span></span>
-<span><span class='va'>res</span> <span class='op'>&lt;-</span> <span class='fu'>proc_freq</span><span class='op'>(</span><span class='va'>df</span>, tables <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span>HairByEyes <span class='op'>=</span> <span class='st'>"Hair * Eye"</span><span class='op'>)</span>,</span>
-<span>                 options <span class='op'>=</span> <span class='fu'><a href='opts.html'>opts</a></span><span class='op'>(</span>totrow <span class='op'>=</span> <span class='cn'>FALSE</span>,</span>
-<span>                                totcol <span class='op'>=</span> <span class='cn'>FALSE</span>,</span>
-<span>                                rowpct <span class='op'>=</span> <span class='cn'>FALSE</span>,</span>
-<span>                                colpct <span class='op'>=</span> <span class='cn'>FALSE</span><span class='op'>)</span>,</span>
-<span>                 weight <span class='op'>=</span> <span class='st'>"Freq"</span><span class='op'>)</span></span>
+<span><span class='co'>#' # Example #3: Crosstab table wturned off</span></span>
+<span><span class='va'>res</span> <span class='op'>&lt;-</span> <span class='fu'>proc_freq</span><span class='op'>(</span><span class='va'>df</span>, tables <span class='op'>=</span> <span class='va'>Hair</span> <span class='op'>*</span> <span class='va'>Eye</span>,</span>
+<span>                 options <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/pkg/common/man/v.html'>v</a></span><span class='op'>(</span><span class='va'>list</span>, <span class='va'>nocum</span><span class='op'>)</span>,</span>
+<span>                 weight <span class='op'>=</span> <span class='va'>Freq</span><span class='op'>)</span></span>
 <span></span>
 <span><span class='co'># View result data</span></span>
 <span><span class='va'>res</span></span>

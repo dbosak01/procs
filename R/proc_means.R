@@ -58,26 +58,24 @@
 #' function. See the \link{ProcMeansOptions} page for details on
 #' the available options.
 #' @param weight An optional weight parameter.
-#' @param view Whether to display the report in the interactive viewer.  Valid
-#' values are TRUE and FALSE.  Default is TRUE.
 #' @param titles A vector of one or more titles to use for the report output.
 #' @param options An options object created with the \code{\link{opts}}
 #' function. This parameter can accept a variety of options.
-#' @param ... One or more output requests. To request a dataset output,
-#' use the desired dataset name as the parameter name, and pass in the
-#' \code{\link{out}} function with the desired specifics.  If only one
-#' output dataset is requested, the function will return a single data frame.
-#' If more than one output dataset is requested, the function will return
-#' a list of data frames. If no statistics are specified in the \code{\link{out}}
-#' function, the procedure will default to the statistics assigned on
-#' the \code{stats} parameter.  Note that this default behavior is different
-#' from SAS®.
-#' @param output A named list of output data requests.  The name of the list item
-#' will become the name of the item in the return list, if there is one.  The
-#' value of the list item is a output request created with the \code{\link{out}}
-#' function.  Output data requests may also be made on the \code{...} parameter
-#' for convenience.  This parameter is provided in case you need to generate
-#' output requests dynamically inside a function.
+# @param ... One or more output requests. To request a dataset output,
+# use the desired dataset name as the parameter name, and pass in the
+# \code{\link{out}} function with the desired specifics.  If only one
+# output dataset is requested, the function will return a single data frame.
+# If more than one output dataset is requested, the function will return
+# a list of data frames. If no statistics are specified in the \code{\link{out}}
+# function, the procedure will default to the statistics assigned on
+# the \code{stats} parameter.  Note that this default behavior is different
+# from SAS®.
+# @param output A named list of output data requests.  The name of the list item
+# will become the name of the item in the return list, if there is one.  The
+# value of the list item is a output request created with the \code{\link{out}}
+# function.  Output data requests may also be made on the \code{...} parameter
+# for convenience.  This parameter is provided in case you need to generate
+# output requests dynamically inside a function.
 #' @return The requested summary statistics.
 #' @import fmtr
 #' @import tibble
@@ -89,11 +87,11 @@ proc_means <- function(data,
                        stats = c("n", "mean", "std", "min", "max"),
               #        ways = NULL,   # Hold off for now
                        weight = NULL,
-                       view = TRUE,
                        titles = NULL,
-                       options = NULL,
-                       ...,
-                       output = NULL) {
+                       options = NULL #,
+                      # ...,
+                      # output = NULL
+                       ) {
 
   # SAS seems to always ignore these
   # Not sure why R has an option to keep them
@@ -117,6 +115,10 @@ proc_means <- function(data,
   ostats <- deparse(substitute(stats, env = environment()))
   stats <- tryCatch({if (typeof(stats) %in% c("character", "NULL")) stats else ostats},
                   error = function(cond) {ostats})
+
+  oopt <- deparse(substitute(options, env = environment()))
+  options <- tryCatch({if (typeof(options) %in% c("character", "NULL")) options else oopt},
+                      error = function(cond) {oopt})
 
   # Parameter checks
   nms <- names(data)
@@ -173,10 +175,14 @@ proc_means <- function(data,
   }
 
   # Generate output specs
-  if (!is.null(output))
-    outreq <- get_output_specs_means(output, stats)
+  # if (!is.null(output))
+  #   outreq <- get_output_specs_means(output, stats)
+  # else
+  #   outreq <- get_output_specs_means(list(...), stats)
+  if (has_option(options, "out"))
+    outreq <- get_output_specs_means(list(), stats, options)
   else
-    outreq <- get_output_specs_means(list(...), stats)
+    outreq <- NULL
 
   rptflg <- FALSE
   rptnm <- ""
@@ -184,11 +190,17 @@ proc_means <- function(data,
 
   # Kill output request for report
   # Otherwise, this will mess up gen_output_means
-  if (has_report(outreq)) {
+  if (has_option(options, "report")) {
     rptflg <- TRUE
-    rptnm <- get_report_name(outreq)
-    outreq[[rptnm]] <- NULL
+    #rptnm <- get_report_name(outreq)
+    rptnm <- "report"
+    #outreq[[rptnm]] <- NULL
   }
+
+  if (option_true(options, "noprint", FALSE))
+    view <- FALSE
+  else
+    view <- TRUE
 
   res <- NULL
 
@@ -207,7 +219,8 @@ proc_means <- function(data,
                            by = by,
                            class = class,
                            var = var,
-                           output = outreq
+                           output = outreq,
+                           options = options
                            )
   }
 
@@ -216,8 +229,9 @@ proc_means <- function(data,
 
     if (is.null(res))
       res <- rptres
-    else
-      res[[rptnm]] <- rptres
+    else {
+      res <- list(out = res, report = rptres)
+    }
 
 
   }
@@ -302,7 +316,7 @@ log_means <- function(data,
 # Stats ---------------------------------------------------------------
 
 
-get_output_specs_means <- function(outs, stats) {
+get_output_specs_means <- function(outs, stats, options) {
 
   # outreq <- NULL
 
@@ -331,8 +345,16 @@ get_output_specs_means <- function(outs, stats) {
       }
     } else {
 
-      outreq[["out"]] <- out(stats = stats, shape = "wide",
-                             type = TRUE, freq = TRUE)
+      if (option_true(options, "long")) {
+        outreq[["out"]] <- out(stats = stats, shape = "long",
+                               type = TRUE, freq = TRUE)
+      } else if (option_true(options, "stacked")) {
+        outreq[["out"]] <- out(stats = stats, shape = "stacked",
+                               type = TRUE, freq = TRUE)
+      } else {
+        outreq[["out"]] <- out(stats = stats, shape = "wide",
+                               type = TRUE, freq = TRUE)
+      }
 
     }
   # }
@@ -889,7 +911,7 @@ gen_report_means <- function(data,
 
   }
 
-  gv <- options("procs.view")[[1]]
+  gv <- options("procs.print")[[1]]
   if (is.null(gv))
     gv <- TRUE
 
@@ -919,7 +941,8 @@ gen_output_means <- function(data,
                              class = NULL,
                              var = NULL,
                              weight = NULL,
-                             output = NULL) {
+                             output = NULL,
+                             options = NULL) {
 
   res <- list()
   if (length(output) > 0) {
@@ -931,12 +954,12 @@ gen_output_means <- function(data,
 
       # Whether to include type variable
       tp <- 0
-      if (outp$parameters$type %eq% FALSE)
+      if (has_option(options, "notype"))
         tp <- NULL
 
       # Whether to include freq variable
       frq <- TRUE
-      if (outp$parameters$freq %eq% FALSE)
+      if (has_option(options, "nonobs"))
         frq <- FALSE
 
       # Create vector of NA class values

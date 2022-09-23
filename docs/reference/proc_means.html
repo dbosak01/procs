@@ -84,7 +84,7 @@ the viewer interactively, and returned as a dataset or a list of datasets." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">procs</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.9005</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.9006</span>
       </span>
     </div>
 
@@ -171,11 +171,8 @@ the viewer interactively, and returned as a dataset or a list of datasets.</p>
 <span>  var <span class='op'>=</span> <span class='cn'>NULL</span>,</span>
 <span>  stats <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"n"</span>, <span class='st'>"mean"</span>, <span class='st'>"std"</span>, <span class='st'>"min"</span>, <span class='st'>"max"</span><span class='op'>)</span>,</span>
 <span>  weight <span class='op'>=</span> <span class='cn'>NULL</span>,</span>
-<span>  view <span class='op'>=</span> <span class='cn'>TRUE</span>,</span>
 <span>  titles <span class='op'>=</span> <span class='cn'>NULL</span>,</span>
-<span>  options <span class='op'>=</span> <span class='cn'>NULL</span>,</span>
-<span>  <span class='va'>...</span>,</span>
-<span>  output <span class='op'>=</span> <span class='cn'>NULL</span></span>
+<span>  options <span class='op'>=</span> <span class='cn'>NULL</span></span>
 <span><span class='op'>)</span></span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
@@ -223,11 +220,6 @@ the available options.</p></td>
       <td><p>An optional weight parameter.</p></td>
     </tr>
     <tr>
-      <th>view</th>
-      <td><p>Whether to display the report in the interactive viewer.  Valid
-values are TRUE and FALSE.  Default is TRUE.</p></td>
-    </tr>
-    <tr>
       <th>titles</th>
       <td><p>A vector of one or more titles to use for the report output.</p></td>
     </tr>
@@ -235,27 +227,6 @@ values are TRUE and FALSE.  Default is TRUE.</p></td>
       <th>options</th>
       <td><p>An options object created with the <code><a href='opts.html'>opts</a></code>
 function. This parameter can accept a variety of options.</p></td>
-    </tr>
-    <tr>
-      <th>...</th>
-      <td><p>One or more output requests. To request a dataset output,
-use the desired dataset name as the parameter name, and pass in the
-<code><a href='out.html'>out</a></code> function with the desired specifics.  If only one
-output dataset is requested, the function will return a single data frame.
-If more than one output dataset is requested, the function will return
-a list of data frames. If no statistics are specified in the <code><a href='out.html'>out</a></code>
-function, the procedure will default to the statistics assigned on
-the <code>stats</code> parameter.  Note that this default behavior is different
-from SAS®.</p></td>
-    </tr>
-    <tr>
-      <th>output</th>
-      <td><p>A named list of output data requests.  The name of the list item
-will become the name of the item in the return list, if there is one.  The
-value of the list item is a output request created with the <code><a href='out.html'>out</a></code>
-function.  Output data requests may also be made on the <code>...</code> parameter
-for convenience.  This parameter is provided in case you need to generate
-output requests dynamically inside a function.</p></td>
     </tr>
     </table>
 

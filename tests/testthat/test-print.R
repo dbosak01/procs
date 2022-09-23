@@ -153,7 +153,6 @@ test_that("print7: Simple proc_print style works.", {
 
 test_that("print8: Print freq report works.", {
 
-  library(common)
 
   fp <- file.path(base_path, "print/test8")
 
@@ -165,9 +164,8 @@ test_that("print8: Print freq report works.", {
                    tables = c("Eyes", "Hair",  Cross = "Hair * Eyes"),
                    titles = "My first Frequency Table",
                    by = "Region",
-                   view = TRUE,
                    weight = "Count",
-                   report = out(report = TRUE))
+                   options = report)
 
   expect_equal(length(res), 6)
 

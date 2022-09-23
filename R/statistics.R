@@ -167,6 +167,25 @@ get_fisher <- function(x, y, wgt = NULL, bylbl = "", output = FALSE) {
                       FISHER.2S = tres[["p.value"]],
                       stringsAsFactors = FALSE)
 
+    # Add by variables if exist
+    if (length(bylbl) > 0) {
+      bv <- bylbl[[1]]
+      if (!is.null(bv)) {
+         lst <- list()
+         nms <- names(bv)
+         if (length(nms) > 0) {
+           for (nm in nms) {
+             lst[[nm]] <- bv[[nm]]
+           }
+           bvds <- as.data.frame(lst, stringsAsFactors = FALSE)
+           names(bvds) <- nms
+           ret <- cbind(bvds, ret)
+         }
+
+      }
+    }
+
+
     rownames(ret) <- NULL
 
   } else {
@@ -218,6 +237,25 @@ get_chisq <- function(x, y, wgt = NULL, corrct = FALSE, bylbl = "", output = FAL
                       CHISQ.DF = res[["parameter"]],
                       CHISQ.P = res[["p.value"]],
                       stringsAsFactors = FALSE)
+
+
+    # Add by variables if exist
+    if (length(bylbl) > 0) {
+      bv <- bylbl[[1]]
+      if (!is.null(bv)) {
+        lst <- list()
+        nms <- names(bv)
+        if (length(nms) > 0) {
+          for (nm in nms) {
+            lst[[nm]] <- bv[[nm]]
+          }
+          bvds <- as.data.frame(lst, stringsAsFactors = FALSE)
+          names(bvds) <- nms
+          ret <- cbind(bvds, ret)
+        }
+
+      }
+    }
 
     rownames(ret) <- NULL
 

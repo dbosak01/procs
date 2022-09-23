@@ -159,16 +159,22 @@ show_viewer <- function(path) {
 
   if (file.exists(path)) {
 
-    pth <- path
+    opts <- options("procs.print")[[1]]
+    if (is.null(opts))
+      opts <- TRUE
 
-    viewer <- getOption("viewer")
+    if (opts == TRUE) {
 
-    if (!is.null(viewer))
-      viewer(pth)
-    else
-      utils::browseURL(pth)
+      pth <- path
 
-    ret <- TRUE
+      viewer <- getOption("viewer")
+
+      if (!is.null(viewer))
+        viewer(pth)
+      else
+        utils::browseURL(pth)
+
+    }
 
   }
 
@@ -273,24 +279,42 @@ get_report_name <- function(outreq) {
 #' @noRd
 option_true <- function(options, name, default = FALSE) {
 
-  ret <- default
+  ret <- NULL
 
-
-  #browser()
-  # print("option_true")
-  # print(options)
 
   if (!is.null(options)) {
-    names(options) <- tolower(names(options))
+    nms <- names(options)
 
-    vl <- options[[tolower(name)]]
-    if (!is.null(vl)) {
-      if (vl == TRUE)
-        ret <- TRUE
-      else
-        ret <- FALSE
+    # Try to find named option
+    if (!is.null(nms)) {
+
+      if (tolower(name) %in% tolower(nms)) {
+        # Force names to lower case
+        names(options) <- tolower(nms)
+        # See if name exists
+        vl <- options[[tolower(name)]]
+        if (!is.null(vl)) {
+          if (vl == TRUE)
+            ret <- TRUE
+          else
+            ret <- FALSE
+        }
+      }
     }
 
+    # Try to find keyword
+    if (is.null(ret)) {
+
+      if (tolower(name) %in% tolower(options)) {
+
+        ret <- TRUE
+      }
+    }
+  }
+
+  # Give up and send default
+  if (is.null(ret)) {
+    ret <- default
   }
 
   return(ret)
@@ -300,20 +324,31 @@ option_true <- function(options, name, default = FALSE) {
 has_option <- function(options, name) {
 
 
-  ret <- FALSE
+  ret <- NULL
 
-  # print("has_option")
-  # print(options)
 
   if (!is.null(options)) {
+    nms <- names(options)
 
-    names(options) <- tolower(names(options))
+    # Try to find named option
+    if (!is.null(nms)) {
+      if (tolower(name) %in% tolower(nms)) {
+        ret <- TRUE
+      }
+    }
 
-    vl <- options[[tolower(name)]]
-    if (!is.null(vl)) {
-      ret <- TRUE
+    # Try to find keyword
+    if (is.null(ret)) {
+
+      if (tolower(name) %in% tolower(options)) {
+
+        ret <- TRUE
+      }
     }
   }
+
+  if (is.null(ret))
+    ret <- FALSE
 
   return(ret)
 
@@ -322,22 +357,43 @@ has_option <- function(options, name) {
 
 get_option <- function(options, name, default = NULL) {
 
-  # print("get_option")
-  # print(name)
-  # print(options)
+  ret <- NULL
 
-
-  ret <- default
 
   if (!is.null(options)) {
+    nms <- names(options)
 
-    names(options) <- tolower(names(options))
+    # Try to find named option
+    if (!is.null(nms)) {
 
-    vl <- options[[tolower(name)]]
-    if (!is.null(vl)) {
-      ret <- vl
+      if (tolower(name) %in% tolower(nms)) {
+
+        # Force names to lower case
+        names(options) <- tolower(nms)
+        # See if name exists
+        vl <- options[[tolower(name)]]
+        if (!is.null(vl)) {
+          ret <- tryCatch(eval(str2expression(vl)),
+                          error = function(cond){vl})
+        }
+      }
+    }
+
+    # Try to find keyword
+    if (is.null(ret)) {
+
+      if (tolower(name) %in% tolower(options)) {
+
+        ret <- TRUE
+      }
     }
   }
+
+  # Give up and send default
+  if (is.null(ret)) {
+    ret <- default
+  }
+
 
   return(ret)
 
@@ -425,4 +481,14 @@ log_output <- function() {
   return(ret)
 }
 
+
+parse_tables <- function(nms, tstr) {
+
+ vl <- "D * (A--C)"
+
+  rng <- regexec("[a-zA-Z0-9.]+\\-\\-[a-zA-Z0-9.]+", vl)
+
+  rng
+
+}
 

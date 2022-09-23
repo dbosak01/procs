@@ -117,34 +117,43 @@ test_that("utils4: option_true() works as expected.", {
 
   expect_equal(option_true(opt, "cumsum"), FALSE)
 
-  opt <- list(fork = TRUE)
+  opt <- v(fork)
 
   expect_equal(option_true(opt, "cumsum"), FALSE)
 
 
-  opt <- list(fork = TRUE, cumsum = FALSE)
+  opt <- v(fork, cumsum = FALSE)
 
   expect_equal(option_true(opt, "cumsum"), FALSE)
 
 
-  opt <- list(fork = TRUE, cumsum = TRUE)
+  opt <- v(fork, cumsum = TRUE)
+
+  expect_equal(option_true(opt, "cumsum"), TRUE)
+
+  opt <- v(fork, cumsum)
 
   expect_equal(option_true(opt, "cumsum"), TRUE)
 
 })
 
-test_that("utils4: option_true() works as expected.", {
+test_that("utils4: has_option() works as expected.", {
 
   opt <- NULL
 
   expect_equal(has_option(opt, "cumsum"), FALSE)
 
-  opt <- list(fork = TRUE)
+  opt <- v(fork = TRUE)
 
   expect_equal(has_option(opt, "cumsum"), FALSE)
 
 
-  opt <- list(fork = TRUE, cumsum = FALSE)
+  opt <- v(fork = TRUE, cumsum = FALSE)
+
+  expect_equal(has_option(opt, "cumsum"), TRUE)
+
+
+  opt <- v(fork, cumsum)
 
   expect_equal(has_option(opt, "cumsum"), TRUE)
 
@@ -165,7 +174,7 @@ test_that("utils5: get_name() works as expected.", {
 
 test_that("utils8: Options are case-insensitive", {
 
-  opts <- list(Fisher = TRUE)
+  opts <- v(Fisher = TRUE)
 
   res <- get_option(opts, "fisher", FALSE)
 
@@ -182,6 +191,53 @@ test_that("utils8: Options are case-insensitive", {
   expect_equal(has_option(opts, "FISHER"), TRUE)
   expect_equal(has_option(opts, "FASHER"), FALSE)
 
+
+  opts <- v(Fisher)
+
+  res <- get_option(opts, "fishEr", FALSE)
+
+  res
+
+  expect_equal(res, TRUE)
+
+
+})
+
+test_that("utils9: get_option() returns appropriate data type.", {
+
+  opts <- v(Fisher = TRUE, fork, bork = c(1, 2, 3), stork = c("A", "B", "C"))
+
+  res <- get_option(opts, "fishEr", FALSE)
+
+  res
+
+  expect_equal(typeof(res), "logical")
+
+  res <- get_option(opts, "bork", FALSE)
+
+  res
+
+  expect_equal(typeof(res), "double")
+
+
+  res <- get_option(opts, "fork", FALSE)
+
+  res
+
+  expect_equal(typeof(res), "logical")
+
+
+  res <- get_option(opts, "stork", FALSE)
+
+  res
+
+  expect_equal(typeof(res), "character")
+
+  res <- get_option(opts, "stack", FALSE)
+
+  res
+
+  expect_equal(typeof(res), "logical")
 
 })
 
@@ -226,44 +282,44 @@ test_that("utils10: has_report() function works.", {
 })
 
 
-test_that("utils11: opts() works with list.", {
-
-  lst <- list(A = 1, B = 2)
-
-  res <- opts(lst)
-
-  expect_equal(class(res), c("opts", "list"))
-  expect_equal(res$A, 1)
-  expect_equal(res$B, 2)
-
-  res2 <- opts(C = 3, D = 4)
-
-  expect_equal(class(res2), c("opts", "list"))
-  expect_equal(res2$C, 3)
-  expect_equal(res2$D, 4)
-
-
-  func1 <- function(mylist) {
-
-    ret <- opts(mylist)
-
-    return(ret)
-  }
-
-  res3 <- func1(lst)
-
-  expect_equal(class(res3), c("opts", "list"))
-  expect_equal(res3$A, 1)
-  expect_equal(res3$B, 2)
-
-
-  res4 <- opts()
-
-  expect_equal(class(res4), c("opts", "list"))
-  expect_equal(length(res4), 0)
-
-
-})
+# test_that("utils11: opts() works with list.", {
+#
+#   lst <- list(A = 1, B = 2)
+#
+#   res <- opts(lst)
+#
+#   expect_equal(class(res), c("opts", "list"))
+#   expect_equal(res$A, 1)
+#   expect_equal(res$B, 2)
+#
+#   res2 <- opts(C = 3, D = 4)
+#
+#   expect_equal(class(res2), c("opts", "list"))
+#   expect_equal(res2$C, 3)
+#   expect_equal(res2$D, 4)
+#
+#
+#   func1 <- function(mylist) {
+#
+#     ret <- opts(mylist)
+#
+#     return(ret)
+#   }
+#
+#   res3 <- func1(lst)
+#
+#   expect_equal(class(res3), c("opts", "list"))
+#   expect_equal(res3$A, 1)
+#   expect_equal(res3$B, 2)
+#
+#
+#   res4 <- opts()
+#
+#   expect_equal(class(res4), c("opts", "list"))
+#   expect_equal(length(res4), 0)
+#
+#
+# })
 
 test_that("utils12: fill_missing() function works as expected.", {
 
@@ -300,6 +356,27 @@ test_that("utils13: out() NSE works as expected.", {
 
 })
 
+test_that("utils14: get_option works with formats.", {
+
+  v1 <- v(format = "%1.2f%%")
+
+
+  res <- get_option(v1, "format")
+
+
+  expect_equal(res, "%1.2f%%")
+
+  v2 <- v(format = c(1, 2, 3))
+
+  res <- get_option(v2, "format")
+
+  res
+
+  expect_equal(res, c(1, 2, 3))
+
+
+})
+
 #
 # test_that("utils12: stackds() function works as expected.", {
 #
@@ -319,6 +396,37 @@ test_that("utils13: out() NSE works as expected.", {
 #   # expect_equal(ncol(res2), 6)
 #   # expect_equal("Group" %in% names(res2), TRUE)
 #
+#
+#
+#
+# })
+
+
+# test_that("utils14: parse_tables() works as expected.", {
+#
+#   nms <- v(A, B, C, D)
+#
+#
+#   v1 <- c("A--C)")
+#   v1
+#
+#   res <- parse_tables(nms, v1)
+#
+#
+#   v2 <- c("A * (B C)")
+#   nms
+#   v2
+#
+#   res <- parse_tables(nms, v2)
+#
+#   res
+#
+#   expect_equal(res, c("A * B", "A * C"))
+#
+#   v2 <- c("(A B) * (C D)")
+#   res2 <- parse_tables(nms, v2)
+#
+#   expect_equal(res, c("A * C", "B * C", "A * C", "B * D"))
 #
 #
 #

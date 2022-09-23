@@ -38,7 +38,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">procs</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.9005</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.9006</span>
       </span>
     </div>
 
@@ -144,27 +144,27 @@ demographics table with p-value statistics.</p>
 <span><span class="fu">sep</span><span class="op">(</span><span class="st">"Prepare formats"</span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu">put</span><span class="op">(</span><span class="st">"Age categories"</span><span class="op">)</span></span>
-<span><span class="va">agecat</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://fmtr.r-sassy.org/reference/value.html">value</a></span><span class="op">(</span><span class="fu"><a href="https://fmtr.r-sassy.org/reference/condition.html">condition</a></span><span class="op">(</span><span class="va">x</span> <span class="op">&gt;=</span> <span class="fl">18</span> <span class="op">&amp;</span> <span class="va">x</span> <span class="op">&lt;=</span> <span class="fl">29</span>, <span class="st">"18 to 29"</span><span class="op">)</span>,</span>
-<span>                <span class="fu"><a href="https://fmtr.r-sassy.org/reference/condition.html">condition</a></span><span class="op">(</span><span class="va">x</span> <span class="op">&gt;=</span><span class="fl">30</span> <span class="op">&amp;</span> <span class="va">x</span> <span class="op">&lt;=</span> <span class="fl">39</span>, <span class="st">"30 to 39"</span><span class="op">)</span>,</span>
-<span>                <span class="fu"><a href="https://fmtr.r-sassy.org/reference/condition.html">condition</a></span><span class="op">(</span><span class="va">x</span> <span class="op">&gt;=</span><span class="fl">40</span> <span class="op">&amp;</span> <span class="va">x</span> <span class="op">&lt;=</span><span class="fl">49</span>, <span class="st">"40 to 49"</span><span class="op">)</span>,</span>
-<span>                <span class="fu"><a href="https://fmtr.r-sassy.org/reference/condition.html">condition</a></span><span class="op">(</span><span class="va">x</span> <span class="op">&gt;=</span> <span class="fl">50</span>, <span class="st">"&gt;= 50"</span><span class="op">)</span>,</span>
-<span>                <span class="fu"><a href="https://fmtr.r-sassy.org/reference/condition.html">condition</a></span><span class="op">(</span><span class="cn">TRUE</span>, <span class="st">"Out of range"</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span> <span class="fu">put</span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="va">agecat</span> <span class="op">&lt;-</span> <span class="fu">value</span><span class="op">(</span><span class="fu">condition</span><span class="op">(</span><span class="va">x</span> <span class="op">&gt;=</span> <span class="fl">18</span> <span class="op">&amp;</span> <span class="va">x</span> <span class="op">&lt;=</span> <span class="fl">29</span>, <span class="st">"18 to 29"</span><span class="op">)</span>,</span>
+<span>                <span class="fu">condition</span><span class="op">(</span><span class="va">x</span> <span class="op">&gt;=</span><span class="fl">30</span> <span class="op">&amp;</span> <span class="va">x</span> <span class="op">&lt;=</span> <span class="fl">39</span>, <span class="st">"30 to 39"</span><span class="op">)</span>,</span>
+<span>                <span class="fu">condition</span><span class="op">(</span><span class="va">x</span> <span class="op">&gt;=</span><span class="fl">40</span> <span class="op">&amp;</span> <span class="va">x</span> <span class="op">&lt;=</span><span class="fl">49</span>, <span class="st">"40 to 49"</span><span class="op">)</span>,</span>
+<span>                <span class="fu">condition</span><span class="op">(</span><span class="va">x</span> <span class="op">&gt;=</span> <span class="fl">50</span>, <span class="st">"&gt;= 50"</span><span class="op">)</span>,</span>
+<span>                <span class="fu">condition</span><span class="op">(</span><span class="cn">TRUE</span>, <span class="st">"Out of range"</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span> <span class="fu">put</span><span class="op">(</span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu">put</span><span class="op">(</span><span class="st">"Sex decodes"</span><span class="op">)</span></span>
-<span><span class="va">fmt_sex</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://fmtr.r-sassy.org/reference/value.html">value</a></span><span class="op">(</span><span class="fu"><a href="https://fmtr.r-sassy.org/reference/condition.html">condition</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/NA.html">is.na</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span>, <span class="st">"Missing"</span><span class="op">)</span>,</span>
-<span>                 <span class="fu"><a href="https://fmtr.r-sassy.org/reference/condition.html">condition</a></span><span class="op">(</span><span class="va">x</span> <span class="op">==</span> <span class="st">"M"</span>, <span class="st">"Male"</span><span class="op">)</span>,</span>
-<span>                 <span class="fu"><a href="https://fmtr.r-sassy.org/reference/condition.html">condition</a></span><span class="op">(</span><span class="va">x</span> <span class="op">==</span> <span class="st">"F"</span>, <span class="st">"Female"</span><span class="op">)</span>,</span>
-<span>                 <span class="fu"><a href="https://fmtr.r-sassy.org/reference/condition.html">condition</a></span><span class="op">(</span><span class="cn">TRUE</span>, <span class="st">"Other"</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span> <span class="fu">put</span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="va">fmt_sex</span> <span class="op">&lt;-</span> <span class="fu">value</span><span class="op">(</span><span class="fu">condition</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/NA.html">is.na</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span>, <span class="st">"Missing"</span><span class="op">)</span>,</span>
+<span>                 <span class="fu">condition</span><span class="op">(</span><span class="va">x</span> <span class="op">==</span> <span class="st">"M"</span>, <span class="st">"Male"</span><span class="op">)</span>,</span>
+<span>                 <span class="fu">condition</span><span class="op">(</span><span class="va">x</span> <span class="op">==</span> <span class="st">"F"</span>, <span class="st">"Female"</span><span class="op">)</span>,</span>
+<span>                 <span class="fu">condition</span><span class="op">(</span><span class="cn">TRUE</span>, <span class="st">"Other"</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span> <span class="fu">put</span><span class="op">(</span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu">put</span><span class="op">(</span><span class="st">"Race decodes"</span><span class="op">)</span></span>
-<span><span class="va">fmt_race</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://fmtr.r-sassy.org/reference/value.html">value</a></span><span class="op">(</span><span class="fu"><a href="https://fmtr.r-sassy.org/reference/condition.html">condition</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/NA.html">is.na</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span>, <span class="st">"Missing"</span><span class="op">)</span>,</span>
-<span>                  <span class="fu"><a href="https://fmtr.r-sassy.org/reference/condition.html">condition</a></span><span class="op">(</span><span class="va">x</span> <span class="op">==</span> <span class="st">"WHITE"</span>, <span class="st">"White"</span><span class="op">)</span>,</span>
-<span>                  <span class="fu"><a href="https://fmtr.r-sassy.org/reference/condition.html">condition</a></span><span class="op">(</span><span class="va">x</span> <span class="op">==</span> <span class="st">"BLACK"</span>, <span class="st">"Black or African American"</span><span class="op">)</span>,</span>
-<span>                  <span class="fu"><a href="https://fmtr.r-sassy.org/reference/condition.html">condition</a></span><span class="op">(</span><span class="cn">TRUE</span>, <span class="st">"Other"</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="va">fmt_race</span> <span class="op">&lt;-</span> <span class="fu">value</span><span class="op">(</span><span class="fu">condition</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/NA.html">is.na</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span>, <span class="st">"Missing"</span><span class="op">)</span>,</span>
+<span>                  <span class="fu">condition</span><span class="op">(</span><span class="va">x</span> <span class="op">==</span> <span class="st">"WHITE"</span>, <span class="st">"White"</span><span class="op">)</span>,</span>
+<span>                  <span class="fu">condition</span><span class="op">(</span><span class="va">x</span> <span class="op">==</span> <span class="st">"BLACK"</span>, <span class="st">"Black or African American"</span><span class="op">)</span>,</span>
+<span>                  <span class="fu">condition</span><span class="op">(</span><span class="cn">TRUE</span>, <span class="st">"Other"</span><span class="op">)</span><span class="op">)</span></span>
 <span></span>
 <span></span>
 <span><span class="fu">put</span><span class="op">(</span><span class="st">"Compile format catalog"</span><span class="op">)</span></span>
-<span><span class="va">fc</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://fmtr.r-sassy.org/reference/fcat.html">fcat</a></span><span class="op">(</span>MEAN <span class="op">=</span> <span class="st">"%.1f"</span>, STD <span class="op">=</span> <span class="st">"(%.2f)"</span>, </span>
+<span><span class="va">fc</span> <span class="op">&lt;-</span> <span class="fu">fcat</span><span class="op">(</span>MEAN <span class="op">=</span> <span class="st">"%.1f"</span>, STD <span class="op">=</span> <span class="st">"(%.2f)"</span>, </span>
 <span>           Q1 <span class="op">=</span> <span class="st">"%.1f"</span>, Q3 <span class="op">=</span> <span class="st">"%.1f"</span>,</span>
 <span>           MIN <span class="op">=</span> <span class="st">"%d"</span>, MAX <span class="op">=</span> <span class="st">"%d"</span>, </span>
 <span>           CNT <span class="op">=</span> <span class="st">"%2d"</span>, PCT <span class="op">=</span> <span class="st">"(%5.1f%%)"</span>,</span>
@@ -207,7 +207,7 @@ demographics table with p-value statistics.</p>
 <span><span class="st">  "016"   "ARM A" "M"  "WHITE" 40'</span><span class="op">)</span>  </span>
 <span></span>
 <span><span class="fu">put</span><span class="op">(</span><span class="st">"Categorize AGE"</span><span class="op">)</span></span>
-<span><span class="va">adsl</span><span class="op">$</span><span class="va">AGECAT</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://fmtr.r-sassy.org/reference/fapply.html">fapply</a></span><span class="op">(</span><span class="va">adsl</span><span class="op">$</span><span class="va">AGE</span>, <span class="va">agecat</span><span class="op">)</span> <span class="op">|&gt;</span> <span class="fu">put</span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="va">adsl</span><span class="op">$</span><span class="va">AGECAT</span> <span class="op">&lt;-</span> <span class="fu">fapply</span><span class="op">(</span><span class="va">adsl</span><span class="op">$</span><span class="va">AGE</span>, <span class="va">agecat</span><span class="op">)</span> <span class="op">|&gt;</span> <span class="fu">put</span><span class="op">(</span><span class="op">)</span></span>
 <span></span>
 <span></span>
 <span><span class="fu">put</span><span class="op">(</span><span class="st">"Get ARM population counts"</span><span class="op">)</span></span>
@@ -235,10 +235,10 @@ demographics table with p-value statistics.</p>
 <span>           format <span class="op">=</span> <span class="va">fc</span>,</span>
 <span>           drop <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/common/man/find.names.html">find.names</a></span><span class="op">(</span><span class="va">age_stats</span>, start <span class="op">=</span> <span class="fl">4</span><span class="op">)</span>, </span>
 <span>           <span class="op">{</span></span>
-<span>              <span class="va">`Min - Max`</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://fmtr.r-sassy.org/reference/fapply2.html">fapply2</a></span><span class="op">(</span><span class="va">MIN</span>, <span class="va">MAX</span>, sep <span class="op">=</span> <span class="st">" - "</span><span class="op">)</span></span>
-<span>              <span class="va">`Q1 - Q3`</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://fmtr.r-sassy.org/reference/fapply2.html">fapply2</a></span><span class="op">(</span><span class="va">Q1</span>, <span class="va">Q3</span>, sep <span class="op">=</span> <span class="st">" - "</span><span class="op">)</span></span>
+<span>              <span class="va">`Min - Max`</span> <span class="op">&lt;-</span> <span class="fu">fapply2</span><span class="op">(</span><span class="va">MIN</span>, <span class="va">MAX</span>, sep <span class="op">=</span> <span class="st">" - "</span><span class="op">)</span></span>
+<span>              <span class="va">`Q1 - Q3`</span> <span class="op">&lt;-</span> <span class="fu">fapply2</span><span class="op">(</span><span class="va">Q1</span>, <span class="va">Q3</span>, sep <span class="op">=</span> <span class="st">" - "</span><span class="op">)</span></span>
 <span>              <span class="va">Median</span> <span class="op">&lt;-</span> <span class="va">MEDIAN</span></span>
-<span>              <span class="va">`Mean (SD)`</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://fmtr.r-sassy.org/reference/fapply2.html">fapply2</a></span><span class="op">(</span><span class="va">MEAN</span>, <span class="va">STD</span><span class="op">)</span></span>
+<span>              <span class="va">`Mean (SD)`</span> <span class="op">&lt;-</span> <span class="fu">fapply2</span><span class="op">(</span><span class="va">MEAN</span>, <span class="va">STD</span><span class="op">)</span></span>
 <span>              </span>
 <span>           <span class="op">}</span><span class="op">)</span> <span class="op">|&gt;</span>  <span class="fu">put</span><span class="op">(</span><span class="op">)</span></span>
 <span></span>
@@ -264,7 +264,7 @@ demographics table with p-value statistics.</p>
 <span>           keep <span class="op">=</span> <span class="st">"PVALUE"</span>,</span>
 <span>           format <span class="op">=</span> <span class="va">fc</span>,</span>
 <span>           <span class="op">{</span></span>
-<span>             <span class="va">PVALUE</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://fmtr.r-sassy.org/reference/fapply2.html">fapply2</a></span><span class="op">(</span><span class="va">AOV.F</span>, <span class="va">AOV.P</span><span class="op">)</span></span>
+<span>             <span class="va">PVALUE</span> <span class="op">&lt;-</span> <span class="fu">fapply2</span><span class="op">(</span><span class="va">AOV.F</span>, <span class="va">AOV.P</span><span class="op">)</span></span>
 <span>             </span>
 <span>           <span class="op">}</span><span class="op">)</span> <span class="op">|&gt;</span> <span class="fu">put</span><span class="op">(</span><span class="op">)</span></span>
 <span></span>
@@ -290,7 +290,7 @@ demographics table with p-value statistics.</p>
 <span>           drop <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/common/man/v.html">v</a></span><span class="op">(</span><span class="va">CNT</span>, <span class="va">PCT</span><span class="op">)</span>, </span>
 <span>           <span class="op">{</span></span>
 <span>             </span>
-<span>             <span class="va">CNTPCT</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://fmtr.r-sassy.org/reference/fapply2.html">fapply2</a></span><span class="op">(</span><span class="va">CNT</span>, <span class="va">PCT</span><span class="op">)</span></span>
+<span>             <span class="va">CNTPCT</span> <span class="op">&lt;-</span> <span class="fu">fapply2</span><span class="op">(</span><span class="va">CNT</span>, <span class="va">PCT</span><span class="op">)</span></span>
 <span>             </span>
 <span>           <span class="op">}</span><span class="op">)</span> <span class="op">|&gt;</span> <span class="fu">put</span><span class="op">(</span><span class="op">)</span></span>
 <span></span>
@@ -304,7 +304,7 @@ demographics table with p-value statistics.</p>
 <span>  <span class="fu">datastep</span><span class="op">(</span><span class="va">sex_trans</span>, drop <span class="op">=</span> <span class="st">"NAME"</span>, </span>
 <span>           <span class="op">{</span></span>
 <span>            </span>
-<span>             <span class="va">LABEL</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://fmtr.r-sassy.org/reference/fapply.html">fapply</a></span><span class="op">(</span><span class="va">LABEL</span>, <span class="va">fc</span><span class="op">$</span><span class="va">SEX</span><span class="op">)</span></span>
+<span>             <span class="va">LABEL</span> <span class="op">&lt;-</span> <span class="fu">fapply</span><span class="op">(</span><span class="va">LABEL</span>, <span class="va">fc</span><span class="op">$</span><span class="va">SEX</span><span class="op">)</span></span>
 <span>             <span class="va">LABEL</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html">factor</a></span><span class="op">(</span><span class="va">LABEL</span>, levels <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/levels.html">levels</a></span><span class="op">(</span><span class="va">fc</span><span class="op">$</span><span class="va">SEX</span><span class="op">)</span><span class="op">)</span></span>
 <span></span>
 <span>           <span class="op">}</span><span class="op">)</span> <span class="op">|&gt;</span> <span class="fu">put</span><span class="op">(</span><span class="op">)</span></span>
@@ -324,7 +324,7 @@ demographics table with p-value statistics.</p>
 <span>           keep <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"PVALUE"</span><span class="op">)</span>, </span>
 <span>           <span class="op">{</span></span>
 <span>             </span>
-<span>             <span class="va">PVALUE</span> <span class="op">=</span> <span class="fu"><a href="https://fmtr.r-sassy.org/reference/fapply2.html">fapply2</a></span><span class="op">(</span><span class="va">CHISQ</span>, <span class="va">CHISQ.P</span><span class="op">)</span></span>
+<span>             <span class="va">PVALUE</span> <span class="op">=</span> <span class="fu">fapply2</span><span class="op">(</span><span class="va">CHISQ</span>, <span class="va">CHISQ.P</span><span class="op">)</span></span>
 <span>           <span class="op">}</span><span class="op">)</span> <span class="op">|&gt;</span> <span class="fu">put</span><span class="op">(</span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu">put</span><span class="op">(</span><span class="st">"Append chisq"</span><span class="op">)</span></span>
@@ -353,7 +353,7 @@ demographics table with p-value statistics.</p>
 <span>           drop <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/common/man/v.html">v</a></span><span class="op">(</span><span class="va">CNT</span>, <span class="va">PCT</span>, <span class="va">VAR2</span><span class="op">)</span>, </span>
 <span>           <span class="op">{</span></span>
 <span>             </span>
-<span>             <span class="va">CNTPCT</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://fmtr.r-sassy.org/reference/fapply2.html">fapply2</a></span><span class="op">(</span><span class="va">CNT</span>, <span class="va">PCT</span><span class="op">)</span></span>
+<span>             <span class="va">CNTPCT</span> <span class="op">&lt;-</span> <span class="fu">fapply2</span><span class="op">(</span><span class="va">CNT</span>, <span class="va">PCT</span><span class="op">)</span></span>
 <span>             </span>
 <span>           <span class="op">}</span><span class="op">)</span> <span class="op">|&gt;</span> <span class="fu">put</span><span class="op">(</span><span class="op">)</span></span>
 <span></span>
@@ -368,7 +368,7 @@ demographics table with p-value statistics.</p>
 <span>           where <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/expression.html">expression</a></span><span class="op">(</span><span class="va">del</span> <span class="op">==</span> <span class="cn">FALSE</span><span class="op">)</span>,</span>
 <span>           <span class="op">{</span></span>
 <span>             </span>
-<span>             <span class="va">LABEL</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://fmtr.r-sassy.org/reference/fapply.html">fapply</a></span><span class="op">(</span><span class="va">LABEL</span>, <span class="va">fc</span><span class="op">$</span><span class="va">RACE</span><span class="op">)</span></span>
+<span>             <span class="va">LABEL</span> <span class="op">&lt;-</span> <span class="fu">fapply</span><span class="op">(</span><span class="va">LABEL</span>, <span class="va">fc</span><span class="op">$</span><span class="va">RACE</span><span class="op">)</span></span>
 <span>             <span class="va">LABEL</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html">factor</a></span><span class="op">(</span><span class="va">LABEL</span>, levels <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/levels.html">levels</a></span><span class="op">(</span><span class="va">fc</span><span class="op">$</span><span class="va">RACE</span><span class="op">)</span><span class="op">)</span></span>
 <span>          </span>
 <span>           <span class="op">}</span><span class="op">)</span> <span class="op">|&gt;</span> <span class="fu">put</span><span class="op">(</span><span class="op">)</span></span>
@@ -389,7 +389,7 @@ demographics table with p-value statistics.</p>
 <span>           keep <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"PVALUE"</span><span class="op">)</span>, </span>
 <span>           <span class="op">{</span></span>
 <span>             </span>
-<span>             <span class="va">PVALUE</span> <span class="op">=</span> <span class="fu"><a href="https://fmtr.r-sassy.org/reference/fapply2.html">fapply2</a></span><span class="op">(</span><span class="va">CHISQ</span>, <span class="va">CHISQ.P</span><span class="op">)</span></span>
+<span>             <span class="va">PVALUE</span> <span class="op">=</span> <span class="fu">fapply2</span><span class="op">(</span><span class="va">CHISQ</span>, <span class="va">CHISQ.P</span><span class="op">)</span></span>
 <span>           <span class="op">}</span><span class="op">)</span> <span class="op">|&gt;</span> <span class="fu">put</span><span class="op">(</span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu">put</span><span class="op">(</span><span class="st">"Append chisq"</span><span class="op">)</span></span>
@@ -417,7 +417,7 @@ demographics table with p-value statistics.</p>
 <span>           format <span class="op">=</span> <span class="va">fc</span>,</span>
 <span>           keep <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/common/man/v.html">v</a></span><span class="op">(</span><span class="va">VAR</span>, <span class="va">LABEL</span>, <span class="va">BY</span>, <span class="va">CNTPCT</span><span class="op">)</span>,</span>
 <span>           <span class="op">{</span></span>
-<span>             <span class="va">CNTPCT</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://fmtr.r-sassy.org/reference/fapply2.html">fapply2</a></span><span class="op">(</span><span class="va">CNT</span>, <span class="va">PCT</span><span class="op">)</span></span>
+<span>             <span class="va">CNTPCT</span> <span class="op">&lt;-</span> <span class="fu">fapply2</span><span class="op">(</span><span class="va">CNT</span>, <span class="va">PCT</span><span class="op">)</span></span>
 <span>             <span class="va">LABEL</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html">factor</a></span><span class="op">(</span><span class="va">CAT</span>, levels <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/levels.html">levels</a></span><span class="op">(</span><span class="va">fc</span><span class="op">$</span><span class="va">AGECAT</span><span class="op">)</span><span class="op">)</span></span>
 <span>           <span class="op">}</span><span class="op">)</span> <span class="op">|&gt;</span> <span class="fu">put</span><span class="op">(</span><span class="op">)</span></span>
 <span></span>
@@ -451,7 +451,7 @@ demographics table with p-value statistics.</p>
 <span>           format <span class="op">=</span> <span class="va">fc</span>,</span>
 <span>           keep <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"PVALUE"</span><span class="op">)</span>, </span>
 <span>           <span class="op">{</span></span>
-<span>             <span class="va">PVALUE</span> <span class="op">=</span> <span class="fu"><a href="https://fmtr.r-sassy.org/reference/fapply2.html">fapply2</a></span><span class="op">(</span><span class="va">CHISQ</span>, <span class="va">CHISQ.P</span><span class="op">)</span></span>
+<span>             <span class="va">PVALUE</span> <span class="op">=</span> <span class="fu">fapply2</span><span class="op">(</span><span class="va">CHISQ</span>, <span class="va">CHISQ.P</span><span class="op">)</span></span>
 <span>           <span class="op">}</span><span class="op">)</span> <span class="op">|&gt;</span> <span class="fu">put</span><span class="op">(</span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu">put</span><span class="op">(</span><span class="st">"Append chisq"</span><span class="op">)</span></span>

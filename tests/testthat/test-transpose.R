@@ -181,8 +181,7 @@ test_that("transpose7: proc_means and proc_transpose.", {
 
   mres <- proc_means(score, var = c("Test1", "Test2", "Final"),
                     stats = c("n", "mean", "std", "median", "min", "max"),
-                    out = out(shape = "wide", type = FALSE,
-                              freq = FALSE))
+                    options = v(out, notype, nonobs))
 
   res <- proc_transpose(mres, id = "VAR", name = "STAT")
 
@@ -264,8 +263,8 @@ test_that("transpose10: transpose by with two variables and v() function.", {
 
 test_that("transpose11: copy parameter works recycle bigger.", {
 
-  stats <- proc_means(datm, out = out(shape = "wide",
-                                      type = FALSE, freq = FALSE))
+  stats <- proc_means(datm, options = v(out,
+                                      notype, nonobs))
 
 
   res1 <- data.frame(Group = "Group1", stats)
@@ -287,7 +286,7 @@ test_that("transpose11: copy parameter works recycle bigger.", {
 test_that("transpose12: copy parameter works recycle smaller", {
 
   stats <- proc_means(datm, stats = c("n", "mean", "median"),
-                      out = out(shape = "wide", type = FALSE, freq = FALSE))
+                      options = v(out, notype, nonobs))
 
 
   res1 <- data.frame(Group = "Group1", stats)
@@ -311,7 +310,7 @@ test_that("transpose13: copy parameter works recycle smaller", {
 
   mns <- proc_means(datm, stats = c("n", "mean", "median", "min", "max"),
                     var = "Age", class = "Flavor",
-                    out = out(shape = "wide", type = FALSE, freq = FALSE))
+                    options = v(out, notype, nonobs))
 
   mns[1, 1] <- "Total"
   mns
@@ -334,8 +333,7 @@ test_that("transpose14: copy parameter works with by groups", {
 
   stats <- proc_means(datm, stats = c("n", "mean", "median"),
                       var = c("Age", "PresentScore", "TasteScore"),
-                      by = "Layers", out = out(type = FALSE, freq = FALSE,
-                                               shape ="wide"))
+                      by = "Layers", options = v(out, notype, nonobs))
 
   stats
 
@@ -359,7 +357,7 @@ test_that("transpose15: all vars eliminates by, copy, and id from transpose", {
 
   stats <- proc_means(datm, stats = c("n", "mean", "median"),
                       by = "Layers",
-                      out = out(freq = FALSE, type = FALSE, shape = "wide"))
+                      options = v(out, nonobs, notype))
 
   stats
 
@@ -401,7 +399,7 @@ test_that("transpose17: NSE works on transpose", {
 
   stats <- proc_means(datm, stats = v(n, mean, median),
                       by = Layers,
-                      out = out(freq = FALSE, type = FALSE, shape = "wide"))
+                      options = v(out, nonobs, notype))
 
   stats
 
@@ -425,7 +423,7 @@ test_that("transpose18: Where clause works as expected.", {
 
   stats <- proc_means(datm, stats = v(n, mean, median),
                       by = Layers,
-                      out = out(freq = FALSE, type = FALSE, shape = "wide"))
+                      options = v(out, nonobs, notype))
 
   stats
 
@@ -496,9 +494,8 @@ test_that("transpose21: transposing two id variables.", {
                    tables = c("internship"),
                    titles = "My first Frequency Table",
                    by = c("sex"),
-                   view = TRUE,
                    weight = "count",
-                   out = out(shape = "wide"))
+                   options = v(out, outcum))
 
   res
 
@@ -523,10 +520,8 @@ test_that("transpose22: transposing inconsistent categories.", {
                    tables = c("internship"),
                    titles = "My first Frequency Table",
                    by = c("sex", "enrollment"),
-                   view = TRUE,
                    weight = "count",
-                   out = out(stats = c("n", "cnt", "pct"),
-                             shape = "wide"))
+                   options = out)
 
   res
 

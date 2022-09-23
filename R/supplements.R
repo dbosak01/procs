@@ -36,7 +36,6 @@
 #' @param ... Various options.  When used with \code{\link{proc_freq}},
 #' the \code{table} option is most frequently used.
 #' @return The output specifications.
-#' @export
 out <- function(stats = NULL,
                 shape = NULL, report = FALSE, where = NULL,
                 drop = NULL, keep = NULL, rename = NULL,

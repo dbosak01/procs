@@ -12,11 +12,8 @@ proc_means(
   var = NULL,
   stats = c("n", "mean", "std", "min", "max"),
   weight = NULL,
-  view = TRUE,
   titles = NULL,
-  options = NULL,
-  ...,
-  output = NULL
+  options = NULL
 )
 }
 \arguments{
@@ -49,30 +46,10 @@ the available options.}
 
 \item{weight}{An optional weight parameter.}
 
-\item{view}{Whether to display the report in the interactive viewer.  Valid
-values are TRUE and FALSE.  Default is TRUE.}
-
 \item{titles}{A vector of one or more titles to use for the report output.}
 
 \item{options}{An options object created with the \code{\link{opts}}
 function. This parameter can accept a variety of options.}
-
-\item{...}{One or more output requests. To request a dataset output,
-use the desired dataset name as the parameter name, and pass in the
-\code{\link{out}} function with the desired specifics.  If only one
-output dataset is requested, the function will return a single data frame.
-If more than one output dataset is requested, the function will return
-a list of data frames. If no statistics are specified in the \code{\link{out}}
-function, the procedure will default to the statistics assigned on
-the \code{stats} parameter.  Note that this default behavior is different
-from SAS®.}
-
-\item{output}{A named list of output data requests.  The name of the list item
-will become the name of the item in the return list, if there is one.  The
-value of the list item is a output request created with the \code{\link{out}}
-function.  Output data requests may also be made on the \code{...} parameter
-for convenience.  This parameter is provided in case you need to generate
-output requests dynamically inside a function.}
 }
 \value{
 The requested summary statistics.

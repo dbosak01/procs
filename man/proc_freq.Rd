@@ -7,73 +7,59 @@
 \usage{
 proc_freq(
   data,
-  by = NULL,
   tables = NULL,
   options = NULL,
+  by = NULL,
   weight = NULL,
-  view = TRUE,
-  titles = NULL,
-  ...,
-  output = NULL
+  order = NULL,
+  plots = NULL,
+  titles = NULL
 )
 }
 \arguments{
 \item{data}{The input data frame to perform frequency calculations on.
 Input data as the first parameter makes this function pipe-friendly.}
 
-\item{by}{An optional by group. Parameter accepts a vector of one or more
-quoted variable names. When this parameter is set, data
-will be subset for each by group, and tables will be generated for
-each subset.}
-
 \item{tables}{The variable or variables to perform frequency counts on.
-The table specifications are passed as a vector of quoted strings. If the
+The table specifications are passed as a vector of quoted strings. You may
+also use the \code{v()} function to pass unquoted strings.  If the
 strings are named, the name will be used as the list item name on the return
 list of tables.  For one-way frequencies, simply pass the variable name.
 For two-way tables, pass the desired combination of variables separated by a
-star (*) operator.}
+star (*) operator.  The parameter does not accept SAS® style grouping syntax.
+All cross combinations should be listed explicitly.}
 
 \item{options}{The options desired for the function.
-Table options are passed to the parameter as a \code{\link{opts}} object
-or a named list.  The name
-of each option should correspond to the option you wish to set.  The
-value of the list item should be the value you wish to set the option
-to.  The following options are available on \code{proc_freq}:
+Table options are passed to the parameter as a vector of quoted strings. You may
+also use the \code{v()} function to pass unquoted strings.
+The following options are available on \code{proc_freq}:
 "colpct", "cumsum", "cumpct",
 "freq", "format", "out", "outcum", "pct", "rowpct", "sparse", "totcol"
 and "totrow". See
 the \strong{Options} section for a description of these options.}
+
+\item{by}{An optional by group. Parameter accepts a vector of one or more
+quoted variable names. When this parameter is set, data
+will be subset for each by group, and tables will be generated for
+each subset.}
 
 \item{weight}{An optional weight parameter.  This parameter is passed
 as a quoted variable name to use for the weight.  If a weight variable is
 indicated, the weighted value will be summed to calculate the frequency
 counts.}
 
-\item{view}{Whether to display procedure results in the viewer.  Valid values
-are TRUE and FALSE.  Default is TRUE.}
+\item{order}{How to order the output.}
 
-\item{titles}{A vector of one or more titles to use for the report output.}
+\item{plots}{Any plots to produce.}
 
-\item{...}{One or more output dataset requests.  Use the \code{\link{out}}
-function to make these requests.}
-
-\item{output}{A named list of output data requests.  The name of the list item
-will become the name of the item in the return list, if there is one.  The
-value of the list item is a output request created with the \code{\link{out}}
-function.  Output data requests may also be made on the \code{...} parameter
-for convenience.  This parameter is provided in case you need to generate
-output requests dynamically inside a function.}
+\item{titles}{A vector of titles to assign to the report.}
 }
 \value{
-By default the function returns a list of tibbles
+By default the function returns a list of datasets
 that contains the requested frequency tables.
 The tables are named according to the variable or variables
 that were requested, and the output tables are in the same order as requested
-in the \code{tables} parameter. If the
-\code{proc_freq} function is being used in a data pipeline, you may wish to return
-the results as a single dataset instead of a list.  To get a single dataset,
-set the \code{piped} parameter to TRUE. This option will return only the last
-table requested.
+in the \code{tables} parameter.
 }
 \description{
 The \code{proc_freq} function generates frequency statistics.
@@ -167,10 +153,9 @@ the format is passed as a formatting string.
 For example, the formatting string "\%.1f\%\%" indicates that the
 data should be rounded to a single decimal place and include a percent sign.
 }
-\item{\strong{out}: The "out" option tells the procedure to output
-a frequency table, and allows you to name it.  This name will be used
-as the list item name.  If more than one table is requested, the "out"
-option will apply to the last table requested.
+\item{\strong{out}: Normally, the \code{proc_freq} function is an interactive
+procedure and does not return data. The "out" option is to request
+return data.
 }
 \item{\strong{outcum}: Whether to include the cumulative frequency and
 cumulative percent on the output table specified on the "out" parameter.
@@ -198,10 +183,6 @@ crosstab tables. Valid values are TRUE and FALSE.  The default is TRUE.
 
 \examples{
 library(procs)
-library(fmtr)
-
-# Get temp directory for output
-tmp <- tempdir()
 
 # Create sample data
 df <- as.data.frame(HairEyeColor, stringsAsFactors = FALSE)
@@ -212,26 +193,31 @@ labels(df) <- list(Hair = "Hair Color",
                    Sex = "Sex at Birth")
 
 # Example #1: One way frequencies on Hair and Eye color with weight option.
-res <- proc_freq(df, tables = c("Hair", "Eye"), weight = "Freq")
+res <- proc_freq(df,
+                 tables = v(Hair, Eye),
+                 options = out,
+                 weight = Freq)
 
 # View result data
 res
-#$Hair
-#  Category Frequency  Percent Cum_Freq   Cum_Pct
-#1    Black       108 18.24324      108  18.24324
-#2    Brown       286 48.31081      394  66.55405
-#3      Red        71 11.99324      465  78.54730
-#4    Blond       127 21.45270      592 100.00000
+# $Hair
+#    VAR   CAT   N CNT      PCT CUMSUM    CUMPCT
+# 1 Hair Black 592 108 18.24324    108  18.24324
+# 2 Hair Blond 592 127 21.45270    235  39.69595
+# 3 Hair Brown 592 286 48.31081    521  88.00676
+# 4 Hair   Red 592  71 11.99324    592 100.00000
 #
-#$Eye
-#  Category Frequency  Percent Cum_Freq   Cum_Pct
-#1    Brown       220 37.16216      220  37.16216
-#2     Blue       215 36.31757      435  73.47973
-#3    Hazel        93 15.70946      528  89.18919
-#4    Green        64 10.81081      592 100.00000
+# $Eye
+#   VAR   CAT   N CNT      PCT CUMSUM    CUMPCT
+# 1 Eye  Blue 592 215 36.31757    215  36.31757
+# 2 Eye Brown 592 220 37.16216    435  73.47973
+# 3 Eye Green 592  64 10.81081    499  84.29054
+# 4 Eye Hazel 592  93 15.70946    592 100.00000
 
-# Example #2: Crosstab table
-res <- proc_freq(df, tables = "Hair * Eye", weight = "Freq")
+# Example #2: 2 x 2 table
+res <- proc_freq(df, tables = Hair * Eye,
+                     weight = Freq,
+                     options = v(list, nocum))
 
 # View result data
 res
@@ -256,13 +242,10 @@ res
 #17    Total Frequency 215.000000 220.000000 64.0000000 93.000000 592.00000
 #18    Total   Percent  36.317568  37.162162 10.8108108 15.709459 100.00000
 
-#' # Example #3: Crosstab table with totrow, totcol, rowpct, and colpct turned off
-res <- proc_freq(df, tables = c(HairByEyes = "Hair * Eye"),
-                 options = opts(totrow = FALSE,
-                                totcol = FALSE,
-                                rowpct = FALSE,
-                                colpct = FALSE),
-                 weight = "Freq")
+#' # Example #3: Crosstab table wturned off
+res <- proc_freq(df, tables = Hair * Eye,
+                 options = v(list, nocum),
+                 weight = Freq)
 
 # View result data
 res
