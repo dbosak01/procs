@@ -10,20 +10,18 @@ articles:
   - procs-example1
 
 reference:
-- title: Procedures
-  desc: Functions that mimic SAS® procedures.
+- title: Statistical Functions
+  desc: Functions that mimic SAS® statistical procedures.
   contents:
   - proc_freq
   - proc_means
+
+- title: Data Manipulation Functions
+  desc: Functions that simulate other SAS® procedures.
+  contents:
   - proc_transpose
   - proc_sort
   - proc_print
-
-- titles: Supporting Functions
-  desc: Functions that support procedure calls.
-  contents:
-  - out
-  - opts
 
 navbar:
   type: inverse

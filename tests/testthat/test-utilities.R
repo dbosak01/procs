@@ -241,45 +241,45 @@ test_that("utils9: get_option() returns appropriate data type.", {
 
 })
 
-
-test_that("utils9: out() function works as expected.", {
-
-
-
-  out <- out(stats = c("mean", "median", "min", "max"), shape = "wide",
-                fork = "sammy", bork = c("one", "two", "three"), table = "A")
-
-  out
-
-  expect_equal(length(out$stats), 4)
-  expect_equal(out$shape, "wide")
-  expect_equal(out$parameters$fork, "sammy")
-  expect_equal(length(out$parameters$bork), 3)
-  expect_equal(out$table, "A")
-
-
-})
-
-
-
-test_that("utils10: has_report() function works.", {
-
-  expect_equal(has_report(NULL), FALSE)
-
-  opts1 <- list(out = out(stats = "n"))
-
-  expect_equal(has_report(opts1), FALSE)
-
-  opts2 <- list(out = out(stats = "n"),
-                out2 = out(report = TRUE))
+#
+# test_that("utils9: out() function works as expected.", {
+#
+#
+#
+#   out <- out(stats = c("mean", "median", "min", "max"), shape = "wide",
+#                 fork = "sammy", bork = c("one", "two", "three"), table = "A")
+#
+#   out
+#
+#   expect_equal(length(out$stats), 4)
+#   expect_equal(out$shape, "wide")
+#   expect_equal(out$parameters$fork, "sammy")
+#   expect_equal(length(out$parameters$bork), 3)
+#   expect_equal(out$table, "A")
+#
+#
+# })
 
 
-  expect_equal(has_report(opts2), TRUE)
 
-  nm <- get_report_name(opts2)
-  expect_equal(nm, "out2")
-
-})
+# test_that("utils10: has_report() function works.", {
+#
+#   expect_equal(has_report(NULL), FALSE)
+#
+#   opts1 <- list(out = out(stats = "n"))
+#
+#   expect_equal(has_report(opts1), FALSE)
+#
+#   opts2 <- list(out = out(stats = "n"),
+#                 out2 = out(report = TRUE))
+#
+#
+#   expect_equal(has_report(opts2), TRUE)
+#
+#   nm <- get_report_name(opts2)
+#   expect_equal(nm, "out2")
+#
+# })
 
 
 # test_that("utils11: opts() works with list.", {
@@ -339,22 +339,22 @@ test_that("utils12: fill_missing() function works as expected.", {
 })
 
 
-test_that("utils13: out() NSE works as expected.", {
-
-
-  res <- out(table = flork, stats = bork, drop = sam,
-             keep = fred, sammy = TRUE)
-
-
-  res
-
-  expect_equal(res$table, "flork")
-  expect_equal(res$stats, "bork")
-  expect_equal(res$keep, "fred")
-  expect_equal(res$parameters$sammy, TRUE)
-  expect_equal(res$drop, "sam")
-
-})
+# test_that("utils13: out() NSE works as expected.", {
+#
+#
+#   res <- out(table = flork, stats = bork, drop = sam,
+#              keep = fred, sammy = TRUE)
+#
+#
+#   res
+#
+#   expect_equal(res$table, "flork")
+#   expect_equal(res$stats, "bork")
+#   expect_equal(res$keep, "fred")
+#   expect_equal(res$parameters$sammy, TRUE)
+#   expect_equal(res$drop, "sam")
+#
+# })
 
 test_that("utils14: get_option works with formats.", {
 

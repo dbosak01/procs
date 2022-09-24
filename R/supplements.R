@@ -84,7 +84,6 @@ out <- function(stats = NULL,
 #' @details Here is some details
 #' @param ... Various options.
 #' @return An options class with the requested options.
-#' @export
 opts <- function(...) {
 
   ret <- tryCatch({

@@ -110,6 +110,12 @@
 #' frequency counts.  Zero-count categories will be included by default.  If the
 #' "nosparse" option is present, zero-count categories will be removed.
 #' }
+#' \item{\strong{notable}: Whether to include the frequency table in the output
+#' dataset list. Normally, the frequency table is included.  You may want to
+#' exclude the frequency table in some cases, for instance, if you only
+#' want the Chi-Square statistic.  This option allows you to exclude the frequency
+#' table.
+#' }
 #' \item{\strong{outcum}: Whether to include the cumulative frequency and percent
 #' on output frequency tables.  By default, these columns are not included.
 #' The "outcum" option will include them.
@@ -131,7 +137,7 @@
 #' also use the \code{v()} function to pass unquoted strings.
 #' The following options are available on \code{proc_freq}:
 #' "crosstab", "list", "nocol", "nocum", "nofreq", "nopercent", "noprint",
-#' "nonobs", "norow", "nosparse", and "outcum". See
+#' "nonobs", "norow", "nosparse", "notable", and "outcum". See
 #' the \strong{Options} section for a description of these options. To get
 #' output from the function, you must pass either the "out" or "report" keywords
 #' to the \code{options} parameter.
@@ -306,7 +312,7 @@ proc_freq <- function(data,
              "list", "nocol", "nocum", "nofreq", "nopercent",
              "norow", "nosparse", "outcum",
              "sparse", "totpct",  "crosstab",
-             "missprint", "missing", "nonobs")
+             "notable", "nonobs")
 
   # "expected", "missprint", "outexpect", "nlevels",
 
@@ -1687,7 +1693,8 @@ gen_output_freq <- function(data,
         formats(tmpres) <- outp$format
 
       # Assign to output
-      res[[nm]] <- tmpres
+      if (!has_option(options, "notable"))
+        res[[nm]] <- tmpres
 
       if (!is.null(chisq))
         res[[paste0("chisq:", nm)]] <- chisq

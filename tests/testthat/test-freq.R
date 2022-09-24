@@ -1535,3 +1535,23 @@ test_that("freq52: zero count categories appear on twoway tables.", {
 
 })
 
+
+test_that("freq53: notable option works as expected.", {
+
+
+  res <- proc_freq(prt,
+                   tables = c("internship * enrollment"),
+                   titles = "My title",
+                   by = c("sex"),
+                   weight = "count",
+                   options = v(out, fisher, notable)
+  )
+
+  res
+
+
+  expect_equal(ncol(res), 5)
+  expect_equal(nrow(res), 2)
+
+
+})

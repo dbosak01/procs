@@ -48,7 +48,7 @@
 
 <meta property="og:title" content="Generates Frequency Statistics — proc_freq" />
 <meta property="og:description" content="The proc_freq function generates frequency statistics.
-It is both and interactive function that can be used for data exploration,
+It is both an interactive function that can be used for data exploration,
 and can produce dataset output for further analysis.
 The function can perform one and two-way frequencies.  Two-way
 frequencies are produced as a cross-tabulation by default.  There
@@ -160,7 +160,7 @@ requested tables in a named list." />
 
     <div class="ref-description">
     <p>The <code>proc_freq</code> function generates frequency statistics.
-It is both and interactive function that can be used for data exploration,
+It is both an interactive function that can be used for data exploration,
 and can produce dataset output for further analysis.
 The function can perform one and two-way frequencies.  Two-way
 frequencies are produced as a cross-tabulation by default.  There
@@ -188,12 +188,14 @@ Input data as the first parameter makes this function pipe-friendly.</p></td>
     <tr>
       <th>tables</th>
       <td><p>The variable or variables to perform frequency counts on.
-The table specifications are passed as a vector of strings. If the
-strings are named, the name will be used as the list item name on the return
-list of tables.  For one-way frequencies, simply pass the variable name.
+The table specifications are passed as a vector of strings. For one-way
+frequencies, simply pass the variable name.
 For two-way tables, pass the desired combination of variables separated by a
 star (*) operator.  The parameter does not accept SAS® style grouping syntax.
-All cross combinations should be listed explicitly.</p></td>
+All cross combinations should be listed explicitly. If the
+table request is named, the name will be used as the list item name on the
+return list of tables. See "Example 3" for an illustration on how to name an
+output table.</p></td>
     </tr>
     <tr>
       <th>options</th>
@@ -203,7 +205,9 @@ also use the <code>v()</code> function to pass unquoted strings.
 The following options are available on <code>proc_freq</code>:
 "crosstab", "list", "nocol", "nocum", "nofreq", "nopercent", "noprint",
 "nonobs", "norow", "nosparse", and "outcum". See
-the <strong>Options</strong> section for a description of these options.</p></td>
+the <strong>Options</strong> section for a description of these options. To get
+output from the function, you must pass either the "out" or "report" keywords
+to the <code>options</code> parameter.</p></td>
     </tr>
     <tr>
       <th>by</th>
