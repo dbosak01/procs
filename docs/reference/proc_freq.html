@@ -48,11 +48,12 @@
 
 <meta property="og:title" content="Generates Frequency Statistics — proc_freq" />
 <meta property="og:description" content="The proc_freq function generates frequency statistics.
+It is both and interactive function that can be used for data exploration,
+and can produce dataset output for further analysis.
 The function can perform one and two-way frequencies.  Two-way
 frequencies are produced as a cross-tabulation by default.  There
 are many options to control the generated tables.  The function will return
-requested tables in a named list. Additionally, it can output results
-directly to a report, or show them in the viewer." />
+requested tables in a named list." />
 <meta property="og:image" content="https://procs.r-sassy.org/logo.png" />
 
 
@@ -159,11 +160,12 @@ directly to a report, or show them in the viewer." />
 
     <div class="ref-description">
     <p>The <code>proc_freq</code> function generates frequency statistics.
+It is both and interactive function that can be used for data exploration,
+and can produce dataset output for further analysis.
 The function can perform one and two-way frequencies.  Two-way
 frequencies are produced as a cross-tabulation by default.  There
 are many options to control the generated tables.  The function will return
-requested tables in a named list. Additionally, it can output results
-directly to a report, or show them in the viewer.</p>
+requested tables in a named list.</p>
     </div>
 
     <pre class="usage"><span><span class='fu'>proc_freq</span><span class='op'>(</span></span>
@@ -172,8 +174,6 @@ directly to a report, or show them in the viewer.</p>
 <span>  options <span class='op'>=</span> <span class='cn'>NULL</span>,</span>
 <span>  by <span class='op'>=</span> <span class='cn'>NULL</span>,</span>
 <span>  weight <span class='op'>=</span> <span class='cn'>NULL</span>,</span>
-<span>  order <span class='op'>=</span> <span class='cn'>NULL</span>,</span>
-<span>  plots <span class='op'>=</span> <span class='cn'>NULL</span>,</span>
 <span>  titles <span class='op'>=</span> <span class='cn'>NULL</span></span>
 <span><span class='op'>)</span></span></pre>
 
@@ -188,8 +188,7 @@ Input data as the first parameter makes this function pipe-friendly.</p></td>
     <tr>
       <th>tables</th>
       <td><p>The variable or variables to perform frequency counts on.
-The table specifications are passed as a vector of quoted strings. You may
-also use the <code>v()</code> function to pass unquoted strings.  If the
+The table specifications are passed as a vector of strings. If the
 strings are named, the name will be used as the list item name on the return
 list of tables.  For one-way frequencies, simply pass the variable name.
 For two-way tables, pass the desired combination of variables separated by a
@@ -202,32 +201,23 @@ All cross combinations should be listed explicitly.</p></td>
 Table options are passed to the parameter as a vector of quoted strings. You may
 also use the <code>v()</code> function to pass unquoted strings.
 The following options are available on <code>proc_freq</code>:
-"colpct", "cumsum", "cumpct",
-"freq", "format", "out", "outcum", "pct", "rowpct", "sparse", "totcol"
-and "totrow". See
+"crosstab", "list", "nocol", "nocum", "nofreq", "nopercent", "noprint",
+"nonobs", "norow", "nosparse", and "outcum". See
 the <strong>Options</strong> section for a description of these options.</p></td>
     </tr>
     <tr>
       <th>by</th>
       <td><p>An optional by group. Parameter accepts a vector of one or more
-quoted variable names. When this parameter is set, data
+variable names. When this parameter is set, data
 will be subset for each by group, and tables will be generated for
 each subset.</p></td>
     </tr>
     <tr>
       <th>weight</th>
       <td><p>An optional weight parameter.  This parameter is passed
-as a quoted variable name to use for the weight.  If a weight variable is
+as a variable name to use for the weight.  If a weight variable is
 indicated, the weighted value will be summed to calculate the frequency
 counts.</p></td>
-    </tr>
-    <tr>
-      <th>order</th>
-      <td><p>How to order the output.</p></td>
-    </tr>
-    <tr>
-      <th>plots</th>
-      <td><p>Any plots to produce.</p></td>
     </tr>
     <tr>
       <th>titles</th>
@@ -237,52 +227,55 @@ counts.</p></td>
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>By default the function returns a list of datasets
-that contains the requested frequency tables.
-The tables are named according to the variable or variables
-that were requested, and the output tables are in the same order as requested
-in the <code>tables</code> parameter.</p>
+    <p>If no output datasets are requested, the function will return
+a NULL.  To request output datasets, pass the "out" or "report" option on
+the <code>options</code> parameter.  If a single dataset is requested, the function
+will return a single dataset.  If multiple datasets are requested, the function
+will return a list of datasets.  The type of data frame returned will
+correspond to the type of data frame passed in on the <code>data</code> parameter.
+In other words, if the input data is a tibble, the output data will be a
+tibble, etc.</p>
     <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
 
     <p>The <code>proc_freq</code> function generates frequency statistics
 for one-way and two-way tables.  Data is passed in on the <code>data</code>
 parameter.  The desired frequencies are specified on the <code>tables</code>
-parameter. Function results are returned as a named list of data
-frames. Results may also be returned as a report.</p>
-    <h2 class="hasAnchor" id="data-frame-output"><a class="anchor" href="#data-frame-output"></a>Data Frame Output</h2>
-
-    
-
-<p>By default, frequency results are returned as tibbles
-in a named list. Data in these tibbles is not rounded or formatted
-to give you the most accurate statistical results.
-The list items are named according to the
-strings specified on the <code>tables</code> parameter. You may control
-the names of the returned results by using a named vector on the
-<code>tables</code> parameter.</p>
-<p>If you are requesting only a single table, and
-do not want it returned in a list, set the <code>piped</code> parameter to TRUE.
-Setting <code>piped</code> to TRUE will cause the function to return results
-as an individual data frame. This option is useful if you are using
-the <code>proc_freq</code> function inside a pipeline.</p>
+parameter.</p>
     <h2 class="hasAnchor" id="report-output"><a class="anchor" href="#report-output"></a>Report Output</h2>
 
     
 
-<p>If the <code>view</code> option is TRUE, <code>proc_freq</code> results will
+<p>By default, <code>proc_freq</code> results will
 be immediately sent to the viewer as an HTML report.  This functionality
 makes it easy to get a quick analysis of your data with very little
-effort.</p>
-<p>The function also allows you to easily export this report to the file system
-by setting the <code>report_type</code> and <code>report_location</code> parameters.
-Setting these parameters will cause the function to output your report
-in the location specified, and in the desired output type.
-You may output the report in TXT, HTML, PDF, RTF, or DOCX file formats.</p>
+effort. To turn off the interactive report, pass the "noprint" keyword
+to the <code>options</code> parameter.</p>
 <p>The <code>titles</code> parameter allows you to set one or more titles for your
 report.  Pass these titles as a vector of strings.</p>
 <p>If the frequency variables have a label assigned, that label
 will be used in the report output. This feature gives you some control
 over the column headers in the final report.</p>
+<p>The exact datasets used for the interactive output can be returned as a list.
+To return these datasets as a list, pass
+the "report" keyword on the <code>options</code> parameter. This list may in
+turn be passed to <code><a href='proc_print.html'>proc_print</a></code> to write the report to a file.</p>
+    <h2 class="hasAnchor" id="data-frame-output"><a class="anchor" href="#data-frame-output"></a>Data Frame Output</h2>
+
+    
+
+<p>To generate output datasets, pass the "out" keyword to the
+<code>options</code> parameter. If you are requesting only one table, a single
+data frame will be returned.  If you request multiple tables, a list of data
+frames will be returned.</p>
+<p>By default, the list items are named according to the
+strings specified on the <code>tables</code> parameter. You may control
+the names of the returned results by using a named vector on the
+<code>tables</code> parameter.</p>
+<p>The dataset generated by the "out" keyword are optimized for data manipulation.
+The column names have been standardized, and additional variables may
+be present to help with data manipulation.  In addition, data values in the
+output datasets are not rounded or formatted
+to give you the most accurate statistical results.</p>
     <h2 class="hasAnchor" id="frequency-weight"><a class="anchor" href="#frequency-weight"></a>Frequency Weight</h2>
 
     
@@ -294,47 +287,50 @@ equally.  In these cases, use the <code>weight</code> parameter.  The parameter
 accepts a quoted variable/column name to use as the weighted value.  If the
 <code>weight</code> parameter is used, the function will sum the weighted values
 instead of counting rows.</p>
+    <h2 class="hasAnchor" id="by-groups"><a class="anchor" href="#by-groups"></a>By Groups</h2>
+
+    
+
+
+<p>"crosstab", "list",   "nocol", "nocum", "nofreq", "nopercent", "noprint",
+"norow", "nosparse", and "outcum".</p>
     <h2 class="hasAnchor" id="options"><a class="anchor" href="#options"></a>Options</h2>
 
     
 
-<p>The <code>options</code> parameter accepts a named list of options and
-their values.  For example, the "sparse" option may be turned off
-like this: <code>options = list(sparse = FALSE)</code>.</p>
-<p>Below are all the available table options and a description of each:</p><ul>
-<li><p><strong>colpct</strong>: This option controls whether or not to include
-column percents on crosstab tables. Value values are TRUE and FALSE.
-The default is TRUE.</p></li>
-<li><p><strong>cumsum</strong>: Whether to include a cumulative sum on one-way
-tables.  Valid values are TRUE and FALSE.  The default is TRUE.</p></li>
-<li><p><strong>cumpct</strong>: Whether to include a cumulative precent on
-one-way tables.  Valid values are TRUE and FALSE.  The default is TRUE.</p></li>
-<li><p><strong>freq</strong>: Whether to include the frequency column on one-way
-tables. Valid values are TRUE and FALSE.  The default is TRUE.</p></li>
-<li><p><strong>format</strong>: A format to use for crosstab percentage values.
-The format
-must be a valid format from the <strong><a href='https://fmtr.r-sassy.org/reference/fmtr.html'>fmtr</a></strong> package.  Typically,
-the format is passed as a formatting string.
-For example, the formatting string "%.1f%%" indicates that the
-data should be rounded to a single decimal place and include a percent sign.</p></li>
-<li><p><strong>out</strong>: Normally, the <code>proc_freq</code> function is an interactive
-procedure and does not return data. The "out" option is to request
-return data.</p></li>
-<li><p><strong>outcum</strong>: Whether to include the cumulative frequency and
-cumulative percent on the output table specified on the "out" parameter.
-Valid values are TRUE and FALSE.  The default is TRUE.</p></li>
-<li><p><strong>pct</strong>: Whether to include the percent column on one-way
-tables. Valid values are TRUE and FALSE.  The default is TRUE.</p></li>
-<li><p><strong>rowpct</strong>: Whether to include the row percent values on two-way
-crosstab tables. Valid values are TRUE and FALSE.  The default is TRUE.</p></li>
-<li><p><strong>sparse</strong>: Whether to include categories for which there are no
-frequency counts.  If the parameter is TRUE, sparse categories will be included.
-If the parameter is FALSE, sparse categories will be removed.
-The default is TRUE.</p></li>
-<li><p><strong>totcol</strong>: Whether to include the total column on two-way
-crosstab tables. Valid values are TRUE and FALSE.  The default is TRUE.</p></li>
-<li><p><strong>totrow</strong>: Whether to include the total rows on two-way
-crosstab tables. Valid values are TRUE and FALSE.  The default is TRUE.</p></li>
+<p>The <code>options</code> parameter accepts a vector of options.  Normally, these
+options must be quoted.  But you may pass them unquoted using the <code><a href='https://rdrr.io/pkg/common/man/v.html'>v()</a></code>
+function.  For example, you can request output datasets and the Chi-Square
+statistic like this: <code>options = v(out, chisq)</code>.</p>
+<p>Below are all the available options and a description of each:</p><ul>
+<li><p><strong>crosstab</strong>: Two-way output tables are a list style by default.
+If you want a crosstab style, pass the "crosstab" option along with the
+"out" option.</p></li>
+<li><p><strong>list</strong>: Two-way interactive tables are a crosstab style
+by default.  If you want a list style two-way table, pass the "list" option.</p></li>
+<li><p><strong>nocol</strong>: Two-way cross tabulation tables include column percents
+by default.  To turn them off, pass the "nocol" option.</p></li>
+<li><p><strong>nocum</strong>: Whether to include the cumulative frequency and percent
+columns on one-way, interactive tables. These columns are included by default.
+To turn them off, pass the "nocum" option.</p></li>
+<li><p><strong>nofreq</strong>: The "nofreq" option will remove the frequency column
+from one-way and two-way tables.</p></li>
+<li><p><strong>nopercent</strong>: The "nopercent" option will remove the percent column
+from one-way and two-way tables.</p></li>
+<li><p><strong>noprint</strong>: Whether to print the interactive report to the
+viewer.  By default, the report is printed to the viewer. The "noprint"
+option will inhibit printing.</p></li>
+<li><p><strong>nonobs</strong>: Whether to include the number of observations "N"
+column on the output and interactive tables.  By default, the N column
+will be included.  The "nonobs" option turns it off.</p></li>
+<li><p><strong>norow</strong>: Whether to include the row percentages on two-way
+crosstab tables. The "norow" option will turn them off.</p></li>
+<li><p><strong>nosparse</strong>: Whether to include categories for which there are no
+frequency counts.  Zero-count categories will be included by default.  If the
+"nosparse" option is present, zero-count categories will be removed.</p></li>
+<li><p><strong>outcum</strong>: Whether to include the cumulative frequency and percent
+on output frequency tables.  By default, these columns are not included.
+The "outcum" option will include them.</p></li>
 </ul>
 
     <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
@@ -357,7 +353,7 @@ see <code><a href='proc_transpose.html'>proc_transpose</a></code>.</p></div>
 <span><span class='co'># Example #1: One way frequencies on Hair and Eye color with weight option.</span></span>
 <span><span class='va'>res</span> <span class='op'>&lt;-</span> <span class='fu'>proc_freq</span><span class='op'>(</span><span class='va'>df</span>,</span>
 <span>                 tables <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/pkg/common/man/v.html'>v</a></span><span class='op'>(</span><span class='va'>Hair</span>, <span class='va'>Eye</span><span class='op'>)</span>,</span>
-<span>                 options <span class='op'>=</span> <span class='va'>out</span>,</span>
+<span>                 options <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/pkg/common/man/v.html'>v</a></span><span class='op'>(</span><span class='va'>out</span>, <span class='va'>outcum</span>, <span class='va'>noprint</span><span class='op'>)</span>,</span>
 <span>                 weight <span class='op'>=</span> <span class='va'>Freq</span><span class='op'>)</span></span>
 <span></span>
 <span><span class='co'># View result data</span></span>
@@ -376,10 +372,10 @@ see <code><a href='proc_transpose.html'>proc_transpose</a></code>.</p></div>
 <span><span class='co'># 3 Eye Green 592  64 10.81081    499  84.29054</span></span>
 <span><span class='co'># 4 Eye Hazel 592  93 15.70946    592 100.00000</span></span>
 <span></span>
-<span><span class='co'># Example #2: 2 x 2 table</span></span>
+<span><span class='co'># Example #2: 2 x 2 Crosstabulation table with Chi-Square statistic</span></span>
 <span><span class='va'>res</span> <span class='op'>&lt;-</span> <span class='fu'>proc_freq</span><span class='op'>(</span><span class='va'>df</span>, tables <span class='op'>=</span> <span class='va'>Hair</span> <span class='op'>*</span> <span class='va'>Eye</span>,</span>
 <span>                     weight <span class='op'>=</span> <span class='va'>Freq</span>,</span>
-<span>                     options <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/pkg/common/man/v.html'>v</a></span><span class='op'>(</span><span class='va'>list</span>, <span class='va'>nocum</span><span class='op'>)</span><span class='op'>)</span></span>
+<span>                     options <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/pkg/common/man/v.html'>v</a></span><span class='op'>(</span><span class='va'>out</span>, <span class='va'>crosstab</span>, <span class='va'>chisq</span>, <span class='va'>noprint</span><span class='op'>)</span><span class='op'>)</span></span>
 <span></span>
 <span><span class='co'># View result data</span></span>
 <span><span class='va'>res</span></span>
@@ -404,23 +400,74 @@ see <code><a href='proc_transpose.html'>proc_transpose</a></code>.</p></div>
 <span><span class='co'>#17    Total Frequency 215.000000 220.000000 64.0000000 93.000000 592.00000</span></span>
 <span><span class='co'>#18    Total   Percent  36.317568  37.162162 10.8108108 15.709459 100.00000</span></span>
 <span></span>
-<span><span class='co'>#' # Example #3: Crosstab table wturned off</span></span>
-<span><span class='va'>res</span> <span class='op'>&lt;-</span> <span class='fu'>proc_freq</span><span class='op'>(</span><span class='va'>df</span>, tables <span class='op'>=</span> <span class='va'>Hair</span> <span class='op'>*</span> <span class='va'>Eye</span>,</span>
-<span>                 options <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/pkg/common/man/v.html'>v</a></span><span class='op'>(</span><span class='va'>list</span>, <span class='va'>nocum</span><span class='op'>)</span>,</span>
+<span><span class='co'># $`chisq:Hair * Eye`</span></span>
+<span><span class='co'>#      CHISQ CHISQ.DF      CHISQ.P</span></span>
+<span><span class='co'># 1 138.2898        9 2.325287e-25</span></span>
+<span></span>
+<span><span class='co'>#' # Example #3: By variable with named table request</span></span>
+<span><span class='va'>res</span> <span class='op'>&lt;-</span> <span class='fu'>proc_freq</span><span class='op'>(</span><span class='va'>df</span>, tables <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/pkg/common/man/v.html'>v</a></span><span class='op'>(</span><span class='va'>Hair</span>, <span class='va'>Eye</span>, Cross <span class='op'>=</span> <span class='va'>Hair</span> <span class='op'>*</span> <span class='va'>Eye</span><span class='op'>)</span>,</span>
+<span>                 by <span class='op'>=</span> <span class='va'>Sex</span>,</span>
+<span>                 options <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/pkg/common/man/v.html'>v</a></span><span class='op'>(</span><span class='va'>out</span>, <span class='va'>noprint</span><span class='op'>)</span>,</span>
 <span>                 weight <span class='op'>=</span> <span class='va'>Freq</span><span class='op'>)</span></span>
 <span></span>
 <span><span class='co'># View result data</span></span>
 <span><span class='va'>res</span></span>
-<span><span class='co'>#$HairByEyes</span></span>
-<span><span class='co'>#  Category Statistic      Blue      Brown      Green     Hazel</span></span>
-<span><span class='co'>#1    Black Frequency 20.000000  68.000000  5.0000000 15.000000</span></span>
-<span><span class='co'>#2    Black   Percent  3.378378  11.486486  0.8445946  2.533784</span></span>
-<span><span class='co'>#3    Blond Frequency 94.000000   7.000000 16.0000000 10.000000</span></span>
-<span><span class='co'>#4    Blond   Percent 15.878378   1.182432  2.7027027  1.689189</span></span>
-<span><span class='co'>#5    Brown Frequency 84.000000 119.000000 29.0000000 54.000000</span></span>
-<span><span class='co'>#6    Brown   Percent 14.189189  20.101351  4.8986486  9.121622</span></span>
-<span><span class='co'>#7      Red Frequency 17.000000  26.000000 14.0000000 14.000000</span></span>
-<span><span class='co'>#8      Red   Percent  2.871622   4.391892  2.3648649  2.364865</span></span></pre>
+<span><span class='co'># $Hair</span></span>
+<span><span class='co'>#       BY  VAR   CAT   N CNT      PCT</span></span>
+<span><span class='co'># 1 Female Hair Black 313  52 16.61342</span></span>
+<span><span class='co'># 2 Female Hair Blond 313  81 25.87859</span></span>
+<span><span class='co'># 3 Female Hair Brown 313 143 45.68690</span></span>
+<span><span class='co'># 4 Female Hair   Red 313  37 11.82109</span></span>
+<span><span class='co'># 5   Male Hair Black 279  56 20.07168</span></span>
+<span><span class='co'># 6   Male Hair Blond 279  46 16.48746</span></span>
+<span><span class='co'># 7   Male Hair Brown 279 143 51.25448</span></span>
+<span><span class='co'># 8   Male Hair   Red 279  34 12.18638</span></span>
+<span><span class='co'>#</span></span>
+<span><span class='co'># $Eye</span></span>
+<span><span class='co'>#       BY VAR   CAT   N CNT       PCT</span></span>
+<span><span class='co'># 1 Female Eye  Blue 313 114 36.421725</span></span>
+<span><span class='co'># 2 Female Eye Brown 313 122 38.977636</span></span>
+<span><span class='co'># 3 Female Eye Green 313  31  9.904153</span></span>
+<span><span class='co'># 4 Female Eye Hazel 313  46 14.696486</span></span>
+<span><span class='co'># 5   Male Eye  Blue 279 101 36.200717</span></span>
+<span><span class='co'># 6   Male Eye Brown 279  98 35.125448</span></span>
+<span><span class='co'># 7   Male Eye Green 279  33 11.827957</span></span>
+<span><span class='co'># 8   Male Eye Hazel 279  47 16.845878</span></span>
+<span><span class='co'>#</span></span>
+<span><span class='co'># $Cross</span></span>
+<span><span class='co'>#        BY VAR1 VAR2  CAT1  CAT2   N CNT        PCT</span></span>
+<span><span class='co'># 1  Female Hair  Eye Black  Blue 313   9  2.8753994</span></span>
+<span><span class='co'># 2  Female Hair  Eye Black Brown 313  36 11.5015974</span></span>
+<span><span class='co'># 3  Female Hair  Eye Black Green 313   2  0.6389776</span></span>
+<span><span class='co'># 4  Female Hair  Eye Black Hazel 313   5  1.5974441</span></span>
+<span><span class='co'># 5  Female Hair  Eye Blond  Blue 313  64 20.4472843</span></span>
+<span><span class='co'># 6  Female Hair  Eye Blond Brown 313   4  1.2779553</span></span>
+<span><span class='co'># 7  Female Hair  Eye Blond Green 313   8  2.5559105</span></span>
+<span><span class='co'># 8  Female Hair  Eye Blond Hazel 313   5  1.5974441</span></span>
+<span><span class='co'># 9  Female Hair  Eye Brown  Blue 313  34 10.8626198</span></span>
+<span><span class='co'># 10 Female Hair  Eye Brown Brown 313  66 21.0862620</span></span>
+<span><span class='co'># 11 Female Hair  Eye Brown Green 313  14  4.4728435</span></span>
+<span><span class='co'># 12 Female Hair  Eye Brown Hazel 313  29  9.2651757</span></span>
+<span><span class='co'># 13 Female Hair  Eye   Red  Blue 313   7  2.2364217</span></span>
+<span><span class='co'># 14 Female Hair  Eye   Red Brown 313  16  5.1118211</span></span>
+<span><span class='co'># 15 Female Hair  Eye   Red Green 313   7  2.2364217</span></span>
+<span><span class='co'># 16 Female Hair  Eye   Red Hazel 313   7  2.2364217</span></span>
+<span><span class='co'># 17   Male Hair  Eye Black  Blue 279  11  3.9426523</span></span>
+<span><span class='co'># 18   Male Hair  Eye Black Brown 279  32 11.4695341</span></span>
+<span><span class='co'># 19   Male Hair  Eye Black Green 279   3  1.0752688</span></span>
+<span><span class='co'># 20   Male Hair  Eye Black Hazel 279  10  3.5842294</span></span>
+<span><span class='co'># 21   Male Hair  Eye Blond  Blue 279  30 10.7526882</span></span>
+<span><span class='co'># 22   Male Hair  Eye Blond Brown 279   3  1.0752688</span></span>
+<span><span class='co'># 23   Male Hair  Eye Blond Green 279   8  2.8673835</span></span>
+<span><span class='co'># 24   Male Hair  Eye Blond Hazel 279   5  1.7921147</span></span>
+<span><span class='co'># 25   Male Hair  Eye Brown  Blue 279  50 17.9211470</span></span>
+<span><span class='co'># 26   Male Hair  Eye Brown Brown 279  53 18.9964158</span></span>
+<span><span class='co'># 27   Male Hair  Eye Brown Green 279  15  5.3763441</span></span>
+<span><span class='co'># 28   Male Hair  Eye Brown Hazel 279  25  8.9605735</span></span>
+<span><span class='co'># 29   Male Hair  Eye   Red  Blue 279  10  3.5842294</span></span>
+<span><span class='co'># 30   Male Hair  Eye   Red Brown 279  10  3.5842294</span></span>
+<span><span class='co'># 31   Male Hair  Eye   Red Green 279   7  2.5089606</span></span>
+<span><span class='co'># 32   Male Hair  Eye   Red Hazel 279   7  2.5089606</span></span></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">

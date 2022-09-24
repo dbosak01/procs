@@ -26,7 +26,7 @@ License: CC0
 Encoding: UTF-8
 URL: https://procs.r-sassy.org
 BugReports: https://github.com/dbosak01/procs/issues
-Depends: R (>= 4.0.0),
+Depends: R (>= 3.6.0),
          common
 Suggests: 
     knitr,

@@ -11,8 +11,6 @@ proc_freq(
   options = NULL,
   by = NULL,
   weight = NULL,
-  order = NULL,
-  plots = NULL,
   titles = NULL
 )
 }
@@ -21,90 +19,69 @@ proc_freq(
 Input data as the first parameter makes this function pipe-friendly.}
 
 \item{tables}{The variable or variables to perform frequency counts on.
-The table specifications are passed as a vector of quoted strings. You may
-also use the \code{v()} function to pass unquoted strings.  If the
-strings are named, the name will be used as the list item name on the return
-list of tables.  For one-way frequencies, simply pass the variable name.
+The table specifications are passed as a vector of strings. For one-way
+frequencies, simply pass the variable name.
 For two-way tables, pass the desired combination of variables separated by a
 star (*) operator.  The parameter does not accept SAS® style grouping syntax.
-All cross combinations should be listed explicitly.}
+All cross combinations should be listed explicitly. If the
+table request is named, the name will be used as the list item name on the
+return list of tables. See "Example 3" for an illustration on how to name an
+output table.}
 
 \item{options}{The options desired for the function.
 Table options are passed to the parameter as a vector of quoted strings. You may
 also use the \code{v()} function to pass unquoted strings.
 The following options are available on \code{proc_freq}:
-"colpct", "cumsum", "cumpct",
-"freq", "format", "out", "outcum", "pct", "rowpct", "sparse", "totcol"
-and "totrow". See
-the \strong{Options} section for a description of these options.}
+"crosstab", "list", "nocol", "nocum", "nofreq", "nopercent", "noprint",
+"nonobs", "norow", "nosparse", and "outcum". See
+the \strong{Options} section for a description of these options. To get
+output from the function, you must pass either the "out" or "report" keywords
+to the \code{options} parameter.}
 
 \item{by}{An optional by group. Parameter accepts a vector of one or more
-quoted variable names. When this parameter is set, data
+variable names. When this parameter is set, data
 will be subset for each by group, and tables will be generated for
 each subset.}
 
 \item{weight}{An optional weight parameter.  This parameter is passed
-as a quoted variable name to use for the weight.  If a weight variable is
+as a variable name to use for the weight.  If a weight variable is
 indicated, the weighted value will be summed to calculate the frequency
 counts.}
-
-\item{order}{How to order the output.}
-
-\item{plots}{Any plots to produce.}
 
 \item{titles}{A vector of titles to assign to the report.}
 }
 \value{
-By default the function returns a list of datasets
-that contains the requested frequency tables.
-The tables are named according to the variable or variables
-that were requested, and the output tables are in the same order as requested
-in the \code{tables} parameter.
+If no output datasets are requested, the function will return
+a NULL.  To request output datasets, pass the "out" or "report" option on
+the \code{options} parameter.  If a single dataset is requested, the function
+will return a single dataset.  If multiple datasets are requested, the function
+will return a list of datasets.  The type of data frame returned will
+correspond to the type of data frame passed in on the \code{data} parameter.
+In other words, if the input data is a tibble, the output data will be a
+tibble, etc.
 }
 \description{
 The \code{proc_freq} function generates frequency statistics.
+It is both an interactive function that can be used for data exploration,
+and can produce dataset output for further analysis.
 The function can perform one and two-way frequencies.  Two-way
 frequencies are produced as a cross-tabulation by default.  There
 are many options to control the generated tables.  The function will return
-requested tables in a named list. Additionally, it can output results
-directly to a report, or show them in the viewer.
+requested tables in a named list.
 }
 \details{
 The \code{proc_freq} function generates frequency statistics
 for one-way and two-way tables.  Data is passed in on the \code{data}
 parameter.  The desired frequencies are specified on the \code{tables}
-parameter. Function results are returned as a named list of data
-frames. Results may also be returned as a report.
+parameter.
 }
-\section{Data Frame Output}{
-
-By default, frequency results are returned as tibbles
-in a named list. Data in these tibbles is not rounded or formatted
-to give you the most accurate statistical results.
-The list items are named according to the
-strings specified on the \code{tables} parameter. You may control
-the names of the returned results by using a named vector on the
-\code{tables} parameter.
-
-If you are requesting only a single table, and
-do not want it returned in a list, set the \code{piped} parameter to TRUE.
-Setting \code{piped} to TRUE will cause the function to return results
-as an individual data frame. This option is useful if you are using
-the \code{proc_freq} function inside a pipeline.
-}
-
 \section{Report Output}{
 
-If the \code{view} option is TRUE, \code{proc_freq} results will
+By default, \code{proc_freq} results will
 be immediately sent to the viewer as an HTML report.  This functionality
 makes it easy to get a quick analysis of your data with very little
-effort.
-
-The function also allows you to easily export this report to the file system
-by setting the \code{report_type} and \code{report_location} parameters.
-Setting these parameters will cause the function to output your report
-in the location specified, and in the desired output type.
-You may output the report in TXT, HTML, PDF, RTF, or DOCX file formats.
+effort. To turn off the interactive report, pass the "noprint" keyword
+to the \code{options} parameter.
 
 The \code{titles} parameter allows you to set one or more titles for your
 report.  Pass these titles as a vector of strings.
@@ -112,6 +89,30 @@ report.  Pass these titles as a vector of strings.
 If the frequency variables have a label assigned, that label
 will be used in the report output. This feature gives you some control
 over the column headers in the final report.
+
+The exact datasets used for the interactive output can be returned as a list.
+To return these datasets as a list, pass
+the "report" keyword on the \code{options} parameter. This list may in
+turn be passed to \code{\link{proc_print}} to write the report to a file.
+}
+
+\section{Data Frame Output}{
+
+To generate output datasets, pass the "out" keyword to the
+\code{options} parameter. If you are requesting only one table, a single
+data frame will be returned.  If you request multiple tables, a list of data
+frames will be returned.
+
+By default, the list items are named according to the
+strings specified on the \code{tables} parameter. You may control
+the names of the returned results by using a named vector on the
+\code{tables} parameter.
+
+The dataset generated by the "out" keyword are optimized for data manipulation.
+The column names have been standardized, and additional variables may
+be present to help with data manipulation.  In addition, data values in the
+output datasets are not rounded or formatted
+to give you the most accurate statistical results.
 }
 
 \section{Frequency Weight}{
@@ -125,58 +126,60 @@ accepts a quoted variable/column name to use as the weighted value.  If the
 instead of counting rows.
 }
 
+\section{By Groups}{
+
+
+"crosstab", "list",   "nocol", "nocum", "nofreq", "nopercent", "noprint",
+"norow", "nosparse", and "outcum".
+}
+
 \section{Options}{
 
-The \code{options} parameter accepts a named list of options and
-their values.  For example, the "sparse" option may be turned off
-like this: \code{options = list(sparse = FALSE)}.
+The \code{options} parameter accepts a vector of options.  Normally, these
+options must be quoted.  But you may pass them unquoted using the \code{v()}
+function.  For example, you can request output datasets and the Chi-Square
+statistic like this: \code{options = v(out, chisq)}.
 
-Below are all the available table options and a description of each:
+Below are all the available options and a description of each:
 \itemize{
-\item{\strong{colpct}: This option controls whether or not to include
-column percents on crosstab tables. Value values are TRUE and FALSE.
-The default is TRUE.
+\item{\strong{crosstab}: Two-way output tables are a list style by default.
+If you want a crosstab style, pass the "crosstab" option along with the
+"out" option.
 }
-\item{\strong{cumsum}: Whether to include a cumulative sum on one-way
-tables.  Valid values are TRUE and FALSE.  The default is TRUE.
+\item{\strong{list}: Two-way interactive tables are a crosstab style
+by default.  If you want a list style two-way table, pass the "list" option.
 }
-\item{\strong{cumpct}: Whether to include a cumulative precent on
-one-way tables.  Valid values are TRUE and FALSE.  The default is TRUE.
+\item{\strong{nocol}: Two-way cross tabulation tables include column percents
+by default.  To turn them off, pass the "nocol" option.
 }
-\item{\strong{freq}: Whether to include the frequency column on one-way
-tables. Valid values are TRUE and FALSE.  The default is TRUE.
+\item{\strong{nocum}: Whether to include the cumulative frequency and percent
+columns on one-way, interactive tables. These columns are included by default.
+To turn them off, pass the "nocum" option.
 }
-\item{\strong{format}: A format to use for crosstab percentage values.
-The format
-must be a valid format from the \strong{\link[fmtr]{fmtr}} package.  Typically,
-the format is passed as a formatting string.
-For example, the formatting string "\%.1f\%\%" indicates that the
-data should be rounded to a single decimal place and include a percent sign.
+\item{\strong{nofreq}: The "nofreq" option will remove the frequency column
+from one-way and two-way tables.
 }
-\item{\strong{out}: Normally, the \code{proc_freq} function is an interactive
-procedure and does not return data. The "out" option is to request
-return data.
+\item{\strong{nopercent}: The "nopercent" option will remove the percent column
+from one-way and two-way tables.
 }
-\item{\strong{outcum}: Whether to include the cumulative frequency and
-cumulative percent on the output table specified on the "out" parameter.
-Valid values are TRUE and FALSE.  The default is TRUE.
+\item{\strong{noprint}: Whether to print the interactive report to the
+viewer.  By default, the report is printed to the viewer. The "noprint"
+option will inhibit printing.
 }
-\item{\strong{pct}: Whether to include the percent column on one-way
-tables. Valid values are TRUE and FALSE.  The default is TRUE.
+\item{\strong{nonobs}: Whether to include the number of observations "N"
+column on the output and interactive tables.  By default, the N column
+will be included.  The "nonobs" option turns it off.
 }
-\item{\strong{rowpct}: Whether to include the row percent values on two-way
-crosstab tables. Valid values are TRUE and FALSE.  The default is TRUE.
+\item{\strong{norow}: Whether to include the row percentages on two-way
+crosstab tables. The "norow" option will turn them off.
 }
-\item{\strong{sparse}: Whether to include categories for which there are no
-frequency counts.  If the parameter is TRUE, sparse categories will be included.
-If the parameter is FALSE, sparse categories will be removed.
-The default is TRUE.
+\item{\strong{nosparse}: Whether to include categories for which there are no
+frequency counts.  Zero-count categories will be included by default.  If the
+"nosparse" option is present, zero-count categories will be removed.
 }
-\item{\strong{totcol}: Whether to include the total column on two-way
-crosstab tables. Valid values are TRUE and FALSE.  The default is TRUE.
-}
-\item{\strong{totrow}: Whether to include the total rows on two-way
-crosstab tables. Valid values are TRUE and FALSE.  The default is TRUE.
+\item{\strong{outcum}: Whether to include the cumulative frequency and percent
+on output frequency tables.  By default, these columns are not included.
+The "outcum" option will include them.
 }
 }
 }
@@ -195,7 +198,7 @@ labels(df) <- list(Hair = "Hair Color",
 # Example #1: One way frequencies on Hair and Eye color with weight option.
 res <- proc_freq(df,
                  tables = v(Hair, Eye),
-                 options = out,
+                 options = v(out, outcum, noprint),
                  weight = Freq)
 
 # View result data
@@ -214,10 +217,10 @@ res
 # 3 Eye Green 592  64 10.81081    499  84.29054
 # 4 Eye Hazel 592  93 15.70946    592 100.00000
 
-# Example #2: 2 x 2 table
+# Example #2: 2 x 2 Crosstabulation table with Chi-Square statistic
 res <- proc_freq(df, tables = Hair * Eye,
                      weight = Freq,
-                     options = v(list, nocum))
+                     options = v(out, crosstab, chisq, noprint))
 
 # View result data
 res
@@ -242,23 +245,74 @@ res
 #17    Total Frequency 215.000000 220.000000 64.0000000 93.000000 592.00000
 #18    Total   Percent  36.317568  37.162162 10.8108108 15.709459 100.00000
 
-#' # Example #3: Crosstab table wturned off
-res <- proc_freq(df, tables = Hair * Eye,
-                 options = v(list, nocum),
+# $`chisq:Hair * Eye`
+#      CHISQ CHISQ.DF      CHISQ.P
+# 1 138.2898        9 2.325287e-25
+
+#' # Example #3: By variable with named table request
+res <- proc_freq(df, tables = v(Hair, Eye, Cross = Hair * Eye),
+                 by = Sex,
+                 options = v(out, noprint),
                  weight = Freq)
 
 # View result data
 res
-#$HairByEyes
-#  Category Statistic      Blue      Brown      Green     Hazel
-#1    Black Frequency 20.000000  68.000000  5.0000000 15.000000
-#2    Black   Percent  3.378378  11.486486  0.8445946  2.533784
-#3    Blond Frequency 94.000000   7.000000 16.0000000 10.000000
-#4    Blond   Percent 15.878378   1.182432  2.7027027  1.689189
-#5    Brown Frequency 84.000000 119.000000 29.0000000 54.000000
-#6    Brown   Percent 14.189189  20.101351  4.8986486  9.121622
-#7      Red Frequency 17.000000  26.000000 14.0000000 14.000000
-#8      Red   Percent  2.871622   4.391892  2.3648649  2.364865
+# $Hair
+#       BY  VAR   CAT   N CNT      PCT
+# 1 Female Hair Black 313  52 16.61342
+# 2 Female Hair Blond 313  81 25.87859
+# 3 Female Hair Brown 313 143 45.68690
+# 4 Female Hair   Red 313  37 11.82109
+# 5   Male Hair Black 279  56 20.07168
+# 6   Male Hair Blond 279  46 16.48746
+# 7   Male Hair Brown 279 143 51.25448
+# 8   Male Hair   Red 279  34 12.18638
+#
+# $Eye
+#       BY VAR   CAT   N CNT       PCT
+# 1 Female Eye  Blue 313 114 36.421725
+# 2 Female Eye Brown 313 122 38.977636
+# 3 Female Eye Green 313  31  9.904153
+# 4 Female Eye Hazel 313  46 14.696486
+# 5   Male Eye  Blue 279 101 36.200717
+# 6   Male Eye Brown 279  98 35.125448
+# 7   Male Eye Green 279  33 11.827957
+# 8   Male Eye Hazel 279  47 16.845878
+#
+# $Cross
+#        BY VAR1 VAR2  CAT1  CAT2   N CNT        PCT
+# 1  Female Hair  Eye Black  Blue 313   9  2.8753994
+# 2  Female Hair  Eye Black Brown 313  36 11.5015974
+# 3  Female Hair  Eye Black Green 313   2  0.6389776
+# 4  Female Hair  Eye Black Hazel 313   5  1.5974441
+# 5  Female Hair  Eye Blond  Blue 313  64 20.4472843
+# 6  Female Hair  Eye Blond Brown 313   4  1.2779553
+# 7  Female Hair  Eye Blond Green 313   8  2.5559105
+# 8  Female Hair  Eye Blond Hazel 313   5  1.5974441
+# 9  Female Hair  Eye Brown  Blue 313  34 10.8626198
+# 10 Female Hair  Eye Brown Brown 313  66 21.0862620
+# 11 Female Hair  Eye Brown Green 313  14  4.4728435
+# 12 Female Hair  Eye Brown Hazel 313  29  9.2651757
+# 13 Female Hair  Eye   Red  Blue 313   7  2.2364217
+# 14 Female Hair  Eye   Red Brown 313  16  5.1118211
+# 15 Female Hair  Eye   Red Green 313   7  2.2364217
+# 16 Female Hair  Eye   Red Hazel 313   7  2.2364217
+# 17   Male Hair  Eye Black  Blue 279  11  3.9426523
+# 18   Male Hair  Eye Black Brown 279  32 11.4695341
+# 19   Male Hair  Eye Black Green 279   3  1.0752688
+# 20   Male Hair  Eye Black Hazel 279  10  3.5842294
+# 21   Male Hair  Eye Blond  Blue 279  30 10.7526882
+# 22   Male Hair  Eye Blond Brown 279   3  1.0752688
+# 23   Male Hair  Eye Blond Green 279   8  2.8673835
+# 24   Male Hair  Eye Blond Hazel 279   5  1.7921147
+# 25   Male Hair  Eye Brown  Blue 279  50 17.9211470
+# 26   Male Hair  Eye Brown Brown 279  53 18.9964158
+# 27   Male Hair  Eye Brown Green 279  15  5.3763441
+# 28   Male Hair  Eye Brown Hazel 279  25  8.9605735
+# 29   Male Hair  Eye   Red  Blue 279  10  3.5842294
+# 30   Male Hair  Eye   Red Brown 279  10  3.5842294
+# 31   Male Hair  Eye   Red Green 279   7  2.5089606
+# 32   Male Hair  Eye   Red Hazel 279   7  2.5089606
 }
 \seealso{
 For summary statistics, see \code{\link{proc_means}}.  To pivot

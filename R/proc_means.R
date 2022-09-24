@@ -59,23 +59,7 @@
 #' the available options.
 #' @param weight An optional weight parameter.
 #' @param titles A vector of one or more titles to use for the report output.
-#' @param options An options object created with the \code{\link{opts}}
-#' function. This parameter can accept a variety of options.
-# @param ... One or more output requests. To request a dataset output,
-# use the desired dataset name as the parameter name, and pass in the
-# \code{\link{out}} function with the desired specifics.  If only one
-# output dataset is requested, the function will return a single data frame.
-# If more than one output dataset is requested, the function will return
-# a list of data frames. If no statistics are specified in the \code{\link{out}}
-# function, the procedure will default to the statistics assigned on
-# the \code{stats} parameter.  Note that this default behavior is different
-# from SAS®.
-# @param output A named list of output data requests.  The name of the list item
-# will become the name of the item in the return list, if there is one.  The
-# value of the list item is a output request created with the \code{\link{out}}
-# function.  Output data requests may also be made on the \code{...} parameter
-# for convenience.  This parameter is provided in case you need to generate
-# output requests dynamically inside a function.
+#' @param options A vector of option keywords.
 #' @return The requested summary statistics.
 #' @import fmtr
 #' @import tibble
@@ -85,12 +69,9 @@ proc_means <- function(data,
                        class = NULL,
                        var = NULL,
                        stats = c("n", "mean", "std", "min", "max"),
-              #        ways = NULL,   # Hold off for now
                        weight = NULL,
                        titles = NULL,
-                       options = NULL #,
-                      # ...,
-                      # output = NULL
+                       options = NULL
                        ) {
 
   # SAS seems to always ignore these
@@ -175,10 +156,6 @@ proc_means <- function(data,
   }
 
   # Generate output specs
-  # if (!is.null(output))
-  #   outreq <- get_output_specs_means(output, stats)
-  # else
-  #   outreq <- get_output_specs_means(list(...), stats)
   if (has_option(options, "out"))
     outreq <- get_output_specs_means(list(), stats, options)
   else
@@ -192,9 +169,7 @@ proc_means <- function(data,
   # Otherwise, this will mess up gen_output_means
   if (has_option(options, "report")) {
     rptflg <- TRUE
-    #rptnm <- get_report_name(outreq)
     rptnm <- "report"
-    #outreq[[rptnm]] <- NULL
   }
 
   if (option_true(options, "noprint", FALSE))

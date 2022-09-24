@@ -48,8 +48,7 @@ the available options.}
 
 \item{titles}{A vector of one or more titles to use for the report output.}
 
-\item{options}{An options object created with the \code{\link{opts}}
-function. This parameter can accept a variety of options.}
+\item{options}{A vector of option keywords.}
 }
 \value{
 The requested summary statistics.
