@@ -17,7 +17,7 @@ Grant     "1230" "2"  63 75 80
 Krupski   "2527" "2"  80 76 71
 Lundsford "4860" "1"  92 40 86
 McBane    "0674" "1"  75 78 72
-')
+', stringsAsFactors = FALSE)
 
 dat2 <- read.table(header = TRUE, text ='
   ID Location Date  Length1 Weight1 Length2 Weight2 Length3 Weight3 Length4 Weight4
@@ -27,7 +27,7 @@ dat2 <- read.table(header = TRUE, text ='
   4 "Eagle Lake"  2JUN95 32 .35 32 .25 33 .30 NA NA
   5 "Eagle Lake"  3JUL95 30 .20 36 .45 NA NA  NA NA
   6 "Eagle Lake"  4AUG95 33 .30 33 .28 34 .42 NA NA
-  ')
+  ', stringsAsFactors = FALSE)
 
 datm <- read.table(header = TRUE, text = '
 LastName  Age PresentScore TasteScore Flavor Layers
@@ -51,7 +51,7 @@ Matthew     42 81 92  Chocolate  2
 Becker      36 62 83  Spice      2
 Anderson    27 87 85  Chocolate  1
 Merritt     62 73 84  Chocolate  1
-')
+', stringsAsFactors = FALSE)
 
 prt <- read.table(header = TRUE, text = '
   sex internship enrollment count
@@ -62,7 +62,8 @@ prt <- read.table(header = TRUE, text = '
   5  boys        yes         no    29
   6  boys         no         no    27
   7 girls        yes         no    10
-  8 girls         no         no    23')
+  8 girls         no         no    23',
+                  stringsAsFactors = FALSE)
 
 prt2 <- read.table(header = TRUE, text = '
       sex internship enrollment count  group
@@ -73,7 +74,8 @@ prt2 <- read.table(header = TRUE, text = '
   5  boys        yes         no    29      2
   6  boys         no         no    27      2
   7 girls        yes         no    10      2
-  8 girls         no         no    23      2')
+  8 girls         no         no    23      2',
+                   stringsAsFactors = FALSE)
 
 
 ageg <- read.table(header = TRUE, text = '
@@ -93,7 +95,8 @@ ageg <- read.table(header = TRUE, text = '
 13 AGECAT    ">= 65" "ARM A" 85  "3 (  3.5%)"
 14 AGECAT    ">= 65" "ARM B" 85  "5 (  5.9%)"
 15 AGECAT    ">= 65" "ARM C" 85  "2 (  2.4%)"
-16 AGECAT    ">= 65" "ARM D" 85  "3 (  3.5%)"')
+16 AGECAT    ">= 65" "ARM D" 85  "3 (  3.5%)"',
+                   stringsAsFactors = FALSE)
 
 
 

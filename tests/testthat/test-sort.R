@@ -8,7 +8,8 @@ prt <- read.table(header = TRUE, text = '
   5  boys        yes         no    29
   6  boys         no         no    27
   7 girls        yes         no    10
-  8 girls         no         no    23')
+  8 girls         no         no    23',
+                  stringsAsFactors = FALSE)
 
 
 test_that("sort1: Simple proc_sort test works.", {
