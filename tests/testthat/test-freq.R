@@ -1555,3 +1555,107 @@ test_that("freq53: notable option works as expected.", {
 
 
 })
+
+test_that("freq54: nopercent works on two-way.", {
+
+  res <- proc_freq(dat, tables = Eyes * Hair,
+            options = v(nocol, norow, out, crosstab, nopercent))
+
+
+  res
+  expect_equal(ncol(res), 8)
+  expect_equal(nrow(res), 4)
+})
+
+test_that("freq55: get_nlevels works as expected.", {
+
+
+  res <- get_nlevels(dat, "Eyes")
+
+  expect_equal(nrow(res), 1)
+  expect_equal(res$stub[1], "Eyes")
+  expect_equal(res$levels[1], 3)
+
+  res <- get_nlevels(dat, "Eyes", "Hair")
+
+  res
+  expect_equal(nrow(res), 2)
+  expect_equal(res[["stub"]][1], "Eyes")
+  expect_equal(res$levels[1], 3)
+  expect_equal(res$levels[2], 5)
+
+
+  bv <- c("Region" = 1)
+
+  res <- get_nlevels(dat, "Eyes", NULL, byvars = bv)
+
+  res
+  attributes(res)
+  expect_equal(nrow(res), 1)
+  expect_equal(res$stub[1], "Eyes")
+  expect_equal(res$levels[1], 3)
+  expect_equal(is.null(attributes(res)), FALSE)
+
+
+  res <- get_nlevels(dat, "Eyes", "Hair", byvars = bv, out = TRUE)
+
+  res
+  expect_equal(nrow(res), 1)
+  expect_equal(res[["VAR1"]][1], 3)
+  expect_equal(res$VAR2[1], 5)
+  expect_equal(labels(res), list(VAR1 = "Eyes", VAR2 = "Hair" ))
+
+
+})
+
+
+test_that("freq56: nlevels works as expected.", {
+
+  res <- proc_freq(dat, tables = Eyes,
+                   options = v(report, nlevels))
+
+
+  res
+
+  expect_equal(length(res), 2)
+  expect_equal(ncol(res[[1]]), 2)
+  expect_equal(nrow(res[[1]]), 1)
+
+
+  res <- proc_freq(dat, tables = v(Eyes, Hair),
+                   options = v(report, nlevels))
+
+
+  res
+
+  expect_equal(length(res), 4)
+  expect_equal(ncol(res[[1]]), 2)
+  expect_equal(nrow(res[[1]]), 1)
+
+  res <- proc_freq(dat, tables = v(Eyes, Hair),
+                   by = Region,
+                   options = v(report, out, nlevels))
+
+
+  res
+
+  expect_equal(length(res), 2)
+  expect_equal(ncol(res$out$`NLevels:Eyes`), 2)
+  expect_equal(nrow(res$out$`NLevels:Eyes`), 2)
+
+
+
+  res <- proc_freq(dat, tables = v(Eyes * Hair),
+                   by = Region,
+                   options = v(report, out, nlevels))
+
+
+  res
+
+  expect_equal(length(res), 2)
+  expect_equal(ncol(res$out$`NLevels:Eyes * Hair`), 3)
+  expect_equal(nrow(res$out$`NLevels:Eyes * Hair`), 2)
+
+
+})
+

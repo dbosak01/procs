@@ -33,7 +33,7 @@ Table options are passed to the parameter as a vector of quoted strings. You may
 also use the \code{v()} function to pass unquoted strings.
 The following options are available on \code{proc_freq}:
 "crosstab", "list", "nocol", "nocum", "nofreq", "nopercent", "noprint",
-"nonobs", "norow", "nosparse", and "outcum". See
+"nonobs", "norow", "nosparse", "notable", and "outcum". See
 the \strong{Options} section for a description of these options. To get
 output from the function, you must pass either the "out" or "report" keywords
 to the \code{options} parameter.}
@@ -176,6 +176,12 @@ crosstab tables. The "norow" option will turn them off.
 \item{\strong{nosparse}: Whether to include categories for which there are no
 frequency counts.  Zero-count categories will be included by default.  If the
 "nosparse" option is present, zero-count categories will be removed.
+}
+\item{\strong{notable}: Whether to include the frequency table in the output
+dataset list. Normally, the frequency table is included.  You may want to
+exclude the frequency table in some cases, for instance, if you only
+want the Chi-Square statistic.  This option allows you to exclude the frequency
+table.
 }
 \item{\strong{outcum}: Whether to include the cumulative frequency and percent
 on output frequency tables.  By default, these columns are not included.

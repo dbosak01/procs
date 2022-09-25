@@ -809,13 +809,16 @@ cross_tab <- function(freqdata, options, var1, var2, bylbl = NULL) {
   names(dt1) <- gsub("CNT.",  "", names(dt1), fixed = TRUE)
 
   # Transpose Percents
-  dt2 <- reshape(dt, timevar = "CAT2", idvar = "CAT1",
-                 v.names = "PCT", direction = "wide",
-                 drop = c("CNT", "rowcnt", "colcnt", "rowpct", "colpct"))
-  dt2$Total <- lkp1[dt1$CAT1] / sum(lkp1, na.rm = TRUE) * 100
-  dt2$Order <- 2
-  dt2$Statistic <- "Percent"
-  names(dt2) <- gsub("PCT.",  "", names(dt2), fixed = TRUE)
+  dt2 <- NULL
+  if (!option_true(options, "nopercent", FALSE)) {
+    dt2 <- reshape(dt, timevar = "CAT2", idvar = "CAT1",
+                   v.names = "PCT", direction = "wide",
+                   drop = c("CNT", "rowcnt", "colcnt", "rowpct", "colpct"))
+    dt2$Total <- lkp1[dt1$CAT1] / sum(lkp1, na.rm = TRUE) * 100
+    dt2$Order <- 2
+    dt2$Statistic <- "Percent"
+    names(dt2) <- gsub("PCT.",  "", names(dt2), fixed = TRUE)
+  }
 
 
   # Transpose Row Percents
@@ -856,14 +859,15 @@ cross_tab <- function(freqdata, options, var1, var2, bylbl = NULL) {
     dt5$Order = 1
     dt5$Statistic = "Frequency"
 
-
-    dt6 <- data.frame(CAT1 = "Total")
-    for (nm in names(lkp2)) {
-      dt6[[nm]] <- lkp2[[nm]] / sum(lkp2, na.rm = TRUE) * 100
+    if (!option_true(options, "nopercent", FALSE)) {
+      dt6 <- data.frame(CAT1 = "Total")
+      for (nm in names(lkp2)) {
+        dt6[[nm]] <- lkp2[[nm]] / sum(lkp2, na.rm = TRUE) * 100
+      }
+      dt6$Total = 100
+      dt6$Order = 2
+      dt6$Statistic = "Percent"
     }
-    dt6$Total = 100
-    dt6$Order = 2
-    dt6$Statistic = "Percent"
   }
 
 
@@ -880,10 +884,15 @@ cross_tab <- function(freqdata, options, var1, var2, bylbl = NULL) {
 
 
   # Make sure total rows are at the end, after the sort
-  if (!is.null(dt5)) {
+  if (!is.null(dt5) & !is.null(dt6)) {
     ret <- rbind(ret,
                  dt5[,  c("CAT1", "Statistic", nnms)],
                  dt6[,  c("CAT1", "Statistic", nnms)],
+                 make.row.names = FALSE, stringsAsFactors = FALSE)
+  } else if (!is.null(dt5)) {
+
+    ret <- rbind(ret,
+                 dt5[,  c("CAT1", "Statistic", nnms)],
                  make.row.names = FALSE, stringsAsFactors = FALSE)
   }
 
@@ -1116,6 +1125,96 @@ get_output_specs <- function(tbls, outs, opts) {
   return(ret)
 }
 
+get_nlevels <- function(data, var1, var2 = NULL, byvars = NULL,
+                        out = FALSE, missing = FALSE) {
+
+  ret <- NULL
+  vars <- c(var1)
+
+  if (missing)
+    l1vals <- data[[var1]]
+  else
+    l1vals <- data[[var1]][!is.na(data[[var1]])]
+
+  lvls <- c(length(unique(l1vals)))
+  lbl <- ""
+
+
+  if (!is.null(var2)) {
+    if (missing)
+      l2vals <- data[[var2]]
+    else
+      l2vals <- data[[var2]][!is.na(data[[var2]])]
+
+  }
+
+
+  if (out) {
+
+    if (!is.null(var2)) {
+
+      ret <- data.frame(VAR1 = lvls, VAR2 =  length(unique(l2vals)),
+                        stringsAsFactors = FALSE)
+
+      labels(ret) <- list(VAR1 = var1, VAR2 = var2)
+
+    } else {
+
+      ret <- data.frame(VAR = lvls, stringsAsFactors = FALSE)
+      labels(ret) <- list(VAR = var1)
+    }
+
+    bv <- list()
+    if (!is.null(byvars)) {
+
+      if (length(byvars) == 1)
+        nms <- "BY"
+      else
+        nms <- paste0("BY", seq_len(length(byvars)))
+
+      for (i in seq_along(nms)) {
+        bv[[nms[[i]]]] <- byvars[[names(byvars)[[i]]]]
+      }
+
+      bret <- as.data.frame(bv, stringsAsFactors = FALSE)
+      labels(bret) <- names(byvars)
+      ret <- cbind(bret, ret)
+
+      lbl <- paste0(byvars, collapse = "")
+    }
+  } else {
+
+    if (!is.null(var2)) {
+      vars[2] <- var2
+      lvls[2] <- length(unique(l2vals))
+    }
+
+    ret <- data.frame(stub = vars, levels = lvls, stringsAsFactors = FALSE)
+
+    labels(ret) <- list(stub = "Variable", levels = "Levels")
+
+    lbl <- gsub(",", "", byvars, fixed = TRUE)
+  }
+
+  # Add spanning headers
+  if (!is.null(byvars)) {
+
+    spn2 <- span(1, ncol(ret), label = lbl, level = 1)
+   # spn1 <- span(1, ncol(ret), label = "Number of Variable Levels", level = 2)
+    attr(ret, "spans") <- list(spn2)
+
+  } else {
+    # lbl <- paste0("Table of ", var1, " by ", var2)
+
+    # spn2 <- span(1, ncol(ret), label = lbl, level = 2)
+    # #spn1 <- span(1, ncol(ret), label = "Number of Variable Levels", level = 1)
+    # attr(ret, "spans") <- list(spn1)
+  }
+
+
+
+  return(ret)
+}
 
 
 # Zero Fill -------------------------------------------------------------
@@ -1212,6 +1311,8 @@ get_output_tables <- function(outs) {
 
 }
 
+
+
 # Drivers -----------------------------------------------------------------
 
 
@@ -1285,6 +1386,7 @@ gen_report_freq <- function(data,
       crstab <- NULL
       chisq <- NULL
       fisher <- NULL
+      nlevels <- NULL
 
       # Split cross variables
       splt <- trimws(strsplit(tb, "*", fixed = TRUE)[[1]])
@@ -1302,6 +1404,12 @@ gen_report_freq <- function(data,
 
         # Perform one-way frequency
         result <- freq_oneway(dt, tb, wgt, options, out = FALSE)
+
+        # Get nlevels if requested
+        if (has_option(options, "nlevels")) {
+
+          nlevels <- get_nlevels(dt, tb, byvars = bylbls[j])
+        }
 
       } else if (length(splt) == 2) {
 
@@ -1338,6 +1446,12 @@ gen_report_freq <- function(data,
             chisq <- get_chisq(dt[[splt[1]]], dt[[splt[[2]]]], bylbl = bylbls[j])
         }
 
+        # Get nlevels if requested
+        if (has_option(options, "nlevels")) {
+
+          nlevels <- get_nlevels(dt, splt[1], splt[2], byvars = bylbls[j])
+        }
+
       } else {
 
         stop("Procedure does not yet support n-way frequencies.")
@@ -1357,6 +1471,13 @@ gen_report_freq <- function(data,
         if (!is.null(chisq))
           chisq <- as_tibble(chisq)
 
+        if (!is.null(nlevels))
+          nlevels <- as_tibble(nlevels)
+
+      }
+
+      if (!is.null(nlevels)) {
+        res[[paste0("Nlevels:", get_name(nm, tb, bylbls[j]))]] <- nlevels
       }
 
       # If a cross tab was produced, add it to result
@@ -1369,7 +1490,7 @@ gen_report_freq <- function(data,
         #   res[[get_name(options[["out"]], "", bylbls[j])]] <- result
         # }
 
-      } else { # Otherwise add one-way to result
+      } else { # Otherwise add list to result
 
         res[[get_name(nm, tb, bylbls[j])]] <- result
 
@@ -1476,6 +1597,7 @@ gen_output_freq <- function(data,
 
       chisq <- NULL
       fisher <- NULL
+      nlevels <- NULL
 
       # Loop through by groups
       for (j in seq_len(length(dtlst))) {
@@ -1486,6 +1608,7 @@ gen_output_freq <- function(data,
         crstab <- NULL
         tmpchisq <- NULL
         tmpfisher <- NULL
+        tmpnlevels <- NULL
 
         # Split cross variables
         splt <- trimws(strsplit(tb, "*", fixed = TRUE)[[1]])
@@ -1501,6 +1624,11 @@ gen_output_freq <- function(data,
             result <- get_output_oneway(dt, tb, wgt, options,
                                         NULL, shape = outp$shape,
                                         stats = outp$stats)
+          }
+
+          if (has_option(options, "nlevels")) {
+
+            tmpnlevels <- get_nlevels(dt, tb, byvars = byvals[[j]], out = TRUE)
           }
 
         } else if (length(splt) == 2) {
@@ -1532,10 +1660,14 @@ gen_output_freq <- function(data,
 
           }
 
+          if (has_option(options, "nlevels")) {
+
+            tmpnlevels <- get_nlevels(dt, splt[1], splt[2],
+                                      byvars = byvals[[j]], out = TRUE)
+          }
 
 
           if (!is.null(outp$stats)) {
-
 
             if (option_true(options, "fisher", FALSE)) {
 
@@ -1619,8 +1751,17 @@ gen_output_freq <- function(data,
           if (!is.null(fisher))
             fisher <- as_tibble(fisher)
 
+          if (!is.null(nlevels))
+            nlevels <- as_tibble(nlevels)
+
         }
 
+        if (has_option(options, "nlevels")) {
+          if (is.null(nlevels))
+            nlevels <- tmpnlevels
+          else
+            nlevels <- rbind(nlevels, tmpnlevels)
+        }
 
         if (!is.null(tmpres))
           tmpres <- rbind(tmpres, result)
@@ -1692,7 +1833,12 @@ gen_output_freq <- function(data,
       if (!is.null(outp$format))
         formats(tmpres) <- outp$format
 
+
+
       # Assign to output
+      if (!is.null(has_option(options, "nlevels")))
+        res[[paste0("NLevels:", nm)]] <- nlevels
+
       if (!has_option(options, "notable"))
         res[[nm]] <- tmpres
 
