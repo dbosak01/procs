@@ -1754,11 +1754,11 @@ test_that("freq58: proc_freq missing option works.", {
   10 girls           NA        no   29')
 
 
-  res <- proc_freq(prtm, tables = internship,
+  res <- proc_freq(prtm, tables = v(internship),
                    options = v(out, nlevels, missing))
 
 
-  res
+  res$tab2
 
   r1 <- res[[1]]
   expect_equal(length(res), 2)

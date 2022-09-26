@@ -209,7 +209,7 @@ proc_means <- function(data,
   if (view == TRUE | rptflg) {
     rptres <- gen_report_means(data, by = by, var = var, class = class,
                             stats = stats, view = view,
-                            titles = titles, weight = weight,
+                            titles = titles, #weight = weight,
                             options = options)
   }
 
@@ -242,7 +242,7 @@ proc_means <- function(data,
             class = class,
             var = var,
             stats = stats,
-            weight = weight,
+           # weight = weight,
             view = view,
             titles = titles,
             outcnt = ifelse("data.frame" %in% class(res),
