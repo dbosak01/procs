@@ -1121,7 +1121,7 @@ test_that("freq41: get_output_twoway() works as expected.", {
   res1
 
   expect_equal(nrow(res1), 4)
-  expect_equal(ncol(res1), 7)
+  expect_equal(ncol(res1), 9)
 
   res2 <- get_output_twoway(prt, "internship", "enrollment", "count",  NULL,
                             FALSE, by = c(by1 = "A", by2 = "B"))
@@ -1130,7 +1130,7 @@ test_that("freq41: get_output_twoway() works as expected.", {
 
 
   expect_equal(nrow(res2), 4)
-  expect_equal(ncol(res2), 8)
+  expect_equal(ncol(res2), 10)
 
 })
 
@@ -1142,7 +1142,7 @@ test_that("freq42: get_output_twoway() long works as expected.", {
 
   res1
 
-  expect_equal(nrow(res1), 2)
+  expect_equal(nrow(res1), 4)
   expect_equal(ncol(res1), 8)
 
   res2 <- get_output_twoway(prt, "internship", "enrollment", "count",  NULL,
@@ -1152,7 +1152,7 @@ test_that("freq42: get_output_twoway() long works as expected.", {
   res2
 
 
-  expect_equal(nrow(res2), 2)
+  expect_equal(nrow(res2), 4)
   expect_equal(ncol(res2), 9)
 
 })
@@ -1659,3 +1659,125 @@ test_that("freq56: nlevels works as expected.", {
 
 })
 
+
+test_that("freq57: get_nlevels missing option works.", {
+
+  prtm <- read.table(header = TRUE, text = '
+  sex internship enrollment count
+  1  boys        yes        yes    35
+  2  boys         no        yes    14
+  3 girls        yes        yes    32
+  4 girls         no        yes    53
+  5  boys        yes         no    29
+  6  boys         no         no    27
+  7 girls        yes         no    10
+  8 girls         no         no    23
+  9 NA            NA        yes   25')
+
+
+  res <- get_nlevels(prt, "sex", missing = TRUE)
+
+  res
+  expect_equal(res$MISS[1], 0)
+
+  res <- get_nlevels(prtm, "sex", missing = TRUE)
+
+  res
+
+  expect_equal(res$MISS[1], 1)
+
+
+
+  res <- get_nlevels(prt, "sex", missing = TRUE, out = TRUE)
+
+  res
+  expect_equal(res$MISS[1], 0)
+
+  res <- get_nlevels(prtm, "sex", missing = TRUE, out = TRUE)
+
+  res
+
+  expect_equal(res$MISS[1], 1)
+
+
+  res <- get_nlevels(prtm, "internship", "enrollment", missing = TRUE, out = FALSE)
+
+  res
+
+  expect_equal(res$MISS[1], 1)
+  expect_equal(res$MISS[2], 0)
+
+
+
+  res <- get_nlevels(prtm, "internship", "enrollment", missing = TRUE, out = TRUE)
+
+  res
+
+  expect_equal(res$VAR1.MISS[1], 1)
+  expect_equal(res$VAR2.MISS[1], 0)
+
+
+
+  res <- get_nlevels(prtm, "internship", "enrollment", byvars = "sex = 1",
+                     missing = TRUE, out = FALSE)
+
+  res
+
+  expect_equal(res$MISS[1], 1)
+  expect_equal(res$MISS[2], 0)
+
+
+
+  res <- get_nlevels(prtm, "internship", "enrollment", missing = TRUE, out = TRUE)
+
+  res
+
+  expect_equal(res$VAR1.MISS[1], 1)
+  expect_equal(res$VAR2.MISS[1], 0)
+
+
+})
+
+test_that("freq58: proc_freq missing option works.", {
+
+  prtm <- read.table(header = TRUE, text = '
+  sex internship enrollment count
+  1  boys        yes        yes    35
+  2  boys         no        yes    14
+  3 girls        yes        yes    32
+  4 girls         no        yes    53
+  5  boys        yes         NA    29
+  6  boys         no         no    27
+  7 girls        yes         no    10
+  8 girls         no         no    23
+  9 girls            NA        yes   25
+  10 girls           NA        no   29')
+
+
+  res <- proc_freq(prtm, tables = internship,
+                   options = v(out, nlevels, missing))
+
+
+  res
+
+  r1 <- res[[1]]
+  expect_equal(length(res), 2)
+  expect_equal(r1$VAR[1], 3)
+  expect_equal(r1$MISS[1], 1)
+  expect_equal(r1$NONMISS[1], 2)
+
+
+  res <- proc_freq(prtm, tables = internship * enrollment,
+                   options = v(out, nlevels, missing))
+
+  res
+
+  r1 <- res[[1]]
+  expect_equal(length(res), 2)
+  expect_equal(r1$VAR2[1], 3)
+  expect_equal(r1$VAR2.MISS[1], 1)
+  expect_equal(r1$VAR2.NONMISS[1], 2)
+
+
+
+})

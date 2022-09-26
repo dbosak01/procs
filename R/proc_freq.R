@@ -82,6 +82,16 @@
 #' \item{\strong{list}: Two-way interactive tables are a crosstab style
 #' by default.  If you want a list style two-way table, pass the "list" option.
 #' }
+#' \item{\strong{missing}: Normally, missing values are not counted and not
+#' shown on frequency tables.  The "missing" option allows you to treat
+#' missing (NA) values as normal values, so that they are counted and
+#' shown on the frequency table.
+#' }
+#' \item{\strong{nlevels}: The "nlevels" option will display the number of unique
+#' values for each variable in the frequency table. These levels are generated
+#' as a separate table that appears on the report, and can also be output using
+#' the "out" option.
+#' }
 #' \item{\strong{nocol}: Two-way cross tabulation tables include column percents
 #' by default.  To turn them off, pass the "nocol" option.
 #' }
@@ -136,7 +146,8 @@
 #' Table options are passed to the parameter as a vector of quoted strings. You may
 #' also use the \code{v()} function to pass unquoted strings.
 #' The following options are available on \code{proc_freq}:
-#' "crosstab", "list", "nocol", "nocum", "nofreq", "nopercent", "noprint",
+#' "crosstab", "list", "missing", "missprint", "nlevels", "nocol",
+#' "nocum", "nofreq", "nopercent", "noprint",
 #' "nonobs", "norow", "nosparse", "notable", and "outcum". See
 #' the \strong{Options} section for a description of these options. To get
 #' output from the function, you must pass either the "out" or "report" keywords
@@ -312,9 +323,9 @@ proc_freq <- function(data,
              "list", "nocol", "nocum", "nofreq", "nopercent",
              "norow", "nosparse", "outcum",
              "sparse", "totpct",  "crosstab",
-             "notable", "nonobs")
+             "notable", "nonobs", "missing", "missprint", "nlevels")
 
-  # "expected", "missprint", "outexpect", "nlevels",
+  # "expected", "outexpect", "missprint"
 
   vstats <- c("chisq", "cl", "fisher")
 
@@ -499,6 +510,11 @@ freq_oneway <- function(data, tb, weight, options, out = FALSE, stats = NULL) {
   # Get target variable vector
   var <- data[[tb]]
 
+  if (has_option(options, "missing")) {
+
+    var <- ifelse(is.na(var), ".", var)
+  }
+
   # Get frequency counts
   if (is.null(weight)) {
 
@@ -507,9 +523,13 @@ freq_oneway <- function(data, tb, weight, options, out = FALSE, stats = NULL) {
 
   } else {
 
-    cnts <- aggregate(data[[weight]], list(data[[tb]]), FUN = sum)
+
+    cnts <- aggregate(data[[weight]], list(var), FUN = sum)
+
     categories <- cnts$Group.1
     frequencies <- cnts$x
+
+
   }
 
   # Perform calculations
@@ -603,6 +623,23 @@ freq_oneway <- function(data, tb, weight, options, out = FALSE, stats = NULL) {
   spn <- span(1, ncol(result), label = lbl, level = 1)
   attr(result, "spans") <- list(spn)
 
+  # Add footnote for missing values
+  if (!has_option(options, "missing")) {
+
+    nas <- is.na(data[[tb]])
+    if (!is.null(weight)) {
+      nacnts <- sum(data[[weight]][nas])
+    } else {
+      nacnts <- sum(nas)
+    }
+
+    if (nacnts > 0) {
+      ftns <- ftn("Frequency Missing = " %p% nacnts, align = "center",
+                  blank_row = "none", borders = "all")
+      attr(result, "footnotes") <- list(ftns)
+    }
+  }
+
 
   return(result)
 }
@@ -632,6 +669,12 @@ freq_twoway <- function(data, tb1, tb2, weight, options,
     v2 <- as.character(data[[tb2]])
   else
     v2 <- data[[tb2]]
+
+  # Deal with missing
+  if (has_option(options, "missing")) {
+    v1 <- ifelse(is.na(v1), ".", v1)
+    v2 <- ifelse(is.na(v2), ".", v2)
+  }
 
   # Get unique values of variables
   t1 <- names(sort(table(v1)))
@@ -666,8 +709,6 @@ freq_twoway <- function(data, tb1, tb2, weight, options,
   categories1 <- cnts$Group.1
   categories2 <- cnts$Group.2
   frequencies <- cnts$x
-
-
 
   # Perform calculations
   n <- sum(frequencies, na.rm = TRUE)
@@ -735,17 +776,17 @@ freq_twoway <- function(data, tb1, tb2, weight, options,
 
 
   # Kill cum freq if requested
-  if (out == FALSE)
+  if (out == FALSE & option_true(options, "nocum"))
     result[["CUMSUM"]] <- NULL
-  else if (!option_true(options, "outcum", FALSE)) {
+  else if (out & !option_true(options, "outcum", FALSE)) {
 
     result[["CUMSUM"]] <- NULL
   }
 
   # Kill cum pct if requested
-  if (out == FALSE)
+  if (out == FALSE & option_true(options, "nocum"))
     result[["CUMPCT"]] <- NULL
-  else if (!option_true(options, "outcum", FALSE)) {
+  else if (out & !option_true(options, "outcum", FALSE)) {
 
     result[["CUMPCT"]] <- NULL
   }
@@ -758,6 +799,28 @@ freq_twoway <- function(data, tb1, tb2, weight, options,
     fstats <- stats[toupper(stats) %in% names(result)]
 
     result <- result[ , c("CAT1", "CAT2", toupper(fstats))]
+  }
+
+  # Add footnote for missing values
+  if (!has_option(options, "missing")) {
+
+    nas1 <- is.na(data[[tb1]])
+    nas2 <- is.na(data[[tb2]])
+
+    if (!is.null(weight)) {
+      na1cnts <- sum(data[[weight]][nas1])
+      na2cnts <- sum(data[[weight]][nas2])
+    } else {
+      na1cnts <- sum(nas1)
+      na2cnts <- sum(nas2)
+    }
+
+    if ((na1cnts + na2cnts) > 0) {
+      ftns <- ftn("Frequency Missing = " %p% (na1cnts + na2cnts),
+                  align = "center",
+                  blank_row = "none", borders = "all")
+      attr(result, "footnotes") <- list(ftns)
+    }
   }
 
   return(result)
@@ -774,6 +837,19 @@ cross_tab <- function(freqdata, options, var1, var2, bylbl = NULL) {
   lbl2 <- attr(freqdata$CAT2, "label")
 
   #browser()
+  if (has_option(options, "missing")) {
+
+    freqdata$CAT1 <- ifelse(is.na(freqdata$CAT1), ".NA", freqdata$CAT1)
+    freqdata$CAT2 <- ifelse(is.na(freqdata$CAT2), ".NA", freqdata$CAT2)
+  }
+
+  nms <- names(freqdata)
+  if ("CUMSUM" %in% nms) {
+    freqdata$CUMSUM <- NULL
+  }
+  if ("CUMPCT" %in% nms) {
+    freqdata$CUMPCT <- NULL
+  }
 
   # Group by both dimensions
   cat1grp <- aggregate(freqdata$CNT, list(freqdata$CAT1), FUN=sum)
@@ -935,6 +1011,14 @@ cross_tab <- function(freqdata, options, var1, var2, bylbl = NULL) {
   spn2 <- span(1, ncol(ret), label = lbl, level = 2)
   spn1 <- span(3, ncol(ret), label = lbl2, level = 1)
   attr(ret, "spans") <- list(spn1, spn2)
+
+  # Add footnote for missing values
+  if (!has_option(options, "missing")) {
+    fa <- attr(freqdata, "footnotes")
+    if (!is.null(fa)) {
+      attr(ret, "footnotes") <- fa
+    }
+  }
 
   return(ret)
 }
@@ -1130,20 +1214,27 @@ get_nlevels <- function(data, var1, var2 = NULL, byvars = NULL,
 
   ret <- NULL
   vars <- c(var1)
+  l1miss <- NULL
+  l2miss <- NULL
 
-  if (missing)
+  if (missing) {
     l1vals <- data[[var1]]
-  else
+    l1miss <- sum(any(is.na(data[[var1]])))
+  } else {
+
     l1vals <- data[[var1]][!is.na(data[[var1]])]
+
+  }
 
   lvls <- c(length(unique(l1vals)))
   lbl <- ""
 
 
   if (!is.null(var2)) {
-    if (missing)
+    if (missing) {
       l2vals <- data[[var2]]
-    else
+      l2miss <- sum(any(is.na(data[[var2]])))
+    } else
       l2vals <- data[[var2]][!is.na(data[[var2]])]
 
   }
@@ -1153,15 +1244,44 @@ get_nlevels <- function(data, var1, var2 = NULL, byvars = NULL,
 
     if (!is.null(var2)) {
 
-      ret <- data.frame(VAR1 = lvls, VAR2 =  length(unique(l2vals)),
-                        stringsAsFactors = FALSE)
+      if (missing) {
 
-      labels(ret) <- list(VAR1 = var1, VAR2 = var2)
+        l2cnt <-  length(unique(l2vals))
+
+        ret <- data.frame(VAR1 = lvls, VAR1.MISS = l1miss,
+                          VAR1.NONMISS = lvls - l1miss,
+                          VAR2 =  l2cnt, VAR2.MISS = l2miss,
+                          VAR2.NONMISS = l2cnt - l2miss,
+                          stringsAsFactors = FALSE)
+
+        labels(ret) <- list(VAR1 = var1, VAR2 = var2,
+                            VAR1.MISS = var1 %p% "Missing Levels",
+                            VAR1.NONMISS = var1 %p% "Nonmissing Levels",
+                            VAR2.MISS = var2 %p% "Missing Levels",
+                            VAR2.NONMISS = var2 %p% "Nonmissing Levels"
+                            )
+
+
+      } else {
+        ret <- data.frame(VAR1 = lvls, VAR2 =  length(unique(l2vals)),
+                          stringsAsFactors = FALSE)
+
+        labels(ret) <- list(VAR1 = var1, VAR2 = var2)
+      }
 
     } else {
 
-      ret <- data.frame(VAR = lvls, stringsAsFactors = FALSE)
-      labels(ret) <- list(VAR = var1)
+      if (missing) {
+
+        ret <- data.frame(VAR = lvls, MISS = l1miss, NONMISS = lvls - l1miss,
+                          stringsAsFactors = FALSE)
+        labels(ret) <- list(VAR = var1, MISS = "Missing Levels",
+                            NONMISS = "Nonmissing Levels")
+
+      } else {
+        ret <- data.frame(VAR = lvls, stringsAsFactors = FALSE)
+        labels(ret) <- list(VAR = var1)
+      }
     }
 
     bv <- list()
@@ -1189,9 +1309,33 @@ get_nlevels <- function(data, var1, var2 = NULL, byvars = NULL,
       lvls[2] <- length(unique(l2vals))
     }
 
-    ret <- data.frame(stub = vars, levels = lvls, stringsAsFactors = FALSE)
+    if (!missing) {
 
-    labels(ret) <- list(stub = "Variable", levels = "Levels")
+
+      ret <- data.frame(stub = vars, levels = lvls, stringsAsFactors = FALSE)
+
+      labels(ret) <- list(stub = "Variable", levels = "Levels")
+    } else {
+
+      if (!is.null(var2)) {
+       mcnt <- c(l1miss, l2miss)
+       nmcnt <- c(lvls[1] - l1miss, lvls[2] - l2miss)
+
+      } else {
+        mcnt <- l1miss
+        nmcnt <- lvls[1] - l1miss
+
+      }
+
+      ret <- data.frame(stub = vars, levels = lvls,
+                        MISS = mcnt, NONMISS = nmcnt,
+                        stringsAsFactors = FALSE)
+
+      labels(ret) <- list(stub = "Variable", levels = "Levels",
+                          MISS = "Missing Levels",
+                          NONMISS = "Nonmissing Levels")
+
+    }
 
     lbl <- gsub(",", "", byvars, fixed = TRUE)
   }
@@ -1408,7 +1552,8 @@ gen_report_freq <- function(data,
         # Get nlevels if requested
         if (has_option(options, "nlevels")) {
 
-          nlevels <- get_nlevels(dt, tb, byvars = bylbls[j])
+          nlevels <- get_nlevels(dt, tb, byvars = bylbls[j],
+                                 missing = has_option(options, "missing"))
         }
 
       } else if (length(splt) == 2) {
@@ -1449,7 +1594,8 @@ gen_report_freq <- function(data,
         # Get nlevels if requested
         if (has_option(options, "nlevels")) {
 
-          nlevels <- get_nlevels(dt, splt[1], splt[2], byvars = bylbls[j])
+          nlevels <- get_nlevels(dt, splt[1], splt[2], byvars = bylbls[j],
+                                 missing = has_option(options, "missing"))
         }
 
       } else {
@@ -1628,7 +1774,15 @@ gen_output_freq <- function(data,
 
           if (has_option(options, "nlevels")) {
 
-            tmpnlevels <- get_nlevels(dt, tb, byvars = byvals[[j]], out = TRUE)
+            if (length(byvals) >= j) {
+              tmpnlevels <- get_nlevels(dt, tb, byvars = byvals[[j]], out = TRUE,
+                                      missing = has_option(options, "missing"))
+            } else {
+              tmpnlevels <- get_nlevels(dt, tb, byvars = NULL, out = TRUE,
+                                        missing = has_option(options, "missing"))
+
+            }
+
           }
 
         } else if (length(splt) == 2) {
@@ -1662,8 +1816,16 @@ gen_output_freq <- function(data,
 
           if (has_option(options, "nlevels")) {
 
-            tmpnlevels <- get_nlevels(dt, splt[1], splt[2],
-                                      byvars = byvals[[j]], out = TRUE)
+            if (length(byvals) >= j) {
+              tmpnlevels <- get_nlevels(dt, splt[1], splt[2],
+                                        byvars = byvals[[j]], out = TRUE,
+                                        missing = has_option(options, "missing"))
+            } else {
+              tmpnlevels <- get_nlevels(dt, splt[1], splt[2],
+                                        byvars = NULL, out = TRUE,
+                                        missing = has_option(options, "missing"))
+
+            }
           }
 
 

@@ -32,7 +32,8 @@ output table.}
 Table options are passed to the parameter as a vector of quoted strings. You may
 also use the \code{v()} function to pass unquoted strings.
 The following options are available on \code{proc_freq}:
-"crosstab", "list", "nocol", "nocum", "nofreq", "nopercent", "noprint",
+"crosstab", "list", "missing", "missprint", "nlevels", "nocol",
+"nocum", "nofreq", "nopercent", "noprint",
 "nonobs", "norow", "nosparse", "notable", and "outcum". See
 the \strong{Options} section for a description of these options. To get
 output from the function, you must pass either the "out" or "report" keywords
@@ -148,6 +149,16 @@ If you want a crosstab style, pass the "crosstab" option along with the
 }
 \item{\strong{list}: Two-way interactive tables are a crosstab style
 by default.  If you want a list style two-way table, pass the "list" option.
+}
+\item{\strong{missing}: Normally, missing values are not counted and not
+shown on frequency tables.  The "missing" option allows you to treat
+missing (NA) values as normal values, so that they are counted and
+shown on the frequency table.
+}
+\item{\strong{nlevels}: The "nlevels" option will display the number of unique
+values for each variable in the frequency table. These levels are generated
+as a separate table that appears on the report, and can also be output using
+the "out" option.
 }
 \item{\strong{nocol}: Two-way cross tabulation tables include column percents
 by default.  To turn them off, pass the "nocol" option.
