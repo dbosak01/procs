@@ -29,12 +29,14 @@ return list of tables. See "Example 3" for an illustration on how to name an
 output table.}
 
 \item{options}{The options desired for the function.
-Table options are passed to the parameter as a vector of quoted strings. You may
+Options are passed to the parameter as a vector of quoted strings. You may
 also use the \code{v()} function to pass unquoted strings.
-The following options are available on \code{proc_freq}:
-"crosstab", "list", "missing", "missprint", "nlevels", "nocol",
+The following options are available:
+"chisq", "crosstab", "fisher", "list", "long", "missing",
+"nlevels", "nocol",
 "nocum", "nofreq", "nopercent", "noprint",
-"nonobs", "norow", "nosparse", "notable", and "outcum". See
+"nonobs", "norow", "nosparse", "notable", "out", "outcum", "report",
+"stacked", and "wide". See
 the \strong{Options} section for a description of these options. To get
 output from the function, you must pass either the "out" or "report" keywords
 to the \code{options} parameter.}
@@ -129,9 +131,13 @@ instead of counting rows.
 
 \section{By Groups}{
 
-
-"crosstab", "list",   "nocol", "nocum", "nofreq", "nopercent", "noprint",
-"norow", "nosparse", and "outcum".
+You may request that frequencies be separated into by groups using the
+\code{by} parameter.  The parameter accepts one or more variable names
+from the input dataset. When this parameter is assigned, the data
+will be subset by the "by" variable(s) before frequency counts are
+calculated.  On the interactive report, the by groups will appear in
+separate tables.  On the output datasets, the by groups will be identified
+by additional columns.
 }
 
 \section{Options}{
@@ -143,17 +149,27 @@ statistic like this: \code{options = v(out, chisq)}.
 
 Below are all the available options and a description of each:
 \itemize{
+\item{\strong{chisq}: Requests that the Chi-square statistics be produced.
+This option is only valid on two-way tables.
+}
 \item{\strong{crosstab}: Two-way output tables are a list style by default.
 If you want a crosstab style, pass the "crosstab" option along with the
 "out" option.
 }
+\item{\strong{fisher}: Requests that the Fisher's exact statistics be produced.
+This option is only valid on two-way tables.
+}
 \item{\strong{list}: Two-way interactive tables are a crosstab style
 by default.  If you want a list style two-way table, pass the "list" option.
+}
+\item{\strong{long}: A shaping option that will transpose the output datasets
+so that statistics are in rows and levels are in columns.
 }
 \item{\strong{missing}: Normally, missing values are not counted and not
 shown on frequency tables.  The "missing" option allows you to treat
 missing (NA) values as normal values, so that they are counted and
-shown on the frequency table.
+shown on the frequency table.  Missing levels will appear on the
+table as a single dot (".").
 }
 \item{\strong{nlevels}: The "nlevels" option will display the number of unique
 values for each variable in the frequency table. These levels are generated
@@ -191,12 +207,26 @@ frequency counts.  Zero-count categories will be included by default.  If the
 \item{\strong{notable}: Whether to include the frequency table in the output
 dataset list. Normally, the frequency table is included.  You may want to
 exclude the frequency table in some cases, for instance, if you only
-want the Chi-Square statistic.  This option allows you to exclude the frequency
-table.
+want the Chi-Square statistic.
+}
+\item{\strong{out}: Requests output datasets.  A dataset will be created
+for each table requested.  If multiple tables are requested, results
+will be returned in a list.  Any tables produced by additional options
+will also be returned.
 }
 \item{\strong{outcum}: Whether to include the cumulative frequency and percent
 on output frequency tables.  By default, these columns are not included.
 The "outcum" option will include them.
+}
+\item{\strong{report}: Requests that the datasets used for the interactive
+report be returned by the function.  If there are multiple datasets,
+they will be returned in a list.
+}
+\item{\strong{stacked}: Requests that output datasets be returned in "stacked"
+form, such that both statistics and levels are in rows.
+}
+\item{\strong{wide}: Requests that output datasets be returned in "wide" form,
+such that statistics are across the top in columns, and levels are in rows.
 }
 }
 }

@@ -51,7 +51,8 @@
 for selected variables on the input dataset.  The variables are identified
 on the var parameter.  The statistics to perform are identified
 on the stats parameter.  By default, results are displayed in
-the viewer interactively, and returned as a dataset or a list of datasets." />
+the viewer interactively.  To return results from the function, pass the
+&quot;out&quot; or &quot;report&quot; keywords on the options parameter." />
 <meta property="og:image" content="https://procs.r-sassy.org/logo.png" />
 
 
@@ -161,18 +162,18 @@ the viewer interactively, and returned as a dataset or a list of datasets." />
 for selected variables on the input dataset.  The variables are identified
 on the <code>var</code> parameter.  The statistics to perform are identified
 on the <code>stats</code> parameter.  By default, results are displayed in
-the viewer interactively, and returned as a dataset or a list of datasets.</p>
+the viewer interactively.  To return results from the function, pass the
+"out" or "report" keywords on the <code>options</code> parameter.</p>
     </div>
 
     <pre class="usage"><span><span class='fu'>proc_means</span><span class='op'>(</span></span>
 <span>  <span class='va'>data</span>,</span>
-<span>  by <span class='op'>=</span> <span class='cn'>NULL</span>,</span>
-<span>  class <span class='op'>=</span> <span class='cn'>NULL</span>,</span>
 <span>  var <span class='op'>=</span> <span class='cn'>NULL</span>,</span>
 <span>  stats <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"n"</span>, <span class='st'>"mean"</span>, <span class='st'>"std"</span>, <span class='st'>"min"</span>, <span class='st'>"max"</span><span class='op'>)</span>,</span>
-<span>  weight <span class='op'>=</span> <span class='cn'>NULL</span>,</span>
-<span>  titles <span class='op'>=</span> <span class='cn'>NULL</span>,</span>
-<span>  options <span class='op'>=</span> <span class='cn'>NULL</span></span>
+<span>  options <span class='op'>=</span> <span class='cn'>NULL</span>,</span>
+<span>  by <span class='op'>=</span> <span class='cn'>NULL</span>,</span>
+<span>  class <span class='op'>=</span> <span class='cn'>NULL</span>,</span>
+<span>  titles <span class='op'>=</span> <span class='cn'>NULL</span></span>
 <span><span class='op'>)</span></span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
@@ -180,31 +181,15 @@ the viewer interactively, and returned as a dataset or a list of datasets.</p>
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
       <th>data</th>
-      <td><p>The input data frame for which calculate summary statistics.</p></td>
-    </tr>
-    <tr>
-      <th>by</th>
-      <td><p>An optional by group. You may
-pass unquoted variable names to this parameter using the <code><a href='https://rdrr.io/pkg/common/man/v.html'>v</a></code>
-function.</p></td>
-    </tr>
-    <tr>
-      <th>class</th>
-      <td><p>The <code>class</code> parameter is similar to the <code>by</code>
-parameter, but the output is different.  By groups will create completely
-separate tables, while class groups will be continued in the same table.
-When a <code>by</code> and a <code>class</code> are both specified, the <code>class</code>
-will be nested in the <code>by</code>.</p></td>
+      <td><p>The input data frame for which to calculate summary statistics.</p></td>
     </tr>
     <tr>
       <th>var</th>
-      <td><p>The variable(s) to calculate summary statistics for. You may
-pass unquoted variable names to this parameter using the <code><a href='https://rdrr.io/pkg/common/man/v.html'>v</a></code>
-function.</p></td>
+      <td><p>The variable(s) to calculate summary statistics for.</p></td>
     </tr>
     <tr>
       <th>stats</th>
-      <td><p>A quoted vector of summary statistics keywords.  Valid
+      <td><p>A vector of summary statistics keywords.  Valid
 keywords are: "css", "clm", "cv", "n", "lclm", "mean", "median", "mode",
 "min", "max",
 "nmiss", "nobs", "range", "std", "stderr", "sum", "uclm", "var",
@@ -216,16 +201,27 @@ function. See the <a href='ProcMeansOptions.html'>ProcMeansOptions</a> page for 
 the available options.</p></td>
     </tr>
     <tr>
-      <th>weight</th>
-      <td><p>An optional weight parameter.</p></td>
+      <th>options</th>
+      <td><p>A vector of option keywords. Valid values are:
+"long", "out", "report", "stacked", and "wide".</p></td>
+    </tr>
+    <tr>
+      <th>by</th>
+      <td><p>An optional by group. If you specify an by group, the input
+data will be subset on the by variable(s) prior to performing any
+statistics.</p></td>
+    </tr>
+    <tr>
+      <th>class</th>
+      <td><p>The <code>class</code> parameter is similar to the <code>by</code>
+parameter, but the output is different.  By groups will create completely
+separate tables, while class groups will be continued in the same table.
+When a <code>by</code> and a <code>class</code> are both specified, the <code>class</code>
+will be nested in the <code>by</code>.</p></td>
     </tr>
     <tr>
       <th>titles</th>
       <td><p>A vector of one or more titles to use for the report output.</p></td>
-    </tr>
-    <tr>
-      <th>options</th>
-      <td><p>A vector of option keywords.</p></td>
     </tr>
     </table>
 
@@ -237,7 +233,7 @@ the available options.</p></td>
     <p>Some details about the sample function.</p>
 <p>All statistics remove missing values by default.  Should there be an
 option to include them?</p>
-    <h2 class="hasAnchor" id="options"><a class="anchor" href="#options"></a>Options</h2>
+    <h2 class="hasAnchor" id="statistics"><a class="anchor" href="#statistics"></a>Statistics</h2>
 
     
 
@@ -246,11 +242,29 @@ option to include them?</p>
 <li><p><strong>CV</strong>: Coefficient of Variation.</p></li>
 </ul>
 
-    <h2 class="hasAnchor" id="using-weights"><a class="anchor" href="#using-weights"></a>Using Weights</h2>
+    <h2 class="hasAnchor" id="options"><a class="anchor" href="#options"></a>Options</h2>
 
     
 
-<p>Need a section explaining how to use weights.</p>
+<ul>
+<li><p><strong>long</strong>: A shaping option that will transpose the output datasets
+so that statistics are in rows and levels are in columns.</p></li>
+<li><p><strong>noprint</strong>: Whether to print the interactive report to the
+viewer.  By default, the report is printed to the viewer. The "noprint"
+option will inhibit printing.</p></li>
+<li><p><strong>out</strong>: Requests output datasets.  A dataset will be created
+for each table requested.  If multiple tables are requested, results
+will be returned in a list.  Any tables produced by additional options
+will also be returned.</p></li>
+<li><p><strong>report</strong>: Requests that the datasets used for the interactive
+report be returned by the function.  If there are multiple datasets,
+they will be returned in a list.</p></li>
+<li><p><strong>stacked</strong>: Requests that output datasets be returned in "stacked"
+form, such that both statistics and levels are in rows.</p></li>
+<li><p><strong>wide</strong>: Requests that output datasets be returned in "wide" form,
+such that statistics are across the top in columns, and levels are in rows.</p></li>
+</ul>
+
     <h2 class="hasAnchor" id="data-constraints"><a class="anchor" href="#data-constraints"></a>Data Constraints</h2>
 
     

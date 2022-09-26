@@ -9,7 +9,8 @@
 #' for selected variables on the input dataset.  The variables are identified
 #' on the \code{var} parameter.  The statistics to perform are identified
 #' on the \code{stats} parameter.  By default, results are displayed in
-#' the viewer interactively, and returned as a dataset or a list of datasets.
+#' the viewer interactively.  To return results from the function, pass the
+#' "out" or "report" keywords on the \code{options} parameter.
 #' @details
 #' Some details about the sample function.
 #'
@@ -17,7 +18,7 @@
 #' All statistics remove missing values by default.  Should there be an
 #' option to include them?
 #'
-#' @section Options:
+#' @section Statistics:
 #' \itemize{
 #'   \item{\strong{CSS}: Corrected Sum of Squares.
 #'
@@ -27,27 +28,42 @@
 #'   }
 #' }
 #'
-#' @section Using Weights:
-#' Need a section explaining how to use weights.
+#' @section Options:
+#' \itemize{
+#' \item{\strong{long}: A shaping option that will transpose the output datasets
+#' so that statistics are in rows and levels are in columns.
+#' }
+#' \item{\strong{noprint}: Whether to print the interactive report to the
+#' viewer.  By default, the report is printed to the viewer. The "noprint"
+#' option will inhibit printing.
+#' }
+#' \item{\strong{out}: Requests output datasets.  A dataset will be created
+#' for each table requested.  If multiple tables are requested, results
+#' will be returned in a list.  Any tables produced by additional options
+#' will also be returned.
+#' }
+#' \item{\strong{report}: Requests that the datasets used for the interactive
+#' report be returned by the function.  If there are multiple datasets,
+#' they will be returned in a list.
+#' }
+#' \item{\strong{stacked}: Requests that output datasets be returned in "stacked"
+#' form, such that both statistics and levels are in rows.
+#' }
+#' \item{\strong{wide}: Requests that output datasets be returned in "wide" form,
+#' such that statistics are across the top in columns, and levels are in rows.
+#' }
+#' }
+#'
+#'
 #'
 #' @section Data Constraints:
 #' Explain limits of data for each stat option.  Number of non-missing
 #' values, etc.
 #'
 #'
-#' @param data The input data frame for which calculate summary statistics.
-#' @param by An optional by group. You may
-#' pass unquoted variable names to this parameter using the \code{\link{v}}
-#' function.
-#' @param class The \code{class} parameter is similar to the \code{by}
-#' parameter, but the output is different.  By groups will create completely
-#' separate tables, while class groups will be continued in the same table.
-#' When a \code{by} and a \code{class} are both specified, the \code{class}
-#' will be nested in the \code{by}.
-#' @param var The variable(s) to calculate summary statistics for. You may
-#' pass unquoted variable names to this parameter using the \code{\link{v}}
-#' function.
-#' @param stats A quoted vector of summary statistics keywords.  Valid
+#' @param data The input data frame for which to calculate summary statistics.
+#' @param var The variable(s) to calculate summary statistics for.
+#' @param stats A vector of summary statistics keywords.  Valid
 #' keywords are: "css", "clm", "cv", "n", "lclm", "mean", "median", "mode",
 #' "min", "max",
 #' "nmiss", "nobs", "range", "std", "stderr", "sum", "uclm", "var",
@@ -57,21 +73,30 @@
 #' pass unquoted variable names to this parameter using the \code{\link{v}}
 #' function. See the \link{ProcMeansOptions} page for details on
 #' the available options.
-#' @param weight An optional weight parameter.
+#' @param options A vector of option keywords. Valid values are:
+#' "long", "out", "report", "stacked", and "wide".
+#' @param by An optional by group. If you specify an by group, the input
+#' data will be subset on the by variable(s) prior to performing any
+#' statistics.
+#' @param class The \code{class} parameter is similar to the \code{by}
+#' parameter, but the output is different.  By groups will create completely
+#' separate tables, while class groups will be continued in the same table.
+#' When a \code{by} and a \code{class} are both specified, the \code{class}
+#' will be nested in the \code{by}.
+# @param weight An optional weight parameter.
 #' @param titles A vector of one or more titles to use for the report output.
-#' @param options A vector of option keywords.
 #' @return The requested summary statistics.
 #' @import fmtr
 #' @import tibble
 #' @export
 proc_means <- function(data,
-                       by = NULL,
-                       class = NULL,
                        var = NULL,
                        stats = c("n", "mean", "std", "min", "max"),
-                       weight = NULL,
-                       titles = NULL,
-                       options = NULL
+                       options = NULL,
+                       by = NULL,
+                       class = NULL,
+                   #    weight = NULL,
+                       titles = NULL
                        ) {
 
   # SAS seems to always ignore these
