@@ -162,10 +162,10 @@ in a manner similar to SAS® PROC FREQ.</p>
 <span><span class="co"># Produce frequency statistics</span></span>
 <span><span class="va">res</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/proc_freq.html">proc_freq</a></span><span class="op">(</span><span class="va">dt</span>, tables <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/common/man/v.html">v</a></span><span class="op">(</span><span class="va">Hair</span>, <span class="va">Eye</span>, <span class="va">Hair</span> <span class="op">*</span> <span class="va">Eye</span><span class="op">)</span>,</span>
 <span>                 weight <span class="op">=</span> <span class="va">Freq</span>,</span>
-<span>                 options <span class="op">=</span> <span class="fu"><a href="../reference/opts.html">opts</a></span><span class="op">(</span>chisq <span class="op">=</span> <span class="cn">TRUE</span>, </span>
+<span>                 options <span class="op">=</span> <span class="fu">opts</span><span class="op">(</span>chisq <span class="op">=</span> <span class="cn">TRUE</span>, </span>
 <span>                                cumsum <span class="op">=</span> <span class="cn">FALSE</span>, cumpct <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span>,</span>
 <span>                 titles <span class="op">=</span> <span class="st">"Hair and Eye Frequency Statistics"</span>,</span>
-<span>                 out <span class="op">=</span> <span class="fu"><a href="../reference/out.html">out</a></span><span class="op">(</span>report <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<span>                 out <span class="op">=</span> <span class="fu">out</span><span class="op">(</span>report <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <p>By default, the following report will be shown in the viewer:
 <img src="../man/images/freq1.png"></p>
 <p>The function call requested that all the report datasets be output in
@@ -228,7 +228,7 @@ similar to the SAS® PROC MEANS procedure.</p>
 <span>                   class <span class="op">=</span> <span class="va">Hair</span>,</span>
 <span>                   by <span class="op">=</span> <span class="va">Sex</span>,</span>
 <span>                   titles <span class="op">=</span> <span class="st">"Hair and Eye Summary Statistics by Sex"</span>,</span>
-<span>                   out1 <span class="op">=</span> <span class="fu"><a href="../reference/out.html">out</a></span><span class="op">(</span>where <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/expression.html">expression</a></span><span class="op">(</span><span class="va">TYPE</span> <span class="op">==</span> <span class="fl">1</span><span class="op">)</span>,</span>
+<span>                   out1 <span class="op">=</span> <span class="fu">out</span><span class="op">(</span>where <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/expression.html">expression</a></span><span class="op">(</span><span class="va">TYPE</span> <span class="op">==</span> <span class="fl">1</span><span class="op">)</span>,</span>
 <span>                              drop <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/common/man/v.html">v</a></span><span class="op">(</span><span class="va">TYPE</span>, <span class="va">FREQ</span>, <span class="va">VAR</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <p>The following is sent to the viewer:</p>
 <p><img src="../man/images/means1.png"></p>
@@ -251,7 +251,7 @@ parameter they represent. This convention is somewhat different from
 SAS®, but makes it easier when you need to manipulate the output
 dataset.</p>
 <p>Also observe that there are some additional parameters on the
-<code><a href="../reference/out.html">out()</a></code> request that allow you to do shaping of the output
+<code>out()</code> request that allow you to do shaping of the output
 dataset. These same shaping parameters are available on
 <code><a href="../reference/proc_freq.html">proc_freq()</a></code> as well.</p>
 </div>
