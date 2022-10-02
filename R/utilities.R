@@ -27,7 +27,8 @@ output_report <- function(lst,
     flnm <- file_name
   }
 
-  rpt <- create_report(font = 'Arial', orientation = 'portrait', missing = "")
+  rpt <- create_report(font = 'Arial', orientation = 'portrait', missing = "",
+                       font_size = 8)
   rpt <- set_margins(rpt, top = margins, bottom = margins,
                      left = margins, right = margins)
 
@@ -41,6 +42,7 @@ output_report <- function(lst,
 
     } else if (all(class(style) %in% "character")) {
 
+
       rpt <- add_style(rpt, theme = style)
 
     } else {
@@ -50,7 +52,11 @@ output_report <- function(lst,
 
   } else {
 
-    rpt <- add_style(rpt, theme = "SASDefault")
+    thm <- get_theme("SASDefault")
+    thm$font_size <- 8
+    thm$title_font_size <- 10
+
+    rpt <- add_style(rpt, style = thm)
 
   }
 

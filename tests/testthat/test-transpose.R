@@ -563,3 +563,65 @@ test_that("transpose24: Transpose with single by var works", {
 
 
 })
+
+
+test_that("transpose25: transpose by retains data type.", {
+
+
+  s2 <- score
+  s2$Section <- as.integer(s2$Section)
+
+  res <- proc_transpose(s2, by = Section)
+
+
+  res
+
+  expect_equal(nrow(res), 6)
+  expect_equal(ncol(res), 6)
+  expect_equal(typeof(res$Section), "integer")
+
+
+
+  s2$Section <- as.double(s2$Section)
+
+  res <- proc_transpose(s2, by = Section)
+
+
+  res
+
+  expect_equal(nrow(res), 6)
+  expect_equal(ncol(res), 6)
+  expect_equal(typeof(res$Section), "double")
+
+
+
+  s2$Section <- ifelse(s2$Section == 1, TRUE, FALSE)
+
+  res <- proc_transpose(s2, by = Section)
+
+
+  res
+
+  expect_equal(nrow(res), 6)
+  expect_equal(ncol(res), 6)
+  expect_equal(typeof(res$Section), "logical")
+
+
+
+  s2$Section <- ifelse(s2$Section == TRUE, as.Date("2020-01-01"), as.Date("2021-01-01"))
+  s2$Section <- as.Date(s2$Section, origin = "1970-01-01")
+
+  res <- proc_transpose(s2, by = Section)
+
+
+  res
+
+  expect_equal(nrow(res), 6)
+  expect_equal(ncol(res), 6)
+  expect_equal(typeof(res$Section), "double")
+  expect_equal(class(res$Section), "Date")
+
+
+
+})
+

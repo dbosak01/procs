@@ -297,7 +297,22 @@ proc_transpose <- function(data,
        bygrps <- list()
        for (grp in seq_len(length(by))) {
 
-        bygrps[[by[[grp]]]] <- bylbls[[j]][[grp]]
+        if (all(class(data[[by[grp]]]) == "factor")) {
+          bygrps[[by[[grp]]]] <- factor(bylbls[[j]][[grp]],
+                                        levels = levels(data[[by[grp]]]))
+        } else {
+          if (typeof(data[[by[grp]]]) == "integer")
+            bygrps[[by[[grp]]]] <- as.integer(bylbls[[j]][[grp]])
+          else if (typeof(data[[by[grp]]]) == "double") {
+            if (all(class(data[[by[grp]]]) == "Date"))
+              bygrps[[by[[grp]]]] <- as.Date(bylbls[[j]][[grp]])
+            else
+              bygrps[[by[[grp]]]] <- as.double(bylbls[[j]][[grp]])
+          } else if (typeof(data[[by[grp]]]) == "logical")
+            bygrps[[by[[grp]]]] <- as.logical(bylbls[[j]][[grp]])
+          else
+            bygrps[[by[[grp]]]] <- bylbls[[j]][[grp]]
+        }
        }
 
        bygrps <- as.data.frame(bygrps, stringsAsFactors = FALSE)
