@@ -113,13 +113,224 @@
 
     
     
-<p>Write up on freq function…</p>
+<p>The <code>proc_freq</code> function simulates a SAS® PROC FREQ
+procedure. Below is a short tutorial on the function. Notice that the
+function is both an interactive function and can return datasets. By
+default, the function is interactive only.</p>
+<div id="create-sample-data" class="section level2">
+<h2 class="hasAnchor">
+<a href="#create-sample-data" class="anchor"></a>Create Sample Data</h2>
+<p>The first step in our tutorial is to create some sample data:</p>
+<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Create sample data</span></span>
+<span><span class="va">dat</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/utils/read.table.html">read.table</a></span><span class="op">(</span>header <span class="op">=</span> <span class="cn">TRUE</span>, </span>
+<span>                  text <span class="op">=</span> <span class="st">'x y z</span></span>
+<span><span class="st">                          6 A 60</span></span>
+<span><span class="st">                          6 A 70</span></span>
+<span><span class="st">                          2 A 100</span></span>
+<span><span class="st">                          2 B 10</span></span>
+<span><span class="st">                          3 B 67</span></span>
+<span><span class="st">                          2 C 81</span></span>
+<span><span class="st">                          3 C 63</span></span>
+<span><span class="st">                          5 C 55'</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># View sample data</span></span>
+<span><span class="va">dat</span></span>
+<span><span class="co">#   x y   z</span></span>
+<span><span class="co"># 1 6 A  60</span></span>
+<span><span class="co"># 2 6 A  70</span></span>
+<span><span class="co"># 3 2 A 100</span></span>
+<span><span class="co"># 4 2 B  10</span></span>
+<span><span class="co"># 5 3 B  67</span></span>
+<span><span class="co"># 6 2 C  81</span></span>
+<span><span class="co"># 7 3 C  63</span></span>
+<span><span class="co"># 8 5 C  55</span></span></code></pre></div>
+</div>
+<div id="get-frequencies" class="section level2">
+<h2 class="hasAnchor">
+<a href="#get-frequencies" class="anchor"></a>Get Frequencies</h2>
+<p>Now that we have some data, lets send that data to the
+<code>proc_freq</code> function to see the frequency distribution. The
+<code><a href="https://rdrr.io/r/base/options.html">options()</a></code> statement below turns off printing of all
+<strong>procs</strong> functions. This statement is necessary so that
+the sample code below can pass CRAN checks. When running sample code
+yourself, the options statement can be omitted.</p>
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Turn off printing for CRAN</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/options.html">options</a></span><span class="op">(</span><span class="st">"procs.print"</span> <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Get frequencies</span></span>
+<span><span class="fu"><a href="../reference/proc_freq.html">proc_freq</a></span><span class="op">(</span><span class="va">dat</span>, tables <span class="op">=</span> <span class="va">y</span><span class="op">)</span></span></code></pre></div>
+<p><img src="../man/images/freqtut1.png"></p>
+<p>The above code illustrates a one-way frequency on the “y” variable.
+The result shows that the “A” and “C” categories appears three times,
+and the “B” category appears twice. The “N” column shows that there are
+eight items in the population. This population is used to get the
+percent shown for each frequency count.</p>
+</div>
+<div id="control-columns" class="section level2">
+<h2 class="hasAnchor">
+<a href="#control-columns" class="anchor"></a>Control Columns</h2>
+<p>The <code>options</code> parameter can control many aspects of the
+<code>proc_freq</code> function. For example, if you did not want the
+cumulative frequency and percent, you could turn off these columns with
+the option “nocum”.</p>
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Turn off cumulative columns</span></span>
+<span><span class="fu"><a href="../reference/proc_freq.html">proc_freq</a></span><span class="op">(</span><span class="va">dat</span>, tables <span class="op">=</span> <span class="va">y</span>, options <span class="op">=</span> <span class="va">nocum</span><span class="op">)</span></span></code></pre></div>
+<p><img src="../man/images/freqtut2.png"></p>
+<p>Let’s say you wanted only the frequency counts, and not the other
+columns. This result can be achived with the following options. Use the
+<code><a href="https://rdrr.io/pkg/common/man/v.html">v()</a></code> function when you are passing multiple options:</p>
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/proc_freq.html">proc_freq</a></span><span class="op">(</span><span class="va">dat</span>, tables <span class="op">=</span> <span class="va">y</span>, options <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/common/man/v.html">v</a></span><span class="op">(</span><span class="va">nocum</span>, <span class="va">nonobs</span>, <span class="va">nopercent</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<p><img src="../man/images/freqtut3.png"></p>
+</div>
+<div id="cross-tabulation" class="section level2">
+<h2 class="hasAnchor">
+<a href="#cross-tabulation" class="anchor"></a>Cross Tabulation</h2>
+<p>If you want a cross-tabulation table, you can do that by crossing two
+variables on the <code>tables</code> parameter:</p>
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/proc_freq.html">proc_freq</a></span><span class="op">(</span><span class="va">dat</span>, tables <span class="op">=</span> <span class="va">y</span> <span class="op">*</span> <span class="va">x</span><span class="op">)</span></span></code></pre></div>
+<p><img src="../man/images/freqtut4.png"></p>
+</div>
+<div id="cross-tabulation-options" class="section level2">
+<h2 class="hasAnchor">
+<a href="#cross-tabulation-options" class="anchor"></a>Cross Tabulation Options</h2>
+<p>If you want the data displayed in a list instead of a
+cross-tabulation table, you can do that with the “list” option. The
+“nosparse” option will turn off zero-count categories, which are
+included by default:</p>
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/proc_freq.html">proc_freq</a></span><span class="op">(</span><span class="va">dat</span>, tables <span class="op">=</span> <span class="va">y</span> <span class="op">*</span> <span class="va">x</span>, options <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/common/man/v.html">v</a></span><span class="op">(</span><span class="va">list</span>, <span class="va">nosparse</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<p><img src="../man/images/freqtut5.png"></p>
+<p>The following options turn off various features of the
+cross-tabulation table:</p>
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/proc_freq.html">proc_freq</a></span><span class="op">(</span><span class="va">dat</span>, tables <span class="op">=</span> <span class="va">y</span> <span class="op">*</span> <span class="va">x</span>, options <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/common/man/v.html">v</a></span><span class="op">(</span><span class="va">norow</span>, <span class="va">nocol</span>, <span class="va">nopercent</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<p><img src="../man/images/freqtut6.png"></p>
+</div>
+<div id="multiple-tables" class="section level2">
+<h2 class="hasAnchor">
+<a href="#multiple-tables" class="anchor"></a>Multiple Tables</h2>
+<p>The <code>tables</code> parameter accepts more than one table
+request. To request multiple tables, pass a quoted or unquoted vector.
+Note that <code>proc_freq</code> does not accept grouping syntax, such
+as that allowed by SAS®. You must specify each cross-tab
+individually:</p>
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/proc_freq.html">proc_freq</a></span><span class="op">(</span><span class="va">dat</span>, tables <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/common/man/v.html">v</a></span><span class="op">(</span><span class="va">y</span> <span class="op">*</span> <span class="va">x</span>, <span class="va">y</span> <span class="op">*</span> <span class="va">z</span><span class="op">)</span>, </span>
+<span>          options <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/common/man/v.html">v</a></span><span class="op">(</span><span class="va">norow</span>, <span class="va">nocol</span>, <span class="va">nopercent</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<p><img src="../man/images/freqtut7.png"></p>
+</div>
+<div id="distinct-values" class="section level2">
+<h2 class="hasAnchor">
+<a href="#distinct-values" class="anchor"></a>Distinct Values</h2>
+<p>The “nlevels” option can be used to count the number of distinct
+values in a categorical variable:</p>
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/proc_freq.html">proc_freq</a></span><span class="op">(</span><span class="va">dat</span>, tables <span class="op">=</span> <span class="va">y</span>, options <span class="op">=</span> <span class="va">nlevels</span><span class="op">)</span></span></code></pre></div>
+<p><img src="../man/images/freqtut8.png"></p>
+</div>
+<div id="weighted-frequencies" class="section level2">
+<h2 class="hasAnchor">
+<a href="#weighted-frequencies" class="anchor"></a>Weighted Frequencies</h2>
+<p>The <code>weight</code> parameter is used to achieve weighted
+frequencies. When a weight is specified, <code>proc_freq</code> will use
+the counts in the indicated variable for all frequency counts.</p>
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/proc_freq.html">proc_freq</a></span><span class="op">(</span><span class="va">dat</span>, tables <span class="op">=</span> <span class="va">y</span>, weight <span class="op">=</span> <span class="va">z</span><span class="op">)</span></span></code></pre></div>
+<p><img src="../man/images/freqtut9.png"></p>
+</div>
+<div id="output-datasets" class="section level2">
+<h2 class="hasAnchor">
+<a href="#output-datasets" class="anchor"></a>Output Datasets</h2>
+<p>You may request datasets from the <code>proc_freq</code> function
+using two options: “out” and “report”. The “out” option requests
+datasets meant for output. These datasets have standardized column
+names, and sometimes have additional columns to help with data
+manipulation. The “report” keyword requests the exact datasets used to
+create the interactive report. For both keywords, if there is more than
+one dataset, they will be returned as a list of datasets. The name of
+the list item will identify the dataset. You may control the names of
+the output tables in the list by using a named table request. Here is an
+example of the “out” option. The “noprint” option turns off the
+interactive report:</p>
+<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Request output data</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>res <span class="ot">&lt;-</span> <span class="fu">proc_freq</span>(dat, <span class="at">tables =</span> <span class="fu">v</span>(x, y, <span class="at">MyCross =</span> y <span class="sc">*</span> x), </span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>                 <span class="at">options =</span> <span class="fu">v</span>(out, noprint))</span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a><span class="co"># View results</span></span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>res</span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a><span class="sc">$</span>x</span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a>  VAR CAT N CNT  PCT</span>
+<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a><span class="dv">1</span>   x   <span class="dv">2</span> <span class="dv">8</span>   <span class="dv">3</span> <span class="fl">37.5</span></span>
+<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a><span class="dv">2</span>   x   <span class="dv">3</span> <span class="dv">8</span>   <span class="dv">2</span> <span class="fl">25.0</span></span>
+<span id="cb11-11"><a href="#cb11-11" aria-hidden="true" tabindex="-1"></a><span class="dv">3</span>   x   <span class="dv">5</span> <span class="dv">8</span>   <span class="dv">1</span> <span class="fl">12.5</span></span>
+<span id="cb11-12"><a href="#cb11-12" aria-hidden="true" tabindex="-1"></a><span class="dv">4</span>   x   <span class="dv">6</span> <span class="dv">8</span>   <span class="dv">2</span> <span class="fl">25.0</span></span>
+<span id="cb11-13"><a href="#cb11-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-14"><a href="#cb11-14" aria-hidden="true" tabindex="-1"></a><span class="sc">$</span>y</span>
+<span id="cb11-15"><a href="#cb11-15" aria-hidden="true" tabindex="-1"></a>  VAR CAT N CNT  PCT</span>
+<span id="cb11-16"><a href="#cb11-16" aria-hidden="true" tabindex="-1"></a><span class="dv">1</span>   y   A <span class="dv">8</span>   <span class="dv">3</span> <span class="fl">37.5</span></span>
+<span id="cb11-17"><a href="#cb11-17" aria-hidden="true" tabindex="-1"></a><span class="dv">2</span>   y   B <span class="dv">8</span>   <span class="dv">2</span> <span class="fl">25.0</span></span>
+<span id="cb11-18"><a href="#cb11-18" aria-hidden="true" tabindex="-1"></a><span class="dv">3</span>   y   C <span class="dv">8</span>   <span class="dv">3</span> <span class="fl">37.5</span></span>
+<span id="cb11-19"><a href="#cb11-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-20"><a href="#cb11-20" aria-hidden="true" tabindex="-1"></a><span class="sc">$</span>MyCross</span>
+<span id="cb11-21"><a href="#cb11-21" aria-hidden="true" tabindex="-1"></a>   VAR1 VAR2 CAT1 CAT2 N CNT  PCT</span>
+<span id="cb11-22"><a href="#cb11-22" aria-hidden="true" tabindex="-1"></a><span class="dv">1</span>     y    x    A    <span class="dv">2</span> <span class="dv">8</span>   <span class="dv">1</span> <span class="fl">12.5</span></span>
+<span id="cb11-23"><a href="#cb11-23" aria-hidden="true" tabindex="-1"></a><span class="dv">2</span>     y    x    A    <span class="dv">3</span> <span class="dv">8</span>   <span class="dv">0</span>  <span class="fl">0.0</span></span>
+<span id="cb11-24"><a href="#cb11-24" aria-hidden="true" tabindex="-1"></a><span class="dv">3</span>     y    x    A    <span class="dv">5</span> <span class="dv">8</span>   <span class="dv">0</span>  <span class="fl">0.0</span></span>
+<span id="cb11-25"><a href="#cb11-25" aria-hidden="true" tabindex="-1"></a><span class="dv">4</span>     y    x    A    <span class="dv">6</span> <span class="dv">8</span>   <span class="dv">2</span> <span class="fl">25.0</span></span>
+<span id="cb11-26"><a href="#cb11-26" aria-hidden="true" tabindex="-1"></a><span class="dv">5</span>     y    x    B    <span class="dv">2</span> <span class="dv">8</span>   <span class="dv">1</span> <span class="fl">12.5</span></span>
+<span id="cb11-27"><a href="#cb11-27" aria-hidden="true" tabindex="-1"></a><span class="dv">6</span>     y    x    B    <span class="dv">3</span> <span class="dv">8</span>   <span class="dv">1</span> <span class="fl">12.5</span></span>
+<span id="cb11-28"><a href="#cb11-28" aria-hidden="true" tabindex="-1"></a><span class="dv">7</span>     y    x    B    <span class="dv">5</span> <span class="dv">8</span>   <span class="dv">0</span>  <span class="fl">0.0</span></span>
+<span id="cb11-29"><a href="#cb11-29" aria-hidden="true" tabindex="-1"></a><span class="dv">8</span>     y    x    B    <span class="dv">6</span> <span class="dv">8</span>   <span class="dv">0</span>  <span class="fl">0.0</span></span>
+<span id="cb11-30"><a href="#cb11-30" aria-hidden="true" tabindex="-1"></a><span class="dv">9</span>     y    x    C    <span class="dv">2</span> <span class="dv">8</span>   <span class="dv">1</span> <span class="fl">12.5</span></span>
+<span id="cb11-31"><a href="#cb11-31" aria-hidden="true" tabindex="-1"></a><span class="dv">10</span>    y    x    C    <span class="dv">3</span> <span class="dv">8</span>   <span class="dv">1</span> <span class="fl">12.5</span></span>
+<span id="cb11-32"><a href="#cb11-32" aria-hidden="true" tabindex="-1"></a><span class="dv">11</span>    y    x    C    <span class="dv">5</span> <span class="dv">8</span>   <span class="dv">1</span> <span class="fl">12.5</span></span>
+<span id="cb11-33"><a href="#cb11-33" aria-hidden="true" tabindex="-1"></a><span class="dv">12</span>    y    x    C    <span class="dv">6</span> <span class="dv">8</span>   <span class="dv">0</span>  <span class="fl">0.0</span></span></code></pre></div>
+</div>
+<div id="statistics-options" class="section level2">
+<h2 class="hasAnchor">
+<a href="#statistics-options" class="anchor"></a>Statistics Options</h2>
+<p>The <code>options</code> parameter also accepts statistics options.
+For two-way tables, you may request either Chi-Square or Fisher’s tests
+of association. Here is an example of the Chi-Square test:</p>
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Request Chi-Square and Output datasets</span></span>
+<span><span class="va">res</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/proc_freq.html">proc_freq</a></span><span class="op">(</span><span class="va">dat</span>, tables <span class="op">=</span> <span class="va">y</span> <span class="op">*</span> <span class="va">x</span>, options <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/common/man/v.html">v</a></span><span class="op">(</span><span class="va">out</span>, <span class="va">chisq</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<p><img src="../man/images/freqtut10.png"></p>
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># View results</span></span>
+<span><span class="va">res</span></span>
+<span><span class="co"># $`y * x`</span></span>
+<span><span class="co">#    VAR1 VAR2 CAT1 CAT2 N CNT  PCT</span></span>
+<span><span class="co"># 1     y    x    A    2 8   1 12.5</span></span>
+<span><span class="co"># 2     y    x    A    3 8   0  0.0</span></span>
+<span><span class="co"># 3     y    x    A    5 8   0  0.0</span></span>
+<span><span class="co"># 4     y    x    A    6 8   2 25.0</span></span>
+<span><span class="co"># 5     y    x    B    2 8   1 12.5</span></span>
+<span><span class="co"># 6     y    x    B    3 8   1 12.5</span></span>
+<span><span class="co"># 7     y    x    B    5 8   0  0.0</span></span>
+<span><span class="co"># 8     y    x    B    6 8   0  0.0</span></span>
+<span><span class="co"># 9     y    x    C    2 8   1 12.5</span></span>
+<span><span class="co"># 10    y    x    C    3 8   1 12.5</span></span>
+<span><span class="co"># 11    y    x    C    5 8   1 12.5</span></span>
+<span><span class="co"># 12    y    x    C    6 8   0  0.0</span></span>
+<span><span class="co"># </span></span>
+<span><span class="co"># $`chisq:y * x`</span></span>
+<span><span class="co">#      CHISQ CHISQ.DF   CHISQ.P</span></span>
+<span><span class="co"># 1 6.444444        6 0.3752853</span></span></code></pre></div>
 <p>Next: <a href="procs-means.html">The Means Function</a></p>
+</div>
   </div>
 
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
 
-      </div>
+        <nav id="toc" data-toggle="toc"><h2 data-toc-skip>Contents</h2>
+    </nav>
+</div>
 
 </div>
 

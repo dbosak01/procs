@@ -19,9 +19,9 @@ SAS® software. The intention of the package is to ease transition to R
 adoption by providing SAS® programmers a familiar conceptual framework and 
 functions that produce nearly identical output. Along the way, the 
 functions in the **procs** package also provide much nicer output 
-than existing R statistical functions.
+than many R statistical functions.
 
-### Key Functions
+## Key Functions
 
 The package includes the following procedure functions:
 
@@ -34,12 +34,20 @@ TRANSPOSE procedure.
 or a report.
 
 
-### How to Use
+## How to Use
 
-#### Frequency Statistics
+### Frequency Statistics
 
 The `proc_freq()` function generates frequency statistics in a manner
-similar to SAS® PROC FREQ.  
+similar to SAS® PROC FREQ. You can request one-way and two-way frequency
+tables using the `tables` parameter.  Frequencies may be weighted using 
+the `weight` parameter.  Simply pass the name of the variable that contains
+the weighted values.  If you want datasets returned from the function,
+pass the "out" or "report" keyword to the `options` parameter.  There are many more
+options to control the output data and display.  Note that the "noprint" option
+has been added to these examples to allow the **procs** package to pass
+CRAN checks.  To see the function output in the viewer, 
+remove this option.
 
 ```{r eval=FALSE, echo=TRUE} 
 library(procs)
@@ -54,33 +62,32 @@ labels(dt) <- list(Hair = "Hair Color",
 # Produce frequency statistics
 res <- proc_freq(dt, tables = v(Hair, Eye, Hair * Eye),
                  weight = Freq,
-                 options = opts(chisq = TRUE, 
-                                cumsum = FALSE, cumpct = FALSE),
-                 titles = "Hair and Eye Frequency Statistics",
-                 out = out(report = TRUE))
+                 options = v(report, chisq, noprint),
+                 titles = "Hair and Eye Frequency Statistics")
 
 ```
-By default, the following report will be shown in the viewer:
+By default, the following report will be shown in the viewer:  
 <img src="../man/images/freq1.png"/>
 
-The function call requested that all the report datasets
-be output in a list.  These datasets can be seen below:
+The function call requested output datasets using the "report" option. If 
+there is more than one output dataset, they will be returned in a list.
+The output dataset list can be seen below:
 ```{r eval=FALSE, echo = TRUE}
 # View output datasets
 res
 # $Hair
-#     CAT   N CNT      PCT
-# 1 Black 592 108 18.24324
-# 2 Blond 592 127 21.45270
-# 3 Brown 592 286 48.31081
-# 4   Red 592  71 11.99324
+#     CAT   N CNT      PCT CUMSUM    CUMPCT
+# 1 Black 592 108 18.24324    108  18.24324
+# 2 Blond 592 127 21.45270    235  39.69595
+# 3 Brown 592 286 48.31081    521  88.00676
+# 4   Red 592  71 11.99324    592 100.00000
 # 
 # $Eye
-#     CAT   N CNT      PCT
-# 1  Blue 592 215 36.31757
-# 2 Brown 592 220 37.16216
-# 3 Green 592  64 10.81081
-# 4 Hazel 592  93 15.70946
+#     CAT   N CNT      PCT CUMSUM    CUMPCT
+# 1  Blue 592 215 36.31757    215  36.31757
+# 2 Brown 592 220 37.16216    435  73.47973
+# 3 Green 592  64 10.81081    499  84.29054
+# 4 Hazel 592  93 15.70946    592 100.00000
 # 
 # $`Hair * Eye`
 #      CAT Statistic       Blue      Brown      Green     Hazel     Total
@@ -111,22 +118,24 @@ res
 
 ```
 
-#### Summary Statistics
+### Summary Statistics
 
 The `proc_means()` function calculates summary statistics, similar to 
-the SAS® PROC MEANS procedure.
+the SAS® PROC MEANS procedure.  The variable or variables to generate 
+statistics for is passed on the `var` parameter.  The `class` parameter
+tells the function to group results by the indicated variable.  The 
+`by` parameter will subset the data according to the distinct by 
+values.  Note that any class groupings are nested in the by.  Like the 
+`proc_freq()` function, you may request output datasets using the "out"
+option.
 
 ```{r eval=FALSE, echo=TRUE} 
-library(procs)
-
-
 # Perform calculations
 res2 <- proc_means(dt, var = Freq, 
                    class = Hair,
                    by = Sex,
-                   titles = "Hair and Eye Summary Statistics by Sex",
-                   out1 = out(where = expression(TYPE == 1),
-                              drop = v(TYPE, FREQ, VAR)))
+                   options = v(out),
+                   titles = "Hair and Eye Summary Statistics by Sex")
 
 ```
 
@@ -134,32 +143,40 @@ The following is sent to the viewer:
 
 <img src="../man/images/means1.png"/>
 
-And here is the output dataset:
+And here is the output dataset.  Observe that the output dataset
+is not identical to the displayed report.  The output dataset has
+been optimized for data manipulation, while the displayed
+report has been optimized for viewing:
 
 ```{r eval=FALSE, echo = TRUE}
 # View the summary statistics
 res2
-#       BY CLASS N  MEAN       STD MIN MAX
-# 1 Female Black 4 13.00 15.599145   2  36
-# 2 Female Blond 4 20.25 29.216149   4  64
-# 3 Female Brown 4 35.75 21.884165  14  66
-# 4 Female   Red 4  9.25  4.500000   7  16
-# 5   Male Black 4 14.00 12.516656   3  32
-# 6   Male Blond 4 11.50 12.503333   3  30
-# 7   Male Brown 4 35.75 18.679311  15  53
-# 8   Male   Red 4  8.50  1.732051   7  10
+#        BY CLASS TYPE FREQ  VAR  N    MEAN       STD MIN MAX
+# 1  Female  <NA>    0   16 Freq 16 19.5625 20.713824   2  66
+# 2  Female Black    1    4 Freq  4 13.0000 15.599145   2  36
+# 3  Female Blond    1    4 Freq  4 20.2500 29.216149   4  64
+# 4  Female Brown    1    4 Freq  4 35.7500 21.884165  14  66
+# 5  Female   Red    1    4 Freq  4  9.2500  4.500000   7  16
+# 6    Male  <NA>    0   16 Freq 16 17.4375 16.008201   3  53
+# 7    Male Black    1    4 Freq  4 14.0000 12.516656   3  32
+# 8    Male Blond    1    4 Freq  4 11.5000 12.503333   3  30
+# 9    Male Brown    1    4 Freq  4 35.7500 18.679311  15  53
+# 10   Male   Red    1    4 Freq  4  8.5000  1.732051   7  10
 ```
+Notice that the output data contains breakouts by class and summaries
+by group.  The summaries by group are identifed by rows where TYPE = 0.
+The breakouts by class are TYPE = 1.  In other words, rows 1 and 6 
+provide summary statistics for the by groups FEMALE and MALE, while the other
+rows provide statistics for each class category.
 
-Note that both `proc_freq()` and `proc_means()` follow the convention of naming
+Also note that both `proc_freq()` 
+and `proc_means()` follow the convention of naming
 columns according to the statistic or parameter they represent.  This convention
-is somewhat different from SAS®, but makes it easier when you need to manipulate
-the output dataset.
+is somewhat different from SAS®, but makes it easier to manipulate
+the output datasets.
 
-Also observe that there are some additional parameters on the `out()` request
-that allow you to do shaping of the output dataset.  These same 
-shaping parameters are available on `proc_freq()` as well.
 
-#### Other Functions
+### Other Functions
 
 While the main purpose of the **procs** package is to replicate SAS® statistical
 procedures, the output from these procedures is often manipulated to
@@ -171,13 +188,14 @@ Continuing from the example above, let's take some additional steps
 to produce a little report:
 
 ```{r eval=FALSE, echo=TRUE} 
-library(procs)
+# Filter and select using subset function
+res3 <- subset(res2, TYPE != 0, c(BY, CLASS, N, MEAN, STD, MIN, MAX))
 
-# Tranpose statistics to rows
-res3 <- proc_transpose(res2, id = CLASS, by = BY, name = Statistic)
+# Transpose statistics 
+res4 <- proc_transpose(res3, id = CLASS, by = BY, name = Statistic)
 
 # View transformed data
-res3
+res4
 #        BY Statistic    Black    Blond    Brown       Red
 # 1  Female         N  4.00000  4.00000  4.00000  4.000000
 # 2  Female      MEAN 13.00000 20.25000 35.75000  9.250000
@@ -191,10 +209,10 @@ res3
 # 10   Male       MAX 32.00000 30.00000 53.00000 10.000000
 
 # Assign factor to BY so we can sort
-res3$BY <- factor(res3$BY, levels = c("Male", "Female"))
+res4$BY <- factor(res4$BY, levels = c("Male", "Female"))
 
 # Sort male to top
-res4 <- proc_sort(res3, by = BY)
+res5 <- proc_sort(res4, by = BY)
 #        BY Statistic    Black    Blond    Brown       Red
 # 6    Male         N  4.00000  4.00000  4.00000  4.000000
 # 7    Male      MEAN 14.00000 11.50000 35.75000  8.500000
@@ -208,39 +226,40 @@ res4 <- proc_sort(res3, by = BY)
 # 5  Female       MAX 36.00000 64.00000 66.00000 16.000000
 
 # Create formatting list
-fmt <- flist(STD = "%.3f", type = "row", lookup = res4$Statistic)
+fmt <- flist(STD = "%.3f", type = "row", lookup = res5$Statistic)
 
 # Create vector lookup
 vf <- c(MEAN = "Mean", STD = "Std", MEDIAN = "Median", 
         MIN = "Min", MAX = "Max")
 
 # Assign formats 
-formats(res4) <- list(Statistic = vf,
+formats(res5) <- list(Statistic = vf,
                       Black = fmt,
                       Blond = fmt,
                       Brown = fmt,
                       Red = fmt)
 
 # Reassign first column name
-names(res4)[1] <- "stub"
+names(res5)[1] <- "stub"
 
 # Assign labels
-labels(res4) <- list(stub = "Sex")
+labels(res5) <- list(stub = "Sex")
 
 # Create list for reporting
-prnt <- list(res$`Hair * Eye`, res$Chisq, res4)
+prnt <- list(res$`Hair * Eye`, res$Chisq, res5)
 
 # Print result
 proc_print(prnt, 
-           titles = "Analysis of Hair and Eyes Dataset")
+           titles = "Analysis of Hair and Eyes Dataset",
+           view = FALSE) # Set view = TRUE to see results
 
 ```
 <img src="../man/images/print1.png"/>
 
 If desired, we could print this report to the file system using 
-the "file_path" and "output_type" parameters on `proc_print()`.
+the `file_path` and `output_type` parameters on `proc_print()`.
 
-### Next Steps
+## Next Steps
 
 For next steps, please review the examples provided in the vignette articles. 
 Those articles include:

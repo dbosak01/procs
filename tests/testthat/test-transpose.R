@@ -517,8 +517,6 @@ test_that("transpose22: transposing inconsistent categories.", {
 
   sp[1, 2] <- "no"
 
-
-
   res <- proc_freq(sp,
                    tables = c("internship"),
                    titles = "My first Frequency Table",
@@ -538,7 +536,7 @@ test_that("transpose22: transposing inconsistent categories.", {
 })
 
 
-test_that("transpose23: tranpose retains original class.", {
+test_that("transpose23: transpose retains original class.", {
 
   library(tibble)
 

@@ -653,7 +653,7 @@ freq_oneway <- function(data, tb, weight, options, out = FALSE, stats = NULL) {
 
 
   # Add spanning headers
-  spn <- span(1, ncol(result), label = lbl, level = 1)
+  spn <- span(1, ncol(result), label = paste("Table of", lbl), level = 1)
   attr(result, "spans") <- list(spn)
 
   # Add footnote for missing values

@@ -12,7 +12,7 @@
 # Introduction to **procs**
 <img src='man/images/procs_new.png' align="left" height="138" style="margin-right:10px"/>
 
-The purpose of the **procs** package is to recreate some SAS® statistical
+The purpose of the **procs** package is to recreate some SAS® 
 procedures in R.  The first version of the package will attempt to recreate
 PROC FREQ and PROC MEANS. 
 Subsequent versions of the package will add more statistical procedures.  
@@ -99,5 +99,5 @@ If you encounter a bug or have a feature request, please submit an issue
 
 The **procs** package is part of the **sassy** meta-package. 
 The **sassy** meta-package includes several packages that help make R
-easier for SAS® programmers.  You can read more about the **sassy** package
+easier.  You can read more about the **sassy** package
 [here](https://sassy.r-sassy.org).
