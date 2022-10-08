@@ -15,8 +15,8 @@ knitr::opts_chunk$set(
 ```
 The `proc_freq` function simulates a SAS® PROC FREQ procedure.  Below is 
 a short tutorial on the function. Notice that the function is both 
-an interactive function and can return datasets.  By default, the function
-is interactive only.
+an interactive function and can return datasets.  Unless you ask
+for output data, the function is interactive only.
 
 ## Create Sample Data
 
@@ -50,7 +50,7 @@ dat
 
 ## Get Frequencies
 
-Now that we have some data, lets send that data to the `proc_freq` function
+Now that we have some data, let's send that data to the `proc_freq` function
 to see the frequency distribution.  The `options()` statement below turns
 off printing of all **procs** functions. This statement is necessary so
 that the sample code below can pass CRAN checks.  When running sample code
@@ -150,7 +150,7 @@ proc_freq(dat, tables = y, options = nlevels)
 
 The `weight` parameter is used to achieve weighted frequencies.  When a 
 weight is specified, `proc_freq` will use the counts in the indicated 
-variable for all frequency counts.
+variable for all frequency calculations.
 ```{r eval=FALSE, echo=TRUE} 
 # Add weight variable
 proc_freq(dat, tables = y, weight = z)
@@ -167,12 +167,14 @@ the exact datasets used to create the interactive report.  For both keywords,
 if there is more than one dataset, they will be returned as a list of datasets.
 The name of the list item will identify the dataset. You may
 control the names of the output tables in the list by using a 
-named table request. Here is an example of the
+named table request. 
+
+Here is an example of the
 "out" option.  The "noprint" option turns off the interactive report:
 ```{r eval=FALSE, echo=TRUE} 
 # Request output data
 res <- proc_freq(dat, tables = v(x, y, MyCross = y * x), 
-                 options = v(out, noprint))
+                 options = out)
 
 # View results
 res
@@ -205,7 +207,7 @@ $MyCross
 12    y    x    C    6 8   0  0.0
 
 ```
-Observe that the way output datasets are requested from `proc_freq` is much
+Notice that the way output datasets are requested from `proc_freq` is much
 simpler than the corresponding mechanism in SAS®.  With `proc_freq`, you just
 pass the "out" option, and all requested tables and statistics will be
 returned in a list. No other output parameters are needed.
@@ -244,7 +246,52 @@ res
 
 ```
 
+## Data Shaping
 
+The `proc_freq` function provides three options for shaping data:
+"wide", "long", and "stacked".  These options control how the output
+data is organized.  The options are best illustrated by an example:
+```{r eval=FALSE, echo=TRUE} 
+# Shape wide
+res1 <- proc_freq(dat, tables = y, 
+                  options = v(out, wide, noprint))
+
+# Wide results
+res1
+#   VAR CAT N CNT  PCT
+# 1   y   A 8   3 37.5
+# 2   y   B 8   2 25.0
+# 3   y   C 8   3 37.5
+
+# Shape long
+res2 <- proc_freq(dat, tables = y, 
+                  options = v(out, long, noprint))
+
+# Long results
+res2
+#   VAR STAT    A  B    C
+# 1   y    N  8.0  8  8.0
+# 2   y  CNT  3.0  2  3.0
+# 3   y  PCT 37.5 25 37.5
+
+# Shape stacked
+res3 <- proc_freq(dat, tables = y, 
+                  options = v(out, stacked, noprint))
+
+# Stacked results
+res3
+#   VAR CAT STAT VALUES
+# 1   y   A    N    8.0
+# 2   y   A  CNT    3.0
+# 3   y   A  PCT   37.5
+# 4   y   B    N    8.0
+# 5   y   B  CNT    2.0
+# 6   y   B  PCT   25.0
+# 7   y   C    N    8.0
+# 8   y   C  CNT    3.0
+# 9   y   C  PCT   37.5
+
+```
 
 
 Next: [The Means Function](procs-means.html)

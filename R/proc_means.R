@@ -30,7 +30,7 @@
 #' The \code{titles} parameter allows you to set one or more titles for your
 #' report.  Pass these titles as a vector of strings.
 #'
-#' The exact datasets used for the interactive output can be returned as a list.
+#' The exact datasets used for the interactive report can be returned as a list.
 #' To return these datasets as a list, pass
 #' the "report" keyword on the \code{options} parameter. This list may in
 #' turn be passed to \code{\link{proc_print}} to write the report to a file.
@@ -82,7 +82,7 @@
 #' \code{v()} function.
 #' \itemize{
 #' \item{\strong{long}: A shaping option that will transpose the output datasets
-#' so that statistics are in rows and levels are in columns.
+#' so that statistics are in rows and variables are in columns.
 #' }
 #' \item{\strong{nofreq, nonobs}: Turns off the FREQ column
 #' on the output datasets.
@@ -905,7 +905,7 @@ mlbls <- list(MEAN = "Mean", STD = "Std Dev", MEDIAN = "Median", MIN = "Minimum"
               STAT = "Statistics", VARI = "Variance", QRANGE = "Quantile Range",
               RANGE = "Range", MODE = "Mode", NMISS = "NMiss",
               LCLM = "Lower Conf. Limit", UCLM = "Upper Conf. Limit",
-              TYPE = "Type", FREQ = "Frequency")
+              TYPE = "Type", FREQ = "Frequency", SUM = "Sum")
 
 #' @import common
 gen_report_means <- function(data,

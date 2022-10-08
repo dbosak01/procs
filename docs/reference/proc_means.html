@@ -256,7 +256,7 @@ effort. To turn off the interactive report, pass the "noprint" keyword
 to the <code>options</code> parameter.</p>
 <p>The <code>titles</code> parameter allows you to set one or more titles for your
 report.  Pass these titles as a vector of strings.</p>
-<p>The exact datasets used for the interactive output can be returned as a list.
+<p>The exact datasets used for the interactive report can be returned as a list.
 To return these datasets as a list, pass
 the "report" keyword on the <code>options</code> parameter. This list may in
 turn be passed to <code><a href='proc_print.html'>proc_print</a></code> to write the report to a file.</p>
@@ -312,7 +312,7 @@ of 5.</p></li>
 be passed as a quoted vector of strings, or an unquoted vector using the
 <code><a href='https://rdrr.io/pkg/common/man/v.html'>v()</a></code> function.</p><ul>
 <li><p><strong>long</strong>: A shaping option that will transpose the output datasets
-so that statistics are in rows and levels are in columns.</p></li>
+so that statistics are in rows and variables are in columns.</p></li>
 <li><p><strong>nofreq, nonobs</strong>: Turns off the FREQ column
 on the output datasets.</p></li>
 <li><p><strong>noprint</strong>: Whether to print the interactive report to the

@@ -113,13 +113,484 @@
 
     
     
-<p>Write up on proc_means…</p>
+<p>The <code>proc_means</code> function simulates a SAS® PROC MEANS
+procedure. It is used to generate summary statistics on numeric
+variables. The function is both interactive and can return datasets. By
+default, it is interactive only, and returns a NULL unless output data
+is requested.</p>
+<div id="create-sample-data" class="section level2">
+<h2 class="hasAnchor">
+<a href="#create-sample-data" class="anchor"></a>Create Sample Data</h2>
+<p>First let’s create some sample data. This sample data is identical to
+that created for the <code>proc_freq</code> tutorial, but has an
+additional grouping variable “g”:</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Create sample data</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>dat <span class="ot">&lt;-</span> <span class="fu">read.table</span>(<span class="at">header =</span> <span class="cn">TRUE</span>, </span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>                  <span class="at">text =</span> <span class="st">'x y z   g</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="st">                          6 A 60  P</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="st">                          6 A 70  P</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="st">                          2 A 100 P</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="st">                          2 B 10  P</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="st">                          3 B 67  Q</span></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="st">                          2 C 81  Q</span></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="st">                          3 C 63  Q</span></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="st">                          5 C 55  Q'</span>)</span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a><span class="co"># View sample data</span></span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>dat</span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>  x y   z g</span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a><span class="dv">1</span> <span class="dv">6</span> A  <span class="dv">60</span> P</span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a><span class="dv">2</span> <span class="dv">6</span> A  <span class="dv">70</span> P</span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a><span class="dv">3</span> <span class="dv">2</span> A <span class="dv">100</span> P</span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a><span class="dv">4</span> <span class="dv">2</span> B  <span class="dv">10</span> P</span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a><span class="dv">5</span> <span class="dv">3</span> B  <span class="dv">67</span> Q</span>
+<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a><span class="dv">6</span> <span class="dv">2</span> C  <span class="dv">81</span> Q</span>
+<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a><span class="dv">7</span> <span class="dv">3</span> C  <span class="dv">63</span> Q</span>
+<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a><span class="dv">8</span> <span class="dv">5</span> C  <span class="dv">55</span> Q</span></code></pre></div>
+</div>
+<div id="get-summary-statistics" class="section level2">
+<h2 class="hasAnchor">
+<a href="#get-summary-statistics" class="anchor"></a>Get Summary Statistics</h2>
+<p>If no parameters are specified, the <code>proc_means</code> function
+will calculate N, Means, Standard Deviation, Minimum, and Maximum on all
+numeric variables.</p>
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Turn off printing for CRAN checks</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/options.html">options</a></span><span class="op">(</span><span class="st">"procs.print"</span> <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># No parameters</span></span>
+<span><span class="fu"><a href="../reference/proc_means.html">proc_means</a></span><span class="op">(</span><span class="va">dat</span><span class="op">)</span></span></code></pre></div>
+<p><img src="../man/images/meanstut1.png"></p>
+<p>Note that the <code>options</code> statement above has been added to
+pass CRAN checks. When you are running code samples, this statement may
+be omitted.</p>
+</div>
+<div id="selected-variables" class="section level2">
+<h2 class="hasAnchor">
+<a href="#selected-variables" class="anchor"></a>Selected Variables</h2>
+<p>If you don’t want statistics on all numeric variables, you may
+specify variables on the <code>var</code> parameter:</p>
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Specific variable</span></span>
+<span><span class="fu"><a href="../reference/proc_means.html">proc_means</a></span><span class="op">(</span><span class="va">dat</span>, var <span class="op">=</span> <span class="va">x</span><span class="op">)</span></span></code></pre></div>
+<p><img src="../man/images/meanstut8.png"></p>
+</div>
+<div id="statistics-options" class="section level2">
+<h2 class="hasAnchor">
+<a href="#statistics-options" class="anchor"></a>Statistics Options</h2>
+<p>The <code>proc_means</code> function has a <code>stats</code>
+parameter that allows you to control which statistics are generated.
+There are many statistics keywords. Here is a sample of some of the most
+frequently used keywords:</p>
+<table class="table">
+<tr>
+<th>
+Keyword
+</th>
+<th>
+Description
+</th>
+</tr>
+<tr>
+<td>
+N
+</td>
+<td>
+Number of Observations
+</td>
+</tr>
+<tr>
+<td>
+NMISS
+</td>
+<td>
+Number of missing observations
+</td>
+</tr>
+<tr>
+<td>
+MEAN
+</td>
+<td>
+Arithmetic mean
+</td>
+</tr>
+<tr>
+<td>
+STD
+</td>
+<td>
+Standard Deviation
+</td>
+</tr>
+<tr>
+<td>
+MIN
+</td>
+<td>
+Minimum
+</td>
+</tr>
+<tr>
+<td>
+MAX
+</td>
+<td>
+Maximum
+</td>
+</tr>
+<tr>
+<td>
+SUM
+</td>
+<td>
+Sum of observations
+</td>
+</tr>
+<tr>
+<td>
+MEDIAN
+</td>
+<td>
+50th percentile
+</td>
+</tr>
+<tr>
+<td>
+P1
+</td>
+<td>
+1st percentile
+</td>
+</tr>
+<tr>
+<td>
+P5
+</td>
+<td>
+5st percentile
+</td>
+</tr>
+<tr>
+<td>
+P10
+</td>
+<td>
+10th percentile
+</td>
+</tr>
+<tr>
+<td>
+P90
+</td>
+<td>
+90th percentile
+</td>
+</tr>
+<tr>
+<td>
+P95
+</td>
+<td>
+95th percentile
+</td>
+</tr>
+<tr>
+<td>
+P99
+</td>
+<td>
+99th percentile
+</td>
+</tr>
+<tr>
+<td>
+Q1
+</td>
+<td>
+First Quartile
+</td>
+</tr>
+<tr>
+<td>
+Q3
+</td>
+<td>
+Third Quartile
+</td>
+</tr>
+</table>
+<p>Now that we know some statistics keywords, let’s practice using them.
+Here is an example which calculates the median, sum, first quartile, and
+third quartile for all numeric variables in our sample data:</p>
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Custom statistics options</span></span>
+<span><span class="fu"><a href="../reference/proc_means.html">proc_means</a></span><span class="op">(</span><span class="va">dat</span>, stats <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/common/man/v.html">v</a></span><span class="op">(</span><span class="va">median</span>, <span class="va">sum</span>, <span class="va">q1</span>, <span class="va">q3</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<p><img src="../man/images/meanstut2.png"></p>
+</div>
+<div id="output-datasets" class="section level2">
+<h2 class="hasAnchor">
+<a href="#output-datasets" class="anchor"></a>Output Datasets</h2>
+<p>Similar to the <code>proc_freq</code> function,
+<code>proc_means</code> can return datasets. There are two options:
+“out” and “report”. The “out” option returns datasets meant for further
+manipulation and analysis. The “report” keyword requests the exact
+datasets used in the interactive report. Specifying either one of these
+options will cause the function to return data.</p>
+<p>Here is an example that shows the difference in the “report” and
+“out” options:</p>
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Output dataset using "report" option</span></span>
+<span><span class="va">res1</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/proc_means.html">proc_means</a></span><span class="op">(</span><span class="va">dat</span>, </span>
+<span>                   stats <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/common/man/v.html">v</a></span><span class="op">(</span><span class="va">median</span>, <span class="va">sum</span>, <span class="va">q1</span>, <span class="va">q3</span><span class="op">)</span>,</span>
+<span>                   options <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/common/man/v.html">v</a></span><span class="op">(</span><span class="va">report</span>, <span class="va">noprint</span><span class="op">)</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># View results</span></span>
+<span><span class="va">res1</span></span>
+<span><span class="co">#   VAR MEDIAN SUM   Q1   Q3</span></span>
+<span><span class="co"># 1   x      3  29  2.0  5.5</span></span>
+<span><span class="co"># 2   z     65 506 57.5 75.5</span></span>
+<span></span>
+<span></span>
+<span><span class="co"># Output dataset using "out" option</span></span>
+<span><span class="va">res2</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/proc_means.html">proc_means</a></span><span class="op">(</span><span class="va">dat</span>, </span>
+<span>                   stats <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/common/man/v.html">v</a></span><span class="op">(</span><span class="va">median</span>, <span class="va">sum</span>, <span class="va">q1</span>, <span class="va">q3</span><span class="op">)</span>,</span>
+<span>                   options <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/common/man/v.html">v</a></span><span class="op">(</span><span class="va">out</span>, <span class="va">noprint</span><span class="op">)</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># View results</span></span>
+<span><span class="va">res2</span></span>
+<span><span class="co">#   TYPE FREQ VAR MEDIAN SUM   Q1   Q3</span></span>
+<span><span class="co"># 1    0    8   x      3  29  2.0  5.5</span></span>
+<span><span class="co"># 2    0    8   z     65 506 57.5 75.5</span></span></code></pre></div>
+<p>As can be seen in the above example, the “out” option includes
+additional variables for TYPE and FREQ. These additional variables can
+be turned off with more options:</p>
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span></span>
+<span><span class="co"># Turn off TYPE and FREQ variables</span></span>
+<span><span class="va">res3</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/proc_means.html">proc_means</a></span><span class="op">(</span><span class="va">dat</span>, </span>
+<span>                   stats <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/common/man/v.html">v</a></span><span class="op">(</span><span class="va">median</span>, <span class="va">sum</span>, <span class="va">q1</span>, <span class="va">q3</span><span class="op">)</span>,</span>
+<span>                   options <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/common/man/v.html">v</a></span><span class="op">(</span><span class="va">out</span>, <span class="va">noprint</span>, <span class="va">notype</span>, <span class="va">nofreq</span><span class="op">)</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># View results</span></span>
+<span><span class="va">res3</span></span>
+<span><span class="co">#   VAR MEDIAN SUM   Q1   Q3</span></span>
+<span><span class="co"># 1   x      3  29  2.0  5.5</span></span>
+<span><span class="co"># 2   z     65 506 57.5 75.5</span></span></code></pre></div>
+</div>
+<div id="grouping" class="section level2">
+<h2 class="hasAnchor">
+<a href="#grouping" class="anchor"></a>Grouping</h2>
+<p>The <code>proc_means</code> function provides two grouping
+parameters: <code>class</code> and <code>by</code>. These parameters
+identify a variable or variables for subsetting the input data. While
+these parameters have similar capabilities, there are some difference
+between them. The differences can be examined by comparing the two
+function calls.</p>
+<div id="class" class="section level3">
+<h3 class="hasAnchor">
+<a href="#class" class="anchor"></a>Class</h3>
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Class grouping</span></span>
+<span><span class="va">res1</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/proc_means.html">proc_means</a></span><span class="op">(</span><span class="va">dat</span>, stats <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/common/man/v.html">v</a></span><span class="op">(</span><span class="va">median</span>, <span class="va">sum</span>, <span class="va">q1</span>, <span class="va">q3</span><span class="op">)</span>,</span>
+<span>                   class <span class="op">=</span> <span class="va">y</span>, </span>
+<span>                   options <span class="op">=</span> <span class="va">out</span><span class="op">)</span></span></code></pre></div>
+<p><img src="../man/images/meanstut3.png"></p>
+<p>Below is the output dataset from the <code>class</code> parameter.
+Notice that summary values have been provided for each variable, in
+addition to the subsets by the class variable. The summary rows are
+identifed by TYPE = 0, while the subset rows are TYPE = 1.</p>
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># View results - class</span></span>
+<span><span class="va">res1</span></span>
+<span><span class="co">#   CLASS TYPE FREQ VAR MEDIAN SUM   Q1    Q3</span></span>
+<span><span class="co"># 1  &lt;NA&gt;    0    8   x    3.0  29  2.0   5.5</span></span>
+<span><span class="co"># 2  &lt;NA&gt;    0    8   z   65.0 506 57.5  75.5</span></span>
+<span><span class="co"># 3     A    1    3   x    6.0  14  2.0   6.0</span></span>
+<span><span class="co"># 4     A    1    3   z   70.0 230 60.0 100.0</span></span>
+<span><span class="co"># 5     B    1    2   x    2.5   5  2.0   3.0</span></span>
+<span><span class="co"># 6     B    1    2   z   38.5  77 10.0  67.0</span></span>
+<span><span class="co"># 7     C    1    3   x    3.0  10  2.0   5.0</span></span>
+<span><span class="co"># 8     C    1    3   z   63.0 199 55.0  81.0</span></span></code></pre></div>
+</div>
+<div id="by" class="section level3">
+<h3 class="hasAnchor">
+<a href="#by" class="anchor"></a>By</h3>
+<p>Here is the same analysis using the <code>by</code> parameter instead
+of the <code>class</code> parameter:</p>
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># By grouping</span></span>
+<span><span class="va">res2</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/proc_means.html">proc_means</a></span><span class="op">(</span><span class="va">dat</span>, stats <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/common/man/v.html">v</a></span><span class="op">(</span><span class="va">median</span>, <span class="va">sum</span>, <span class="va">q1</span>, <span class="va">q3</span><span class="op">)</span>,</span>
+<span>                   by <span class="op">=</span> <span class="va">y</span>,</span>
+<span>                   options <span class="op">=</span> <span class="va">out</span><span class="op">)</span></span></code></pre></div>
+<p><img src="../man/images/meanstut4.png"></p>
+<p>Notice that with the <code>by</code> parameter, separate tables are
+created for each by group on the interactive report.</p>
+<p>Now let’s look at the output dataset:</p>
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># View results - by</span></span>
+<span><span class="va">res2</span></span>
+<span><span class="co">#   BY TYPE FREQ VAR MEDIAN SUM Q1  Q3</span></span>
+<span><span class="co"># 1  A    0    3   x    6.0  14  2   6</span></span>
+<span><span class="co"># 2  A    0    3   z   70.0 230 60 100</span></span>
+<span><span class="co"># 3  B    0    2   x    2.5   5  2   3</span></span>
+<span><span class="co"># 4  B    0    2   z   38.5  77 10  67</span></span>
+<span><span class="co"># 5  C    0    3   x    3.0  10  2   5</span></span>
+<span><span class="co"># 6  C    0    3   z   63.0 199 55  81</span></span></code></pre></div>
+<p>The output dataset is also different from the <code>class</code>
+output. While the TYPE variables exists on the output dataset, the
+output data for the by group does not include the summary rows. The
+summary rows are a feature of the <code>class</code> variable. You
+should select the grouping parameter that most suits your needs.</p>
+</div>
+</div>
+<div id="multiple-groups" class="section level2">
+<h2 class="hasAnchor">
+<a href="#multiple-groups" class="anchor"></a>Multiple Groups</h2>
+<div id="class-1" class="section level3">
+<h3 class="hasAnchor">
+<a href="#class-1" class="anchor"></a>Class</h3>
+<p>The <code>proc_means</code> function can perform analysis with
+multiple grouping variables. First let’s examine what happens when we
+pass multiple grouping variables to the <code>class</code>
+parameter:</p>
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Class grouping - two variables</span></span>
+<span><span class="va">res1</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/proc_means.html">proc_means</a></span><span class="op">(</span><span class="va">dat</span>, stats <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/common/man/v.html">v</a></span><span class="op">(</span><span class="va">median</span>, <span class="va">sum</span>, <span class="va">q1</span>, <span class="va">q3</span><span class="op">)</span>,</span>
+<span>                   class <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/common/man/v.html">v</a></span><span class="op">(</span><span class="va">g</span>, <span class="va">y</span><span class="op">)</span>, </span>
+<span>                   options <span class="op">=</span> <span class="va">out</span><span class="op">)</span></span></code></pre></div>
+<p><img src="../man/images/meanstut5.png"></p>
+<p>Here is the output dataset:</p>
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># View results - two class variables</span></span>
+<span><span class="va">res1</span></span>
+<span><span class="co">#    CLASS1 CLASS2 TYPE FREQ VAR MEDIAN SUM   Q1    Q3</span></span>
+<span><span class="co"># 1    &lt;NA&gt;   &lt;NA&gt;    0    8   x      3  29  2.0   5.5</span></span>
+<span><span class="co"># 2    &lt;NA&gt;   &lt;NA&gt;    0    8   z     65 506 57.5  75.5</span></span>
+<span><span class="co"># 3       P      A    1    3   x      6  14  2.0   6.0</span></span>
+<span><span class="co"># 4       P      A    1    3   z     70 230 60.0 100.0</span></span>
+<span><span class="co"># 5       P      B    1    1   x      2   2  2.0   2.0</span></span>
+<span><span class="co"># 6       P      B    1    1   z     10  10 10.0  10.0</span></span>
+<span><span class="co"># 7       Q      B    1    1   x      3   3  3.0   3.0</span></span>
+<span><span class="co"># 8       Q      B    1    1   z     67  67 67.0  67.0</span></span>
+<span><span class="co"># 9       Q      C    1    3   x      3  10  2.0   5.0</span></span>
+<span><span class="co"># 10      Q      C    1    3   z     63 199 55.0  81.0</span></span></code></pre></div>
+</div>
+<div id="by-1" class="section level3">
+<h3 class="hasAnchor">
+<a href="#by-1" class="anchor"></a>By</h3>
+<p>Now let’s see what happens when we use the <code>by</code> parameter
+with two variables:</p>
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># By grouping - two variables</span></span>
+<span><span class="va">res2</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/proc_means.html">proc_means</a></span><span class="op">(</span><span class="va">dat</span>, stats <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/common/man/v.html">v</a></span><span class="op">(</span><span class="va">median</span>, <span class="va">sum</span>, <span class="va">q1</span>, <span class="va">q3</span><span class="op">)</span>,</span>
+<span>                   by <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/common/man/v.html">v</a></span><span class="op">(</span><span class="va">g</span>, <span class="va">y</span><span class="op">)</span>, </span>
+<span>                   options <span class="op">=</span> <span class="va">out</span><span class="op">)</span></span></code></pre></div>
+<p><img src="../man/images/meanstut6.png"></p>
+<p>Here is the output dataset for the <code>by</code> parameter:</p>
+<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># View results - two by variables</span></span>
+<span><span class="va">res2</span></span>
+<span><span class="co">#   BY1 BY2 TYPE FREQ VAR MEDIAN SUM Q1  Q3</span></span>
+<span><span class="co"># 1   P   A    0    3   x      6  14  2   6</span></span>
+<span><span class="co"># 2   P   A    0    3   z     70 230 60 100</span></span>
+<span><span class="co"># 3   P   B    0    1   x      2   2  2   2</span></span>
+<span><span class="co"># 4   P   B    0    1   z     10  10 10  10</span></span>
+<span><span class="co"># 5   Q   B    0    1   x      3   3  3   3</span></span>
+<span><span class="co"># 6   Q   B    0    1   z     67  67 67  67</span></span>
+<span><span class="co"># 7   Q   C    0    3   x      3  10  2   5</span></span>
+<span><span class="co"># 8   Q   C    0    3   z     63 199 55  81</span></span></code></pre></div>
+</div>
+<div id="by-and-class" class="section level3">
+<h3 class="hasAnchor">
+<a href="#by-and-class" class="anchor"></a>By and Class</h3>
+<p>Finally, let’s see what happens when we specify both <code>by</code>
+and <code>class</code> parameters:</p>
+<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># By grouping - by and class</span></span>
+<span><span class="va">res3</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/proc_means.html">proc_means</a></span><span class="op">(</span><span class="va">dat</span>, stats <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/common/man/v.html">v</a></span><span class="op">(</span><span class="va">median</span>, <span class="va">sum</span>, <span class="va">q1</span>, <span class="va">q3</span><span class="op">)</span>,</span>
+<span>                   by <span class="op">=</span> <span class="va">g</span>,</span>
+<span>                   class <span class="op">=</span> <span class="va">y</span>,</span>
+<span>                   options <span class="op">=</span> <span class="va">out</span><span class="op">)</span></span></code></pre></div>
+<p><img src="../man/images/meanstut6.png"></p>
+<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># View results - by and class</span></span>
+<span><span class="va">res3</span></span>
+<span><span class="co">#    BY CLASS TYPE FREQ VAR MEDIAN SUM   Q1  Q3</span></span>
+<span><span class="co"># 1   P  &lt;NA&gt;    0    4   x      4  16  2.0   6</span></span>
+<span><span class="co"># 2   P  &lt;NA&gt;    0    4   z     65 240 35.0  85</span></span>
+<span><span class="co"># 3   P     A    1    3   x      6  14  2.0   6</span></span>
+<span><span class="co"># 4   P     A    1    3   z     70 230 60.0 100</span></span>
+<span><span class="co"># 5   P     B    1    1   x      2   2  2.0   2</span></span>
+<span><span class="co"># 6   P     B    1    1   z     10  10 10.0  10</span></span>
+<span><span class="co"># 7   Q  &lt;NA&gt;    0    4   x      3  13  2.5   4</span></span>
+<span><span class="co"># 8   Q  &lt;NA&gt;    0    4   z     65 266 59.0  74</span></span>
+<span><span class="co"># 9   Q     B    1    1   x      3   3  3.0   3</span></span>
+<span><span class="co"># 10  Q     B    1    1   z     67  67 67.0  67</span></span>
+<span><span class="co"># 11  Q     C    1    3   x      3  10  2.0   5</span></span>
+<span><span class="co"># 12  Q     C    1    3   z     63 199 55.0  81</span></span></code></pre></div>
+</div>
+</div>
+<div id="data-shaping" class="section level2">
+<h2 class="hasAnchor">
+<a href="#data-shaping" class="anchor"></a>Data Shaping</h2>
+<p>The <code>proc_means</code> function also offers options for data
+shaping. The shaping options can reduce the number of transformations
+needed to get to your target table.</p>
+<p>There are three shaping options: “wide”, “long”, and “stacked”. The
+“wide” options is the default, and has the statistics in columns and
+variables in rows. The “long” option has statistics in rows and
+variables in columns. The “stacked” option has both statistics and
+variables in rows.</p>
+<p>The following example illustrates the differences between these data
+shaping options:</p>
+<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Shape wide</span></span>
+<span><span class="va">res1</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/proc_means.html">proc_means</a></span><span class="op">(</span><span class="va">dat</span>, stats <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/common/man/v.html">v</a></span><span class="op">(</span><span class="va">median</span>, <span class="va">sum</span>, <span class="va">q1</span>, <span class="va">q3</span><span class="op">)</span>,</span>
+<span>                   options <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/common/man/v.html">v</a></span><span class="op">(</span><span class="va">out</span>, <span class="va">wide</span>, <span class="va">noprint</span><span class="op">)</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Wide results</span></span>
+<span><span class="va">res1</span></span>
+<span><span class="co">#   TYPE FREQ VAR MEDIAN SUM   Q1   Q3</span></span>
+<span><span class="co"># 1    0    8   x      3  29  2.0  5.5</span></span>
+<span><span class="co"># 2    0    8   z     65 506 57.5 75.5</span></span>
+<span></span>
+<span><span class="co"># Shape long</span></span>
+<span><span class="va">res2</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/proc_means.html">proc_means</a></span><span class="op">(</span><span class="va">dat</span>, stats <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/common/man/v.html">v</a></span><span class="op">(</span><span class="va">median</span>, <span class="va">sum</span>, <span class="va">q1</span>, <span class="va">q3</span><span class="op">)</span>,</span>
+<span>                   options <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/common/man/v.html">v</a></span><span class="op">(</span><span class="va">out</span>, <span class="va">long</span>, <span class="va">noprint</span><span class="op">)</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Long results</span></span>
+<span><span class="va">res2</span></span>
+<span><span class="co">#   TYPE FREQ   STAT    x     z</span></span>
+<span><span class="co"># 1    0    8 MEDIAN  3.0  65.0</span></span>
+<span><span class="co"># 2    0    8    SUM 29.0 506.0</span></span>
+<span><span class="co"># 3    0    8     Q1  2.0  57.5</span></span>
+<span><span class="co"># 4    0    8     Q3  5.5  75.5</span></span>
+<span></span>
+<span><span class="co"># Shape stacked</span></span>
+<span><span class="va">res3</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/proc_means.html">proc_means</a></span><span class="op">(</span><span class="va">dat</span>, stats <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/common/man/v.html">v</a></span><span class="op">(</span><span class="va">median</span>, <span class="va">sum</span>, <span class="va">q1</span>, <span class="va">q3</span><span class="op">)</span>,</span>
+<span>                   options <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/common/man/v.html">v</a></span><span class="op">(</span><span class="va">out</span>, <span class="va">stacked</span>, <span class="va">noprint</span><span class="op">)</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Stacked results</span></span>
+<span><span class="va">res3</span></span>
+<span><span class="co">#   TYPE FREQ VAR   STAT VALUES</span></span>
+<span><span class="co"># 1    0    8   x MEDIAN    3.0</span></span>
+<span><span class="co"># 2    0    8   x    SUM   29.0</span></span>
+<span><span class="co"># 3    0    8   x     Q1    2.0</span></span>
+<span><span class="co"># 4    0    8   x     Q3    5.5</span></span>
+<span><span class="co"># 5    0    8   z MEDIAN   65.0</span></span>
+<span><span class="co"># 6    0    8   z    SUM  506.0</span></span>
+<span><span class="co"># 7    0    8   z     Q1   57.5</span></span>
+<span><span class="co"># 8    0    8   z     Q3   75.5</span></span></code></pre></div>
 <p>Next: <a href="procs-transpose.html">Proc Transpose</a></p>
+</div>
   </div>
 
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
 
-      </div>
+        <nav id="toc" data-toggle="toc"><h2 data-toc-skip>Contents</h2>
+    </nav>
+</div>
 
 </div>
 

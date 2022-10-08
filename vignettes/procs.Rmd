@@ -188,6 +188,8 @@ Continuing from the example above, let's take some additional steps
 to produce a little report:
 
 ```{r eval=FALSE, echo=TRUE} 
+library(fmtr)
+
 # Filter and select using subset function
 res3 <- subset(res2, TYPE != 0, c(BY, CLASS, N, MEAN, STD, MIN, MAX))
 

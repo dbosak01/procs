@@ -282,7 +282,9 @@ programmers will be familiar with: <code><a href="../reference/proc_transpose.ht
 <p>Continuing from the example above, let’s take some additional steps
 to produce a little report:</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># Filter and select using subset function</span></span>
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://fmtr.r-sassy.org">fmtr</a></span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Filter and select using subset function</span></span>
 <span><span class="va">res3</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/subset.html">subset</a></span><span class="op">(</span><span class="va">res2</span>, <span class="va">TYPE</span> <span class="op">!=</span> <span class="fl">0</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="va">BY</span>, <span class="va">CLASS</span>, <span class="va">N</span>, <span class="va">MEAN</span>, <span class="va">STD</span>, <span class="va">MIN</span>, <span class="va">MAX</span><span class="op">)</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Transpose statistics </span></span>
@@ -320,14 +322,14 @@ to produce a little report:</p>
 <span><span class="co"># 5  Female       MAX 36.00000 64.00000 66.00000 16.000000</span></span>
 <span></span>
 <span><span class="co"># Create formatting list</span></span>
-<span><span class="va">fmt</span> <span class="op">&lt;-</span> <span class="fu">flist</span><span class="op">(</span>STD <span class="op">=</span> <span class="st">"%.3f"</span>, type <span class="op">=</span> <span class="st">"row"</span>, lookup <span class="op">=</span> <span class="va">res5</span><span class="op">$</span><span class="va">Statistic</span><span class="op">)</span></span>
+<span><span class="va">fmt</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://fmtr.r-sassy.org/reference/flist.html">flist</a></span><span class="op">(</span>STD <span class="op">=</span> <span class="st">"%.3f"</span>, type <span class="op">=</span> <span class="st">"row"</span>, lookup <span class="op">=</span> <span class="va">res5</span><span class="op">$</span><span class="va">Statistic</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Create vector lookup</span></span>
 <span><span class="va">vf</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span>MEAN <span class="op">=</span> <span class="st">"Mean"</span>, STD <span class="op">=</span> <span class="st">"Std"</span>, MEDIAN <span class="op">=</span> <span class="st">"Median"</span>, </span>
 <span>        MIN <span class="op">=</span> <span class="st">"Min"</span>, MAX <span class="op">=</span> <span class="st">"Max"</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Assign formats </span></span>
-<span><span class="fu">formats</span><span class="op">(</span><span class="va">res5</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span>Statistic <span class="op">=</span> <span class="va">vf</span>,</span>
+<span><span class="fu"><a href="https://fmtr.r-sassy.org/reference/formats.html">formats</a></span><span class="op">(</span><span class="va">res5</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span>Statistic <span class="op">=</span> <span class="va">vf</span>,</span>
 <span>                      Black <span class="op">=</span> <span class="va">fmt</span>,</span>
 <span>                      Blond <span class="op">=</span> <span class="va">fmt</span>,</span>
 <span>                      Brown <span class="op">=</span> <span class="va">fmt</span>,</span>
