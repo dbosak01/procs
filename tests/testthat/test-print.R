@@ -62,20 +62,20 @@ test_that("print1: Simple proc_print text works.", {
   expect_equal(file.exists(fp), TRUE)
 
 })
-
-test_that("print2: Simple proc_print pdf works.", {
-
-
-  fp <- file.path(base_path, "print/test2")
-
-  res <- proc_print(mtcars, fp, output_type = "PDF",
-                    titles = "My title", view = FALSE)
-
-  res
-
-  expect_equal(file.exists(res[[1]]), TRUE)
-
-})
+#
+# test_that("print2: Simple proc_print pdf works.", {
+#
+#
+#   fp <- file.path(base_path, "print/test2")
+#
+#   res <- proc_print(mtcars, fp, output_type = "PDF",
+#                     titles = "My title", view = FALSE)
+#
+#   res
+#
+#   expect_equal(file.exists(res[[1]]), TRUE)
+#
+# })
 
 
 
