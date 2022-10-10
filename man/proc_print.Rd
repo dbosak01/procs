@@ -45,14 +45,17 @@ and is meant to quickly view your data or dump it out to a file.
 For more reporting options, use the \strong{\link{reporter}} package.
 }
 \examples{
+# Turn off printing to pass CRAN checks
+options("procs.print" = FALSE)
+
 # Print mtcars to the viewer
 proc_print(mtcars)
 
 # Print mtcars to a PDF
 pth <- proc_print(mtcars,
-                  file_path = tempfile(fileext = ".pdf"),
+                  file_path = tempfile(fileext = ".rtf"),
                   titles = "MTCARS Proc Print Example",
-                  output_type = "PDF", view = FALSE)
+                  output_type = "RTF", view = FALSE)
 
 # View file
 # file.show(pth)

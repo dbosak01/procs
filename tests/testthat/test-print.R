@@ -62,7 +62,8 @@ test_that("print1: Simple proc_print text works.", {
   expect_equal(file.exists(fp), TRUE)
 
 })
-#
+
+
 # test_that("print2: Simple proc_print pdf works.", {
 #
 #
