@@ -38,7 +38,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">procs</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.9006</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.9007</span>
       </span>
     </div>
 
@@ -115,8 +115,7 @@
     
 <p>The <code>proc_freq</code> function simulates a SAS® PROC FREQ
 procedure. Below is a short tutorial on the function. Notice that the
-function is both an interactive function and can return datasets. Unless
-you ask for output data, the function is interactive only.</p>
+function is both an interactive function and returns datasets.</p>
 <div id="create-sample-data" class="section level2">
 <h2 class="hasAnchor">
 <a href="#create-sample-data" class="anchor"></a>Create Sample Data</h2>
@@ -150,8 +149,8 @@ you ask for output data, the function is interactive only.</p>
 <h2 class="hasAnchor">
 <a href="#get-frequencies" class="anchor"></a>Get Frequencies</h2>
 <p>Now that we have some data, let’s send that data to the
-<code>proc_freq</code> function to see the frequency distribution. The
-<code><a href="https://rdrr.io/r/base/options.html">options()</a></code> statement below turns off printing of all
+<code>proc_freq</code> function to see the frequency distribution.</p>
+<p>The <code><a href="https://rdrr.io/r/base/options.html">options()</a></code> statement below turns off printing of all
 <strong>procs</strong> functions. This statement is necessary so that
 the sample code below can pass CRAN checks. When running sample code
 yourself, the options statement can be omitted.</p>
@@ -181,9 +180,9 @@ the option “nocum”.</p>
 <p><img src="../man/images/freqtut2.png"></p>
 <p>Let’s say you wanted only the frequency counts, and not the other
 columns. This result can be achived with the following options. Use the
-<code><a href="https://rdrr.io/pkg/common/man/v.html">v()</a></code> function when you are passing multiple options:</p>
+<code><a href="https://common.r-sassy.org/reference/v.html">v()</a></code> function when you are passing multiple options:</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="../reference/proc_freq.html">proc_freq</a></span><span class="op">(</span><span class="va">dat</span>, tables <span class="op">=</span> <span class="va">y</span>, options <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/common/man/v.html">v</a></span><span class="op">(</span><span class="va">nocum</span>, <span class="va">nonobs</span>, <span class="va">nopercent</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/proc_freq.html">proc_freq</a></span><span class="op">(</span><span class="va">dat</span>, tables <span class="op">=</span> <span class="va">y</span>, options <span class="op">=</span> <span class="fu"><a href="https://common.r-sassy.org/reference/v.html">v</a></span><span class="op">(</span><span class="va">nocum</span>, <span class="va">nonobs</span>, <span class="va">nopercent</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <p><img src="../man/images/freqtut3.png"></p>
 </div>
 <div id="cross-tabulation" class="section level2">
@@ -206,14 +205,14 @@ cross-tabulation table, you can do that with the “list” option. The
 included by default:</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Two-way frequency in list form</span></span>
-<span><span class="fu"><a href="../reference/proc_freq.html">proc_freq</a></span><span class="op">(</span><span class="va">dat</span>, tables <span class="op">=</span> <span class="va">y</span> <span class="op">*</span> <span class="va">x</span>, options <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/common/man/v.html">v</a></span><span class="op">(</span><span class="va">list</span>, <span class="va">nosparse</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu"><a href="../reference/proc_freq.html">proc_freq</a></span><span class="op">(</span><span class="va">dat</span>, tables <span class="op">=</span> <span class="va">y</span> <span class="op">*</span> <span class="va">x</span>, options <span class="op">=</span> <span class="fu"><a href="https://common.r-sassy.org/reference/v.html">v</a></span><span class="op">(</span><span class="va">list</span>, <span class="va">nosparse</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <p><img src="../man/images/freqtut5.png"></p>
 <p>The following options turn off various features of the
 cross-tabulation table:</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># View frequencies only</span></span>
 <span><span class="fu"><a href="../reference/proc_freq.html">proc_freq</a></span><span class="op">(</span><span class="va">dat</span>, tables <span class="op">=</span> <span class="va">y</span> <span class="op">*</span> <span class="va">x</span>, </span>
-<span>          options <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/common/man/v.html">v</a></span><span class="op">(</span><span class="va">norow</span>, <span class="va">nocol</span>, <span class="va">nopercent</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<span>          options <span class="op">=</span> <span class="fu"><a href="https://common.r-sassy.org/reference/v.html">v</a></span><span class="op">(</span><span class="va">norow</span>, <span class="va">nocol</span>, <span class="va">nopercent</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <p><img src="../man/images/freqtut6.png"></p>
 </div>
 <div id="multiple-tables" class="section level2">
@@ -226,8 +225,8 @@ as that allowed by SAS®. You must specify each cross-tab
 individually:</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Request two crosstabs</span></span>
-<span><span class="fu"><a href="../reference/proc_freq.html">proc_freq</a></span><span class="op">(</span><span class="va">dat</span>, tables <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/common/man/v.html">v</a></span><span class="op">(</span><span class="va">y</span> <span class="op">*</span> <span class="va">x</span>, <span class="va">y</span> <span class="op">*</span> <span class="va">z</span><span class="op">)</span>, </span>
-<span>          options <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/common/man/v.html">v</a></span><span class="op">(</span><span class="va">norow</span>, <span class="va">nocol</span>, <span class="va">nopercent</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu"><a href="../reference/proc_freq.html">proc_freq</a></span><span class="op">(</span><span class="va">dat</span>, tables <span class="op">=</span> <span class="fu"><a href="https://common.r-sassy.org/reference/v.html">v</a></span><span class="op">(</span><span class="va">y</span> <span class="op">*</span> <span class="va">x</span>, <span class="va">y</span> <span class="op">*</span> <span class="va">z</span><span class="op">)</span>, </span>
+<span>          options <span class="op">=</span> <span class="fu"><a href="https://common.r-sassy.org/reference/v.html">v</a></span><span class="op">(</span><span class="va">norow</span>, <span class="va">nocol</span>, <span class="va">nopercent</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <p><img src="../man/images/freqtut7.png"></p>
 </div>
 <div id="distinct-values" class="section level2">
@@ -255,19 +254,19 @@ the counts in the indicated variable for all frequency calculations.</p>
 <h2 class="hasAnchor">
 <a href="#output-datasets" class="anchor"></a>Output Datasets</h2>
 <p>You may request datasets from the <code>proc_freq</code> function
-using two options: “out” and “report”. The “out” option requests
-datasets meant for output. These datasets have standardized column
-names, and sometimes have additional columns to help with data
+using the <code>output</code> parameter. This parameter takes three
+values: “all”, “report”, and “none”. The “all” keyword requests datasets
+meant for output, and is the default. These datasets have standardized
+column names, and sometimes have additional columns to help with data
 manipulation. The “report” keyword requests the exact datasets used to
 create the interactive report. For both keywords, if there is more than
 one dataset, they will be returned as a list of datasets. The name of
 the list item will identify the dataset. You may control the names of
 the output tables in the list by using a named table request.</p>
-<p>Here is an example of the “out” option. The “noprint” option turns
-off the interactive report:</p>
+<p>Here is an example of the “all” option:</p>
 <div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Request output data</span></span>
 <span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>res <span class="ot">&lt;-</span> <span class="fu">proc_freq</span>(dat, <span class="at">tables =</span> <span class="fu">v</span>(x, y, <span class="at">MyCross =</span> y <span class="sc">*</span> x), </span>
-<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>                 <span class="at">options =</span> out)</span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>                 <span class="at">output =</span> all)</span>
 <span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a><span class="co"># View results</span></span>
 <span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>res</span>
@@ -300,9 +299,9 @@ off the interactive report:</p>
 <span id="cb11-33"><a href="#cb11-33" aria-hidden="true" tabindex="-1"></a><span class="dv">12</span>    y    x    C    <span class="dv">6</span> <span class="dv">8</span>   <span class="dv">0</span>  <span class="fl">0.0</span></span></code></pre></div>
 <p>Notice that the way output datasets are requested from
 <code>proc_freq</code> is much simpler than the corresponding mechanism
-in SAS®. With <code>proc_freq</code>, you just pass the “out” option,
-and all requested tables and statistics will be returned in a list. No
-other output parameters are needed.</p>
+in SAS®. With <code>proc_freq</code>, by default, all requested tables
+and statistics will be returned in a list. No other output parameters
+are needed.</p>
 </div>
 <div id="statistics-options" class="section level2">
 <h2 class="hasAnchor">
@@ -312,7 +311,7 @@ For two-way tables, you may request either Chi-Square or Fisher’s tests
 of association. Here is an example of the Chi-Square test:</p>
 <div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Request Chi-Square and Output datasets</span></span>
-<span><span class="va">res</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/proc_freq.html">proc_freq</a></span><span class="op">(</span><span class="va">dat</span>, tables <span class="op">=</span> <span class="va">y</span> <span class="op">*</span> <span class="va">x</span>, options <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/common/man/v.html">v</a></span><span class="op">(</span><span class="va">out</span>, <span class="va">chisq</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<span><span class="va">res</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/proc_freq.html">proc_freq</a></span><span class="op">(</span><span class="va">dat</span>, tables <span class="op">=</span> <span class="va">y</span> <span class="op">*</span> <span class="va">x</span>, options <span class="op">=</span> <span class="va">chisq</span><span class="op">)</span></span></code></pre></div>
 <p><img src="../man/images/freqtut10.png"></p>
 <div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># View results</span></span>
@@ -346,7 +345,7 @@ example:</p>
 <div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Shape wide</span></span>
 <span><span class="va">res1</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/proc_freq.html">proc_freq</a></span><span class="op">(</span><span class="va">dat</span>, tables <span class="op">=</span> <span class="va">y</span>, </span>
-<span>                  options <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/common/man/v.html">v</a></span><span class="op">(</span><span class="va">out</span>, <span class="va">wide</span>, <span class="va">noprint</span><span class="op">)</span><span class="op">)</span></span>
+<span>                  options <span class="op">=</span> <span class="va">wide</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Wide results</span></span>
 <span><span class="va">res1</span></span>
@@ -357,7 +356,7 @@ example:</p>
 <span></span>
 <span><span class="co"># Shape long</span></span>
 <span><span class="va">res2</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/proc_freq.html">proc_freq</a></span><span class="op">(</span><span class="va">dat</span>, tables <span class="op">=</span> <span class="va">y</span>, </span>
-<span>                  options <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/common/man/v.html">v</a></span><span class="op">(</span><span class="va">out</span>, <span class="va">long</span>, <span class="va">noprint</span><span class="op">)</span><span class="op">)</span></span>
+<span>                  options <span class="op">=</span> <span class="va">long</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Long results</span></span>
 <span><span class="va">res2</span></span>
@@ -368,7 +367,7 @@ example:</p>
 <span></span>
 <span><span class="co"># Shape stacked</span></span>
 <span><span class="va">res3</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/proc_freq.html">proc_freq</a></span><span class="op">(</span><span class="va">dat</span>, tables <span class="op">=</span> <span class="va">y</span>, </span>
-<span>                  options <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/common/man/v.html">v</a></span><span class="op">(</span><span class="va">out</span>, <span class="va">stacked</span>, <span class="va">noprint</span><span class="op">)</span><span class="op">)</span></span>
+<span>                  options <span class="op">=</span> <span class="va">stacked</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Stacked results</span></span>
 <span><span class="va">res3</span></span>

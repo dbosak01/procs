@@ -165,7 +165,7 @@ test_that("print8: Print freq report works.", {
                    titles = "My first Frequency Table",
                    by = "Region",
                    weight = "Count",
-                   options = report)
+                   output = report)
 
   expect_equal(length(res), 6)
 
@@ -182,14 +182,14 @@ test_that("print8: Print freq report works.", {
 
 })
 
-test_that("print9: log_print() works as expected.", {
+test_that("print9: log_prnt() works as expected.", {
 
 
   # data, file_path = NULL, output_type = "HTML",
   # titles = NULL, style = NULL, view = TRUE
 
 
-  res <- log_print(mtcars, file_path = "c:/mypath",
+  res <- log_prnt(mtcars, file_path = "c:/mypath",
                   output_type = "HTML",
                   titles = c("Title1 ", "Title 2"),
                   style = "default", view = TRUE)

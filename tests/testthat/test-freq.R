@@ -65,7 +65,7 @@ options("logr.output" = FALSE)
 #options("procs.print" = FALSE)
 #options("procs.print" = NULL)
 
-test_that("freq1: Simple proc_freq no out works.", {
+test_that("freq1: Simple proc_freq no output works.", {
 
 
   labels(dat) <- list(Eyes = "Eye Color",
@@ -73,6 +73,7 @@ test_that("freq1: Simple proc_freq no out works.", {
                       Region = "Geographic Region")
 
   res <- proc_freq(dat, tables = c("Eyes"),
+                   output = "none",
                    titles = "My first Frequency Table")
 
   res
@@ -91,7 +92,7 @@ test_that("freq2: Simple proc_freq with out works.", {
 
   res <- proc_freq(dat, tables = c("Eyes"),
                    titles = "My first Frequency Table",
-                   options = v(out, outcum))
+                   options = outcum)
 
   res
 
@@ -139,7 +140,7 @@ test_that("freq3: Two table proc_freq test with output works.", {
 
   res <- proc_freq(dat, tables = c("Eyes", HairCount = "Hair"),
                    titles = "My first Frequency Table",
-                   options = v(out, outcum))
+                   options = outcum)
 
   res
 
@@ -164,7 +165,7 @@ test_that("freq4: Simple proc_freq test with weight works.", {
   res <- proc_freq(dat, tables = c("Eyes"),
                    weight = "Count",
                    titles = "My first Frequency Table",
-                   options = v(out, outcum))
+                   options = outcum)
 
   res
 
@@ -186,7 +187,7 @@ test_that("freq5: Two var proc_freq with weight works.", {
   res <- proc_freq(dat, tables = c("Eyes", "Hair"),
                    weight = "Count",
                    titles = "Eye and Hair Color of European Children",
-                   options = v(out, outcum))
+                   options = outcum)
 
   res
   #ex <- file.exists(fl)
@@ -211,7 +212,7 @@ test_that("freq6: Simple proc_freq with output long works.", {
   res <- proc_freq(dat, tables = c("Eyes"),
                    weight = "Count",
                    titles = "My first Frequency Table",
-                   options = v(out, long))
+                   options = long)
 
 
   res
@@ -232,8 +233,7 @@ test_that("freq7: Simple proc_freq with 2 way works.", {
 
   res <- proc_freq(dat, tables = c("Eyes * Hair"),
                    weight = "Count",
-                   titles = "My first Frequency Table",
-                   options = out)
+                   titles = "My first Frequency Table")
 
   res
 
@@ -253,7 +253,7 @@ test_that("freq8: Simple proc_freq in multiple outputs works.", {
                    tables = v(out1 = Eyes, out2 = Hair, out3 = Eyes * Hair),
                    weight = "Count",
                    titles = "My first Frequency Table",
-                   options = v(out, outcum)
+                   options = outcum
                    )
 
   res
@@ -279,7 +279,7 @@ test_that("freq9: Simple proc_freq 1 way by variable works.", {
                    weight = "Count",
                    titles = "My first Frequency Table",
                    by = "Region",
-                   options = v(out, outcum))
+                   options =  outcum)
 
   res
 
@@ -297,7 +297,7 @@ test_that("freq10: Two way proc_freq works.", {
                       Region = "Geographic Region")
 
   res <- proc_freq(dat, tables = c("Eyes * Hair"),
-                   options = c("out", "outcum"),
+                   options = "outcum",
                    weight = "Count",
                    titles = "Eye and Hair Color of European Children")
 
@@ -318,7 +318,7 @@ test_that("freq11: Two way proc_freq no weight works.", {
 
   res <- proc_freq(dat, tables = c(FreqCount = "Eyes * Hair"),
                    titles = "Eye and Hair Color of European Children",
-                   options = v(out, outcum))
+                   options = outcum)
 
   res
 
@@ -337,7 +337,7 @@ test_that("freq12: One way and two way proc_freq works.", {
   res <- proc_freq(dat, tables = c("Eyes", "Hair", FreqCount = "Eyes * Hair"),
                    weight = "Count",
                    titles = "Eye and Hair Color of European Children",
-                   options = v(out, outcum))
+                   options = outcum)
 
   res
 
@@ -358,7 +358,8 @@ test_that("freq13: Nocum option work as expected.", {
 
 
   res <- proc_freq(dat, tables = c("Eyes"),
-                   options = v(report, nocum),
+                   output = report,
+                   options = nocum,
                    titles = "Eye and Hair Color of European Children")
 
   res
@@ -373,11 +374,12 @@ test_that("freq13: Nocum option work as expected.", {
 })
 
 
-test_that("freq14: Out = options on table.", {
+test_that("freq14: output = all on table.", {
 
 
   res <- proc_freq(dat, tables = c("Eyes", "Eyes * Hair"),
-                   options = out,
+                   output = all,
+                   options = noprint,
                    titles = "Eye and Hair Color of European Children")
 
   res
@@ -396,7 +398,7 @@ test_that("freq15: Outcum option works as expected.", {
 
 
   res <- proc_freq(dat, tables = c("Eyes"),
-                   options = v(out, nocum),
+                   options = nocum,
                    titles = "Eye and Hair Color of European Children")
 
   res
@@ -408,7 +410,7 @@ test_that("freq15: Outcum option works as expected.", {
   expect_equal("CUMPCT" %in% d, FALSE)
 
   res <- proc_freq(dat, tables = c("Eyes"),
-                   options = v(out, outcum),
+                   options = outcum,
                    titles = "Eye and Hair Color of European Children")
 
   res
@@ -428,7 +430,7 @@ test_that("freq16: Freq and Pct options works as expected.", {
 
 
   res <- proc_freq(dat, tables = c("Eyes"),
-                   options = v(out, nofreq,
+                   options = v(nofreq,
                                nocum),
                    titles = "Eye and Hair Color of European Children")
 
@@ -441,7 +443,7 @@ test_that("freq16: Freq and Pct options works as expected.", {
   expect_equal("PCT" %in% d, TRUE)
 
   res <- proc_freq(dat, tables = c("Eyes"),
-                   options = v(out, nopercent, nocum),
+                   options = v(nopercent, nocum),
                    titles = "Eye and Hair Color of European Children")
 
   res
@@ -461,7 +463,7 @@ test_that("freq17: Sparse option works as expected.", {
 
 
   res <- proc_freq(dat, tables = c("Eyes * Hair"),
-                   options = v(out, nosparse),
+                   options = v(nosparse),
                    titles = "Eye and Hair Color of European Children")
 
   res
@@ -482,7 +484,7 @@ test_that("freq18: Crosstab works.", {
   res <- proc_freq(dat, tables = c("Eyes * Hair"),
                    weight = "Count",
                    titles = "Eye and Hair Color of European Children",
-                   options = report)
+                   output = report)
 
   res
 
@@ -521,7 +523,7 @@ test_that("freq20: SAS replication of one way tables works.", {
 
   res <- proc_freq(dat, tables = c("Eyes", "Hair"),
                    titles = "Eye and Hair Color of European Children",
-                   weight = "Count", options = v(out, outcum))
+                   weight = "Count", options = outcum)
 
   res
 
@@ -541,7 +543,8 @@ test_that("freq21: Rowpct and Colpct options on table work.", {
                       Region = "Geographic Region")
 
   res <- proc_freq(dat, tables = c("Eyes * Hair"),
-                   options = v(norow, nocol, report),
+                   output = report,
+                   options = v(norow, nocol),
                    weight = "Count",
                    titles = "Eye and Hair Color of European Children")
 
@@ -561,7 +564,7 @@ test_that("freq22: Crosstab option works.", {
                       Region = "Geographic Region")
 
   res <- proc_freq(dat, tables = c("Eyes", "Hair", "Eyes * Hair"),
-                   options = v(out, crosstab),
+                   options = v(crosstab),
                    weight = "Count",
                    titles = "Eye and Hair Color of European Children")
 
@@ -627,7 +630,6 @@ test_that("freq25: Single by group on single table works.", {
 
   res <- proc_freq(dat, tables = c("Eyes"), by = "Region",
                    weight = "Count",
-                   options = out,
                    titles = "Eye and Hair Color of European Children")
 
   res
@@ -649,7 +651,6 @@ test_that("freq26: Single by group on double table works.", {
 
   res <- proc_freq(dat, tables = c("Eyes", "Hair"), by = c("Region"),
                    weight = "Count",
-                   options = out,
                    titles = "Eye and Hair Color of European Children")
 
   res
@@ -675,7 +676,7 @@ test_that("freq27: Double by group on double table works.", {
 
   res <- proc_freq(spdat, tables = c("Eyes", "Hair"), by = c("Sex", "Region"),
                    weight = "Count",
-                   options = v(out, nosparse),
+                   options = v(nosparse),
                    titles = "Eye and Hair Color of European Children")
 
   res
@@ -689,7 +690,6 @@ test_that("freq27: Double by group on double table works.", {
 
   res <- proc_freq(spdat, tables = c("Eyes", "Hair"), by = c("Sex", "Region"),
                    weight = "Count",
-                   options = out,
                    titles = "Eye and Hair Color of European Children")
 
   res
@@ -716,7 +716,6 @@ test_that("freq28: Double by group on double table with table names works.", {
 
   res <- proc_freq(spdat, tables = c(EyeTbl = "Eyes", HairTbl ="Hair"), by = c("Sex", "Region"),
                    weight = "Count",
-                   options = out,
                    titles = "Eye and Hair Color of European Children")
 
   res
@@ -743,7 +742,6 @@ test_that("freq29: Double by group on double table no labels works.", {
   res <- proc_freq(spdat, tables = c(EyeTbl = "Eyes", HairTbl ="Hair"),
                    by = c("Sex", "Region"),
                    weight = "Count",
-                   options = out,
                    titles = "Eye and Hair Color of European Children")
 
   res
@@ -771,7 +769,6 @@ test_that("freq30: Crosstab with by works.", {
   res <- proc_freq(spdat, tables = c("Eyes * Hair"),
                    by = c("Sex"),
                    weight = "Count",
-                   options = out,
                    titles = "Eye and Hair Color of European Children")
 
   res
@@ -798,7 +795,7 @@ test_that("freq30: Crosstab with by and report works.", {
                    by = c("Sex"),
                    weight = "Count",
                    titles = "Eye and Hair Color of European Children",
-                   options = v(report))
+                   output = report)
 
   res
 
@@ -830,7 +827,8 @@ test_that("freq32: chi sqr works with weight.", {
 
 
   res <- proc_freq(prt, tables = "internship * enrollment",
-                   options = v(report, chisq),
+                   output = report,
+                   options = chisq,
                    weight = "count")
 
   res
@@ -849,7 +847,8 @@ test_that("freq32: chi sqr works with weight.", {
 test_that("freq33: fisher's works with weight.", {
 
   res <- proc_freq(prt, tables = "internship * enrollment",
-                   options = v(report, fisher),
+                   output = report,
+                   options = fisher,
                    weight = "count")
 
   res
@@ -869,7 +868,8 @@ test_that("freq33: fisher's works with weight.", {
 test_that("freq34: fisher's works with weight and by.", {
 
   res <- proc_freq(prt, tables = "internship * enrollment",
-                   options = v(report, fisher, list),
+                   output = report,
+                   options = v(fisher, list),
                    by = "sex",
                    weight = "count")
 
@@ -893,7 +893,7 @@ test_that("freq34: fisher's works with weight and by.", {
 
 
   res <- proc_freq(prt, tables = "internship * enrollment",
-                   options = v(out, fisher, list),
+                   options = v(fisher, list),
                    by = "sex",
                    weight = "count")
 
@@ -923,7 +923,8 @@ test_that("freq35: chi sqr works with weight and by.", {
 
 
   res <- proc_freq(prt, tables = "internship * enrollment",
-                   options = v(report, ChiSq),
+                   output = report,
+                   options = ChiSq,
                    by = "sex",
                    weight = "count")
 
@@ -944,7 +945,7 @@ test_that("freq35: chi sqr works with weight and by.", {
 
 
   res <- proc_freq(prt, tables = "internship * enrollment",
-                   options = v(out, ChiSq),
+                   options = ChiSq,
                    by = "sex",
                    weight = "count")
 
@@ -969,7 +970,7 @@ test_that("freq36: 2 way table is sorted properly.", {
 
   res <- proc_freq(prt, tables = "internship * enrollment",
                    weight = "count",
-                   options = "report")
+                   output = "report")
 
   res
   expect_equal(res[9, 1], "Total")
@@ -987,7 +988,7 @@ test_that("freq37: Crosstab works with factors.", {
 
 
   res <- proc_freq(prt2, tables = c("sex", FreqCounts = "internship * enrollment"),
-                   options = v(report),
+                   output = "report",
                    weight = "count")
 
   res
@@ -1168,7 +1169,7 @@ test_that("freq43: oneway output statistics work.", {
 
   res <- proc_freq(dat,
                    tables = c("Eyes", "Hair"),
-                   options = v(out, long),
+                   options = long,
                    titles = "My first Frequency Table",
                    weight = "Count")
 
@@ -1192,7 +1193,7 @@ test_that("freq45: twoway output statistics work.", {
   res <- proc_freq(dat,
                    tables = c("Eyes", "Region * Eyes", "Region"),
                    titles = "My first Frequency Table",
-                   options = v(out, long, outcum),
+                   options = v(long, outcum),
                    weight = "Count")
 
   res
@@ -1217,7 +1218,7 @@ test_that("freq46: output parameter works.", {
                    tables = c("Eyes", "Region * Eyes", "Region"),
                    titles = "My first Frequency Table",
                    weight = "Count",
-                   options = v(out, outcum, long))
+                   options = v(outcum, long))
 
 
   res
@@ -1243,7 +1244,7 @@ test_that("freq47: output report works.", {
                    titles = "My first Frequency Table",
                    by = "Region",
                    weight = "Count",
-                   options = report)
+                   output = report)
 
 
   res
@@ -1265,7 +1266,7 @@ test_that("freq48: oneway output stacked works.", {
                    titles = "My first Frequency Table",
                    by = "Region",
                    weight = "Count",
-                   options = v(out, stacked))
+                   options = v(stacked))
 
 
   res
@@ -1301,7 +1302,7 @@ test_that("freq50: chisq output statistics works.", {
                    titles = "My title",
                    by = c("sex"),
                    weight = "count",
-                   options = v(out, chisq))
+                   options = "chisq")
 
 
   res
@@ -1324,7 +1325,7 @@ test_that("freq51: fisher output statistics works.", {
                    titles = "My title",
                    by = c("sex"),
                    weight = "count",
-                   options = v(out, fisher)
+                   options = v(fisher)
   )
 
   res
@@ -1477,8 +1478,7 @@ test_that("freq52: zero count categories appear on oneway tables.", {
                    tables = c("internship"),
                    titles = "My first Frequency Table",
                    by = c("sex", "enrollment"),
-                   weight = "count",
-                   options = out)
+                   weight = "count")
 
   res
 
@@ -1491,7 +1491,7 @@ test_that("freq52: zero count categories appear on oneway tables.", {
                    titles = "My first Frequency Table",
                    by = c("sex", "enrollment"),
                    weight = "count",
-                   options = report)
+                   output = report)
 
   res
 
@@ -1512,7 +1512,7 @@ test_that("freq52: zero count categories appear on twoway tables.", {
                    titles = "My first Frequency Table",
                    by = c("sex"),
                    weight = "count",
-                   options = out)
+                   output = all)
 
   res
 
@@ -1525,7 +1525,7 @@ test_that("freq52: zero count categories appear on twoway tables.", {
                    titles = "My first Frequency Table",
                    by = c("sex"),
                    weight = "count",
-                   options = report)
+                   output = report)
 
   res
 
@@ -1544,7 +1544,7 @@ test_that("freq53: notable option works as expected.", {
                    titles = "My title",
                    by = c("sex"),
                    weight = "count",
-                   options = v(out, fisher, notable)
+                   options = v(fisher, notable)
   )
 
   res
@@ -1559,7 +1559,7 @@ test_that("freq53: notable option works as expected.", {
 test_that("freq54: nopercent works on two-way.", {
 
   res <- proc_freq(dat, tables = Eyes * Hair,
-            options = v(nocol, norow, out, crosstab, nopercent))
+            options = v(nocol, norow, crosstab, nopercent))
 
 
   res
@@ -1612,7 +1612,8 @@ test_that("freq55: get_nlevels works as expected.", {
 test_that("freq56: nlevels works as expected.", {
 
   res <- proc_freq(dat, tables = Eyes,
-                   options = v(report, nlevels))
+                   output = report,
+                   options = nlevels)
 
 
   res
@@ -1623,7 +1624,8 @@ test_that("freq56: nlevels works as expected.", {
 
 
   res <- proc_freq(dat, tables = v(Eyes, Hair),
-                   options = v(report, nlevels))
+                   output = report,
+                   options = nlevels)
 
 
   res
@@ -1632,29 +1634,29 @@ test_that("freq56: nlevels works as expected.", {
   expect_equal(ncol(res[[1]]), 2)
   expect_equal(nrow(res[[1]]), 1)
 
-  res <- proc_freq(dat, tables = v(Eyes, Hair),
-                   by = Region,
-                   options = v(report, out, nlevels))
-
-
-  res
-
-  expect_equal(length(res), 2)
-  expect_equal(ncol(res$out$`NLevels:Eyes`), 2)
-  expect_equal(nrow(res$out$`NLevels:Eyes`), 2)
-
-
-
-  res <- proc_freq(dat, tables = v(Eyes * Hair),
-                   by = Region,
-                   options = v(report, out, nlevels))
-
-
-  res
-
-  expect_equal(length(res), 2)
-  expect_equal(ncol(res$out$`NLevels:Eyes * Hair`), 3)
-  expect_equal(nrow(res$out$`NLevels:Eyes * Hair`), 2)
+  # res <- proc_freq(dat, tables = v(Eyes, Hair),
+  #                  by = Region,
+  #                  options = v(report, out, nlevels))
+  #
+  #
+  # res
+  #
+  # expect_equal(length(res), 2)
+  # expect_equal(ncol(res$out$`NLevels:Eyes`), 2)
+  # expect_equal(nrow(res$out$`NLevels:Eyes`), 2)
+  #
+  #
+  #
+  # res <- proc_freq(dat, tables = v(Eyes * Hair),
+  #                  by = Region,
+  #                  options = v(report, out, nlevels))
+  #
+  #
+  # res
+  #
+  # expect_equal(length(res), 2)
+  # expect_equal(ncol(res$out$`NLevels:Eyes * Hair`), 3)
+  # expect_equal(nrow(res$out$`NLevels:Eyes * Hair`), 2)
 
 
 })
@@ -1755,7 +1757,7 @@ test_that("freq58: proc_freq missing option works.", {
 
 
   res <- proc_freq(prtm, tables = v(internship),
-                   options = v(out, nlevels, missing))
+                   options = v(nlevels, missing))
 
 
   res$tab2
@@ -1768,7 +1770,7 @@ test_that("freq58: proc_freq missing option works.", {
 
 
   res <- proc_freq(prtm, tables = internship * enrollment,
-                   options = v(out, nlevels, missing))
+                   options = v(nlevels, missing))
 
   res
 

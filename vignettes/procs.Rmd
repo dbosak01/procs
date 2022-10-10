@@ -42,15 +42,19 @@ The `proc_freq()` function generates frequency statistics in a manner
 similar to SAS® PROC FREQ. You can request one-way and two-way frequency
 tables using the `tables` parameter.  Frequencies may be weighted using 
 the `weight` parameter.  Simply pass the name of the variable that contains
-the weighted values.  If you want datasets returned from the function,
-pass the "out" or "report" keyword to the `options` parameter.  There are many more
-options to control the output data and display.  Note that the "noprint" option
+the weighted values.  There are many
+options to control the output data and display.  
+
+Note that the `options("procs.print" = FALSE)` global option
 has been added to these examples to allow the **procs** package to pass
-CRAN checks.  To see the function output in the viewer, 
-remove this option.
+CRAN checks.  When running sample code yourself,  
+remove this option or set to TRUE.
 
 ```{r eval=FALSE, echo=TRUE} 
 library(procs)
+
+# Turn off printing for CRAN checks
+options("procs.print" = FALSE)
 
 # Prepare sample data
 dt <- as.data.frame(HairEyeColor, stringsAsFactors = FALSE)
@@ -62,7 +66,8 @@ labels(dt) <- list(Hair = "Hair Color",
 # Produce frequency statistics
 res <- proc_freq(dt, tables = v(Hair, Eye, Hair * Eye),
                  weight = Freq,
-                 options = v(report, chisq, noprint),
+                 output = report,
+                 options = chisq,
                  titles = "Hair and Eye Frequency Statistics")
 
 ```
@@ -125,16 +130,13 @@ the SAS® PROC MEANS procedure.  The variable or variables to generate
 statistics for is passed on the `var` parameter.  The `class` parameter
 tells the function to group results by the indicated variable.  The 
 `by` parameter will subset the data according to the distinct by 
-values.  Note that any class groupings are nested in the by.  Like the 
-`proc_freq()` function, you may request output datasets using the "out"
-option.
+values.  Note that any class groupings are nested in the by.  
 
 ```{r eval=FALSE, echo=TRUE} 
 # Perform calculations
 res2 <- proc_means(dt, var = Freq, 
                    class = Hair,
                    by = Sex,
-                   options = v(out),
                    titles = "Hair and Eye Summary Statistics by Sex")
 
 ```

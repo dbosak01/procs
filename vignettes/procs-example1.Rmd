@@ -30,7 +30,7 @@ library(procs)
 options("logr.autolog" = TRUE,
         "logr.on" = TRUE,
         "logr.notes" = FALSE,
-        "procs.view" = FALSE)
+        "procs.print" = FALSE)
 
 tmp <- tempdir()
 
@@ -48,13 +48,13 @@ agecat <- value(condition(x >= 18 & x <= 29, "18 to 29"),
                 condition(x >=30 & x <= 39, "30 to 39"),
                 condition(x >=40 & x <=49, "40 to 49"),
                 condition(x >= 50, ">= 50"),
-                condition(TRUE, "Out of range")) |> put()
+                condition(TRUE, "Out of range")) 
 
 put("Sex decodes")
 fmt_sex <- value(condition(is.na(x), "Missing"),
                  condition(x == "M", "Male"),
                  condition(x == "F", "Female"),
-                 condition(TRUE, "Other")) |> put()
+                 condition(TRUE, "Other"))
 
 put("Race decodes")
 fmt_race <- value(condition(is.na(x), "Missing"),
@@ -74,16 +74,12 @@ fc <- fcat(MEAN = "%.1f", STD = "(%.2f)",
            AOV.F = "%5.3f",
            AOV.P = "(%5.3f)",
            CHISQ = "%5.3f",
-           CHISQ.P = "(%5.3f)") |> put()
+           CHISQ.P = "(%5.3f)")
 
 
 # Load and Prepare Data ---------------------------------------------------
 
 sep("Prepare Data")
-
-
-# Write out log separator
-sep("Read in ADSL data")
 
 
 put("Create sample ADSL data.")
@@ -113,9 +109,7 @@ adsl$AGECAT <- fapply(adsl$AGE, agecat) |> put()
 put("Get ARM population counts")
 arm_pop <- 
   proc_freq(adsl, tables = ARM, 
-            out = out(table = ARM, 
-                      stats = "cnt", 
-                      shape = "long")) |> put()
+            options = v(nopercent, nonobs, long)) 
 
 # Age Summary Block -------------------------------------------------------
 
@@ -126,28 +120,26 @@ age_stats <-
   proc_means(adsl, var = AGE,
              stats = v(n, mean, std, median, q1, q3, min, max),
              by = ARM, 
-             out = out(shape = "wide",
-                      type = FALSE, 
-                      freq = FALSE)) |> put()
+             options = v(notype, nofreq)) 
+
 put("Combine stats")
 age_comb <- 
   datastep(age_stats, 
            format = fc,
            drop = find.names(age_stats, start = 4), 
            {
-              `Min - Max` <- fapply2(MIN, MAX, sep = " - ")
-              `Q1 - Q3` <- fapply2(Q1, Q3, sep = " - ")
-              Median <- MEDIAN
               `Mean (SD)` <- fapply2(MEAN, STD)
-              
-           }) |>  put()
+              Median <- MEDIAN
+              `Q1 - Q3` <- fapply2(Q1, Q3, sep = " - ")
+              `Min - Max` <- fapply2(MIN, MAX, sep = " - ")
+           }) 
 
 put("Transpose ARMs into columns")
 age_trans <- 
   proc_transpose(age_comb, 
                  var = names(age_comb),
                  copy = VAR, id = BY, 
-                 name = LABEL) |> put()
+                 name = LABEL) 
 
 put("Calculate aov")
 age_aov <- aov(AGE ~ ARM, data = adsl) |> 
@@ -166,7 +158,7 @@ age_aov_comb <-
            {
              PVALUE <- fapply2(AOV.F, AOV.P)
              
-           }) |> put()
+           }) 
 
 put("Append aov")
 age_block <- cbind(age_trans, age_aov_comb) |> put()
@@ -179,7 +171,7 @@ put("Get sex frequency counts")
 sex_freq <- 
   proc_freq(adsl, tables = SEX,
             by = ARM,
-            out = out(stats = v(cnt, pct))) |> put()
+            options = nonobs) 
 
 
 put("Combine counts and percents.")
@@ -192,12 +184,12 @@ sex_comb <-
              
              CNTPCT <- fapply2(CNT, PCT)
              
-           }) |> put()
+           }) 
 
 put("Transpose ARMs into columns")
 sex_trans <- 
   proc_transpose(sex_comb, id = BY, var = CNTPCT,
-                 copy = VAR, by = LABEL) |> put()
+                 copy = VAR, by = LABEL) 
 
 put("Clean up")
 sex_cnts <- 
@@ -207,15 +199,14 @@ sex_cnts <-
              LABEL <- fapply(LABEL, fc$SEX)
              LABEL <- factor(LABEL, levels = levels(fc$SEX))
 
-           }) |> put()
+           }) 
 
 put("Sort by label")
-sex_cnts <- proc_sort(sex_cnts, by = LABEL) |> put()
+sex_cnts <- proc_sort(sex_cnts, by = LABEL) 
 
 put("Get sex chisq")
 sex_chisq <- proc_freq(adsl, tables = v(SEX * ARM),
-                       out2 = out(table = SEX * ARM, 
-                                  stats = chisq)) |> put()
+                       options = v(chisq, notable)) 
 
 put("Combine chisq statistics")
 sex_chisq_comb <- 
@@ -225,7 +216,7 @@ sex_chisq_comb <-
            {
              
              PVALUE = fapply2(CHISQ, CHISQ.P)
-           }) |> put()
+           }) 
 
 put("Append chisq")
 sex_block <- cbind(sex_cnts, sex_chisq_comb) |> put()
@@ -239,10 +230,9 @@ sep("Create frequency counts for RACE")
 
 put("Get race frequency counts")
 race_freq <- 
-  proc_freq(adsl, tables = v(RACE),
+  proc_freq(adsl, tables = RACE,
             by = ARM,
-            options = opts(cumsum = FALSE, cumpct = FALSE),
-            out = out( stats = v(cnt, pct))) |> put()
+            options = nonobs) 
 
 
 put("Combine counts and percents.")
@@ -250,17 +240,17 @@ race_comb <-
   datastep(race_freq, 
            format = fc, 
            rename = list(CAT = "LABEL"),
-           drop = v(CNT, PCT, VAR2), 
+           drop = v(CNT, PCT), 
            {
              
              CNTPCT <- fapply2(CNT, PCT)
              
-           }) |> put()
+           }) 
 
 put("Transpose ARMs into columns")
 race_trans <- 
   proc_transpose(race_comb, id = BY, var = CNTPCT,
-                 copy = VAR, by = LABEL) |> put()
+                 copy = VAR, by = LABEL) 
 
 put("Clean up")
 race_cnts <- 
@@ -271,7 +261,7 @@ race_cnts <-
              LABEL <- fapply(LABEL, fc$RACE)
              LABEL <- factor(LABEL, levels = levels(fc$RACE))
           
-           }) |> put()
+           }) 
 
 put("Sort by label")
 race_cnts <- proc_sort(race_cnts, by = LABEL)
@@ -279,8 +269,7 @@ race_cnts <- proc_sort(race_cnts, by = LABEL)
 put("Get race chisq")
 race_chisq <- 
   proc_freq(adsl, tables = RACE * ARM,
-            out2 = out(table = RACE * ARM, 
-                       stats = chisq)) |> put()
+            options = v(chisq, notable)) 
 
 put("Combine chisq statistics")
 race_chisq_comb <- 
@@ -290,7 +279,7 @@ race_chisq_comb <-
            {
              
              PVALUE = fapply2(CHISQ, CHISQ.P)
-           }) |> put()
+           }) 
 
 put("Append chisq")
 race_block <- cbind(race_cnts, race_chisq_comb) |> put()
@@ -308,8 +297,7 @@ ageg_freq <-
   proc_freq(adsl,
             table = AGECAT,
             by = ARM,
-            out = out(stats = v(cnt, pct),
-                      shape = "wide")) |> put()
+            options = nonobs) 
 
 put("Combine counts and percents and assign age group factor for sorting")
 ageg_comb <- 
@@ -319,11 +307,11 @@ ageg_comb <-
            {
              CNTPCT <- fapply2(CNT, PCT)
              LABEL <- factor(CAT, levels = levels(fc$AGECAT))
-           }) |> put()
+           }) 
 
 
 put("Sort by age group factor")
-ageg_sort <- proc_sort(ageg_comb, by = v(BY, LABEL)) |> put()
+ageg_sort <- proc_sort(ageg_comb, by = v(BY, LABEL)) 
 
 put("Tranpose age group block")
 ageg_trans <- 
@@ -331,19 +319,18 @@ ageg_trans <-
                  var = CNTPCT,
                  copy = VAR,
                  id = BY,
-                 by = LABEL) |> put()
+                 by = LABEL) 
 
 put("Some clean up")
 ageg_cnts <- 
   datastep(ageg_trans,
            drop = "NAME",
-           {}) |> put()
+           {}) 
 
 put("Get ageg chisq")
 ageg_chisq <- 
   proc_freq(adsl, tables = v(AGECAT * ARM),
-            out2 = out(table = AGECAT * ARM, 
-                       stats = chisq)) |> put()
+            options = v(chisq, notable)) 
 
 put("Combine chisq statistics")
 ageg_chisq_comb <- 
@@ -352,7 +339,7 @@ ageg_chisq_comb <-
            keep = c("PVALUE"), 
            {
              PVALUE = fapply2(CHISQ, CHISQ.P)
-           }) |> put()
+           }) 
 
 put("Append chisq")
 ageg_block <- cbind(ageg_cnts, ageg_chisq_comb) |> put()
@@ -368,7 +355,7 @@ sep("Create and print report")
 
 var_fmt <- c("AGE" = "Age", "AGECAT" = "Age Group", "SEX" = "Sex", "RACE" = "Race")
 
-plbl <- "Tests of Association" %p% supsc("1") %p% "\n Value (P-Value)"
+plbl <- "Tests of Association{supsc('1')}\n Value (P-Value)"
 
 # Create Table
 tbl <- create_table(final, first_row_blank = TRUE) |>  
@@ -386,7 +373,7 @@ tbl <- create_table(final, first_row_blank = TRUE) |>
          "Safety Population") |> 
   footnotes("Program: DM_Table.R",
             "NOTE: Denominator based on number of non-missing responses.",
-            supsc("1") %p% "Pearson's Chi-Square tests will be used for "
+            "{supsc('1')}Pearson's Chi-Square tests will be used for "
             %p% "Categorical variables and ANOVA tests for continuous variables.") 
 
 rpt <- create_report(file.path(tmp, "example2.rtf"), 
@@ -395,7 +382,7 @@ rpt <- create_report(file.path(tmp, "example2.rtf"),
   page_header("Sponsor: Archytas", "Study: ABC") |> 
   set_margins(top = 1, bottom = 1) |>  
   add_content(tbl) |> 
-  page_footer("Date Produced: " %p% Sys.Date(), right = "Page [pg] of [tpg]")
+  page_footer("Date Produced: {Sys.Date()}", right = "Page [pg] of [tpg]")
 
 put("Write out the report")
 res <- write_report(rpt)

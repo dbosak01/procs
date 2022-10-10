@@ -187,8 +187,7 @@ test_that("means8: proc_means with unquoted parameter values.", {
 
   res <- proc_means(datm, var = PresentScore,
                     stats = mean,
-                    titles = "My first title for Means",
-                    options = out)
+                    titles = "My first title for Means")
 
   res
 
@@ -223,8 +222,7 @@ test_that("means10: proc_means with variable parameter values.", {
 
   res <- proc_means(datm, var = var1,
                     stats = var2,
-                    titles = "My first title for Means",
-                    options = out)
+                    titles = "My first title for Means")
 
   res
 
@@ -243,8 +241,7 @@ test_that("means11: proc_means with variable parameter values and v().", {
 
   res <- proc_means(datm, var = var1,
                     stats = var2,
-                    titles = "My first title for Means",
-                    options = out)
+                    titles = "My first title for Means")
 
   res
 
@@ -264,7 +261,7 @@ test_that("means12: proc_means in function works.", {
     myres <- proc_means(datm, var = var1,
                       stats = var2,
                       titles = "My first title for Means",
-                      options = v(out, long))
+                      options = long)
 
     return(myres)
   }
@@ -282,9 +279,7 @@ test_that("means13: check more stats options", {
 
   res <- proc_means(datm, var = v(PresentScore, TasteScore),
                     stats = v(nmiss, median, mode, clm, stderr),
-                    options = v(out, nonobs, notype),
-                    # out1 = out(stats = v(nmiss, median, mode, clm, stderr),
-                    #            shape = "wide", type = FALSE, freq = FALSE),
+                    options = v(nonobs, notype),
                     titles = "My first title for Means")
 
   res
@@ -312,7 +307,7 @@ test_that("means14: check missing value works.", {
   res <- proc_means(datm2, var = c("PresentScore", "TasteScore"),
                     stats = c("n", "nmiss", "mean", "median", "mode", "clm", "std"),
                     titles = "My first title for Means",
-                    options = v(out, notype, nonobs))
+                    options = v(notype, nonobs))
 
   res
 
@@ -348,8 +343,7 @@ test_that("means15: check missing parameter works.", {
                               "p60", "p70",
                               "p75", "p80", "p90", "p95", "p99", "q1", "q3",
                               "qrange"),
-                    titles = "My first title for Means",
-                    options = out)
+                    titles = "My first title for Means")
 
 
   res
@@ -397,7 +391,7 @@ test_that("means15: check missing parameter works.", {
 
 test_that("means16: default vars works.", {
 
-  res <- proc_means(datm, options = v(out, long))
+  res <- proc_means(datm, options = long)
 
   res
 
@@ -572,7 +566,7 @@ test_that("means25: class parameter works.", {
                     stats = var2,
                     class = Layers,
                     titles = "My first title for Means",
-                    options = v(out, long))
+                    options = long)
 
   res
 
@@ -623,7 +617,7 @@ test_that("means27: by parameter works.", {
                     by = "Layers",
                   #  class = "Flavor",
                     titles = "My first title for Means",
-                    options = v(out, long))
+                    options = long)
 
   res
 
@@ -643,7 +637,7 @@ test_that("means28: by with class works.", {
                     by = "Layers",
                     class = "Flavor",
                     titles = "My first title for Means",
-                    options = v(out, long))
+                    options = long)
 
   res
 
@@ -663,7 +657,7 @@ test_that("means29: 2 class vars works.", {
                     #by = "Layers",
                     class = c("Layers", "Flavor"),
                     titles = "My first title for Means",
-                    options = v(out, long))
+                    options = long)
 
   res
 
@@ -686,7 +680,7 @@ test_that("means30: by and 2 class vars works.", {
                     by = "Group",
                     class = c("Flavor", "Layers"),
                     titles = "My first title for Means",
-                    options = v(out, long))
+                    options = long)
 
   res
 
@@ -698,18 +692,18 @@ test_that("means30: by and 2 class vars works.", {
 
 
 # ?
-test_that("means31: Default outputs work as expected.", {
+test_that("means31: Outputs work as expected.", {
 
   options("procs.print" = FALSE)
 
-  res <- proc_means(datm)
+  res <- proc_means(datm, output = none)
 
   res
 
   expect_equal(is.null(res), TRUE)
 
 
-  res2 <- proc_means(datm, options = out)
+  res2 <- proc_means(datm, output = all)
 
   expect_equal(nrow(res2), 4)
   expect_equal(ncol(res2), 8)
@@ -749,7 +743,7 @@ test_that("means33: 2 by and 1 class vars works.", {
                     by = c("Group", "Layers"),
                     class = "Flavor",
                     titles = "My first title for Means",
-                    options = v(out, long))
+                    options = long)
 
   res
 
@@ -767,7 +761,7 @@ test_that("means34: Report output works.", {
 
   res <- proc_means(datm,
                     by = "Layers",
-                    options = v(report))
+                    output = report)
 
   res
 
@@ -787,7 +781,7 @@ test_that("means35: Stacked output works.", {
 
   res <- proc_means(datm,
                     by = "Layers",
-                    options = v(out, stacked))
+                    options = stacked)
 
   res
 
@@ -1032,8 +1026,7 @@ test_that("means48: warning on unknown parameter works.", {
                     stats = var2,
                     class = Layers,
                     fork = TRUE,
-                    titles = "My first title for Means",
-                    options = out))
+                    titles = "My first title for Means"))
 
 })
 
@@ -1047,8 +1040,7 @@ test_that("means49: view can be FALSE without error.", {
   res <- proc_means(datm, var = var1,
                     stats = var2,
                     class = Layers,
-                    titles = "My first title for Means",
-                    options = out)
+                    titles = "My first title for Means")
 
 
   expect_equal(is.null(res), FALSE)

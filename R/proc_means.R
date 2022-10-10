@@ -129,9 +129,8 @@
 #' "uclm", and "var".
 #' Defaults statistics are: "n", "mean", "std",
 #' "min", and "max".
-#' @param options A vector of optional keywords. Valid values are:
-#' "long", "noprint", "notype, "nofreq", "nonobs", "out", "report",
-#' "stacked", and "wide".
+#' @param output Whether or not to return datasets from the function. Valid
+#' values are "all", "none", and "report".  Default is "all".
 #' @param by An optional by group. If you specify an by group, the input
 #' data will be subset on the by variable(s) prior to performing any
 #' statistics.
@@ -141,6 +140,9 @@
 #' When a \code{by} and a \code{class} are both specified, the \code{class}
 #' will be nested in the \code{by}.
 # @param weight An optional weight parameter.
+#' @param options A vector of optional keywords. Valid values are:
+#' "long", "noprint", "notype, "nofreq", "nonobs",
+#' "stacked", and "wide".
 #' @param titles A vector of one or more titles to use for the report output.
 #' @return The requested summary statistics are shown interactively in the viewer.
 #' To return dataset results, pass the "out" or "report" options on the
@@ -151,8 +153,11 @@
 #' @import tibble
 #' @export
 #' @examples
+#' # Turn off printing for CRAN checks
+#' options("procs.print" = FALSE)
+#'
 #' # Default statistics on iris
-#' res1 <- proc_means(iris, options = v(out, noprint))
+#' res1 <- proc_means(iris)
 #'
 #' # View results
 #' res1
@@ -164,8 +169,7 @@
 #'
 #' # Defaults statistics with by
 #' res2 <- proc_means(iris,
-#'                    by = Species,
-#'                    options = v(out, noprint))
+#'                    by = Species)
 #' # View results
 #' res2
 #' #            BY TYPE FREQ          VAR  N  MEAN       STD MIN MAX
@@ -187,7 +191,7 @@
 #'                    var = v(Petal.Length, Petal.Width),
 #'                    class = Species,
 #'                    stats = v(n, mean, std, median, qrange, clm),
-#'                    options = v(out, noprint, nofreq, long))
+#'                    options = v(nofreq, long))
 #' # View results
 #' res3
 #' #         CLASS TYPE   STAT Petal.Length Petal.Width
@@ -223,10 +227,11 @@
 proc_means <- function(data,
                        var = NULL,
                        stats = c("n", "mean", "std", "min", "max"),
-                       options = NULL,
+                       output = NULL,
                        by = NULL,
                        class = NULL,
                    #    weight = NULL,
+                       options = NULL,
                        titles = NULL
                        ) {
 
@@ -256,6 +261,10 @@ proc_means <- function(data,
   oopt <- deparse(substitute(options, env = environment()))
   options <- tryCatch({if (typeof(options) %in% c("character", "NULL")) options else oopt},
                       error = function(cond) {oopt})
+
+  oout <- deparse(substitute(output, env = environment()))
+  output <- tryCatch({if (typeof(output) %in% c("character", "NULL")) output else oout},
+                      error = function(cond) {oout})
 
   # Parameter checks
   nms <- names(data)
@@ -312,7 +321,7 @@ proc_means <- function(data,
   }
 
   # Generate output specs
-  if (has_option(options, "out"))
+  if (has_output(output))
     outreq <- get_output_specs_means(list(), stats, options)
   else
     outreq <- NULL
@@ -323,15 +332,15 @@ proc_means <- function(data,
 
   # Kill output request for report
   # Otherwise, this will mess up gen_output_means
-  if (has_option(options, "report")) {
+  if (has_report(output)) {
     rptflg <- TRUE
     rptnm <- "report"
   }
 
-  if (option_true(options, "noprint", FALSE))
-    view <- FALSE
-  else
+  if (has_view(options))
     view <- TRUE
+  else
+    view <- FALSE
 
   res <- NULL
 
@@ -373,6 +382,7 @@ proc_means <- function(data,
             class = class,
             var = var,
             stats = stats,
+            output = output,
            # weight = weight,
             view = view,
             titles = titles,
@@ -397,6 +407,7 @@ log_means <- function(data,
                       class = NULL,
                       var = NULL,
                       stats = NULL,
+                      output = NULL,
                       weight = NULL,
                       view = TRUE,
                       titles = NULL,
@@ -425,6 +436,8 @@ log_means <- function(data,
     ret[length(ret) + 1] <- paste0(indt, "stats: ",
                                    paste(stats, collapse = " "))
 
+  if (!is.null(output))
+    ret[length(ret) + 1] <- paste0(indt, "output: ", paste(output, collapse = " "))
 
   if (!is.null(weight))
     ret[length(ret) + 1] <- paste0(indt, "weight: ", paste(weight, collapse = " "))

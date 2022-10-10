@@ -377,6 +377,132 @@ test_that("utils14: get_option works with formats.", {
 
 })
 
+test_that("utils15: has_* functions work as expected.", {
+
+  # Reset
+  options("procs.interactive" = NULL)
+
+  # Output
+  res <- has_output("all")
+
+  expect_equal(res, TRUE)
+
+  res <- has_output("none")
+
+  expect_equal(res, FALSE)
+
+  res <- has_output("report")
+
+  expect_equal(res, FALSE)
+
+  res <- has_output(NULL)
+
+  expect_equal(res, TRUE)
+
+  # Report
+  res <- has_report("all")
+
+  expect_equal(res, FALSE)
+
+  res <- has_report("none")
+
+  expect_equal(res, FALSE)
+
+  res <- has_report("report")
+
+  expect_equal(res, TRUE)
+
+  res <- has_report(NULL)
+
+  expect_equal(res, FALSE)
+
+  # View
+  res <- has_view(NULL)
+
+  expect_equal(res, TRUE)
+
+  res <- has_view("noprint")
+
+  expect_equal(res, FALSE)
+
+  res <- has_view("print")
+
+  expect_equal(res, TRUE)
+
+
+  options("procs.interactive" = TRUE)
+
+  # Output
+  res <- has_output("all")
+
+  expect_equal(res, TRUE)
+
+  res <- has_output("none")
+
+  expect_equal(res, FALSE)
+
+  res <- has_output("report")
+
+  expect_equal(res, FALSE)
+
+  res <- has_output(NULL)
+
+  expect_equal(res, FALSE)
+
+  # Report
+  res <- has_report("all")
+
+  expect_equal(res, FALSE)
+
+  res <- has_report("none")
+
+  expect_equal(res, FALSE)
+
+  res <- has_report("report")
+
+  expect_equal(res, TRUE)
+
+  res <- has_report(NULL)
+
+  expect_equal(res, FALSE)
+
+  # View
+  res <- has_view(NULL)
+
+  expect_equal(res, TRUE)
+
+  res <- has_view("noprint")
+
+  expect_equal(res, FALSE)
+
+  res <- has_view("print")
+
+  expect_equal(res, TRUE)
+
+
+
+  options("procs.interactive" = FALSE)
+
+  # Output
+  res <- has_output(NULL)
+
+  expect_equal(res, TRUE)
+
+  # Report
+  res <- has_report(NULL)
+
+  expect_equal(res, FALSE)
+
+  # View
+  res <- has_view(NULL)
+
+  expect_equal(res, FALSE)
+
+  # Reset
+  options("procs.interactive" = NULL)
+
+})
+
 #
 # test_that("utils12: stackds() function works as expected.", {
 #

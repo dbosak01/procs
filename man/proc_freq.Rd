@@ -8,9 +8,10 @@
 proc_freq(
   data,
   tables = NULL,
-  options = NULL,
+  output = NULL,
   by = NULL,
   weight = NULL,
+  options = NULL,
   titles = NULL
 )
 }
@@ -28,18 +29,8 @@ table request is named, the name will be used as the list item name on the
 return list of tables. See "Example 3" for an illustration on how to name an
 output table.}
 
-\item{options}{The options desired for the function.
-Options are passed to the parameter as a vector of quoted strings. You may
-also use the \code{v()} function to pass unquoted strings.
-The following options are available:
-"chisq", "crosstab", "fisher", "list", "long", "missing",
-"nlevels", "nocol",
-"nocum", "nofreq", "nopercent", "noprint",
-"nonobs", "norow", "nosparse", "notable", "out", "outcum", "report",
-"stacked", and "wide". See
-the \strong{Options} section for a description of these options. To get
-output from the function, you must pass either the "out" or "report" keywords
-to the \code{options} parameter.}
+\item{output}{Whether or not to return datasets from the function. Valid
+values are "all", "none", and "report".  Default is "all".}
 
 \item{by}{An optional by group. Parameter accepts a vector of one or more
 variable names. When this parameter is set, data
@@ -50,6 +41,17 @@ each subset.}
 as a variable name to use for the weight.  If a weight variable is
 indicated, the weighted value will be summed to calculate the frequency
 counts.}
+
+\item{options}{The options desired for the function.
+Options are passed to the parameter as a vector of quoted strings. You may
+also use the \code{v()} function to pass unquoted strings.
+The following options are available:
+"chisq", "crosstab", "fisher", "list", "long", "missing",
+"nlevels", "nocol",
+"nocum", "nofreq", "nopercent", "noprint",
+"nonobs", "norow", "nosparse", "notable", "outcum",
+"stacked", and "wide". See
+the \strong{Options} section for a description of these options.}
 
 \item{titles}{A vector of titles to assign to the report.}
 }
@@ -209,18 +211,9 @@ dataset list. Normally, the frequency table is included.  You may want to
 exclude the frequency table in some cases, for instance, if you only
 want the Chi-Square statistic.
 }
-\item{\strong{out}: Requests output datasets.  A dataset will be created
-for each table requested.  If multiple tables are requested, results
-will be returned in a list.  Any tables produced by additional options
-will also be returned.
-}
 \item{\strong{outcum}: Whether to include the cumulative frequency and percent
 on output frequency tables.  By default, these columns are not included.
 The "outcum" option will include them.
-}
-\item{\strong{report}: Requests that the datasets used for the interactive
-report be returned by the function.  If there are multiple datasets,
-they will be returned in a list.
 }
 \item{\strong{stacked}: Requests that output datasets be returned in "stacked"
 form, such that both statistics and levels are in rows.
@@ -234,6 +227,9 @@ such that statistics are across the top in columns, and levels are in rows.
 \examples{
 library(procs)
 
+# Turn off printing for CRAN checks
+options("procs.print" = FALSE)
+
 # Create sample data
 df <- as.data.frame(HairEyeColor, stringsAsFactors = FALSE)
 
@@ -245,7 +241,7 @@ labels(df) <- list(Hair = "Hair Color",
 # Example #1: One way frequencies on Hair and Eye color with weight option.
 res <- proc_freq(df,
                  tables = v(Hair, Eye),
-                 options = v(out, outcum, noprint),
+                 options = outcum,
                  weight = Freq)
 
 # View result data
@@ -267,7 +263,7 @@ res
 # Example #2: 2 x 2 Crosstabulation table with Chi-Square statistic
 res <- proc_freq(df, tables = Hair * Eye,
                      weight = Freq,
-                     options = v(out, crosstab, chisq, noprint))
+                     options = v(crosstab, chisq))
 
 # View result data
 res
@@ -299,7 +295,6 @@ res
 #' # Example #3: By variable with named table request
 res <- proc_freq(df, tables = v(Hair, Eye, Cross = Hair * Eye),
                  by = Sex,
-                 options = v(out, noprint),
                  weight = Freq)
 
 # View result data

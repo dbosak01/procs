@@ -1,12 +1,21 @@
 Package: procs
 Type: Package
 Title: Recreates some SAS® procedures in R
-Version: 0.0.9006
+Version: 0.0.9007
 Authors@R: c(
     person(given = "David",
            family = "Bosak",
            role = c("aut", "cre"),
-           email = "dbosak01@gmail.com"))
+           email = "dbosak01@gmail.com"),
+    person(given = "Kevin",
+           family = "Kramer",
+           role = c("ctb"),
+           email = "kkrame02@amgen.com"),
+    person(given = "Brian",
+           family = "Varney",
+           role = c("ctb"),
+           email = "brian.varney@experis.com")
+           )
 Maintainer: David Bosak <dbosak01@gmail.com>
 Description: Contains functions to simulate the most commonly used 
     SAS® procedures.  Specifically, the package aims to 

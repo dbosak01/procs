@@ -140,18 +140,9 @@
 #' exclude the frequency table in some cases, for instance, if you only
 #' want the Chi-Square statistic.
 #' }
-#' \item{\strong{out}: Requests output datasets.  A dataset will be created
-#' for each table requested.  If multiple tables are requested, results
-#' will be returned in a list.  Any tables produced by additional options
-#' will also be returned.
-#' }
 #' \item{\strong{outcum}: Whether to include the cumulative frequency and percent
 #' on output frequency tables.  By default, these columns are not included.
 #' The "outcum" option will include them.
-#' }
-#' \item{\strong{report}: Requests that the datasets used for the interactive
-#' report be returned by the function.  If there are multiple datasets,
-#' they will be returned in a list.
 #' }
 #' \item{\strong{stacked}: Requests that output datasets be returned in "stacked"
 #' form, such that both statistics and levels are in rows.
@@ -171,18 +162,8 @@
 #' table request is named, the name will be used as the list item name on the
 #' return list of tables. See "Example 3" for an illustration on how to name an
 #' output table.
-#' @param options The options desired for the function.
-#' Options are passed to the parameter as a vector of quoted strings. You may
-#' also use the \code{v()} function to pass unquoted strings.
-#' The following options are available:
-#' "chisq", "crosstab", "fisher", "list", "long", "missing",
-#' "nlevels", "nocol",
-#' "nocum", "nofreq", "nopercent", "noprint",
-#' "nonobs", "norow", "nosparse", "notable", "out", "outcum", "report",
-#' "stacked", and "wide". See
-#' the \strong{Options} section for a description of these options. To get
-#' output from the function, you must pass either the "out" or "report" keywords
-#' to the \code{options} parameter.
+#' @param output Whether or not to return datasets from the function. Valid
+#' values are "all", "none", and "report".  Default is "all".
 #' @param by An optional by group. Parameter accepts a vector of one or more
 #' variable names. When this parameter is set, data
 #' will be subset for each by group, and tables will be generated for
@@ -193,6 +174,16 @@
 #' counts.
 # @param order How to order the output.
 # @param plots Any plots to produce.
+#' @param options The options desired for the function.
+#' Options are passed to the parameter as a vector of quoted strings. You may
+#' also use the \code{v()} function to pass unquoted strings.
+#' The following options are available:
+#' "chisq", "crosstab", "fisher", "list", "long", "missing",
+#' "nlevels", "nocol",
+#' "nocum", "nofreq", "nopercent", "noprint",
+#' "nonobs", "norow", "nosparse", "notable", "outcum",
+#' "stacked", and "wide". See
+#' the \strong{Options} section for a description of these options.
 #' @param titles A vector of titles to assign to the report.
 #' @return If no output datasets are requested, the function will return
 #' a NULL.  To request output datasets, pass the "out" or "report" option on
@@ -208,6 +199,9 @@
 #' @examples
 #' library(procs)
 #'
+#' # Turn off printing for CRAN checks
+#' options("procs.print" = FALSE)
+#'
 #' # Create sample data
 #' df <- as.data.frame(HairEyeColor, stringsAsFactors = FALSE)
 #'
@@ -219,7 +213,7 @@
 #' # Example #1: One way frequencies on Hair and Eye color with weight option.
 #' res <- proc_freq(df,
 #'                  tables = v(Hair, Eye),
-#'                  options = v(out, outcum, noprint),
+#'                  options = outcum,
 #'                  weight = Freq)
 #'
 #' # View result data
@@ -241,7 +235,7 @@
 #' # Example #2: 2 x 2 Crosstabulation table with Chi-Square statistic
 #' res <- proc_freq(df, tables = Hair * Eye,
 #'                      weight = Freq,
-#'                      options = v(out, crosstab, chisq, noprint))
+#'                      options = v(crosstab, chisq))
 #'
 #' # View result data
 #' res
@@ -273,7 +267,6 @@
 #' #' # Example #3: By variable with named table request
 #' res <- proc_freq(df, tables = v(Hair, Eye, Cross = Hair * Eye),
 #'                  by = Sex,
-#'                  options = v(out, noprint),
 #'                  weight = Freq)
 #'
 #' # View result data
@@ -340,9 +333,10 @@
 #' @export
 proc_freq <- function(data,
                       tables = NULL,
-                      options = NULL,
+                      output = NULL,
                       by = NULL,
                       weight = NULL,
+                      options = NULL,
                       titles = NULL
                     #  order = NULL,
                     #  plots = NULL
@@ -355,8 +349,9 @@ proc_freq <- function(data,
              "norow", "nosparse", "outcum",
              "sparse", "totpct",  "crosstab",
              "notable", "nonobs", "missing", "nlevels",
-             "out", "report",
              "wide", "long", "stacked")
+
+  outopts <- c("all", "report", "none")
 
   # "expected", "outexpect", "missprint"
 
@@ -380,6 +375,10 @@ proc_freq <- function(data,
   oopt <- deparse(substitute(options, env = environment()))
   options <- tryCatch({if (typeof(options) %in% c("character", "NULL")) options else oopt},
                      error = function(cond) {oopt})
+
+  oout <- deparse(substitute(output, env = environment()))
+  output <- tryCatch({if (typeof(output) %in% c("character", "NULL")) output else oout},
+                      error = function(cond) {oout})
 
 
   # Parameter checks
@@ -413,7 +412,7 @@ proc_freq <- function(data,
   }
 
   # Set default statistics for output parameters
-  if (has_option(options, "out"))
+  if (has_output(output))
     outreq <- outreq <- get_output_specs(tables, list(), options)
   else
     outreq <- NULL
@@ -421,14 +420,14 @@ proc_freq <- function(data,
 
   rptflg <- FALSE
   rptnm <- ""
-  if (option_true(options, "report", FALSE)) {
+  if (has_report(output)) {
     rptflg <- TRUE
   }
 
-  if (option_true(options, "noprint", FALSE))
-    view <- FALSE
-  else
+  if (has_view(options))
     view <- TRUE
+  else
+    view <- FALSE
 
   rptres <- NULL
   res <- NULL
@@ -465,7 +464,7 @@ proc_freq <- function(data,
     }
   }
 
-  log_freq(data = data, by = by, tables = tables, options = options,
+  log_freq(data = data, by = by, tables = tables, options = options, output = output,
            weight = weight, view = view, titles = titles, outcnt = length(res))
 
 
@@ -486,6 +485,7 @@ proc_freq <- function(data,
 log_freq <- function(data,
                      by = NULL,
                      tables = NULL,
+                     output = NULL,
                      options = NULL,
                      weight = NULL,
                      view = TRUE,
@@ -507,6 +507,8 @@ log_freq <- function(data,
   if (!is.null(by))
     ret[length(ret) + 1] <- paste0(indt, "by: ", paste(by, collapse = " "))
 
+  if (!is.null(output))
+    ret[length(ret) + 1] <- paste0(indt, "output: ", paste(output, collapse = " "))
 
   if (!is.null(weight))
     ret[length(ret) + 1] <- paste0(indt, "weight: ", paste(weight, collapse = " "))

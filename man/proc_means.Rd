@@ -9,9 +9,10 @@ proc_means(
   data,
   var = NULL,
   stats = c("n", "mean", "std", "min", "max"),
-  options = NULL,
+  output = NULL,
   by = NULL,
   class = NULL,
+  options = NULL,
   titles = NULL
 )
 }
@@ -34,9 +35,8 @@ keywords are: "css", "clm", "cv", "lclm", "mean", "median", "mode",
 Defaults statistics are: "n", "mean", "std",
 "min", and "max".}
 
-\item{options}{A vector of optional keywords. Valid values are:
-"long", "noprint", "notype, "nofreq", "nonobs", "out", "report",
-"stacked", and "wide".}
+\item{output}{Whether or not to return datasets from the function. Valid
+values are "all", "none", and "report".  Default is "all".}
 
 \item{by}{An optional by group. If you specify an by group, the input
 data will be subset on the by variable(s) prior to performing any
@@ -47,6 +47,10 @@ parameter, but the output is different.  By groups will create completely
 separate tables, while class groups will be continued in the same table.
 When a \code{by} and a \code{class} are both specified, the \code{class}
 will be nested in the \code{by}.}
+
+\item{options}{A vector of optional keywords. Valid values are:
+"long", "noprint", "notype, "nofreq", "nonobs",
+"stacked", and "wide".}
 
 \item{titles}{A vector of one or more titles to use for the report output.}
 }
@@ -179,8 +183,11 @@ values, etc.
 }
 
 \examples{
+# Turn off printing for CRAN checks
+options("procs.print" = FALSE)
+
 # Default statistics on iris
-res1 <- proc_means(iris, options = v(out, noprint))
+res1 <- proc_means(iris)
 
 # View results
 res1
@@ -192,8 +199,7 @@ res1
 
 # Defaults statistics with by
 res2 <- proc_means(iris,
-                   by = Species,
-                   options = v(out, noprint))
+                   by = Species)
 # View results
 res2
 #            BY TYPE FREQ          VAR  N  MEAN       STD MIN MAX
@@ -215,7 +221,7 @@ res3 <- proc_means(iris,
                    var = v(Petal.Length, Petal.Width),
                    class = Species,
                    stats = v(n, mean, std, median, qrange, clm),
-                   options = v(out, noprint, nofreq, long))
+                   options = v(nofreq, long))
 # View results
 res3
 #         CLASS TYPE   STAT Petal.Length Petal.Width

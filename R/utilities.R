@@ -429,6 +429,76 @@ get_name <- function(nm = NULL, var = NULL, bylbl = NULL) {
   return(ret)
 }
 
+has_output <- function(outpt) {
+
+  glb <- options("procs.interactive")[[1]]
+
+  ret <- TRUE
+
+  if (!is.null(glb)) {
+
+    if (glb == TRUE)
+      ret <- FALSE
+  }
+
+  if (!is.null(outpt)) {
+    if (any(tolower(outpt) %in% c("report", "none"))) {
+      ret <- FALSE
+    }
+
+    if (any(tolower(outpt) %in% c("all"))) {
+      ret <- TRUE
+    }
+
+  }
+
+  return(ret)
+}
+
+has_view <- function(opts) {
+
+  glb <- options("procs.interactive")[[1]]
+
+  ret <- TRUE
+
+  if (!is.null(glb)) {
+
+    if (glb == FALSE)
+      ret <- FALSE
+  }
+
+
+  if (!is.null(opts)) {
+    if (any(tolower(opts) %in% c("noprint"))) {
+      ret <- FALSE
+    }
+
+    if (any(tolower(opts) %in% c("print"))) {
+      ret <- TRUE
+    }
+
+  }
+
+  return(ret)
+
+}
+
+has_report<- function(outpt) {
+
+
+  ret <- FALSE
+
+
+  if (!is.null(outpt)) {
+    if (any(tolower(outpt) %in% c("report"))) {
+      ret <- TRUE
+    }
+
+  }
+
+  return(ret)
+
+}
 
 # Other Utilities ---------------------------------------------------------
 

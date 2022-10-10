@@ -15,8 +15,7 @@ knitr::opts_chunk$set(
 ```
 The `proc_means` function simulates a SAS® PROC MEANS procedure.  It is used to
 generate summary statistics on numeric variables.  The function is both 
-interactive and can return datasets.  By default, it
-is interactive only, and returns a NULL unless output data is requested. 
+interactive and returns datasets.   
 
 ## Create Sample Data
 
@@ -116,8 +115,9 @@ proc_means(dat, stats = v(median, sum, q1, q3))
 ## Output Datasets
 
 Similar to the `proc_freq` function, `proc_means` can return datasets.
-There are two options: "out" and "report".  The 
-"out" option returns datasets meant for further manipulation and analysis.
+There are three options: "all", "report", and "none".  The 
+"all" option returns datasets meant for further manipulation and analysis, and
+is the default.
 The "report" keyword requests the exact datasets used in the interactive
 report.  Specifying either one of these options will cause the function
 to return data.  
@@ -127,7 +127,7 @@ Here is an example that shows the difference in the "report" and "out" options:
 # Output dataset using "report" option
 res1 <- proc_means(dat, 
                    stats = v(median, sum, q1, q3),
-                   options = v(report, noprint))
+                   output = report)
 
 # View results
 res1
@@ -139,7 +139,7 @@ res1
 # Output dataset using "out" option
 res2 <- proc_means(dat, 
                    stats = v(median, sum, q1, q3),
-                   options = v(out, noprint))
+                   output = all)
 
 # View results
 res2
@@ -148,15 +148,16 @@ res2
 # 2    0    8   z     65 506 57.5 75.5
 
 ```
-As can be seen in the above example, the "out" option includes additional
+As can be seen in the above example, the "all" output datasets include additional
 variables for TYPE and FREQ. These additional variables can be 
-turned off with more options:
+turned off with options:
 ```{r eval=FALSE, echo=TRUE} 
 
 # Turn off TYPE and FREQ variables
 res3 <- proc_means(dat, 
                    stats = v(median, sum, q1, q3),
-                   options = v(out, noprint, notype, nofreq))
+                   output = all,
+                   options = v(notype, nofreq))
 
 # View results
 res3
@@ -177,8 +178,7 @@ the two function calls.
 ```{r eval=FALSE, echo=TRUE} 
 # Class grouping
 res1 <- proc_means(dat, stats = v(median, sum, q1, q3),
-                   class = y, 
-                   options = out)
+                   class = y)
 ```
 <img src="../man/images/meanstut3.png"/>
 
@@ -207,8 +207,7 @@ parameter:
 ```{r eval=FALSE, echo=TRUE} 
 # By grouping
 res2 <- proc_means(dat, stats = v(median, sum, q1, q3),
-                   by = y,
-                   options = out)
+                   by = y)
 
 ```
 <img src="../man/images/meanstut4.png"/>
@@ -242,8 +241,7 @@ the `class` parameter:
 ```{r eval=FALSE, echo=TRUE} 
 # Class grouping - two variables
 res1 <- proc_means(dat, stats = v(median, sum, q1, q3),
-                   class = v(g, y), 
-                   options = out)
+                   class = v(g, y))
 ```
 <img src="../man/images/meanstut5.png"/>
 
@@ -270,8 +268,7 @@ two variables:
 ```{r eval=FALSE, echo=TRUE} 
 # By grouping - two variables
 res2 <- proc_means(dat, stats = v(median, sum, q1, q3),
-                   by = v(g, y), 
-                   options = out)
+                   by = v(g, y))
 ```
 <img src="../man/images/meanstut6.png"/>
 
@@ -297,8 +294,7 @@ parameters:
 # By grouping - by and class
 res3 <- proc_means(dat, stats = v(median, sum, q1, q3),
                    by = g,
-                   class = y,
-                   options = out)
+                   class = y)
 ```
 <img src="../man/images/meanstut6.png"/>
 
@@ -337,7 +333,7 @@ shaping options:
 ```{r eval=FALSE, echo=TRUE} 
 # Shape wide
 res1 <- proc_means(dat, stats = v(median, sum, q1, q3),
-                   options = v(out, wide, noprint))
+                   options = wide)
 
 # Wide results
 res1
@@ -347,7 +343,7 @@ res1
 
 # Shape long
 res2 <- proc_means(dat, stats = v(median, sum, q1, q3),
-                   options = v(out, long, noprint))
+                   options = long))
 
 # Long results
 res2
@@ -359,7 +355,7 @@ res2
 
 # Shape stacked
 res3 <- proc_means(dat, stats = v(median, sum, q1, q3),
-                   options = v(out, stacked, noprint))
+                   options = stacked)
 
 # Stacked results
 res3

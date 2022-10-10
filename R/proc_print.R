@@ -79,7 +79,7 @@ proc_print <- function(data, file_path = NULL, output_type = "HTML",
   }
 
 
-  log_print(data, file_path = file_path, output_type = output_type,
+  log_prnt(data, file_path = file_path, output_type = output_type,
             titles = titles, style = style, view = view)
 
 
@@ -89,7 +89,7 @@ proc_print <- function(data, file_path = NULL, output_type = "HTML",
 
 
 
-log_print <- function(data, file_path = NULL, output_type = NULL,
+log_prnt <- function(data, file_path = NULL, output_type = NULL,
                       titles = NULL, style = NULL, view = NULL) {
 
   ret <- c()
