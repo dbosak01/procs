@@ -31,6 +31,8 @@
 <![endif]-->
 </head>
 <body data-spy="scroll" data-target="#toc">
+    
+
     <div class="container template-home">
       <header><div class="navbar navbar-inverse navbar-fixed-top" role="navigation">
   <div class="container">
@@ -43,19 +45,13 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="index.html">procs</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.9007</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.0.9007</span>
       </span>
     </div>
 
     <div id="navbar" class="navbar-collapse collapse">
       <ul class="nav navbar-nav"></ul>
 <ul class="nav navbar-nav navbar-right">
-<li>
-  <a href="index.html">
-    <span class="fas fa-home fa-lg"></span>
-     
-  </a>
-</li>
 <li>
   <a href="articles/procs.html">Get started</a>
 </li>
@@ -73,10 +69,16 @@
       <a href="articles/procs-means.html">The Means Function</a>
     </li>
     <li>
-      <a href="articles/procs-other.html">Other Functions</a>
+      <a href="articles/procs-dm.html">Data Manipulation Functions</a>
     </li>
     <li>
-      <a href="articles/procs-example1.html">Complete Example</a>
+      <a href="articles/procs-example1.html">Example 1: Demographics</a>
+    </li>
+    <li>
+      <a href="articles/procs-example2.html">Example 2: Adverse Events</a>
+    </li>
+    <li>
+      <a href="articles/procs-faq.html">Frequently Asked Questions</a>
     </li>
   </ul>
 </li>
@@ -90,7 +92,7 @@
   <a href="news/index.html">Changelog</a>
 </li>
 <li>
-  <a href="https://github.com/dbosak01/procs/">
+  <a href="https://github.com/dbosak01/procs/" class="external-link">
     <span class="fab fa-github fa-lg"></span>
      
   </a>
@@ -110,87 +112,45 @@
 
 
 <!-- badges: end -->
-<div id="introduction-to-procs" class="section level1">
-<div class="page-header"><h1 class="hasAnchor">
-<a href="#introduction-to-procs" class="anchor"></a>Introduction to <strong>procs</strong>
+<div class="section level1">
+<div class="page-header"><h1 id="introduction-to-procs">Introduction to <strong>procs</strong>
+<a class="anchor" aria-label="anchor" href="#introduction-to-procs"></a>
 </h1></div>
-<p><img src="man/images/procs_new.png" align="left" height="138" style="margin-right:10px"></p>
-<p>The purpose of the <strong>procs</strong> package is to recreate some
-SAS® procedures in R. The first version of the package will attempt to
-recreate PROC FREQ and PROC MEANS. Subsequent versions of the package
-will add more statistical procedures.</p>
-<p>The package will also include a recreation of PROC TRANSPOSE, PROC
-SORT, and PROC PRINT. The reason these procedures are included is
-because they are frequently used in conjunction with the statistical
-procedures to prepare results for reporting.</p>
-<p>There are three motivations for recreating SAS® statistical
-procedures in R:</p>
-<p><strong>1) Rich Outputs:</strong> R provides a wide range of
-statistical packages and functions. However, these statistical functions
-frequently return a fragmented output. The user is often left to compile
-R statistical results into a readable report themselves.</p>
-<p>SAS® software, on the other hand, provides the same statistical
-results, but with rich outputs. These outputs include multiple datasets,
-plots, and complete statistical reports. These rich outputs could be a
-benefit to R users.</p>
-<p><strong>2) Pre-Validation:</strong> There is an industry-wide
-movement to adopt R for statistical analysis. This effort is complicated
-by the fact that R statistical procedures frequently do not produce
-identical output to SAS®. Many hours are burned trying to figure out why
-R statistical results do not match SAS® statistical results.</p>
-<p>Therefore another goal of the package is to match SAS® statistics
-with as much fidelity as possible. If R statistical results match SAS®
-output, it makes it much easier to rewrite SAS® programs in R. This
-pre-validation will ultimately save the industry tens of thousands of
-hours of effort.</p>
-<p><strong>3) Ease of Adoption:</strong> Another important aspect of the
-package is to facilitate the adoption of R by SAS® programmers. SAS®
-programmers will easily understand and be comfortable with the functions
-in this package. They will become productive in R much faster than with
-Base R functions, or statistical functions from other packages.</p>
-<p><strong>4) Stability:</strong> SAS® software is renowned for its
-backwards compatibility. A final goal of the <strong>procs</strong>
-package is to create a set of functions with a similarly intense concern
-for stability. The package aims to avoid breaking changes at all costs.
-The dream is that programs written with these functions will still work
-years from now.</p>
-<div id="call-for-contributors" class="section level3">
-<h3 class="hasAnchor">
-<a href="#call-for-contributors" class="anchor"></a>Call for Contributors</h3>
-<p>There are many useful SAS® procedures, and these procedures are very
-complicated. The <strong>procs</strong> package is therefore also a
-potentially large and complicated package. The package would benefit
-from an energetic team of contributors, rather than relying on a single
-individual. If you wish to contribute to <strong>procs</strong>, please
-contact the package author at dbosak01 at gmail.com.</p>
+<p><img src="man/images/procs_new.png" align="left" height="138px" style="margin-right:10px;height:138px"></p>
+<p>The purpose of the <strong>procs</strong> package is to recreate some SAS® procedures in R. The first version of the package will attempt to recreate PROC FREQ and PROC MEANS. Subsequent versions of the package will add more statistical procedures.</p>
+<p>The package will also include a recreation of PROC TRANSPOSE, PROC SORT, and PROC PRINT. The reason these procedures are included is because they are frequently used in conjunction with the statistical procedures to prepare results for reporting.</p>
+<p>There are three motivations for recreating SAS® statistical procedures in R:</p>
+<p><strong>1) Rich Outputs:</strong> R provides a wide range of statistical packages and functions. However, these statistical functions frequently return a fragmented output. The user is often left to compile R statistical results into a readable report themselves.</p>
+<p>SAS® software, on the other hand, provides the same statistical results, but with rich outputs. These outputs include multiple datasets, plots, and complete statistical reports. These rich outputs could be a benefit to R users.</p>
+<p><strong>2) Pre-Validation:</strong> There is an industry-wide movement to adopt R for statistical analysis. This effort is complicated by the fact that R statistical procedures frequently do not produce identical output to SAS®. Many hours are burned trying to figure out why R statistical results do not match SAS® statistical results.</p>
+<p>Therefore another goal of the package is to match SAS® statistics with as much fidelity as possible. If R statistical results match SAS® output, it makes it much easier to rewrite SAS® programs in R. This pre-validation will ultimately save the industry tens of thousands of hours of effort.</p>
+<p><strong>3) Ease of Adoption:</strong> Another important aspect of the package is to facilitate the adoption of R by SAS® programmers. SAS® programmers will easily understand and be comfortable with the functions in this package. They will become productive in R much faster than with Base R functions, or statistical functions from other packages.</p>
+<p><strong>4) Stability:</strong> SAS® software is renowned for its backwards compatibility. A final goal of the <strong>procs</strong> package is to create a set of functions with a similarly intense concern for stability. The package aims to avoid breaking changes at all costs. The dream is that programs written with these functions will still work years from now.</p>
+<div class="section level3">
+<h3 id="call-for-contributors">Call for Contributors<a class="anchor" aria-label="anchor" href="#call-for-contributors"></a>
+</h3>
+<p>There are many useful SAS® procedures, and these procedures are very complicated. The <strong>procs</strong> package is therefore also a potentially large and complicated package. The package would benefit from an energetic team of contributors, rather than relying on a single individual. If you wish to contribute to <strong>procs</strong>, please contact the package author at dbosak01 at gmail.com.</p>
 </div>
-<div id="installation" class="section level3">
-<h3 class="hasAnchor">
-<a href="#installation" class="anchor"></a>Installation</h3>
-<p>The easiest way to install the <strong>procs</strong> package is to
-run the following command from your R console:</p>
+<div class="section level3">
+<h3 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
+</h3>
+<p>The easiest way to install the <strong>procs</strong> package is to run the following command from your R console:</p>
 <div class="sourceCode" id="cb1"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">install.packages</span>(<span class="st">"procs"</span>)</span></code></pre></div>
 <p>Then put the following line at the top of your script:</p>
 <div class="sourceCode" id="cb2"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(procs)</span></code></pre></div>
-<p>For examples and usage information, please visit the
-<strong>procs</strong> documentation site <a href="https://procs.r-sassy.org/articles/procs.html">here</a></p>
+<p>For examples and usage information, please visit the <strong>procs</strong> documentation site <a href="https://procs.r-sassy.org/articles/procs.html">here</a></p>
 </div>
-<div id="getting-help" class="section level3">
-<h3 class="hasAnchor">
-<a href="#getting-help" class="anchor"></a>Getting Help</h3>
+<div class="section level3">
+<h3 id="getting-help">Getting Help<a class="anchor" aria-label="anchor" href="#getting-help"></a>
+</h3>
 <p>If you need help, the first place to turn to is the <a href="https://procs.r-sassy.org">procs</a> web site.</p>
-<p>If you want to look at the code for the <strong>procs</strong>
-package, visit the github page <a href="https://github.com/dbosak01/procs">here</a>.</p>
-<p>If you encounter a bug or have a feature request, please submit an
-issue <a href="https://github.com/dbosak01/procs/issues">here</a>.</p>
+<p>If you want to look at the code for the <strong>procs</strong> package, visit the github page <a href="https://github.com/dbosak01/procs" class="external-link">here</a>.</p>
+<p>If you encounter a bug or have a feature request, please submit an issue <a href="https://github.com/dbosak01/procs/issues" class="external-link">here</a>.</p>
 </div>
-<div id="see-also" class="section level3">
-<h3 class="hasAnchor">
-<a href="#see-also" class="anchor"></a>See Also</h3>
-<p>The <strong>procs</strong> package is part of the
-<strong>sassy</strong> meta-package. The <strong>sassy</strong>
-meta-package includes several packages that help make R easier. You can
-read more about the <strong>sassy</strong> package <a href="https://sassy.r-sassy.org">here</a>.</p>
+<div class="section level3">
+<h3 id="see-also">See Also<a class="anchor" aria-label="anchor" href="#see-also"></a>
+</h3>
+<p>The <strong>procs</strong> package is part of the <strong>sassy</strong> meta-package. The <strong>sassy</strong> meta-package includes several packages that help make R easier. You can read more about the <strong>sassy</strong> package <a href="https://sassy.r-sassy.org" class="external-link">here</a>.</p>
 </div>
 </div>
 
@@ -198,50 +158,61 @@ read more about the <strong>sassy</strong> package <a href="https://sassy.r-sass
 
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <div class="links">
-<h2>Links</h2>
+<h2 data-toc-skip>Links</h2>
 <ul class="list-unstyled">
-<li>Browse source code at <br><a href="https://github.com/dbosak01/procs/">https://​github.com/​dbosak01/​procs/​</a>
-</li>
-<li>Report a bug at <br><a href="https://github.com/dbosak01/procs/issues">https://​github.com/​dbosak01/​procs/​issues</a>
-</li>
+<li><a href="https://github.com/dbosak01/procs/" class="external-link">Browse source code</a></li>
+<li><a href="https://github.com/dbosak01/procs/issues" class="external-link">Report a bug</a></li>
 </ul>
 </div>
+
 <div class="license">
-<h2>License</h2>
+<h2 data-toc-skip>License</h2>
 <ul class="list-unstyled">
 <li><a href="LICENSE.html">Full license</a></li>
 <li><small>CC0</small></li>
 </ul>
 </div>
-<div class="developers">
-<h2>Developers</h2>
+
+
+<div class="citation">
+<h2 data-toc-skip>Citation</h2>
 <ul class="list-unstyled">
-<li>David Bosak <br><small class="roles"> Author, maintainer </small>  </li>
-<li><a href="authors.html">All authors...</a></li>
+<li><a href="authors.html#citation">Citing procs</a></li>
 </ul>
 </div>
 
-  <div class="dev-status">
-<h2>Dev status</h2>
+<div class="developers">
+<h2 data-toc-skip>Developers</h2>
 <ul class="list-unstyled">
-<li><a href="https://cran.r-project.org/package=procs"><img src="https://www.r-pkg.org/badges/version/procs" alt="procs version"></a></li>
-<li><a href="https://cran.r-project.org/package=procs"><img src="https://img.shields.io/badge/lifecycle-maturing-blue.svg" alt="procs lifecycle"></a></li>
-<li><a href="https://cran.r-project.org/package=procs"><img src="https://cranlogs.r-pkg.org/badges/procs" alt="procs downloads"></a></li>
-<li><a href="https://cran.r-project.org/package=procs"><img src="https://cranlogs.r-pkg.org/badges/grand-total/procs" alt="procs total downloads"></a></li>
-<li><a href="https://github.com/dbosak01/procs/actions/workflows/R-CMD-check.yaml"><img src="https://github.com/dbosak01/procs/actions/workflows/R-CMD-check.yaml/badge.svg" alt="R-CMD-check"></a></li>
-<li><a href="https://app.codecov.io/gh/dbosak01/procs?branch=master"><img src="https://codecov.io/gh/dbosak01/procs/branch/master/graph/badge.svg" alt="Codecov test coverage"></a></li>
+<li>David Bosak <br><small class="roles"> Author, maintainer </small>  </li>
+<li><a href="authors.html">More about authors...</a></li>
 </ul>
 </div>
+
+<div class="dev-status">
+<h2 data-toc-skip>Dev status</h2>
+<ul class="list-unstyled">
+<li><a href="https://cran.r-project.org/package=procs" class="external-link"><img src="https://www.r-pkg.org/badges/version/procs" alt="procs version"></a></li>
+<li><a href="https://cran.r-project.org/package=procs" class="external-link"><img src="https://img.shields.io/badge/lifecycle-maturing-blue.svg" alt="procs lifecycle"></a></li>
+<li><a href="https://cran.r-project.org/package=procs" class="external-link"><img src="https://cranlogs.r-pkg.org/badges/procs" alt="procs downloads"></a></li>
+<li><a href="https://cran.r-project.org/package=procs" class="external-link"><img src="https://cranlogs.r-pkg.org/badges/grand-total/procs" alt="procs total downloads"></a></li>
+<li><a href="https://github.com/dbosak01/procs/actions/workflows/R-CMD-check.yaml" class="external-link"><img src="https://github.com/dbosak01/procs/actions/workflows/R-CMD-check.yaml/badge.svg" alt="R-CMD-check"></a></li>
+<li><a href="https://app.codecov.io/gh/dbosak01/procs?branch=master" class="external-link"><img src="https://codecov.io/gh/dbosak01/procs/branch/master/graph/badge.svg" alt="Codecov test coverage"></a></li>
+</ul>
 </div>
+
+  </div>
 </div>
 
 
       <footer><div class="copyright">
-  <p>Developed by David Bosak.</p>
+  <p></p>
+<p>Developed by David Bosak.</p>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
+  <p></p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.</p>
 </div>
 
       </footer>
@@ -249,6 +220,8 @@ read more about the <strong>sassy</strong> package <a href="https://sassy.r-sass
 
   
 
+
+  
 
   </body>
 </html>

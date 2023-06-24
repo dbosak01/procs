@@ -28,5 +28,6 @@
 #'
 #' See function documentation for additional details.
 #' @docType package
+#' @keywords internal
 #' @name procs
 NULL

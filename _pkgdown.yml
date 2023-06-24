@@ -6,28 +6,39 @@ articles:
   contents:
   - procs-freq
   - procs-means
-  - procs-other
+  - procs-dm
   - procs-example1
+  - procs-example2
+  - procs-faq
 
 reference:
-- title: Statistical Functions
-  desc: Functions that mimic SAS® statistical procedures.
+- title: Statistics
+  desc: Functions that calculate statistics.
   contents:
   - proc_freq
   - proc_means
 
-- title: Data Manipulation Functions
-  desc: Functions that simulate other SAS® procedures.
+- title: Data Manipulation
+  desc: Functions to manipulate data.
   contents:
   - proc_transpose
   - proc_sort
+
+- title: Utility
+  desc: Functions that simulate other procedures.
+  contents:
   - proc_print
+
+news:
+  cran_dates: false
 
 navbar:
   type: inverse
   structure:
     right: [home, intro, articles, reference, faq, news, github]
+    left: []
   components:
     faq:
       text: FAQ
+      content:
       href: ./articles/procs-faq.html

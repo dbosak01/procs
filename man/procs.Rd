@@ -35,3 +35,4 @@ The \strong{procs} package contains the following major functions:
 See function documentation for additional details.
 }
 
+\keyword{internal}

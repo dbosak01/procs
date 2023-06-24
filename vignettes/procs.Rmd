@@ -23,7 +23,7 @@ than many R statistical functions.
 
 ## Key Functions
 
-The package includes the following procedure functions:
+The package includes the following functions:
 
 * `proc_freq()`: A function to simulate the FREQ procedure.
 * `proc_means()`: A function to simulate the MEANS or SUMMARY procedure.
@@ -47,7 +47,7 @@ options to control the output data and display.
 
 Note that the `options("procs.print" = FALSE)` global option
 has been added to these examples to allow the **procs** package to pass
-CRAN checks.  When running sample code yourself,  
+CRAN checks.  When running sample code yourself,
 remove this option or set to TRUE.
 
 ```{r eval=FALSE, echo=TRUE} 
@@ -71,7 +71,8 @@ res <- proc_freq(dt, tables = v(Hair, Eye, Hair * Eye),
                  titles = "Hair and Eye Frequency Statistics")
 
 ```
-By default, the following report will be shown in the viewer:  
+When printing is allowed, the `proc_freq` function will display the 
+following report in the viewer:  
 <img src="../man/images/freq1.png"/>
 
 The function call requested output datasets using the "report" option. If 
@@ -180,10 +181,10 @@ the output datasets.
 
 ### Other Functions
 
-While the main purpose of the **procs** package is to replicate SAS® statistical
+While the main focus of the **procs** package is on statistical
 procedures, the output from these procedures is often manipulated to
 produce a more desirable result. Some additional functions have been added
-to the **procs** package that SAS programmers will be familiar with:
+to the **procs** package that SAS® programmers will be familiar with:
 `proc_transpose()`, `proc_sort()`, and `proc_print()`.
 
 Continuing from the example above, let's take some additional steps
@@ -270,8 +271,9 @@ Those articles include:
 
 * [The Frequency Function](procs-freq.html)
 * [The Means Function](procs-means.html)
-* [Other Functions](procs-other.html)
-* [Complete Example](procs-example1.html)
+* [Data Manipulation Functions](procs-dm.html)
+* [Example 1: Demographics](procs-example1.html)
+* [Example 2: Adverse Events](procs-example2.html)
 
 
 

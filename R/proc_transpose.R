@@ -9,19 +9,44 @@
 #' accept quoted or unquoted values.
 #' @details
 #' The \code{proc_tranpose} function takes an input data frame or tibble
-#' and transposes the columns and rows.
+#' and transposes the columns and rows.  If no parameters are specified,
+#' the function will assign all numeric variables to the \code{var} parameter.
+#' These variables will become rows, and generic column names
+#' ("COL1", "COL2", etc.) will be generated.
+#' Other variables will be dropped.
 #'
-#' Talk about vars
+#' There are several parameters to control how new column names are constructed.
+#' If the desired column names already exist in your data, identify them on the
+#' \code{id} parameter.  The function will then use those data values
+#' unaltered.  The label for these new columns can also be constructed from
+#' data values using the \code{idlabel} parameter.
 #'
-#' Talk about ID
+#' The \code{name} and \code{namelabel} parameter are used to control the
+#' name of the column created for the \code{var} values.  If this parameter
+#' is not passed, the column will be called "NAME", and no label will be assigned.
 #'
-#' Talk about by groups
+#' You may group the transposed values using the \code{by} parameter. This
+#' parameter accepts one or more variable names to use for grouping.  If this
+#' parameter is used, the function will first subset the data by the unique
+#' combination of \code{by} variables, transpose each subset, and then
+#' combine the result into a single output dataset.  The by group variables
+#' will be named on the output dataset with a generic name ("BY1", "BY2", etc.).
 #'
-#' Talk about copy
+#' The \code{copy} parameter is used to simply copy columns from the input
+#' dataset to the transposed dataset.  If necessary, these values will be
+#' recycled or truncated to fit the number of output rows.  Any input
+#' variables not included in the \code{var}, \code{id}, or \code{copy} parameter
+#' will be dropped.
 #'
-#' Talk about column naming
+#' Once the transpose is complete, you may wish to filter the output data.
+#' Filtering can be accomplished using the \code{where} parameter.  This parameter
+#' takes an expression using the \code{expression} function.  The expression
+#' is constructed using standard R logical operators.  Variable names do
+#' not need to be quoted.
 #'
-#' Talk about where clause
+#' The \code{prefix}, \code{delimiter}, and \code{suffix} parameter are used
+#' to control how generic column names are constructed.  These parameters
+#' are especially useful when there are multiple \code{var} variables.
 #'
 #' @param data The input data to transpose.
 #' @param by An optional by group.  Parameter accepts a vector of one or more
@@ -174,6 +199,18 @@ proc_transpose <- function(data,
   onamelabel <- deparse(substitute(namelabel, env = environment()))
   namelabel <- tryCatch({if (typeof(namelabel) %in% c("character", "NULL")) namelabel else onamelabel},
                    error = function(cond) {onamelabel})
+
+  oprefix <- deparse(substitute(prefix, env = environment()))
+  prefix <- tryCatch({if (typeof(prefix) %in% c("character", "NULL")) prefix else oprefix},
+                        error = function(cond) {oprefix})
+
+  osuffix <- deparse(substitute(suffix, env = environment()))
+  suffix <- tryCatch({if (typeof(suffix) %in% c("character", "NULL")) suffix else osuffix},
+                     error = function(cond) {osuffix})
+
+  odelimiter <- deparse(substitute(delimiter, env = environment()))
+  delimiter <- tryCatch({if (typeof(delimiter) %in% c("character", "NULL")) delimiter else odelimiter},
+                     error = function(cond) {odelimiter})
 
   # Parameter checks
   nms <- names(data)
@@ -373,8 +410,14 @@ proc_transpose <- function(data,
 
      } else {
 
+       if (is.null(prefix))
+         prefix <- "COL"
+
+       if (is.null(suffix))
+         suffix <- ""
+
        if (nrow(dt) > 0) {
-         nms_new <- paste0("COL", seq(1, nrow(dt)))
+         nms_new <- paste0(prefix, seq(1, nrow(dt)), suffix)
          names(ret) <- c(by, copy, name,  nms_new)
        } else {
          names(ret) <- name

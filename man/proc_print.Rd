@@ -51,7 +51,7 @@ options("procs.print" = FALSE)
 # Print mtcars to the viewer
 proc_print(mtcars)
 
-# Print mtcars to a PDF
+# Print mtcars to an RTF
 pth <- proc_print(mtcars,
                   file_path = tempfile(fileext = ".rtf"),
                   titles = "MTCARS Proc Print Example",

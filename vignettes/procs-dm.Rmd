@@ -1,0 +1,443 @@
+---
+title: "Data Manipulation Functions"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Data Manipulation Functions}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+## Transpose
+
+There are several functions in base R to pivot data.  These include the `t()`
+and `reshape()` functions.  There are also well-designed functions in the
+**tidyverse** for transposing data.  Nevertheless, some users will prefer
+the syntax of `proc_transpose`.  This function provides control over output
+column naming, and an intuitive set of parameters.
+
+To explore `proc_transpose`, let's first create some sample data:
+```{r eval=FALSE, echo=TRUE} 
+# Create input data
+dat <- read.table(header = TRUE, text = '
+                  Name    Subject   Semester1  Semester2
+                  Samma	  Maths	    96             94
+                  Sandy	  English	  76             51
+                  Devesh	German	  76             95
+                  Rakesh	Maths	    50             63
+                  Priya	  English	  62             80
+                  Kranti	Maths	    92             92
+                  William	German	  87             75')
+
+# View data
+dat
+#      Name Subject Semester1 Semester2
+# 1   Samma   Maths        96        94
+# 2   Sandy English        76        51
+# 3  Devesh  German        76        95
+# 4  Rakesh   Maths        50        63
+# 5   Priya English        62        80
+# 6  Kranti   Maths        92        92
+# 7 William  German        87        75
+```
+### Default Transpose
+
+The `proc_tranpose` function may be executed without any parameters.  The 
+default usage will tranpose all numeric variables and construct generic 
+column names for the new columns:
+```{r eval=FALSE, echo=TRUE} 
+# No parameters
+res <- proc_transpose(dat)
+
+# View result
+res
+#        NAME COL1 COL2 COL3 COL4 COL5 COL6 COL7
+# 1 Semester1   96   76   76   50   62   92   87
+# 2 Semester2   94   51   95   63   80   92   75
+
+```
+If you didn't want all numeric variables transposed, you could specify which
+variable(s) to transpose using the `var` parameter. Multiple variables can be
+passed as a vector:
+```{r eval=FALSE, echo=TRUE} 
+# Var parameter
+res <- proc_transpose(dat, var = "Semester1")
+
+# View result
+res
+#        NAME COL1 COL2 COL3 COL4 COL5 COL6 COL7
+# 1 Semester1   96   76   76   50   62   92   87
+
+```
+
+### Prefix and Suffix
+
+Notice that in the default usage, all output column names have been assigned
+generic names.  You may control the output column names using the `prefix`, 
+`suffix`, and `name` parameters.  The `prefix` and `suffix` will be used to
+construct the new transposed column names.  The `name` parameter value will
+be used as the name of the generic "NAME" column which identify 
+the `var` parameter values:
+```{r eval=FALSE, echo=TRUE} 
+# With prefix
+res <- proc_transpose(dat, name = VarName, prefix = Student)
+
+# View result
+res
+    VarName Student1 Student2 Student3 Student4 Student5 Student6 Student7
+1 Semester1       96       76       76       50       62       92       87
+2 Semester2       94       51       95       63       80       92       75
+```
+Here is the same function call with a `suffix`:
+```{r eval=FALSE, echo=TRUE} 
+# With suffix
+res <- proc_transpose(dat, name = VarName, prefix = S, suffix = Score)
+
+# View result
+res
+    VarName S1Score S2Score S3Score S4Score S5Score S6Score S7Score
+1 Semester1      96      76      76      50      62      92      87
+2 Semester2      94      51      95      63      80      92      75
+```
+Note that since a variable name in R cannot start with a number, some sort
+of prefix is required.
+
+### Name Columns From Data
+
+If your data contains a column with appropriate labels for the transposed columns,
+you can assign it to the `id` parameter.  The `id` values will then be used for
+the new column names.
+```{r eval=FALSE, echo=TRUE} 
+# Assign column names from data
+res <- proc_transpose(dat, name = VarName, id = Name)
+
+# View result
+res
+    VarName Samma Sandy Devesh Rakesh Priya Kranti William
+1 Semester1    96    76     76     50    62     92      87
+2 Semester2    94    51     95     63    80     92      75
+```
+
+Using two `id` parameters tells the function that you want columns that are
+combinations of the two variables:
+```{r eval=FALSE, echo=TRUE}
+# Two id variables
+res <- proc_transpose(dat, id = v(Name, Subject))
+
+res
+#        NAME Samma.Maths Sandy.English Devesh.German Rakesh.Maths Priya.English Kranti.Maths William.German
+# 1 Semester1          96            76            76           50            62           92             87
+# 2 Semester2          94            51            95           63            80           92             75
+```
+The default delimiter shown above is a dot (".").  The delimiter may be changed
+with the `delimiter` parameter:
+
+```{r eval=FALSE, echo=TRUE}
+# Underscore delimiter
+res <- proc_transpose(dat, id = v(Name, Subject), delimiter = "_")
+
+res
+#        NAME Samma_Maths Sandy_English Devesh_German Rakesh_Maths Priya_English Kranti_Maths William_German
+# 1 Semester1          96            76            76           50            62           92             87
+# 2 Semester2          94            51            95           63            80           92             75
+```
+
+### By Groups
+
+The `by` parameter tells the function to group by the `by` variable 
+before transposing.  As you can see below, the `by` varible is then retained
+on the output dataset so you can identify which rows belong to which group.
+```{r eval=FALSE, echo=TRUE} 
+# By variable
+res <- proc_transpose(dat, by = Name, id = Subject, name = Semester)
+
+# View result
+res
+#       Name  Semester German English Maths
+# 1   Devesh Semester1     76      NA    NA
+# 2   Devesh Semester2     95      NA    NA
+# 3   Kranti Semester1     NA      NA    92
+# 4   Kranti Semester2     NA      NA    92
+# 5    Priya Semester1     NA      62    NA
+# 6    Priya Semester2     NA      80    NA
+# 7   Rakesh Semester1     NA      NA    50
+# 8   Rakesh Semester2     NA      NA    63
+# 9    Samma Semester1     NA      NA    96
+# 10   Samma Semester2     NA      NA    94
+# 11   Sandy Semester1     NA      76    NA
+# 12   Sandy Semester2     NA      51    NA
+# 13 William Semester1     87      NA    NA
+# 14 William Semester2     75      NA    NA 
+```
+The `by` parameter is a valuable feature of `proc_transpose`.  The by variable
+can have a significant effect on the shape of the output data. Let's see
+what happens when we use a different by variable.
+```{r eval=FALSE, echo=TRUE} 
+# By variable
+res <- proc_transpose(dat, by = Subject, id = Name)
+
+#   Subject      NAME Sandy Priya Devesh William Samma Rakesh Kranti
+# 1 English Semester1    76    62     NA      NA    NA     NA     NA
+# 2 English Semester2    51    80     NA      NA    NA     NA     NA
+# 3  German Semester1    NA    NA     76      87    NA     NA     NA
+# 4  German Semester2    NA    NA     95      75    NA     NA     NA
+# 5   Maths Semester1    NA    NA     NA      NA    96     50     92
+# 6   Maths Semester2    NA    NA     NA      NA    94     63     92
+
+```
+
+Now let's use two by variables:
+```{r eval=FALSE, echo=TRUE} 
+# Two by variables
+res <- proc_transpose(dat, by = v(Name, Subject))
+
+# View results
+res
+#       Name Subject      NAME COL1
+# 1    Priya English Semester1   62
+# 2    Priya English Semester2   80
+# 3    Sandy English Semester1   76
+# 4    Sandy English Semester2   51
+# 5   Devesh  German Semester1   76
+# 6   Devesh  German Semester2   95
+# 7  William  German Semester1   87
+# 8  William  German Semester2   75
+# 9   Kranti   Maths Semester1   92
+# 10  Kranti   Maths Semester2   92
+# 11  Rakesh   Maths Semester1   50
+# 12  Rakesh   Maths Semester2   63
+# 13   Samma   Maths Semester1   96
+# 14   Samma   Maths Semester2   94
+
+```
+By transposing one more time on the results of the previous example,
+you can nearly restore the original data frame.
+```{r eval=FALSE, echo=TRUE} 
+# Restore original data shape
+res2 <- proc_transpose(res, by = v(Name, Subject), id = NAME)
+
+# View results
+res2[ , c("Name", "Subject", "Semester1", "Semester2")]
+#      Name Subject Semester1 Semester2
+# 1   Priya English        62        80
+# 2   Sandy English        76        51
+# 3  Devesh  German        76        95
+# 4 William  German        87        75
+# 5  Kranti   Maths        92        92
+# 6  Rakesh   Maths        50        63
+# 7   Samma   Maths        96        94
+
+```
+## Sort
+
+The `proc_sort` function in the **procs** package attempts to recreate the most
+basic functionality of PROC SORT.  The function accepts an input data frame
+and returns the sorted result. Before examining the function, first let's create
+some sample data:
+```{r eval=FALSE, echo=TRUE} 
+# Create sample data
+dat <- read.table(header = TRUE, text = '
+                    ID	Name	Score
+                    1	David	74
+                    2	Sam	45
+                    3	Bane	87
+                    3	Mary	92
+                    4	Dane	23
+                    5	Jenny	87
+                    6	Simran	63
+                    8	Priya	72 
+                    1	David	45
+                    2	Ram	54
+                    3	Bane	87
+                    5	Ken	87')
+
+# View data
+dat
+#    ID   Name Score
+# 1   1  David    74
+# 2   2    Sam    45
+# 3   3   Bane    87
+# 4   3   Mary    92
+# 5   4   Dane    23
+# 6   5  Jenny    87
+# 7   6 Simran    63
+# 8   8  Priya    72
+# 9   1  David    45
+# 10  2    Ram    54
+# 11  3   Bane    87
+# 12  5    Ken    87
+```
+
+Like `proc_transpose`, the function has a default
+usage, which will sort by all variables:
+```{r eval=FALSE, echo=TRUE} 
+# Default sort
+res <- proc_sort(dat)
+
+# View results
+res
+#    ID   Name Score
+# 9   1  David    45
+# 1   1  David    74
+# 10  2    Ram    54
+# 2   2    Sam    45
+# 3   3   Bane    87
+# 11  3   Bane    87
+# 4   3   Mary    92
+# 5   4   Dane    23
+# 6   5  Jenny    87
+# 12  5    Ken    87
+# 7   6 Simran    63
+# 8   8  Priya    72
+
+```
+### Sort By
+To sort by a specific variable, you can use the `by` parameter:
+```{r eval=FALSE, echo=TRUE} 
+# Sort By
+res <- proc_sort(dat, by = Score)
+
+# View results
+res
+#    ID   Name Score
+# 5   4   Dane    23
+# 2   2    Sam    45
+# 9   1  David    45
+# 10  2    Ram    54
+# 7   6 Simran    63
+# 8   8  Priya    72
+# 1   1  David    74
+# 3   3   Bane    87
+# 6   5  Jenny    87
+# 11  3   Bane    87
+# 12  5    Ken    87
+# 4   3   Mary    92
+```
+You can also sort by two variables:
+```{r eval=FALSE, echo=TRUE} 
+# Sort By
+res <- proc_sort(dat, by = v(Score, Name))
+
+# View results
+res
+#    ID   Name Score
+# 5   4   Dane    23
+# 9   1  David    45
+# 2   2    Sam    45
+# 10  2    Ram    54
+# 7   6 Simran    63
+# 8   8  Priya    72
+# 1   1  David    74
+# 3   3   Bane    87
+# 11  3   Bane    87
+# 6   5  Jenny    87
+# 12  5    Ken    87
+# 4   3   Mary    92
+```
+Notice that when the scores are tied, the data is now sorted alphabetically 
+by name.
+
+### Sort Order
+
+To put the highest scores on top, you can sort descending using the `order`
+parameter.
+```{r eval=FALSE, echo=TRUE} 
+# Sort By
+res <- proc_sort(dat, by = Score, order = descending)
+
+# View results
+res
+#    ID   Name Score
+# 4   3   Mary    92
+# 3   3   Bane    87
+# 6   5  Jenny    87
+# 11  3   Bane    87
+# 12  5    Ken    87
+# 1   1  David    74
+# 8   8  Priya    72
+# 7   6 Simran    63
+# 10  2    Ram    54
+# 2   2    Sam    45
+# 9   1  David    45
+# 5   4   Dane    23
+```
+
+The `order` instructions can be abbreviated "a" for ascending and "d" for 
+descending.  These abbreviations are convenient when there is more than 
+one `by` variable.
+```{r eval=FALSE, echo=TRUE} 
+# Sort By
+res <- proc_sort(dat, by = v(Score, Name), order = v(d, a))
+
+# View results
+res
+#    ID   Name Score
+# 4   3   Mary    92
+# 3   3   Bane    87
+# 11  3   Bane    87
+# 6   5  Jenny    87
+# 12  5    Ken    87
+# 1   1  David    74
+# 8   8  Priya    72
+# 7   6 Simran    63
+# 10  2    Ram    54
+# 9   1  David    45
+# 2   2    Sam    45
+# 5   4   Dane    23
+```
+### Keep 
+The `keep` parameter allows you to select only some of the variables for the
+output dataset:
+```{r eval=FALSE, echo=TRUE} 
+# Keep Name and Score only
+res <- proc_sort(dat, by = Name, keep = v(Name, Score))
+
+# View results
+res
+#      Name Score
+# 3    Bane    87
+# 11   Bane    87
+# 5    Dane    23
+# 1   David    74
+# 9   David    45
+# 6   Jenny    87
+# 12    Ken    87
+# 4    Mary    92
+# 8   Priya    72
+# 10    Ram    54
+# 2     Sam    45
+# 7  Simran    63
+
+```
+
+### Nodupkey
+Another convenient feature of `proc_sort` is the `nodupkey` parameter.  This 
+parameter will eliminate duplicates based on the unique combination of values
+of the `by` variables. For instance, to get a unique list of students, you
+could use `keep` and `nodupkey = TRUE`:
+```{r eval=FALSE, echo=TRUE} 
+# Keep and Nodupkey
+res <- proc_sort(dat, by = Name, keep = Name, nodupkey = TRUE)
+
+# View results
+res
+#      Name
+# 3    Bane
+# 5    Dane
+# 1   David
+# 6   Jenny
+# 12    Ken
+# 4    Mary
+# 8   Priya
+# 10    Ram
+# 2     Sam
+# 7  Simran
+```
+
+

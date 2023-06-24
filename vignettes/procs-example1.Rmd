@@ -1,8 +1,8 @@
 ---
-title: "Complete Example"
+title: "Example 1: Demographics"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Complete Example}
+  %\VignetteIndexEntry{Example 1: Demographics}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -32,6 +32,7 @@ options("logr.autolog" = TRUE,
         "logr.notes" = FALSE,
         "procs.print" = FALSE)
 
+# Get temp directory
 tmp <- tempdir()
 
 # Open log
@@ -54,7 +55,7 @@ put("Sex decodes")
 fmt_sex <- value(condition(is.na(x), "Missing"),
                  condition(x == "M", "Male"),
                  condition(x == "F", "Female"),
-                 condition(TRUE, "Other"))
+                 condition(TRUE, "Other")) 
 
 put("Race decodes")
 fmt_race <- value(condition(is.na(x), "Missing"),
@@ -74,7 +75,7 @@ fc <- fcat(MEAN = "%.1f", STD = "(%.2f)",
            AOV.F = "%5.3f",
            AOV.P = "(%5.3f)",
            CHISQ = "%5.3f",
-           CHISQ.P = "(%5.3f)")
+           CHISQ.P = "(%5.3f)") 
 
 
 # Load and Prepare Data ---------------------------------------------------
@@ -103,124 +104,122 @@ adsl <- read.table(header = TRUE, text = '
   "016"   "ARM A" "M"  "WHITE" 40')  
 
 put("Categorize AGE")
-adsl$AGECAT <- fapply(adsl$AGE, agecat) |> put()
+adsl$AGECAT <- fapply(adsl$AGE, agecat) 
+
+put("Log starting dataset")
+put(adsl)
 
 
 put("Get ARM population counts")
-arm_pop <- 
-  proc_freq(adsl, tables = ARM, 
-            options = v(nopercent, nonobs, long)) 
+proc_freq(adsl, tables = ARM, 
+          options = v(long, nopercent, nonobs)) -> arm_pop
 
 # Age Summary Block -------------------------------------------------------
 
 sep("Create summary statistics for age")
 
 put("Call means procedure to get summary statistics for age")
-age_stats <- 
-  proc_means(adsl, var = AGE,
-             stats = v(n, mean, std, median, q1, q3, min, max),
-             by = ARM, 
-             options = v(notype, nofreq)) 
+proc_means(adsl, var = AGE,
+           stats = v(n, mean, std, median, q1, q3, min, max),
+           by = ARM, 
+           options = v(notype, nofreq)) -> age_stats 
 
 put("Combine stats")
-age_comb <- 
-  datastep(age_stats, 
-           format = fc,
-           drop = find.names(age_stats, start = 4), 
-           {
-              `Mean (SD)` <- fapply2(MEAN, STD)
-              Median <- MEDIAN
-              `Q1 - Q3` <- fapply2(Q1, Q3, sep = " - ")
-              `Min - Max` <- fapply2(MIN, MAX, sep = " - ")
-           }) 
+datastep(age_stats, 
+         format = fc,
+         drop = find.names(age_stats, start = 4), 
+         {
+           `Mean (SD)` <- fapply2(MEAN, STD)
+           Median <- MEDIAN
+           `Q1 - Q3` <- fapply2(Q1, Q3, sep = " - ")
+           `Min - Max` <- fapply2(MIN, MAX, sep = " - ")
+           
+           
+         }) -> age_comb
 
 put("Transpose ARMs into columns")
-age_trans <- 
-  proc_transpose(age_comb, 
-                 var = names(age_comb),
-                 copy = VAR, id = BY, 
-                 name = LABEL) 
+proc_transpose(age_comb, 
+               var = names(age_comb),
+               copy = VAR, id = BY, 
+               name = LABEL) -> age_trans 
 
 put("Calculate aov")
 age_aov <- aov(AGE ~ ARM, data = adsl) |> 
-  summary()
+  summary() 
 
 put("Get aov into proper data frame") 
+
 age_aov <- age_aov[[1]][1, c("F value", "Pr(>F)")]
 names(age_aov) <- c("AOV.F", "AOV.P")
 age_aov <- as.data.frame(age_aov) |> put()
 
 put("Combine aov statistics")
-age_aov_comb <- 
-  datastep(age_aov, 
-           keep = "PVALUE",
-           format = fc,
-           {
-             PVALUE <- fapply2(AOV.F, AOV.P)
-             
-           }) 
+datastep(age_aov, 
+         keep = PVALUE,
+         format = fc,
+         {
+           PVALUE <- fapply2(AOV.F, AOV.P)
+           
+         }) -> age_aov_comb 
 
 put("Append aov")
-age_block <- cbind(age_trans, age_aov_comb) |> put()
+datastep(age_trans, merge = age_aov_comb, {}) -> age_block
 
 # Sex Block ---------------------------------------------------------------
 
 sep("Create frequency counts for SEX")
 
 put("Get sex frequency counts")
-sex_freq <- 
-  proc_freq(adsl, tables = SEX,
-            by = ARM,
-            options = nonobs) 
+proc_freq(adsl, tables = SEX,
+          by = ARM,
+          options = v(nonobs)) -> sex_freq 
 
 
 put("Combine counts and percents.")
-sex_comb <- 
-  datastep(sex_freq, 
-           format = fc, 
-           rename = list(CAT = "LABEL"),
-           drop = v(CNT, PCT), 
-           {
-             
-             CNTPCT <- fapply2(CNT, PCT)
-             
-           }) 
+datastep(sex_freq, 
+         format = fc, 
+         rename = list(CAT = "LABEL"),
+         drop = v(CNT, PCT), 
+         {
+           
+           CNTPCT <- fapply2(CNT, PCT)
+           
+         }) -> sex_comb 
 
 put("Transpose ARMs into columns")
-sex_trans <- 
-  proc_transpose(sex_comb, id = BY, var = CNTPCT,
-                 copy = VAR, by = LABEL) 
+proc_transpose(sex_comb, id = BY, 
+               var = CNTPCT,
+               copy = VAR, by = LABEL) -> sex_trans
 
 put("Clean up")
-sex_cnts <- 
-  datastep(sex_trans, drop = "NAME", 
-           {
-            
-             LABEL <- fapply(LABEL, fc$SEX)
-             LABEL <- factor(LABEL, levels = levels(fc$SEX))
-
-           }) 
+datastep(sex_trans, drop = NAME, 
+         {
+           
+           LABEL <- fapply(LABEL, fc$SEX)
+           LABEL <- factor(LABEL, levels = levels(fc$SEX))
+           
+         }) -> sex_cnts
 
 put("Sort by label")
-sex_cnts <- proc_sort(sex_cnts, by = LABEL) 
+proc_sort(sex_cnts, by = LABEL) -> sex_cnts 
 
 put("Get sex chisq")
-sex_chisq <- proc_freq(adsl, tables = v(SEX * ARM),
-                       options = v(chisq, notable)) 
+proc_freq(adsl, tables = v(SEX * ARM),
+          options = v(chisq, notable)) -> sex_chisq
 
 put("Combine chisq statistics")
-sex_chisq_comb <- 
-  datastep(sex_chisq,
-           format = fc,
-           keep = c("PVALUE"), 
-           {
-             
-             PVALUE = fapply2(CHISQ, CHISQ.P)
-           }) 
+datastep(sex_chisq,
+         format = fc,
+         keep = PVALUE, 
+         {
+           
+           PVALUE = fapply2(CHISQ, CHISQ.P)
+         }) -> sex_chisq_comb 
 
 put("Append chisq")
-sex_block <- cbind(sex_cnts, sex_chisq_comb) |> put()
-                
+datastep(sex_cnts, 
+         merge = sex_chisq_comb, 
+         {}) -> sex_block
 
 
 # Race block --------------------------------------------------------------
@@ -229,62 +228,54 @@ sex_block <- cbind(sex_cnts, sex_chisq_comb) |> put()
 sep("Create frequency counts for RACE")
 
 put("Get race frequency counts")
-race_freq <- 
-  proc_freq(adsl, tables = RACE,
-            by = ARM,
-            options = nonobs) 
+proc_freq(adsl, tables = RACE,
+          by = ARM,
+          options = v(nonobs)) -> race_freq 
 
 
 put("Combine counts and percents.")
-race_comb <- 
-  datastep(race_freq, 
-           format = fc, 
-           rename = list(CAT = "LABEL"),
-           drop = v(CNT, PCT), 
-           {
-             
-             CNTPCT <- fapply2(CNT, PCT)
-             
-           }) 
+datastep(race_freq, 
+         format = fc, 
+         rename = list(CAT = "LABEL"),
+         drop = v(CNT, PCT), 
+         {
+           
+           CNTPCT <- fapply2(CNT, PCT)
+           
+         }) -> race_comb 
 
 put("Transpose ARMs into columns")
-race_trans <- 
-  proc_transpose(race_comb, id = BY, var = CNTPCT,
-                 copy = VAR, by = LABEL) 
+proc_transpose(race_comb, id = BY, var = CNTPCT,
+               copy = VAR, by = LABEL) -> race_trans
 
 put("Clean up")
-race_cnts <- 
-  datastep(race_trans, drop = v(NAME),
-           where = expression(del == FALSE),
-           {
-             
-             LABEL <- fapply(LABEL, fc$RACE)
-             LABEL <- factor(LABEL, levels = levels(fc$RACE))
-          
-           }) 
+           
+           LABEL <- fapply(LABEL, fc$RACE)
+           LABEL <- factor(LABEL, levels = levels(fc$RACE))
+           
+         }) -> race_cnts 
+datastep(race_trans, drop = NAME,
+         where = expression(del == FALSE),
+         {
 
 put("Sort by label")
-race_cnts <- proc_sort(race_cnts, by = LABEL)
+proc_sort(race_cnts, by = LABEL) -> race_cnts 
 
 put("Get race chisq")
-race_chisq <- 
-  proc_freq(adsl, tables = RACE * ARM,
-            options = v(chisq, notable)) 
+proc_freq(adsl, tables = RACE * ARM,
+          options = v(chisq, notable)) -> race_chisq 
 
 put("Combine chisq statistics")
-race_chisq_comb <- 
-  datastep(race_chisq,
-           format = fc,
-           keep = c("PVALUE"), 
-           {
-             
-             PVALUE = fapply2(CHISQ, CHISQ.P)
-           }) 
+datastep(race_chisq,
+         format = fc,
+         keep = c("PVALUE"), 
+         {
+           
+           PVALUE = fapply2(CHISQ, CHISQ.P)
+         }) -> race_chisq_comb
 
 put("Append chisq")
-race_block <- cbind(race_cnts, race_chisq_comb) |> put()
-
-
+datastep(race_cnts, merge = race_chisq_comb, {}) -> race_block
 
 
 # Age Group Block ----------------------------------------------------------
@@ -293,60 +284,57 @@ sep("Create frequency counts for Age Group")
 
 
 put("Get age group frequency counts")
-ageg_freq <- 
-  proc_freq(adsl,
-            table = AGECAT,
-            by = ARM,
-            options = nonobs) 
+proc_freq(adsl,
+          table = AGECAT,
+          by = ARM,
+          options = v(nonobs)) -> ageg_freq
 
 put("Combine counts and percents and assign age group factor for sorting")
-ageg_comb <- 
-  datastep(ageg_freq,
-           format = fc,
-           keep = v(VAR, LABEL, BY, CNTPCT),
-           {
-             CNTPCT <- fapply2(CNT, PCT)
-             LABEL <- factor(CAT, levels = levels(fc$AGECAT))
-           }) 
+datastep(ageg_freq,
+         format = fc,
+         keep = v(VAR, LABEL, BY, CNTPCT),
+         {
+           CNTPCT <- fapply2(CNT, PCT)
+           LABEL <- factor(CAT, levels = levels(fc$AGECAT))
+         }) -> ageg_comb
 
 
 put("Sort by age group factor")
-ageg_sort <- proc_sort(ageg_comb, by = v(BY, LABEL)) 
+proc_sort(ageg_comb, by = v(BY, LABEL)) -> ageg_sort 
 
 put("Tranpose age group block")
-ageg_trans <- 
-  proc_transpose(ageg_sort,
-                 var = CNTPCT,
-                 copy = VAR,
-                 id = BY,
-                 by = LABEL) 
+proc_transpose(ageg_sort,
+               var = CNTPCT,
+               copy = VAR,
+               id = BY,
+               by = LABEL) -> ageg_trans 
 
 put("Some clean up")
-ageg_cnts <- 
-  datastep(ageg_trans,
-           drop = "NAME",
-           {}) 
+datastep(ageg_trans,
+         drop = NAME,
+         {}) -> ageg_cnts 
 
 put("Get ageg chisq")
-ageg_chisq <- 
-  proc_freq(adsl, tables = v(AGECAT * ARM),
-            options = v(chisq, notable)) 
+proc_freq(adsl, tables = AGECAT * ARM,
+          options = v(chisq, notable)) -> ageg_chisq 
 
 put("Combine chisq statistics")
-ageg_chisq_comb <- 
-  datastep(ageg_chisq,
-           format = fc,
-           keep = c("PVALUE"), 
-           {
-             PVALUE = fapply2(CHISQ, CHISQ.P)
-           }) 
+datastep(ageg_chisq,
+         format = fc,
+         keep = c("PVALUE"), 
+         {
+           PVALUE = fapply2(CHISQ, CHISQ.P)
+         }) -> ageg_chisq_comb 
 
 put("Append chisq")
-ageg_block <- cbind(ageg_cnts, ageg_chisq_comb) |> put()
+datastep(ageg_cnts, merge = ageg_chisq_comb, 
+         {}) -> ageg_block
 
 
 put("Combine blocks into final data frame")
-final <- rbind(age_block, ageg_block, sex_block, race_block) |> put()
+datastep(age_block, 
+         set = list(ageg_block, sex_block, race_block),
+         {}) -> final
 
 # Report ------------------------------------------------------------------
 
@@ -370,16 +358,16 @@ tbl <- create_table(final, first_row_blank = TRUE) |>
   define(`ARM D`,  label = "Competitor", n = arm_pop["ARM D"]) |>  
   define(PVALUE, label = plbl, width = 2, dedupe = TRUE, align = "center") |> 
   titles("Table 1.0", "Analysis of Demographic Characteristics", 
-         "Safety Population") |> 
+         "Safety Population", bold = TRUE) |> 
   footnotes("Program: DM_Table.R",
             "NOTE: Denominator based on number of non-missing responses.",
             "{supsc('1')}Pearson's Chi-Square tests will be used for "
             %p% "Categorical variables and ANOVA tests for continuous variables.") 
 
-rpt <- create_report(file.path(tmp, "example2.rtf"), 
+rpt <- create_report(file.path(tmp, "ProcsDemoDM.rtf"), 
                      output_type = "RTF", 
-                     font = "Courier") |> 
-  page_header("Sponsor: Archytas", "Study: ABC") |> 
+                     font = "Times") |> 
+  page_header("Sponsor: Company", "Study: ABC") |> 
   set_margins(top = 1, bottom = 1) |>  
   add_content(tbl) |> 
   page_footer("Date Produced: {Sys.Date()}", right = "Page [pg] of [tpg]")
@@ -390,16 +378,17 @@ res <- write_report(rpt)
 # Clean Up ----------------------------------------------------------------
 sep("Clean Up")
 
+put("Unload libname")
+lib_unload(sdtm)
 
+put("Close log")
 log_close()
 
-# View log
-writeLines(readLines(lf, encoding = "UTF-8"))
 
-# View report
+# Uncomment to view report
 # file.show(res$modified_path)
 
-# View log
+# Uncomment to view log
 # file.show(lf)
 
 ```
@@ -415,17 +404,17 @@ Here is the output:
 And here is the log:
 ```
 =========================================================================
-Log Path: C:/Users/dbosa/AppData/Local/Temp/Rtmp44T45t/log/example1.log
-Program Path: C:/packages/Testing/procs/DemoProcTest2.R
-Working Directory: C:/packages/Testing
+Log Path: C:/Users/dbosa/AppData/Local/Temp/RtmpKQddL7/log/example1.log
+Program Path: C:/Projects/Archytas/Demo/example1.R
+Working Directory: C:/Projects/Archytas/Demo
 User Name: dbosa
 R Version: 4.2.1 (2022-06-23 ucrt)
 Machine: SOCRATES x86-64
 Operating System: Windows 10 x64 build 19044
 Base Packages: stats graphics grDevices utils datasets methods base Other
-Packages: tidylog_1.0.2 procs_0.0.9005 reporter_1.3.6 libr_1.2.6 fmtr_1.5.8
-logr_1.3.2 common_1.0.3 sassy_1.0.8
-Log Start Time: 2022-08-19 08:05:51
+Packages: tidylog_1.0.2 procs_0.0.9007 reporter_1.3.7 libr_1.2.6 fmtr_1.5.9
+logr_1.3.3 common_1.0.5 sassy_1.0.8
+Log Start Time: 2022-10-15 20:01:02
 =========================================================================
 
 =========================================================================
@@ -453,6 +442,13 @@ Sex decodes
 
 Race decodes
 
+# A user-defined format: 4 conditions
+  Name Type   Expression                     Label Order
+1  obj    U     is.na(x)                   Missing    NA
+2  obj    U x == "WHITE"                     White    NA
+3  obj    U x == "BLACK" Black or African American    NA
+4  obj    U         TRUE                     Other    NA
+
 Compile format catalog
 
 # A format catalog: 15 formats
@@ -476,30 +472,29 @@ Compile format catalog
 Prepare Data
 =========================================================================
 
-=========================================================================
-Read in ADSL data
-=========================================================================
-
 Create sample ADSL data.
 
 Categorize AGE
 
-18 to 29
-18 to 29
-18 to 29
-18 to 29
-30 to 39
-30 to 39
-30 to 39
-30 to 39
-30 to 39
-30 to 39
-30 to 39
-30 to 39
-30 to 39
-30 to 39
-30 to 39
-40 to 49
+Log starting dataset
+
+   SUBJID   ARM SEX  RACE AGE   AGECAT
+1       1 ARM A   F WHITE  19 18 to 29
+2       2 ARM B   F WHITE  21 18 to 29
+3       3 ARM C   F WHITE  23 18 to 29
+4       4 ARM D   F BLACK  28 18 to 29
+5       5 ARM A   M WHITE  37 30 to 39
+6       6 ARM B   M WHITE  34 30 to 39
+7       7 ARM C   M WHITE  36 30 to 39
+8       8 ARM D   M WHITE  30 30 to 39
+9       9 ARM A   F WHITE  39 30 to 39
+10     10 ARM B   F WHITE  31 30 to 39
+11     11 ARM C   F BLACK  33 30 to 39
+12     12 ARM D   F WHITE  38 30 to 39
+13     13 ARM A   M BLACK  37 30 to 39
+14     14 ARM B   M WHITE  34 30 to 39
+15     15 ARM C   M WHITE  36 30 to 39
+16     16 ARM A   M WHITE  40 40 to 49
 
 Get ARM population counts
 
@@ -572,12 +567,14 @@ datastep: columns decreased from 2 to 1
 
 Append aov
 
+datastep: columns increased from 6 to 7
+
   VAR     LABEL       ARM A       ARM B       ARM C       ARM D        PVALUE
 1 AGE         N           5           4           4           3 0.298 (0.826)
-2 AGE Mean (SD) 34.4 (8.71) 30.0 (6.16) 32.0 (6.16) 32.0 (5.29) 0.298 (0.826)
-3 AGE    Median        37.0        32.5        34.5        30.0 0.298 (0.826)
-4 AGE   Q1 - Q3 37.0 - 39.0 26.0 - 34.0 28.0 - 36.0 28.0 - 38.0 0.298 (0.826)
-5 AGE Min - Max     19 - 40     21 - 34     23 - 36     28 - 38 0.298 (0.826)
+2 AGE Mean (SD) 34.4 (8.71) 30.0 (6.16) 32.0 (6.16) 32.0 (5.29)          <NA>
+3 AGE    Median        37.0        32.5        34.5        30.0          <NA>
+4 AGE   Q1 - Q3 37.0 - 39.0 26.0 - 34.0 28.0 - 36.0 28.0 - 38.0          <NA>
+5 AGE Min - Max     19 - 40     21 - 34     23 - 36     28 - 38          <NA>
 
 =========================================================================
 Create frequency counts for SEX
@@ -657,21 +654,23 @@ proc_freq: input data set 16 rows and 6 columns
            view: TRUE
            output: 1 datasets
 
-  VAR1 VAR2     CHISQ CHISQ.DF   CHISQ.P
-1  SEX  ARM 0.5333333        3 0.9115095
+      CHISQ CHISQ.DF   CHISQ.P
+1 0.5333333        3 0.9115095
 
 Combine chisq statistics
 
-datastep: columns decreased from 5 to 1
+datastep: columns decreased from 3 to 1
 
          PVALUE
 1 0.533 (0.912)
 
 Append chisq
 
+datastep: columns increased from 6 to 7
+
   VAR  LABEL       ARM A       ARM B       ARM C       ARM D        PVALUE
-2 SEX   Male  3 ( 60.0%)  2 ( 50.0%)  2 ( 50.0%)  1 ( 33.3%) 0.533 (0.912)
-1 SEX Female  2 ( 40.0%)  2 ( 50.0%)  2 ( 50.0%)  2 ( 66.7%) 0.533 (0.912)
+1 SEX   Male  3 ( 60.0%)  2 ( 50.0%)  2 ( 50.0%)  1 ( 33.3%) 0.533 (0.912)
+2 SEX Female  2 ( 40.0%)  2 ( 50.0%)  2 ( 50.0%)  2 ( 66.7%)          <NA>
 
 =========================================================================
 Create frequency counts for RACE
@@ -740,6 +739,10 @@ proc_sort: input data set 2 rows and 6 columns
            nodupkey: FALSE
            output data set 2 rows and 6 columns
 
+   VAR                     LABEL       ARM A       ARM B       ARM C       ARM D
+2 RACE                     White  4 ( 80.0%)  4 (100.0%)  3 ( 75.0%)  2 ( 66.7%)
+1 RACE Black or African American  1 ( 20.0%)  0 (  0.0%)  1 ( 25.0%)  1 ( 33.3%)
+
 Get race chisq
 
 proc_freq: input data set 16 rows and 6 columns
@@ -747,21 +750,26 @@ proc_freq: input data set 16 rows and 6 columns
            view: TRUE
            output: 1 datasets
 
-  VAR1 VAR2    CHISQ CHISQ.DF   CHISQ.P
-1 RACE  ARM 1.449573        3 0.6939569
+     CHISQ CHISQ.DF   CHISQ.P
+1 1.449573        3 0.6939569
 
 Combine chisq statistics
 
-datastep: columns decreased from 5 to 1
+datastep: columns decreased from 3 to 1
 
          PVALUE
 1 1.450 (0.694)
 
 Append chisq
 
-   VAR                     LABEL       ARM A       ARM B       ARM C       ARM D        PVALUE
-2 RACE                     White  4 ( 80.0%)  4 (100.0%)  3 ( 75.0%)  2 ( 66.7%) 1.450 (0.694)
-1 RACE Black or African American  1 ( 20.0%)  0 (  0.0%)  1 ( 25.0%)  1 ( 33.3%) 1.450 (0.694)
+datastep: columns increased from 6 to 7
+
+   VAR                     LABEL       ARM A       ARM B       ARM C       ARM D
+1 RACE                     White  4 ( 80.0%)  4 (100.0%)  3 ( 75.0%)  2 ( 66.7%)
+2 RACE Black or African American  1 ( 20.0%)  0 (  0.0%)  1 ( 25.0%)  1 ( 33.3%)
+         PVALUE
+1 1.450 (0.694)
+2          <NA>
 
 =========================================================================
 Create frequency counts for Age Group
@@ -861,38 +869,55 @@ proc_freq: input data set 16 rows and 6 columns
            view: TRUE
            output: 1 datasets
 
-    VAR1 VAR2    CHISQ CHISQ.DF   CHISQ.P
-1 AGECAT  ARM 2.436364        6 0.8755205
+     CHISQ CHISQ.DF   CHISQ.P
+1 2.436364        6 0.8755205
 
 Combine chisq statistics
 
-datastep: columns decreased from 5 to 1
+datastep: columns decreased from 3 to 1
 
          PVALUE
 1 2.436 (0.876)
 
 Append chisq
 
+datastep: columns increased from 6 to 7
+
      VAR    LABEL       ARM A       ARM B       ARM C       ARM D        PVALUE
 1 AGECAT 18 to 29  1 ( 20.0%)  1 ( 25.0%)  1 ( 25.0%)  1 ( 33.3%) 2.436 (0.876)
-2 AGECAT 30 to 39  3 ( 60.0%)  3 ( 75.0%)  3 ( 75.0%)  2 ( 66.7%) 2.436 (0.876)
-3 AGECAT 40 to 49  1 ( 20.0%)  0 (  0.0%)  0 (  0.0%)  0 (  0.0%) 2.436 (0.876)
+2 AGECAT 30 to 39  3 ( 60.0%)  3 ( 75.0%)  3 ( 75.0%)  2 ( 66.7%)          <NA>
+3 AGECAT 40 to 49  1 ( 20.0%)  0 (  0.0%)  0 (  0.0%)  0 (  0.0%)          <NA>
 
 Combine blocks into final data frame
 
-      VAR                     LABEL       ARM A       ARM B       ARM C       ARM D        PVALUE
-1     AGE                         N           5           4           4           3 0.298 (0.826)
-2     AGE                 Mean (SD) 34.4 (8.71) 30.0 (6.16) 32.0 (6.16) 32.0 (5.29) 0.298 (0.826)
-3     AGE                    Median        37.0        32.5        34.5        30.0 0.298 (0.826)
-4     AGE                   Q1 - Q3 37.0 - 39.0 26.0 - 34.0 28.0 - 36.0 28.0 - 38.0 0.298 (0.826)
-5     AGE                 Min - Max     19 - 40     21 - 34     23 - 36     28 - 38 0.298 (0.826)
-6  AGECAT                  18 to 29  1 ( 20.0%)  1 ( 25.0%)  1 ( 25.0%)  1 ( 33.3%) 2.436 (0.876)
-7  AGECAT                  30 to 39  3 ( 60.0%)  3 ( 75.0%)  3 ( 75.0%)  2 ( 66.7%) 2.436 (0.876)
-8  AGECAT                  40 to 49  1 ( 20.0%)  0 (  0.0%)  0 (  0.0%)  0 (  0.0%) 2.436 (0.876)
-21    SEX                      Male  3 ( 60.0%)  2 ( 50.0%)  2 ( 50.0%)  1 ( 33.3%) 0.533 (0.912)
-11    SEX                    Female  2 ( 40.0%)  2 ( 50.0%)  2 ( 50.0%)  2 ( 66.7%) 0.533 (0.912)
-22   RACE                     White  4 ( 80.0%)  4 (100.0%)  3 ( 75.0%)  2 ( 66.7%) 1.450 (0.694)
-12   RACE Black or African American  1 ( 20.0%)  0 (  0.0%)  1 ( 25.0%)  1 ( 33.3%) 1.450 (0.694)
+datastep: columns started with 7 and ended with 7
+
+      VAR                     LABEL       ARM A       ARM B       ARM C       ARM D
+1     AGE                         N           5           4           4           3
+2     AGE                 Mean (SD) 34.4 (8.71) 30.0 (6.16) 32.0 (6.16) 32.0 (5.29)
+3     AGE                    Median        37.0        32.5        34.5        30.0
+4     AGE                   Q1 - Q3 37.0 - 39.0 26.0 - 34.0 28.0 - 36.0 28.0 - 38.0
+5     AGE                 Min - Max     19 - 40     21 - 34     23 - 36     28 - 38
+6  AGECAT                  18 to 29  1 ( 20.0%)  1 ( 25.0%)  1 ( 25.0%)  1 ( 33.3%)
+7  AGECAT                  30 to 39  3 ( 60.0%)  3 ( 75.0%)  3 ( 75.0%)  2 ( 66.7%)
+8  AGECAT                  40 to 49  1 ( 20.0%)  0 (  0.0%)  0 (  0.0%)  0 (  0.0%)
+9     SEX                      Male  3 ( 60.0%)  2 ( 50.0%)  2 ( 50.0%)  1 ( 33.3%)
+10    SEX                    Female  2 ( 40.0%)  2 ( 50.0%)  2 ( 50.0%)  2 ( 66.7%)
+11   RACE                     White  4 ( 80.0%)  4 (100.0%)  3 ( 75.0%)  2 ( 66.7%)
+12   RACE Black or African American  1 ( 20.0%)  0 (  0.0%)  1 ( 25.0%)  1 ( 33.3%)
+          PVALUE
+1  0.298 (0.826)
+2           <NA>
+3           <NA>
+4           <NA>
+5           <NA>
+6  2.436 (0.876)
+7           <NA>
+8           <NA>
+9  0.533 (0.912)
+10          <NA>
+11 1.450 (0.694)
+12          <NA>
 
 =========================================================================
 Create and print report
@@ -901,14 +926,14 @@ Create and print report
 Write out the report
 
 # A report specification: 1 pages
-- file_path: 'C:\Users\dbosa\AppData\Local\Temp\Rtmp44T45t/example2.rtf'
+- file_path: 'C:\Users\dbosa\AppData\Local\Temp\RtmpKQddL7/ProcsDemoDM.rtf'
 - output_type: RTF
 - units: inches
 - orientation: landscape
 - margins: top 1 bottom 1 left 1 right 1
 - line size/count: 9/36
-- page_header: left=Sponsor: Archytas right=Study: ABC
-- page_footer: left=Date Produced: 2022-08-19 center= right=Page [pg] of [tpg]
+- page_header: left=Sponsor: Company right=Study: ABC
+- page_footer: left=Date Produced: 2022-10-15 center= right=Page [pg] of [tpg]
 - content: 
 # A table specification:
 - data: data.frame 'final' 12 rows 7 cols
@@ -934,10 +959,19 @@ Write out the report
 Clean Up
 =========================================================================
 
+Unload libname
+
+lib_sync: synchronized data in library 'sdtm'
+
+lib_unload: library 'sdtm' unloaded
+
+Close log
+
 =========================================================================
-Log End Time: 2022-08-19 08:05:52
+Log End Time: 2022-10-15 20:01:03
 Log Elapsed Time: 0 00:00:00
 =========================================================================
+
 
 ```
 
