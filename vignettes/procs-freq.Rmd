@@ -14,7 +14,7 @@ knitr::opts_chunk$set(
 )
 ```
 The `proc_freq` function simulates a SAS® PROC FREQ procedure.  Below is 
-a short tutorial on the function. Notice that the function is both 
+a short tutorial on the function. Like PROC FREQ, the function is both 
 an interactive function and returns datasets. 
 
 ## Create Sample Data
@@ -85,7 +85,7 @@ proc_freq(dat, tables = y, options = nocum)
 <img src="../man/images/freqtut2.png"/>
 
 Let's say you wanted only the frequency counts, and not the other columns.
-This result can be achived with the following options.  Use the `v()` function
+This result can be achieved with the following options.  Use the `v()` function
 when you are passing multiple options:
 ```{r eval=FALSE, echo=TRUE} 
 proc_freq(dat, tables = y, options = v(nocum, nonobs, nopercent))
@@ -209,9 +209,9 @@ $MyCross
 12    y    x    C    6 8   0  0.0
 
 ```
-Notice that the way output datasets are requested from `proc_freq` is much
-simpler than the corresponding mechanism in SAS®.  With `proc_freq`, by default,
-all requested tables and statistics will be
+Notice that the way output datasets are requested from the `proc_freq` function 
+is much simpler than the corresponding mechanism in SAS®.  With `proc_freq`, 
+by default, all requested tables and statistics will be
 returned in a list. No other output parameters are needed.
 
 ## Statistics Options
@@ -294,6 +294,13 @@ res3
 # 9   y   C  PCT   37.5
 
 ```
+As seen above, the "wide" option places the statistics in columns across the 
+top of the dataset and the categories in rows.  This shaping option is the default.  
+The "long" option places the statistics in rows, with each category in columns.
+The "stacked" option places both the statistics and the categories in rows. 
 
+These shaping options reduce some of the manipulation needed to get your 
+data in the desired form. These options were added for convenience during
+the development of the **procs** package, and have no equivalent in SAS®.
 
 Next: [The Means Function](procs-means.html)

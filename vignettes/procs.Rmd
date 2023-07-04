@@ -173,10 +173,10 @@ provide summary statistics for the by groups FEMALE and MALE, while the other
 rows provide statistics for each class category.
 
 Also note that both `proc_freq()` 
-and `proc_means()` follow the convention of naming
+and `proc_means()` output datasets follow the convention of naming
 columns according to the statistic or parameter they represent.  This convention
 is somewhat different from SAS®, but makes it easier to manipulate
-the output datasets.
+the output data.
 
 
 ### Other Functions

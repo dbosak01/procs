@@ -121,32 +121,32 @@ variables. The function is both interactive and returns datasets.</p>
 <div class="section level2">
 <h2 id="create-sample-data">Create Sample Data<a class="anchor" aria-label="anchor" href="#create-sample-data"></a>
 </h2>
-<p>First let’s create some sample data. This sample data is identical to
+<p>Let’s again create some sample data. This sample data is identical to
 that created for the <code>proc_freq</code> tutorial, but has an
 additional grouping variable “g”:</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Create sample data</span></span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>dat <span class="ot">&lt;-</span> <span class="fu">read.table</span>(<span class="at">header =</span> <span class="cn">TRUE</span>, </span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>                  <span class="at">text =</span> <span class="st">'x y z   g</span></span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="st">                          6 A 60  P</span></span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="st">                          6 A 70  P</span></span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="st">                          2 A 100 P</span></span>
-<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="st">                          2 B 10  P</span></span>
-<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="st">                          3 B 67  Q</span></span>
-<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="st">                          2 C 81  Q</span></span>
-<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="st">                          3 C 63  Q</span></span>
-<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="st">                          5 C 55  Q'</span>)</span>
-<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a><span class="co"># View sample data</span></span>
-<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>dat</span>
-<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>  x y   z g</span>
-<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a><span class="dv">1</span> <span class="dv">6</span> A  <span class="dv">60</span> P</span>
-<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a><span class="dv">2</span> <span class="dv">6</span> A  <span class="dv">70</span> P</span>
-<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a><span class="dv">3</span> <span class="dv">2</span> A <span class="dv">100</span> P</span>
-<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a><span class="dv">4</span> <span class="dv">2</span> B  <span class="dv">10</span> P</span>
-<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a><span class="dv">5</span> <span class="dv">3</span> B  <span class="dv">67</span> Q</span>
-<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a><span class="dv">6</span> <span class="dv">2</span> C  <span class="dv">81</span> Q</span>
-<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a><span class="dv">7</span> <span class="dv">3</span> C  <span class="dv">63</span> Q</span>
-<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a><span class="dv">8</span> <span class="dv">5</span> C  <span class="dv">55</span> Q</span></code></pre></div>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a><span class="co"># Create sample data</span></span>
+<span id="cb1-2"><a href="#cb1-2" tabindex="-1"></a>dat <span class="ot">&lt;-</span> <span class="fu">read.table</span>(<span class="at">header =</span> <span class="cn">TRUE</span>, </span>
+<span id="cb1-3"><a href="#cb1-3" tabindex="-1"></a>                  <span class="at">text =</span> <span class="st">'x y z   g</span></span>
+<span id="cb1-4"><a href="#cb1-4" tabindex="-1"></a><span class="st">                          6 A 60  P</span></span>
+<span id="cb1-5"><a href="#cb1-5" tabindex="-1"></a><span class="st">                          6 A 70  P</span></span>
+<span id="cb1-6"><a href="#cb1-6" tabindex="-1"></a><span class="st">                          2 A 100 P</span></span>
+<span id="cb1-7"><a href="#cb1-7" tabindex="-1"></a><span class="st">                          2 B 10  P</span></span>
+<span id="cb1-8"><a href="#cb1-8" tabindex="-1"></a><span class="st">                          3 B 67  Q</span></span>
+<span id="cb1-9"><a href="#cb1-9" tabindex="-1"></a><span class="st">                          2 C 81  Q</span></span>
+<span id="cb1-10"><a href="#cb1-10" tabindex="-1"></a><span class="st">                          3 C 63  Q</span></span>
+<span id="cb1-11"><a href="#cb1-11" tabindex="-1"></a><span class="st">                          5 C 55  Q'</span>)</span>
+<span id="cb1-12"><a href="#cb1-12" tabindex="-1"></a></span>
+<span id="cb1-13"><a href="#cb1-13" tabindex="-1"></a><span class="co"># View sample data</span></span>
+<span id="cb1-14"><a href="#cb1-14" tabindex="-1"></a>dat</span>
+<span id="cb1-15"><a href="#cb1-15" tabindex="-1"></a>  x y   z g</span>
+<span id="cb1-16"><a href="#cb1-16" tabindex="-1"></a><span class="dv">1</span> <span class="dv">6</span> A  <span class="dv">60</span> P</span>
+<span id="cb1-17"><a href="#cb1-17" tabindex="-1"></a><span class="dv">2</span> <span class="dv">6</span> A  <span class="dv">70</span> P</span>
+<span id="cb1-18"><a href="#cb1-18" tabindex="-1"></a><span class="dv">3</span> <span class="dv">2</span> A <span class="dv">100</span> P</span>
+<span id="cb1-19"><a href="#cb1-19" tabindex="-1"></a><span class="dv">4</span> <span class="dv">2</span> B  <span class="dv">10</span> P</span>
+<span id="cb1-20"><a href="#cb1-20" tabindex="-1"></a><span class="dv">5</span> <span class="dv">3</span> B  <span class="dv">67</span> Q</span>
+<span id="cb1-21"><a href="#cb1-21" tabindex="-1"></a><span class="dv">6</span> <span class="dv">2</span> C  <span class="dv">81</span> Q</span>
+<span id="cb1-22"><a href="#cb1-22" tabindex="-1"></a><span class="dv">7</span> <span class="dv">3</span> C  <span class="dv">63</span> Q</span>
+<span id="cb1-23"><a href="#cb1-23" tabindex="-1"></a><span class="dv">8</span> <span class="dv">5</span> C  <span class="dv">55</span> Q</span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="get-summary-statistics">Get Summary Statistics<a class="anchor" aria-label="anchor" href="#get-summary-statistics"></a>
@@ -154,6 +154,9 @@ additional grouping variable “g”:</p>
 <p>If no parameters are specified, the <code>proc_means</code> function
 will calculate N, Means, Standard Deviation, Minimum, and Maximum on all
 numeric variables.</p>
+<p>Note that the <code>options</code> statement has been added to pass
+CRAN checks. When you are running code samples, this statement may be
+omitted.</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Turn off printing for CRAN checks</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">options</a></span><span class="op">(</span><span class="st">"procs.print"</span> <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
@@ -161,9 +164,6 @@ numeric variables.</p>
 <span><span class="co"># No parameters</span></span>
 <span><span class="fu"><a href="../reference/proc_means.html">proc_means</a></span><span class="op">(</span><span class="va">dat</span><span class="op">)</span></span></code></pre></div>
 <p><img src="../man/images/meanstut1.png"></p>
-<p>Note that the <code>options</code> statement above has been added to
-pass CRAN checks. When you are running code samples, this statement may
-be omitted.</p>
 </div>
 <div class="section level2">
 <h2 id="selected-variables">Selected Variables<a class="anchor" aria-label="anchor" href="#selected-variables"></a>
@@ -339,7 +339,7 @@ keyword requests the exact datasets used in the interactive report.
 Specifying either one of these options will cause the function to return
 data.</p>
 <p>Here is an example that shows the difference in the “report” and
-“out” options:</p>
+“all” options:</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Output dataset using "report" option</span></span>
 <span><span class="va">res1</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/proc_means.html">proc_means</a></span><span class="op">(</span><span class="va">dat</span>, </span>
@@ -353,7 +353,7 @@ data.</p>
 <span><span class="co"># 2   z     65 506 57.5 75.5</span></span>
 <span></span>
 <span></span>
-<span><span class="co"># Output dataset using "out" option</span></span>
+<span><span class="co"># Output dataset using "all" option</span></span>
 <span><span class="va">res2</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/proc_means.html">proc_means</a></span><span class="op">(</span><span class="va">dat</span>, </span>
 <span>                   stats <span class="op">=</span> <span class="fu"><a href="https://common.r-sassy.org/reference/v.html" class="external-link">v</a></span><span class="op">(</span><span class="va">median</span>, <span class="va">sum</span>, <span class="va">q1</span>, <span class="va">q3</span><span class="op">)</span>,</span>
 <span>                   output <span class="op">=</span> <span class="va">all</span><span class="op">)</span></span>
@@ -541,43 +541,43 @@ variables in columns. The “stacked” option has both statistics and
 variables in rows.</p>
 <p>The following example illustrates the differences between these data
 shaping options:</p>
-<div class="sourceCode" id="cb17"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Shape wide</span></span>
-<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>res1 <span class="ot">&lt;-</span> <span class="fu">proc_means</span>(dat, <span class="at">stats =</span> <span class="fu">v</span>(median, sum, q1, q3),</span>
-<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>                   <span class="at">options =</span> wide)</span>
-<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Wide results</span></span>
-<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a>res1</span>
-<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a><span class="co">#   TYPE FREQ VAR MEDIAN SUM   Q1   Q3</span></span>
-<span id="cb17-8"><a href="#cb17-8" aria-hidden="true" tabindex="-1"></a><span class="co"># 1    0    8   x      3  29  2.0  5.5</span></span>
-<span id="cb17-9"><a href="#cb17-9" aria-hidden="true" tabindex="-1"></a><span class="co"># 2    0    8   z     65 506 57.5 75.5</span></span>
-<span id="cb17-10"><a href="#cb17-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb17-11"><a href="#cb17-11" aria-hidden="true" tabindex="-1"></a><span class="co"># Shape long</span></span>
-<span id="cb17-12"><a href="#cb17-12" aria-hidden="true" tabindex="-1"></a>res2 <span class="ot">&lt;-</span> <span class="fu">proc_means</span>(dat, <span class="at">stats =</span> <span class="fu">v</span>(median, sum, q1, q3),</span>
-<span id="cb17-13"><a href="#cb17-13" aria-hidden="true" tabindex="-1"></a>                   <span class="at">options =</span> long)<span class="er">)</span></span>
-<span id="cb17-14"><a href="#cb17-14" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb17-15"><a href="#cb17-15" aria-hidden="true" tabindex="-1"></a><span class="co"># Long results</span></span>
-<span id="cb17-16"><a href="#cb17-16" aria-hidden="true" tabindex="-1"></a>res2</span>
-<span id="cb17-17"><a href="#cb17-17" aria-hidden="true" tabindex="-1"></a><span class="co">#   TYPE FREQ   STAT    x     z</span></span>
-<span id="cb17-18"><a href="#cb17-18" aria-hidden="true" tabindex="-1"></a><span class="co"># 1    0    8 MEDIAN  3.0  65.0</span></span>
-<span id="cb17-19"><a href="#cb17-19" aria-hidden="true" tabindex="-1"></a><span class="co"># 2    0    8    SUM 29.0 506.0</span></span>
-<span id="cb17-20"><a href="#cb17-20" aria-hidden="true" tabindex="-1"></a><span class="co"># 3    0    8     Q1  2.0  57.5</span></span>
-<span id="cb17-21"><a href="#cb17-21" aria-hidden="true" tabindex="-1"></a><span class="co"># 4    0    8     Q3  5.5  75.5</span></span>
-<span id="cb17-22"><a href="#cb17-22" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb17-23"><a href="#cb17-23" aria-hidden="true" tabindex="-1"></a><span class="co"># Shape stacked</span></span>
-<span id="cb17-24"><a href="#cb17-24" aria-hidden="true" tabindex="-1"></a>res3 <span class="ot">&lt;-</span> <span class="fu">proc_means</span>(dat, <span class="at">stats =</span> <span class="fu">v</span>(median, sum, q1, q3),</span>
-<span id="cb17-25"><a href="#cb17-25" aria-hidden="true" tabindex="-1"></a>                   <span class="at">options =</span> stacked)</span>
-<span id="cb17-26"><a href="#cb17-26" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb17-27"><a href="#cb17-27" aria-hidden="true" tabindex="-1"></a><span class="co"># Stacked results</span></span>
-<span id="cb17-28"><a href="#cb17-28" aria-hidden="true" tabindex="-1"></a>res3</span>
-<span id="cb17-29"><a href="#cb17-29" aria-hidden="true" tabindex="-1"></a><span class="co">#   TYPE FREQ VAR   STAT VALUES</span></span>
-<span id="cb17-30"><a href="#cb17-30" aria-hidden="true" tabindex="-1"></a><span class="co"># 1    0    8   x MEDIAN    3.0</span></span>
-<span id="cb17-31"><a href="#cb17-31" aria-hidden="true" tabindex="-1"></a><span class="co"># 2    0    8   x    SUM   29.0</span></span>
-<span id="cb17-32"><a href="#cb17-32" aria-hidden="true" tabindex="-1"></a><span class="co"># 3    0    8   x     Q1    2.0</span></span>
-<span id="cb17-33"><a href="#cb17-33" aria-hidden="true" tabindex="-1"></a><span class="co"># 4    0    8   x     Q3    5.5</span></span>
-<span id="cb17-34"><a href="#cb17-34" aria-hidden="true" tabindex="-1"></a><span class="co"># 5    0    8   z MEDIAN   65.0</span></span>
-<span id="cb17-35"><a href="#cb17-35" aria-hidden="true" tabindex="-1"></a><span class="co"># 6    0    8   z    SUM  506.0</span></span>
-<span id="cb17-36"><a href="#cb17-36" aria-hidden="true" tabindex="-1"></a><span class="co"># 7    0    8   z     Q1   57.5</span></span>
-<span id="cb17-37"><a href="#cb17-37" aria-hidden="true" tabindex="-1"></a><span class="co"># 8    0    8   z     Q3   75.5</span></span></code></pre></div>
+<div class="sourceCode" id="cb17"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" tabindex="-1"></a><span class="co"># Shape wide</span></span>
+<span id="cb17-2"><a href="#cb17-2" tabindex="-1"></a>res1 <span class="ot">&lt;-</span> <span class="fu">proc_means</span>(dat, <span class="at">stats =</span> <span class="fu">v</span>(median, sum, q1, q3),</span>
+<span id="cb17-3"><a href="#cb17-3" tabindex="-1"></a>                   <span class="at">options =</span> wide)</span>
+<span id="cb17-4"><a href="#cb17-4" tabindex="-1"></a></span>
+<span id="cb17-5"><a href="#cb17-5" tabindex="-1"></a><span class="co"># Wide results</span></span>
+<span id="cb17-6"><a href="#cb17-6" tabindex="-1"></a>res1</span>
+<span id="cb17-7"><a href="#cb17-7" tabindex="-1"></a><span class="co">#   TYPE FREQ VAR MEDIAN SUM   Q1   Q3</span></span>
+<span id="cb17-8"><a href="#cb17-8" tabindex="-1"></a><span class="co"># 1    0    8   x      3  29  2.0  5.5</span></span>
+<span id="cb17-9"><a href="#cb17-9" tabindex="-1"></a><span class="co"># 2    0    8   z     65 506 57.5 75.5</span></span>
+<span id="cb17-10"><a href="#cb17-10" tabindex="-1"></a></span>
+<span id="cb17-11"><a href="#cb17-11" tabindex="-1"></a><span class="co"># Shape long</span></span>
+<span id="cb17-12"><a href="#cb17-12" tabindex="-1"></a>res2 <span class="ot">&lt;-</span> <span class="fu">proc_means</span>(dat, <span class="at">stats =</span> <span class="fu">v</span>(median, sum, q1, q3),</span>
+<span id="cb17-13"><a href="#cb17-13" tabindex="-1"></a>                   <span class="at">options =</span> long)<span class="er">)</span></span>
+<span id="cb17-14"><a href="#cb17-14" tabindex="-1"></a></span>
+<span id="cb17-15"><a href="#cb17-15" tabindex="-1"></a><span class="co"># Long results</span></span>
+<span id="cb17-16"><a href="#cb17-16" tabindex="-1"></a>res2</span>
+<span id="cb17-17"><a href="#cb17-17" tabindex="-1"></a><span class="co">#   TYPE FREQ   STAT    x     z</span></span>
+<span id="cb17-18"><a href="#cb17-18" tabindex="-1"></a><span class="co"># 1    0    8 MEDIAN  3.0  65.0</span></span>
+<span id="cb17-19"><a href="#cb17-19" tabindex="-1"></a><span class="co"># 2    0    8    SUM 29.0 506.0</span></span>
+<span id="cb17-20"><a href="#cb17-20" tabindex="-1"></a><span class="co"># 3    0    8     Q1  2.0  57.5</span></span>
+<span id="cb17-21"><a href="#cb17-21" tabindex="-1"></a><span class="co"># 4    0    8     Q3  5.5  75.5</span></span>
+<span id="cb17-22"><a href="#cb17-22" tabindex="-1"></a></span>
+<span id="cb17-23"><a href="#cb17-23" tabindex="-1"></a><span class="co"># Shape stacked</span></span>
+<span id="cb17-24"><a href="#cb17-24" tabindex="-1"></a>res3 <span class="ot">&lt;-</span> <span class="fu">proc_means</span>(dat, <span class="at">stats =</span> <span class="fu">v</span>(median, sum, q1, q3),</span>
+<span id="cb17-25"><a href="#cb17-25" tabindex="-1"></a>                   <span class="at">options =</span> stacked)</span>
+<span id="cb17-26"><a href="#cb17-26" tabindex="-1"></a></span>
+<span id="cb17-27"><a href="#cb17-27" tabindex="-1"></a><span class="co"># Stacked results</span></span>
+<span id="cb17-28"><a href="#cb17-28" tabindex="-1"></a>res3</span>
+<span id="cb17-29"><a href="#cb17-29" tabindex="-1"></a><span class="co">#   TYPE FREQ VAR   STAT VALUES</span></span>
+<span id="cb17-30"><a href="#cb17-30" tabindex="-1"></a><span class="co"># 1    0    8   x MEDIAN    3.0</span></span>
+<span id="cb17-31"><a href="#cb17-31" tabindex="-1"></a><span class="co"># 2    0    8   x    SUM   29.0</span></span>
+<span id="cb17-32"><a href="#cb17-32" tabindex="-1"></a><span class="co"># 3    0    8   x     Q1    2.0</span></span>
+<span id="cb17-33"><a href="#cb17-33" tabindex="-1"></a><span class="co"># 4    0    8   x     Q3    5.5</span></span>
+<span id="cb17-34"><a href="#cb17-34" tabindex="-1"></a><span class="co"># 5    0    8   z MEDIAN   65.0</span></span>
+<span id="cb17-35"><a href="#cb17-35" tabindex="-1"></a><span class="co"># 6    0    8   z    SUM  506.0</span></span>
+<span id="cb17-36"><a href="#cb17-36" tabindex="-1"></a><span class="co"># 7    0    8   z     Q1   57.5</span></span>
+<span id="cb17-37"><a href="#cb17-37" tabindex="-1"></a><span class="co"># 8    0    8   z     Q3   75.5</span></span></code></pre></div>
 <p>Next: <a href="procs-transpose.html">Proc Transpose</a></p>
 </div>
   </div>
@@ -599,7 +599,7 @@ shaping options:</p>
 
 <div class="pkgdown">
   <p></p>
-<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.</p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.7.</p>
 </div>
 
       </footer>

@@ -19,7 +19,7 @@ interactive and returns datasets.
 
 ## Create Sample Data
 
-First let's create some sample data.  This sample data is identical to that
+Let's again create some sample data.  This sample data is identical to that
 created for the `proc_freq` tutorial, but has an additional grouping 
 variable "g":  
 ```{r eval=FALSE, echo=TRUE} 
@@ -52,6 +52,9 @@ dat
 
 If no parameters are specified, the `proc_means` function will calculate
 N, Means, Standard Deviation, Minimum, and Maximum on all numeric variables.  
+
+Note that the `options` statement has been added to pass CRAN checks.
+When you are running code samples, this statement may be omitted.
 ```{r eval=FALSE, echo=TRUE} 
 # Turn off printing for CRAN checks
 options("procs.print" = FALSE)
@@ -61,9 +64,6 @@ proc_means(dat)
 
 ```
 <img src="../man/images/meanstut1.png"/>
-
-Note that the `options` statement above has been added to pass CRAN checks.
-When you are running code samples, this statement may be omitted.
 
 ## Selected Variables
 If you don't want statistics on all numeric variables, you may specify
@@ -122,7 +122,7 @@ The "report" keyword requests the exact datasets used in the interactive
 report.  Specifying either one of these options will cause the function
 to return data.  
 
-Here is an example that shows the difference in the "report" and "out" options:
+Here is an example that shows the difference in the "report" and "all" options:
 ```{r eval=FALSE, echo=TRUE} 
 # Output dataset using "report" option
 res1 <- proc_means(dat, 
@@ -136,7 +136,7 @@ res1
 # 2   z     65 506 57.5 75.5
 
 
-# Output dataset using "out" option
+# Output dataset using "all" option
 res2 <- proc_means(dat, 
                    stats = v(median, sum, q1, q3),
                    output = all)

@@ -12,7 +12,7 @@
 # Introduction to **procs**
 <img src='man/images/procs_new.png' align="left" height="138px" style="margin-right:10px;height:138px"/>
 
-The purpose of the **procs** package is to recreate some SAS® 
+The purpose of the **procs** package is to recreate commonly used SAS® 
 procedures in R.  The first version of the package will attempt to recreate
 PROC FREQ and PROC MEANS. 
 Subsequent versions of the package will add more statistical procedures.  
@@ -82,6 +82,13 @@ Then put the following line at the top of your script:
 For examples and usage 
 information, please visit the **procs** documentation site 
 [here](https://procs.r-sassy.org/articles/procs.html)
+    
+The **procs** package is under active development.  If you want the latest
+development version, you can download from the github site by running
+the following code:
+
+    devtools::install_github("https://github.com/dbosak01/procs")    
+
 
 ### Getting Help
 

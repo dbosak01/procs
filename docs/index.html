@@ -117,7 +117,7 @@
 <a class="anchor" aria-label="anchor" href="#introduction-to-procs"></a>
 </h1></div>
 <p><img src="man/images/procs_new.png" align="left" height="138px" style="margin-right:10px;height:138px"></p>
-<p>The purpose of the <strong>procs</strong> package is to recreate some SAS® procedures in R. The first version of the package will attempt to recreate PROC FREQ and PROC MEANS. Subsequent versions of the package will add more statistical procedures.</p>
+<p>The purpose of the <strong>procs</strong> package is to recreate commonly used SAS® procedures in R. The first version of the package will attempt to recreate PROC FREQ and PROC MEANS. Subsequent versions of the package will add more statistical procedures.</p>
 <p>The package will also include a recreation of PROC TRANSPOSE, PROC SORT, and PROC PRINT. The reason these procedures are included is because they are frequently used in conjunction with the statistical procedures to prepare results for reporting.</p>
 <p>There are three motivations for recreating SAS® statistical procedures in R:</p>
 <p><strong>1) Rich Outputs:</strong> R provides a wide range of statistical packages and functions. However, these statistical functions frequently return a fragmented output. The user is often left to compile R statistical results into a readable report themselves.</p>
@@ -135,10 +135,12 @@
 <h3 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
 </h3>
 <p>The easiest way to install the <strong>procs</strong> package is to run the following command from your R console:</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">install.packages</span>(<span class="st">"procs"</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb1"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a><span class="fu">install.packages</span>(<span class="st">"procs"</span>)</span></code></pre></div>
 <p>Then put the following line at the top of your script:</p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(procs)</span></code></pre></div>
+<div class="sourceCode" id="cb2"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" tabindex="-1"></a><span class="fu">library</span>(procs)</span></code></pre></div>
 <p>For examples and usage information, please visit the <strong>procs</strong> documentation site <a href="https://procs.r-sassy.org/articles/procs.html">here</a></p>
+<p>The <strong>procs</strong> package is under active development. If you want the latest development version, you can download from the github site by running the following code:</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" tabindex="-1"></a>devtools<span class="sc">::</span><span class="fu">install_github</span>(<span class="st">"https://github.com/dbosak01/procs"</span>)    </span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="getting-help">Getting Help<a class="anchor" aria-label="anchor" href="#getting-help"></a>
@@ -212,7 +214,7 @@
 
 <div class="pkgdown">
   <p></p>
-<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.</p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.7.</p>
 </div>
 
       </footer>

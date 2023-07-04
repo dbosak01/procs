@@ -623,3 +623,18 @@ test_that("transpose25: transpose by retains data type.", {
 
 })
 
+
+test_that("transpose26: prefix, and suffix works with no ID.", {
+
+  res <- proc_transpose(score, prefix = "sn", suffix = "x")
+
+  res
+
+
+  expect_equal(names(res[2]), "sn1x")
+
+
+})
+
+
+

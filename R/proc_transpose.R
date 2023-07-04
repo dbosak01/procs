@@ -504,6 +504,7 @@ proc_transpose <- function(data,
      if (log_output()) {
        log_logr(res)
        print(res)
+       return(invisible(res))
      }
    }
 
