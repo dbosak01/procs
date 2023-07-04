@@ -22,142 +22,139 @@ on the links below to navigate to the full question and answer content.
 
 ## Index{#top}
 
-* [How can I generate a frequency table?](#freq)
-* [How can I generate summary statistics?](#means)
-* [How can I pivot my statistical results?](#transpose)
-* [How can I generate a crosstabulation table?](#crosstab)
-* [How can I write a frequency report?](#report)
-* [Why are you trying to simulate SAS® procedures?](#motivation)
+* [Why did you write the procs package?](#why)
+* [Are these functions validated?](#validation)
+* [Why is the output different?](#different)
 * [Can you do N-way tables?](#nway)
 * [Can these procedures create plots?](#plots)
-* [How can I get p-values?](#stats)
-* [Are these functions validated?](#validation)
+* [Does the package support Cochran-Mantel-Hanzel Statistics?](#cmh)
+* [What about PROC COMPARE?](#compare)
+* [Are there any other statistics procedure coming?](#other)
 * [Can I create a PDF directly?  What about RTF?](#outputs)
-* [Can I change the report colors?](#colors)
 
 
 ## Content
 
-### Question? {#freq}
+### Why did you write the **procs** package? {#why}
 
-**Q:** A question.
+**Q:** There are already many statistical functions and packages in R.  Why did
+you write **procs**?
 
-**A:** An answer.  
-
-[top](#top) 
-
-******
-
-### Question? {#means}
-
-**Q:** A question.
-
-**A:** An answer.  
+**A:** I wrote the **procs** package to help SAS® programmers. There are  
+many SAS® programmers trying to learn R and struggling with the many  
+differences between these two languages.  The **procs** package provides them with
+a set of functions that are conceptually similar to SAS® procedures. The aim
+is to help them become more productive and comfortable working in R in a shorter
+amount of time.
 
 [top](#top) 
 
 ******
 
-### Question? {#transpose}
+### Are these functions validated? {#validation}
 
-**Q:** A question.
+**Q:** May company requires that all software be validated before using in 
+production. Is the **procs** package validated?
 
-**A:** An answer.  
-
-[top](#top) 
-
-******
-
-### Question? {#crosstab}
-
-**Q:** I can see from the examples ...
-
-
-**A:** The package supports ...
+**A:** Yes.  The functions were validated by comparing to SAS®. The validation
+documentation is [here](https://procs.r-sassy.org/validation.docx).
 
 [top](#top) 
 
 ******
 
-### Question 2? {#report}
+### Why is the output different? {#different}
 
-**Q:** Question here.
+**Q:** The output dataset columns and column names are a little bit
+different from SAS®.  Why?
 
-**A:** Answer here.
+**A:** The output datasets and column names have been standardized.  They should be
+more predictable and easier to manipulate programmatically. They were
+changed intentionally as an improvement over the corresponding SAS® procedures.
 
-[top](#top)
+[top](#top) 
 
-****** 
+******
 
-### Question 2? {#motivation}
+### Can you do N-way tables? {#nway}
 
-**Q:** Question here.
+**Q:** I see you can do one-way and two-way frequency tables. What about
+N-way tables?  Does that package support them?
 
-**A:** Answer here.
+**A:** No.  N-way tables are less common, and were not seen as a priority.
+These types of tables are on the list for a future enhancement.
 
-[top](#top)
+[top](#top) 
 
-****** 
+******
 
-### Question 2? {#nway}
+### Can these procedures create plots? {#plots}
 
-**Q:** Question here.
+**Q:** I'm trying to find the option to produce a plot, and can't find it.
+Does the package support plots or not?
 
-**A:** Answer here.
 
-[top](#top)
+**A:** Not yet. Plots are expected for a future release.
 
-****** 
+[top](#top) 
 
-### Question 2? {#plots}
+******
 
-**Q:** Question here.
+### Does the package support Cochran-Mantel-Haenszel Statistics? {#cmh}
 
-**A:** Answer here.
+**Q:** I see the frequency function supports Chi-square and Fishers's exact
+tests.  What about Cochran-Mantel-Haenszel?
 
-[top](#top)
-
-****** 
-
-### Question 2? {#stats}
-
-**Q:** Question here.
-
-**A:** Answer here.
-
-[top](#top)
-
-****** 
-
-### Question 2? {#validation}
-
-**Q:** Question here.
-
-**A:** Answer here.
+**A:** CMH statistics were left out of the current version because the
+corresponding R function does not match SAS® reliably.  You can run CMH statistics
+yourself using using the 'mantelhaen.test()' function
+from the **stats** package.  
 
 [top](#top)
 
 ****** 
 
-### Question 2? {#outputs}
+### What about PROC COMPARE? {#compare}
 
-**Q:** Question here.
+**Q:** I see you have PROC TRANSPOSE and PROC SORT.  How come you didn't include
+PROC COMPARE?
 
-**A:** Answer here.
+**A:** There are already several dataset comparison packages in R.  Therefore,
+I didn't make it a priority.  Yet several people have asked for it, and it 
+will be included in a future release.
+
+[top](#top)
+
+****** 
+
+### Are there any other statistics procedure coming? {#other}
+
+**Q:** The 'proc_freq' and 'proc_means' functions are helpful.  But what about
+some other stats procedures?  What about PROC GLM, PROC ANOVA, and PROC REG?
+
+**A:** These functions are planned for a future release.  The focus of this
+release was 'proc_freq' and 'proc_means', as those are the most basic SAS® 
+procedures and the most commonly used.
 
 [top](#top)
 
 ****** 
 
-### Question 2? {#colors}
+### Can I create a PDF directly?  What about RTF? {#outputs}
 
-**Q:** Question here.
+**Q:** I created some frequencies, and need to output them to a report. Is there
+a way to create a PDF or RTF directly from the **procs** package?
 
-**A:** Answer here.
+**A:** Yes.  Put your data frames in a list, and send to 'proc_print'.  You can
+use the parameters to assign the titles, the output location, and the output
+type. The function supports PDF, RTF, HTML, DOCX, and TXT.  For more advanced
+reporting features, see the **reporter** package.
 
 [top](#top)
 
 ****** 
+
+
 
 <!-- ### Question 2? {#q2} -->
 

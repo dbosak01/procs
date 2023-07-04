@@ -20,7 +20,8 @@ proc_means(
 \item{data}{The input data frame for which to calculate summary statistics.
 This parameter is required.}
 
-\item{var}{The variable(s) to calculate summary statistics for.  By default,
+\item{var}{The variable(s) to calculate summary statistics for. If no
+variables are specified,
 summary statistics will be generated for all numeric variables on the
 input data frame.}
 
@@ -32,11 +33,15 @@ keywords are: "css", "clm", "cv", "lclm", "mean", "median", "mode",
 "p50", "p60", "p70", "p75", "p80", "p90",
 "p95", "p99", "q1", "q3", "qrange", "range", "std", "stderr", "sum",
 "uclm", and "var".
-Defaults statistics are: "n", "mean", "std",
+Default statistics are: "n", "mean", "std",
 "min", and "max".}
 
 \item{output}{Whether or not to return datasets from the function. Valid
-values are "all", "none", and "report".  Default is "all".}
+values are "all", "none", and "report".  Default is "all", and will
+produce dataset output specifically designed for programmatic use. The "none"
+option will return a NULL instead of a dataset or list of datasets.
+The "report" keyword returns the datasets from the interactive report, which
+may be different from the standard output.}
 
 \item{by}{An optional by group. If you specify an by group, the input
 data will be subset on the by variable(s) prior to performing any
@@ -50,35 +55,38 @@ will be nested in the \code{by}.}
 
 \item{options}{A vector of optional keywords. Valid values are:
 "long", "noprint", "notype, "nofreq", "nonobs",
-"stacked", and "wide".}
+"stacked", and "wide".  The "wide", "long", and "stacked" keywords are data
+shaping options that control the structure of the output data.
+The "notype", "nofreq", and "nonobs" keywords will turn
+off columns on the output datasets.}
 
 \item{titles}{A vector of one or more titles to use for the report output.}
 }
 \value{
-The requested summary statistics are shown interactively in the viewer.
-To return dataset results, pass the "out" or "report" options on the
-\code{options} parameter.  If the request is a single dataset, results
-will be returned as a single dataset.  Multiple datasets will be returned
-in a list.  You may then access individual result datasets from the list.
+Normally, the requested summary statistics are shown interactively
+in the viewer, and output results are returned as a data frame.
+If the request produces multiple data frames, they will be returned in a list.
+You may then access individual dataset from the list.
+The interactive report can be turned off using the "noprint" option, and
+the output datasets can be turned off using the "none" keyword on the
+\code{output} parameter.
 }
 \description{
 The \code{proc_means} function generates summary statistics
 for selected variables on the input dataset.  The variables are identified
 on the \code{var} parameter.  The statistics to perform are identified
-on the \code{stats} parameter.  By default, results are displayed in
-the viewer interactively.  To return results from the function, pass the
-"out" or "report" keywords on the \code{options} parameter.
+on the \code{stats} parameter.  Results are displayed in
+the viewer interactively and returned from the function.
 }
 \details{
 The \code{proc_means} function is for analysis of continuous variables.
 Data is passed in on the \code{data}
 parameter.  The desired statistics are specified using keywords
 on the \code{stats} parameter.  The function can segregate data into
-groups using the \code{by} and \code{class} parameters. By default,
-the function generates an interactive report, but does not generate
-dataset output.
+groups using the \code{by} and \code{class} parameters. There are also
+options to determine whether and what results are returned.
 }
-\section{Report Output}{
+\section{Interactive Output}{
 
 By default, \code{proc_freq} results will
 be immediately sent to the viewer as an HTML report.  This functionality
@@ -88,32 +96,32 @@ to the \code{options} parameter.
 
 The \code{titles} parameter allows you to set one or more titles for your
 report.  Pass these titles as a vector of strings.
+}
+
+\section{Dataset Output}{
+
+Dataset results are also returned from the function by default.
+If the results are a single dataset, a single
+data frame will be returned.  If there are multiple results, a list of data
+frames will be returned.
+
+The output datasets generated are optimized for data manipulation.
+The column names have been standardized, and additional variables may
+be present to help with data manipulation.  In addition, data values in the
+output datasets are intentionally not rounded or formatted
+to give you the most accurate statistical results.
 
 The exact datasets used for the interactive report can be returned as a list.
 To return these datasets as a list, pass
-the "report" keyword on the \code{options} parameter. This list may in
+the "report" keyword on the \code{output} parameter. This list may in
 turn be passed to \code{\link{proc_print}} to write the report to a file.
-}
-
-\section{Data Frame Output}{
-
-To generate output datasets, pass the "out" keyword to the
-\code{options} parameter. If you are requesting only one result, a single
-data frame will be returned.  If you request multiple results, a list of data
-frames will be returned.
-
-The datasets generated by the "out" keyword are optimized for data manipulation.
-The column names have been standardized, and additional variables may
-be present to help with data manipulation.  In addition, data values in the
-output datasets are not rounded or formatted
-to give you the most accurate statistical results.
 }
 
 \section{Statistics Keywords}{
 
 The following statistics keywords can be passed on the \code{stats}
-parameter.  When output datasets are requested, each statistic
-will be contained in a separate column.  The column name will be
+parameter.  Normally, each statistic
+will be contained in a separate column and the column name will be
 the same as the statistic keyword. You may pass statistic keywords as a
 quoted vector of strings, or an unquoted vector using the \code{v()} function.
 \itemize{
@@ -146,7 +154,7 @@ The \code{proc_means} function recognizes the following options.  Options may
 be passed as a quoted vector of strings, or an unquoted vector using the
 \code{v()} function.
 \itemize{
-\item{\strong{long}: A shaping option that will transpose the output datasets
+\item{\strong{long}: A shaping option that will transpose the output dataset
 so that statistics are in rows and variables are in columns.
 }
 \item{\strong{nofreq, nonobs}: Turns off the FREQ column
@@ -159,14 +167,6 @@ option will inhibit printing.
 \item{\strong{notype}: Turns off the TYPE column on the output
 dataset.
 }
-\item{\strong{out}: Requests output datasets.   Normally, there will be
-a single result dataset with all variables, statistics, and by groups.
-If there are multiple result datasets, they will be returned in a list.
-}
-\item{\strong{report}: Requests that the datasets used for the interactive
-report be returned by the function.  If there are multiple datasets,
-they will be returned in a list.
-}
 \item{\strong{stacked}: Requests that output datasets be returned in "stacked"
 form, such that both statistics and variables are in rows.
 }
@@ -174,12 +174,6 @@ form, such that both statistics and variables are in rows.
 such that statistics are across the top in columns, and variables are in rows.
 }
 }
-}
-
-\section{Data Constraints}{
-
-Explain limits of data for each stat option.  Number of non-missing
-values, etc.
 }
 
 \examples{

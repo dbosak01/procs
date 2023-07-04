@@ -122,120 +122,131 @@ the full question and answer content.</p>
 <h2 id="top">Index<a class="anchor" aria-label="anchor" href="#top"></a>
 </h2>
 <ul>
-<li><a href="#freq">How can I generate a frequency table?</a></li>
-<li><a href="#means">How can I generate summary statistics?</a></li>
-<li><a href="#transpose">How can I pivot my statistical
-results?</a></li>
-<li><a href="#crosstab">How can I generate a crosstabulation
-table?</a></li>
-<li><a href="#report">How can I write a frequency report?</a></li>
-<li><a href="#motivation">Why are you trying to simulate SAS®
-procedures?</a></li>
+<li><a href="#why">Why did you write the procs package?</a></li>
+<li><a href="#validation">Are these functions validated?</a></li>
+<li><a href="#different">Why is the output different?</a></li>
 <li><a href="#nway">Can you do N-way tables?</a></li>
 <li><a href="#plots">Can these procedures create plots?</a></li>
-<li><a href="#stats">How can I get p-values?</a></li>
-<li><a href="#validation">Are these functions validated?</a></li>
+<li><a href="#cmh">Does the package support Cochran-Mantel-Hanzel
+Statistics?</a></li>
+<li><a href="#compare">What about PROC COMPARE?</a></li>
+<li><a href="#other">Are there any other statistics procedure
+coming?</a></li>
 <li><a href="#outputs">Can I create a PDF directly? What about
 RTF?</a></li>
-<li><a href="#colors">Can I change the report colors?</a></li>
 </ul>
 </div>
 <div class="section level2">
 <h2 id="content">Content<a class="anchor" aria-label="anchor" href="#content"></a>
 </h2>
 <div class="section level3">
-<h3 id="freq">Question?<a class="anchor" aria-label="anchor" href="#freq"></a>
+<h3 id="why">Why did you write the <strong>procs</strong> package?<a class="anchor" aria-label="anchor" href="#why"></a>
 </h3>
-<p><strong>Q:</strong> A question.</p>
-<p><strong>A:</strong> An answer.</p>
+<p><strong>Q:</strong> There are already many statistical functions and
+packages in R. Why did you write <strong>procs</strong>?</p>
+<p><strong>A:</strong> I wrote the <strong>procs</strong> package to
+help SAS® programmers. There are<br>
+many SAS® programmers trying to learn R and struggling with the
+many<br>
+differences between these two languages. The <strong>procs</strong>
+package provides them with a set of functions that are conceptually
+similar to SAS® procedures. The aim is to help them become more
+productive and comfortable working in R in a shorter amount of time.</p>
 <p><a href="#top">top</a></p>
 <hr>
 </div>
 <div class="section level3">
-<h3 id="means">Question?<a class="anchor" aria-label="anchor" href="#means"></a>
+<h3 id="validation">Are these functions validated?<a class="anchor" aria-label="anchor" href="#validation"></a>
 </h3>
-<p><strong>Q:</strong> A question.</p>
-<p><strong>A:</strong> An answer.</p>
+<p><strong>Q:</strong> May company requires that all software be
+validated before using in production. Is the <strong>procs</strong>
+package validated?</p>
+<p><strong>A:</strong> Yes. The functions were validated by comparing to
+SAS®. The validation documentation is <a href="https://procs.r-sassy.org/validation.docx">here</a>.</p>
 <p><a href="#top">top</a></p>
 <hr>
 </div>
 <div class="section level3">
-<h3 id="transpose">Question?<a class="anchor" aria-label="anchor" href="#transpose"></a>
+<h3 id="different">Why is the output different?<a class="anchor" aria-label="anchor" href="#different"></a>
 </h3>
-<p><strong>Q:</strong> A question.</p>
-<p><strong>A:</strong> An answer.</p>
+<p><strong>Q:</strong> The output dataset columns and column names are a
+little bit different from SAS®. Why?</p>
+<p><strong>A:</strong> The output datasets and column names have been
+standardized. They should be more predictable and easier to manipulate
+programmatically. They were changed intentionally as an improvement over
+the corresponding SAS® procedures.</p>
 <p><a href="#top">top</a></p>
 <hr>
 </div>
 <div class="section level3">
-<h3 id="crosstab">Question?<a class="anchor" aria-label="anchor" href="#crosstab"></a>
+<h3 id="nway">Can you do N-way tables?<a class="anchor" aria-label="anchor" href="#nway"></a>
 </h3>
-<p><strong>Q:</strong> I can see from the examples …</p>
-<p><strong>A:</strong> The package supports …</p>
+<p><strong>Q:</strong> I see you can do one-way and two-way frequency
+tables. What about N-way tables? Does that package support them?</p>
+<p><strong>A:</strong> No. N-way tables are less common, and were not
+seen as a priority. These types of tables are on the list for a future
+enhancement.</p>
 <p><a href="#top">top</a></p>
 <hr>
 </div>
 <div class="section level3">
-<h3 id="report">Question 2?<a class="anchor" aria-label="anchor" href="#report"></a>
+<h3 id="plots">Can these procedures create plots?<a class="anchor" aria-label="anchor" href="#plots"></a>
 </h3>
-<p><strong>Q:</strong> Question here.</p>
-<p><strong>A:</strong> Answer here.</p>
+<p><strong>Q:</strong> I’m trying to find the option to produce a plot,
+and can’t find it. Does the package support plots or not?</p>
+<p><strong>A:</strong> Not yet. Plots are expected for a future
+release.</p>
 <p><a href="#top">top</a></p>
 <hr>
 </div>
 <div class="section level3">
-<h3 id="motivation">Question 2?<a class="anchor" aria-label="anchor" href="#motivation"></a>
+<h3 id="cmh">Does the package support Cochran-Mantel-Haenszel Statistics?<a class="anchor" aria-label="anchor" href="#cmh"></a>
 </h3>
-<p><strong>Q:</strong> Question here.</p>
-<p><strong>A:</strong> Answer here.</p>
+<p><strong>Q:</strong> I see the frequency function supports Chi-square
+and Fishers’s exact tests. What about Cochran-Mantel-Haenszel?</p>
+<p><strong>A:</strong> CMH statistics were left out of the current
+version because the corresponding R function does not match SAS®
+reliably. You can run CMH statistics yourself using using the
+‘mantelhaen.test()’ function from the <strong>stats</strong>
+package.</p>
 <p><a href="#top">top</a></p>
 <hr>
 </div>
 <div class="section level3">
-<h3 id="nway">Question 2?<a class="anchor" aria-label="anchor" href="#nway"></a>
+<h3 id="compare">What about PROC COMPARE?<a class="anchor" aria-label="anchor" href="#compare"></a>
 </h3>
-<p><strong>Q:</strong> Question here.</p>
-<p><strong>A:</strong> Answer here.</p>
+<p><strong>Q:</strong> I see you have PROC TRANSPOSE and PROC SORT. How
+come you didn’t include PROC COMPARE?</p>
+<p><strong>A:</strong> There are already several dataset comparison
+packages in R. Therefore, I didn’t make it a priority. Yet several
+people have asked for it, and it will be included in a future
+release.</p>
 <p><a href="#top">top</a></p>
 <hr>
 </div>
 <div class="section level3">
-<h3 id="plots">Question 2?<a class="anchor" aria-label="anchor" href="#plots"></a>
+<h3 id="other">Are there any other statistics procedure coming?<a class="anchor" aria-label="anchor" href="#other"></a>
 </h3>
-<p><strong>Q:</strong> Question here.</p>
-<p><strong>A:</strong> Answer here.</p>
+<p><strong>Q:</strong> The ‘proc_freq’ and ‘proc_means’ functions are
+helpful. But what about some other stats procedures? What about PROC
+GLM, PROC ANOVA, and PROC REG?</p>
+<p><strong>A:</strong> These functions are planned for a future release.
+The focus of this release was ‘proc_freq’ and ‘proc_means’, as those are
+the most basic SAS® procedures and the most commonly used.</p>
 <p><a href="#top">top</a></p>
 <hr>
 </div>
 <div class="section level3">
-<h3 id="stats">Question 2?<a class="anchor" aria-label="anchor" href="#stats"></a>
+<h3 id="outputs">Can I create a PDF directly? What about RTF?<a class="anchor" aria-label="anchor" href="#outputs"></a>
 </h3>
-<p><strong>Q:</strong> Question here.</p>
-<p><strong>A:</strong> Answer here.</p>
-<p><a href="#top">top</a></p>
-<hr>
-</div>
-<div class="section level3">
-<h3 id="validation">Question 2?<a class="anchor" aria-label="anchor" href="#validation"></a>
-</h3>
-<p><strong>Q:</strong> Question here.</p>
-<p><strong>A:</strong> Answer here.</p>
-<p><a href="#top">top</a></p>
-<hr>
-</div>
-<div class="section level3">
-<h3 id="outputs">Question 2?<a class="anchor" aria-label="anchor" href="#outputs"></a>
-</h3>
-<p><strong>Q:</strong> Question here.</p>
-<p><strong>A:</strong> Answer here.</p>
-<p><a href="#top">top</a></p>
-<hr>
-</div>
-<div class="section level3">
-<h3 id="colors">Question 2?<a class="anchor" aria-label="anchor" href="#colors"></a>
-</h3>
-<p><strong>Q:</strong> Question here.</p>
-<p><strong>A:</strong> Answer here.</p>
+<p><strong>Q:</strong> I created some frequencies, and need to output
+them to a report. Is there a way to create a PDF or RTF directly from
+the <strong>procs</strong> package?</p>
+<p><strong>A:</strong> Yes. Put your data frames in a list, and send to
+‘proc_print’. You can use the parameters to assign the titles, the
+output location, and the output type. The function supports PDF, RTF,
+HTML, DOCX, and TXT. For more advanced reporting features, see the
+<strong>reporter</strong> package.</p>
 <p><a href="#top">top</a></p>
 <hr>
 <!-- ### Question 2? {#q2} --><!-- **Q:** Question here. --><!-- **A:** Answer here. --><!-- [top](#top) --><!-- ****** --><!-- ### Question 1? {#q1} --><!-- **Q:** Question here. --><!-- **A:** Answer here. --><!-- [top](#top)  --><!-- ****** -->
