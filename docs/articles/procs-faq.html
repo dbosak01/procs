@@ -127,13 +127,13 @@ the full question and answer content.</p>
 <li><a href="#different">Why is the output different?</a></li>
 <li><a href="#nway">Can you do N-way tables?</a></li>
 <li><a href="#plots">Can these procedures create plots?</a></li>
-<li><a href="#cmh">Does the package support Cochran-Mantel-Hanzel
+<li><a href="#cmh">Does the package support Cochran-Mantel-Haenszel
 Statistics?</a></li>
 <li><a href="#compare">What about PROC COMPARE?</a></li>
-<li><a href="#other">Are there any other statistics procedure
+<li><a href="#other">Are there any other statistics procedures
 coming?</a></li>
-<li><a href="#outputs">Can I create a PDF directly? What about
-RTF?</a></li>
+<li><a href="#outputs">How do I get my statistics into a
+report?</a></li>
 </ul>
 </div>
 <div class="section level2">
@@ -145,24 +145,23 @@ RTF?</a></li>
 <p><strong>Q:</strong> There are already many statistical functions and
 packages in R. Why did you write <strong>procs</strong>?</p>
 <p><strong>A:</strong> I wrote the <strong>procs</strong> package to
-help SAS® programmers. There are<br>
-many SAS® programmers trying to learn R and struggling with the
-many<br>
-differences between these two languages. The <strong>procs</strong>
-package provides them with a set of functions that are conceptually
-similar to SAS® procedures. The aim is to help them become more
-productive and comfortable working in R in a shorter amount of time.</p>
+help SAS® programmers. There are many SAS® programmers trying to learn R
+and struggling with the many differences between these two languages.
+The <strong>procs</strong> package provides them with a set of functions
+that are conceptually similar to SAS® procedures. The aim is to make
+them more productive and comfortable working in R in a shorter time
+frame.</p>
 <p><a href="#top">top</a></p>
 <hr>
 </div>
 <div class="section level3">
 <h3 id="validation">Are these functions validated?<a class="anchor" aria-label="anchor" href="#validation"></a>
 </h3>
-<p><strong>Q:</strong> May company requires that all software be
+<p><strong>Q:</strong> My company requires that all software be
 validated before using in production. Is the <strong>procs</strong>
 package validated?</p>
 <p><strong>A:</strong> Yes. The functions were validated by comparing to
-SAS®. The validation documentation is <a href="https://procs.r-sassy.org/validation.docx">here</a>.</p>
+SAS®. The validation documentation is <a href="https://r-sassy.org/validation/Procs%20Validation.docx" class="external-link">here</a>.</p>
 <p><a href="#top">top</a></p>
 <hr>
 </div>
@@ -194,8 +193,9 @@ enhancement.</p>
 </h3>
 <p><strong>Q:</strong> I’m trying to find the option to produce a plot,
 and can’t find it. Does the package support plots or not?</p>
-<p><strong>A:</strong> Not yet. Plots are expected for a future
-release.</p>
+<p><strong>A:</strong> Not yet. Plots are expected for a future release.
+In the meantime, you can send the output results into <a href="https://ggplot2.tidyverse.org/" class="external-link">ggplot2</a> and create the plots
+on your own.</p>
 <p><a href="#top">top</a></p>
 <hr>
 </div>
@@ -204,10 +204,11 @@ release.</p>
 </h3>
 <p><strong>Q:</strong> I see the frequency function supports Chi-square
 and Fishers’s exact tests. What about Cochran-Mantel-Haenszel?</p>
-<p><strong>A:</strong> CMH statistics were left out of the current
-version because the corresponding R function does not match SAS®
-reliably. You can run CMH statistics yourself using using the
-‘mantelhaen.test()’ function from the <strong>stats</strong>
+<p><strong>A:</strong> CMH statistics were left out of the of the
+<strong>procs</strong> package because the corresponding R function does
+not match SAS® reliably. You can run CMH statistics yourself using using
+the <a href="https://stat.ethz.ch/R-manual/R-devel/library/stats/html/mantelhaen.test.html" class="external-link">mantelhaen.test</a>
+function from the <a href="https://stat.ethz.ch/R-manual/R-devel/library/stats/html/00Index.html" class="external-link">stats</a>
 package.</p>
 <p><a href="#top">top</a></p>
 <hr>
@@ -218,35 +219,38 @@ package.</p>
 <p><strong>Q:</strong> I see you have PROC TRANSPOSE and PROC SORT. How
 come you didn’t include PROC COMPARE?</p>
 <p><strong>A:</strong> There are already several dataset comparison
-packages in R. Therefore, I didn’t make it a priority. Yet several
-people have asked for it, and it will be included in a future
-release.</p>
+packages in R, such as <a href="https://cran.r-project.org/web/packages/diffdf/vignettes/diffdf-basic.html" class="external-link">diffdf</a>
+and <a href="https://cran.r-project.org/web/packages/arsenal/vignettes/comparedf.html" class="external-link">comparedf</a>.
+The functionality of these packages is also similar to SAS® PROC
+COMPARE. If you wish to do dataset comparisons, please research these
+existing packages.</p>
 <p><a href="#top">top</a></p>
 <hr>
 </div>
 <div class="section level3">
-<h3 id="other">Are there any other statistics procedure coming?<a class="anchor" aria-label="anchor" href="#other"></a>
+<h3 id="other">Are there any other statistics procedures coming?<a class="anchor" aria-label="anchor" href="#other"></a>
 </h3>
 <p><strong>Q:</strong> The ‘proc_freq’ and ‘proc_means’ functions are
 helpful. But what about some other stats procedures? What about PROC
 GLM, PROC ANOVA, and PROC REG?</p>
 <p><strong>A:</strong> These functions are planned for a future release.
-The focus of this release was ‘proc_freq’ and ‘proc_means’, as those are
-the most basic SAS® procedures and the most commonly used.</p>
+The focus of this release was ‘proc_freq()’ and ‘proc_means()’, as those
+are the most basic SAS® procedures and the most commonly used. In the
+meantime, please see the excellent package <a href="https://cran.r-project.org/package=sasLM" class="external-link">sasLM</a> for functions
+that replicate SAS® statistics related to linear modeling.</p>
 <p><a href="#top">top</a></p>
 <hr>
 </div>
 <div class="section level3">
-<h3 id="outputs">Can I create a PDF directly? What about RTF?<a class="anchor" aria-label="anchor" href="#outputs"></a>
+<h3 id="outputs">How do I get my statistics into a report?<a class="anchor" aria-label="anchor" href="#outputs"></a>
 </h3>
 <p><strong>Q:</strong> I created some frequencies, and need to output
 them to a report. Is there a way to create a PDF or RTF directly from
 the <strong>procs</strong> package?</p>
 <p><strong>A:</strong> Yes. Put your data frames in a list, and send to
-‘proc_print’. You can use the parameters to assign the titles, the
+‘proc_print()’. You can use the parameters to assign the titles, the
 output location, and the output type. The function supports PDF, RTF,
-HTML, DOCX, and TXT. For more advanced reporting features, see the
-<strong>reporter</strong> package.</p>
+HTML, DOCX, and TXT. For more advanced reporting features, see the <a href="https://reporter.r-sassy.org/" class="external-link">reporter</a> package.</p>
 <p><a href="#top">top</a></p>
 <hr>
 <!-- ### Question 2? {#q2} --><!-- **Q:** Question here. --><!-- **A:** Answer here. --><!-- [top](#top) --><!-- ****** --><!-- ### Question 1? {#q1} --><!-- **Q:** Question here. --><!-- **A:** Answer here. --><!-- [top](#top)  --><!-- ****** -->

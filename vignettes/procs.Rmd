@@ -71,7 +71,7 @@ res <- proc_freq(dt, tables = v(Hair, Eye, Hair * Eye),
                  titles = "Hair and Eye Frequency Statistics")
 
 ```
-When printing is allowed, the `proc_freq` function will display the 
+When printing is allowed, the `proc_freq()` function will display the 
 following report in the viewer:  
 <img src="../man/images/freq1.png"/>
 

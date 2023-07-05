@@ -101,6 +101,9 @@ github page [here](https://github.com/dbosak01/procs).
 If you encounter a bug or have a feature request, please submit an issue 
 [here](https://github.com/dbosak01/procs/issues).
 
+The **procs** packages has been validated, and the validation documentation
+is [here](https://r-sassy.org/validation/Procs%20Validation.docx).
+
 
 ### See Also
 
