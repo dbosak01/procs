@@ -136,11 +136,11 @@ If you wish to do dataset comparisons, please research these existing packages.
 
 ### Are there any other statistics procedures coming? {#other}
 
-**Q:** The 'proc_freq' and 'proc_means' functions are helpful.  But what about
+**Q:** The `proc_freq()` and `proc_means()` functions are helpful.  But what about
 some other stats procedures?  What about PROC GLM, PROC ANOVA, and PROC REG?
 
 **A:** These functions are planned for a future release.  The focus of this
-release was 'proc_freq()' and 'proc_means()', as those are the most basic SAS® 
+release was `proc_freq()` and `proc_means()`, as those are the most basic SAS® 
 procedures and the most commonly used. In the meantime, please see the 
 excellent package [sasLM](https://cran.r-project.org/package=sasLM) for 
 functions that replicate SAS® statistics related to linear modeling.
@@ -154,7 +154,7 @@ functions that replicate SAS® statistics related to linear modeling.
 **Q:** I created some frequencies, and need to output them to a report. Is there
 a way to create a PDF or RTF directly from the **procs** package?
 
-**A:** Yes.  Put your data frames in a list, and send to 'proc_print()'.  You can
+**A:** Yes.  Put your data frames in a list, and send to `proc_print()`.  You can
 use the parameters to assign the titles, the output location, and the output
 type. The function supports PDF, RTF, HTML, DOCX, and TXT.  For more advanced
 reporting features, see the [reporter](https://reporter.r-sassy.org/) package.
