@@ -53,12 +53,13 @@ separate tables, while class groups will be continued in the same table.
 When a \code{by} and a \code{class} are both specified, the \code{class}
 will be nested in the \code{by}.}
 
-\item{options}{A vector of optional keywords. Valid values are:
+\item{options}{A vector of optional keywords. Valid values are: "alpha =",
 "long", "noprint", "notype, "nofreq", "nonobs",
 "stacked", and "wide".  The "wide", "long", and "stacked" keywords are data
 shaping options that control the structure of the output data.
 The "notype", "nofreq", and "nonobs" keywords will turn
-off columns on the output datasets.}
+off columns on the output datasets.  The "alpha = " option will set the alpha
+value for confidence limit statistics.  The default is 95\% (alpha = 0.05).}
 
 \item{titles}{A vector of one or more titles to use for the report output.}
 }
@@ -154,6 +155,11 @@ The \code{proc_means} function recognizes the following options.  Options may
 be passed as a quoted vector of strings, or an unquoted vector using the
 \code{v()} function.
 \itemize{
+\item{\strong{alpha = }: The "alpha = " option will set the alpha
+value for confidence limit statistics.  Set the alpha as a decimal value
+between 0 and 1.  For example, you can set a 90\% confidence limit as
+\code{alpha = 0.1}.
+}
 \item{\strong{long}: A shaping option that will transpose the output dataset
 so that statistics are in rows and variables are in columns.
 }

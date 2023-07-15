@@ -1048,6 +1048,96 @@ test_that("means49: view can be FALSE without error.", {
 })
 
 
+test_that("means50: check more confidence limit options", {
+
+  # 2-sided 95%
+  res <- proc_means(datm, var = v(PresentScore, TasteScore),
+                    stats = v(mean, clm),
+                    options = v(nonobs, notype, alpha = .05),
+                    titles = "My first title for Means")
+
+  res
+
+
+  expect_equal("data.frame" %in% class(res), TRUE)
+  expect_equal(ncol(res), 4)
+
+  expect_equal(res[2, "MEAN"], 81.35)
+  expect_equal(res[2, "UCLM"], 84.44432)
+  expect_equal(res[2, "LCLM"], 78.25568)
+
+
+  # 2-sided 90%
+  res <- proc_means(datm, var = v(PresentScore, TasteScore),
+                    stats = v(mean, clm),
+                    options = v(nonobs, notype, alpha = .1),
+                    titles = "My first title for Means")
+
+  res
+
+
+  expect_equal("data.frame" %in% class(res), TRUE)
+  expect_equal(ncol(res), 4)
+
+  expect_equal(res[2, "MEAN"], 81.35)
+  expect_equal(res[2, "UCLM"], 83.906345)
+  expect_equal(res[2, "LCLM"], 78.793655)
+
+
+  # 1-sided 90% uclm
+  res <- proc_means(datm, var = v(PresentScore, TasteScore),
+                    stats = v(mean, uclm),
+                    options = v(nonobs, notype, alpha = .1),
+                    titles = "My first title for Means")
+
+  res
+
+
+  expect_equal("data.frame" %in% class(res), TRUE)
+  expect_equal(ncol(res), 3)
+
+  expect_equal(res[2, "MEAN"], 81.35)
+  expect_equal(res[2, "UCLM"], 83.31291)
+
+
+  # 1-sided 90% lclm
+  res <- proc_means(datm, var = v(PresentScore, TasteScore),
+                    stats = v(mean, lclm),
+                    options = v(nonobs, notype, alpha = .1),
+                    titles = "My first title for Means")
+
+  res
+
+
+  expect_equal("data.frame" %in% class(res), TRUE)
+  expect_equal(ncol(res), 3)
+
+  expect_equal(res[2, "MEAN"], 81.35)
+  expect_equal(res[2, "LCLM"], 79.38709)
+
+
+
+  # 2-sided 90% with individual stat keywords
+  res <- proc_means(datm, var = v(PresentScore, TasteScore),
+                    stats = v(mean, lclm, uclm),
+                    options = v(nonobs, notype, alpha = .1),
+                    titles = "My first title for Means")
+
+  res
+
+
+  expect_equal("data.frame" %in% class(res), TRUE)
+  expect_equal(ncol(res), 4)
+
+  expect_equal(res[2, "MEAN"], 81.35)
+  expect_equal(res[2, "UCLM"], 83.906345)
+  expect_equal(res[2, "LCLM"], 78.793655)
+
+})
+
+
+
+
 # test_that("means50: where works before and after rename.", {
 #
 #   var1 <- c("Age", "PresentScore", "TasteScore")

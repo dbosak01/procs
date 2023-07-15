@@ -503,6 +503,34 @@ test_that("utils15: has_* functions work as expected.", {
 
 })
 
+
+test_that("utils16: get_alpha() option works as expected.", {
+
+
+  opt <- c("bork", "fork", alpha = 0.1)
+
+
+  res <- get_alpha(opt)
+
+  res
+
+  expect_equal(res, 0.1)
+
+
+
+  opt <- c("bork", "fork")
+
+
+  res <- get_alpha(opt)
+
+  res
+
+  expect_equal(res, 0.05)
+
+
+
+})
+
 #
 # test_that("utils12: stackds() function works as expected.", {
 #

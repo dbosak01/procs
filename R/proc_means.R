@@ -79,6 +79,11 @@
 #' be passed as a quoted vector of strings, or an unquoted vector using the
 #' \code{v()} function.
 #' \itemize{
+#' \item{\strong{alpha = }: The "alpha = " option will set the alpha
+#' value for confidence limit statistics.  Set the alpha as a decimal value
+#' between 0 and 1.  For example, you can set a 90% confidence limit as
+#' \code{alpha = 0.1}.
+#' }
 #' \item{\strong{long}: A shaping option that will transpose the output dataset
 #' so that statistics are in rows and variables are in columns.
 #' }
@@ -134,12 +139,13 @@
 #' When a \code{by} and a \code{class} are both specified, the \code{class}
 #' will be nested in the \code{by}.
 # @param weight An optional weight parameter.
-#' @param options A vector of optional keywords. Valid values are:
+#' @param options A vector of optional keywords. Valid values are: "alpha =",
 #' "long", "noprint", "notype, "nofreq", "nonobs",
 #' "stacked", and "wide".  The "wide", "long", and "stacked" keywords are data
 #' shaping options that control the structure of the output data.
 #' The "notype", "nofreq", and "nonobs" keywords will turn
-#' off columns on the output datasets.
+#' off columns on the output datasets.  The "alpha = " option will set the alpha
+#' value for confidence limit statistics.  The default is 95% (alpha = 0.05).
 #' @param titles A vector of one or more titles to use for the report output.
 #' @return Normally, the requested summary statistics are shown interactively
 #' in the viewer, and output results are returned as a data frame.
@@ -349,7 +355,7 @@ proc_means <- function(data,
     rptres <- gen_report_means(data, by = by, var = var, class = class,
                             stats = stats, view = view,
                             titles = titles, #weight = weight,
-                            options = options)
+                            opts = options)
   }
 
   # Get output datasets if requested
@@ -359,7 +365,7 @@ proc_means <- function(data,
                            class = class,
                            var = var,
                            output = outreq,
-                           options = options
+                           opts = options
                            )
   }
 
@@ -411,7 +417,7 @@ log_means <- function(data,
                       weight = NULL,
                       view = TRUE,
                       titles = NULL,
-                      options = NULL,
+                      opts = NULL,
                       outcnt = NULL) {
 
   ret <- c()
@@ -460,7 +466,7 @@ log_means <- function(data,
 # Stats ---------------------------------------------------------------
 
 
-get_output_specs_means <- function(outs, stats, options) {
+get_output_specs_means <- function(outs, stats, opts) {
 
   # outreq <- NULL
 
@@ -489,10 +495,10 @@ get_output_specs_means <- function(outs, stats, options) {
       }
     } else {
 
-      if (option_true(options, "long")) {
+      if (option_true(opts, "long")) {
         outreq[["out"]] <- out(stats = stats, shape = "long",
                                type = TRUE, freq = TRUE)
-      } else if (option_true(options, "stacked")) {
+      } else if (option_true(opts, "stacked")) {
         outreq[["out"]] <- out(stats = stats, shape = "stacked",
                                type = TRUE, freq = TRUE)
       } else {
@@ -513,13 +519,13 @@ get_output_specs_means <- function(outs, stats, options) {
 # These subsets will get stacked up in the driver function.
 get_output <- function(data, var, stats, missing = FALSE,
                              shape = "wide", type = NULL, freq = FALSE,
-                             by = NULL, class = NULL) {
+                             by = NULL, class = NULL, opts = NULL) {
 
   if (is.null(stats))
     stats <- c("n", "mean", "std", "min", "max")
 
   ret <- get_summaries(data, var, stats, missing = missing,
-                       shape = shape)
+                       shape = shape, opts = opts)
 
   if (freq)
     ret <- cbind(data.frame(FREQ = nrow(data)), ret)
@@ -586,7 +592,7 @@ get_output <- function(data, var, stats, missing = FALSE,
 
 # This is where most of the summary statistics get calculated.
 get_summaries <- function(data, var, stats, missing = FALSE,
-                          shape = "wide") {
+                          shape = "wide", opts = NULL) {
 
   narm <- TRUE
   ret <- NULL
@@ -716,36 +722,48 @@ get_summaries <- function(data, var, stats, missing = FALSE,
         }
 
 
+        # Check for two-sided CLM
+        if (st == "clm" || all(c("lclm", "uclm") %in% sts)) {
 
-        if (st == "lclm") {
+          alph <- get_alpha(opts)
 
-          tmp <- get_clm(var, narm)
-
-          rw[["LCLM"]] <- tmp[["lcl"]]
-
-
-        }
-
-        if (st == "uclm") {
-
-          tmp <- get_clm(var, narm)
-
-          rw[["UCLM"]] <- tmp[["ucl"]]
-
-
-        }
-
-
-        if (st == "clm") {
-
-          tmp <- get_clm(var, narm)
+          tmp <- get_clm(var, narm, alph)
 
           rw[["LCLM"]] <- tmp[["lcl"]]
 
           rw[["UCLM"]] <- tmp[["ucl"]]
 
 
+        } else {
+
+          # Check for one-sided LCLM
+          if (st == "lclm") {
+
+            alph <- get_alpha(opts)
+
+
+            tmp <- get_clm(var, narm, alph, onesided = TRUE)
+
+            rw[["LCLM"]] <- tmp[["lcl"]]
+
+
+          }
+
+          # Check for one-sided UCLM
+          if (st == "uclm") {
+
+
+            alph <- get_alpha(opts)
+
+            tmp <- get_clm(var, narm, alph, onesided = TRUE)
+
+            rw[["UCLM"]] <- tmp[["ucl"]]
+
+
+          }
         }
+
+
 
         if (st == "uss") {
 
@@ -910,14 +928,14 @@ shape_means_data <- function(ds, shape, copy = NULL) {
 
 }
 
-
+sprintf("hello %s%% there", 23)
 
 # Drivers --------------------------------------------------------------------
 mlbls <- list(MEAN = "Mean", STD = "Std Dev", MEDIAN = "Median", MIN = "Minimum",
               MAX = "Maximum", VAR = "Variable", STDERR = "Std Err",
               STAT = "Statistics", VARI = "Variance", QRANGE = "Quantile Range",
               RANGE = "Range", MODE = "Mode", NMISS = "NMiss",
-              LCLM = "Lower Conf. Limit", UCLM = "Upper Conf. Limit",
+              LCLM = "Lower %s%% CL for Mean", UCLM = "Upper %s%% CL for Mean",
               TYPE = "Type", FREQ = "Frequency", SUM = "Sum")
 
 #' @import common
@@ -927,12 +945,17 @@ gen_report_means <- function(data,
                             var = NULL,
                             stats = c("n", "mean", "std", "min", "max"),
                             weight = NULL,
-                            options = NULL,
+                            opts = NULL,
                             view = TRUE,
                             titles = NULL) {
 
   # Declare return list
   res <- list()
+
+  # Assign CL Percentage on Labels
+  alph <- (1 - get_alpha(opts)) * 100
+  mlbls[["UCLM"]] <- sprintf(mlbls[["UCLM"]], alph)
+  mlbls[["LCLM"]] <- sprintf(mlbls[["LCLM"]], alph)
 
   #browser()
 
@@ -978,7 +1001,7 @@ gen_report_means <- function(data,
     # data, var, class, outp, freq = TRUE,
     # type = NULL, byvals = NULL
     outp <- out(stats = stats, shape = "wide")
-    smtbl <- get_class(dt, var, class, outp, freq = FALSE)
+    smtbl <- get_class(dt, var, class, outp, freq = FALSE, opts = opts)
 
     aov <- NULL
     # Get aov if requested
@@ -1018,6 +1041,7 @@ gen_report_means <- function(data,
       }
 
     }
+
 
     # Assign labels
     if (is.null(class))
@@ -1086,7 +1110,7 @@ gen_output_means <- function(data,
                              var = NULL,
                              weight = NULL,
                              output = NULL,
-                             options = NULL) {
+                             opts = NULL) {
 
   res <- list()
   if (length(output) > 0) {
@@ -1098,13 +1122,13 @@ gen_output_means <- function(data,
 
       # Whether to include type variable
       tp <- 0
-      if (has_option(options, "notype"))
+      if (has_option(opts, "notype"))
         tp <- NULL
 
       # Whether to include freq variable
       frq <- TRUE
-      if (has_option(options, "nonobs") |
-          has_option(options, "nofreq"))
+      if (has_option(opts, "nonobs") |
+          has_option(opts, "nofreq"))
         frq <- FALSE
 
       # Create vector of NA class values
@@ -1160,7 +1184,8 @@ gen_output_means <- function(data,
                              stats = outp$stats,
                              shape = outp$shape,
                              freq = frq,
-                             type = tp)
+                             type = tp,
+                             opts = opts)
 
         if (is.null(tmpres))
           tmpres <- tmpby
@@ -1204,7 +1229,7 @@ gen_output_means <- function(data,
           # } else {
             tmpcls <- get_class(dat, var = var,
                                 class = class, outp = outp,
-                                freq = frq, type = tp, byvals = bynm)
+                                freq = frq, type = tp, byvals = bynm, opts = opts)
 
             tmpres <- rbind(tmpres, tmpcls)
           #}
@@ -1287,7 +1312,7 @@ gen_output_means <- function(data,
 
 
 get_class <- function(data, var, class, outp, freq = TRUE,
-                      type = NULL, byvals = NULL, weight = NULL) {
+                      type = NULL, byvals = NULL, weight = NULL, opts = NULL) {
 
 
   res <- NULL
@@ -1347,7 +1372,8 @@ get_class <- function(data, var, class, outp, freq = TRUE,
                            stats = outp$stats,
                            shape = "wide",
                            freq = freq,
-                           type = type)
+                           type = type,
+                           opts = opts)
 
       tmpres <- cbind(tmpres, aovds[ , c("AOV.DF", "AOV.SUMSQ",
                                          "AOV.MEANSQ", "AOV.F", "AOV.P")])
@@ -1369,7 +1395,8 @@ get_class <- function(data, var, class, outp, freq = TRUE,
                            stats = outp$stats,
                            shape = outp$shape,
                            freq = freq,
-                           type = type)
+                           type = type,
+                           opts = opts)
     }
 
 

@@ -568,3 +568,25 @@ parse_tables <- function(nms, tstr) {
 
 }
 
+
+get_alpha <- function(opts) {
+
+  ret <- .05
+
+  if (!is.null(opts)) {
+
+    nms <- tolower(names(opts))
+    if ("alpha" %in% nms) {
+
+      ret <- opts[["alpha"]]
+
+      if (!is.numeric(ret)) {
+
+        ret <- as.numeric(ret)
+      }
+    }
+
+  }
+
+  return(ret)
+}

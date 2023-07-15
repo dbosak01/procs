@@ -53,12 +53,25 @@ test_that("stats2: CLM works.", {
 
   dt <- c(4, -1, 7, -4, 6, 8, 10)
 
-  res <- get_clm(dt)
+  # 95% limit
+  res <- get_clm(dt, alpha = .05)
 
   res
 
   expect_equal(res[["ucl"]], 8.9624928)
   expect_equal(res[["lcl"]], -0.3910642)
+
+
+  # 90% limit
+  res <- get_clm(dt, alpha = 0.1)
+
+  res
+
+  expect_equal(res[["ucl"]], 7.9997115)
+  expect_equal(res[["lcl"]], 0.5717171)
+
+
+
 
 })
 

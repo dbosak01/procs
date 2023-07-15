@@ -105,7 +105,16 @@ get_stderr <- function(x, narm = TRUE) {
 
 
 #' @noRd
-get_clm <- function(x, narm = TRUE) {
+get_clm <- function(x, narm = TRUE, alpha = 0.05, onesided = FALSE) {
+
+  if (!is.numeric(alpha))
+    alpha <- as.numeric(alpha)
+
+  if (onesided) {
+    alp <- 1 - alpha
+  } else {
+    alp <- 1 - (alpha / 2)
+  }
 
   #Sample size
   n <- sum(!is.na(x), na.rm = narm)
@@ -117,14 +126,18 @@ get_clm <- function(x, narm = TRUE) {
   std <- sd(x, na.rm = narm)
 
   # Margin of error
-  margin <- qt(0.975,df=n-1)*std/sqrt(n)
+  margin <- qt(alp,df=n-1)*std/sqrt(n)
 
   # Lower and upper confidence interval boundaries
   res <- c(ucl = xbar + margin,
-           lcl = xbar - margin)
+           lcl = xbar - margin,
+           alpha = alpha)
 
   return(res)
 }
+
+
+
 
 #' @noRd
 get_mode <- function(x) {

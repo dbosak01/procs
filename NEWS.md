@@ -1,3 +1,8 @@
+# procs 0.0.9008
+
+* Added alpha = option for confidence limits.
+* Differentiated between one-side and two-sided confidence limits.
+
 # procs 0.0.9007
 
 * Documentation updates.

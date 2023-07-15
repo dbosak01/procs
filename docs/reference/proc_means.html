@@ -21,7 +21,7 @@ the viewer interactively and returned from the function."><meta property="og:ima
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">procs</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.0.9007</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.0.9008</span>
       </span>
     </div>
 
@@ -155,12 +155,13 @@ will be nested in the <code>by</code>.</p></dd>
 
 
 <dt>options</dt>
-<dd><p>A vector of optional keywords. Valid values are:
+<dd><p>A vector of optional keywords. Valid values are: "alpha =",
 "long", "noprint", "notype, "nofreq", "nonobs",
 "stacked", and "wide".  The "wide", "long", and "stacked" keywords are data
 shaping options that control the structure of the output data.
 The "notype", "nofreq", and "nonobs" keywords will turn
-off columns on the output datasets.</p></dd>
+off columns on the output datasets.  The "alpha = " option will set the alpha
+value for confidence limit statistics.  The default is 95% (alpha = 0.05).</p></dd>
 
 
 <dt>titles</dt>
@@ -253,7 +254,11 @@ of 5.</p></li>
 
 <p>The <code>proc_means</code> function recognizes the following options.  Options may
 be passed as a quoted vector of strings, or an unquoted vector using the
-<code><a href="https://common.r-sassy.org/reference/v.html" class="external-link">v()</a></code> function.</p><ul><li><p><strong>long</strong>: A shaping option that will transpose the output dataset
+<code><a href="https://common.r-sassy.org/reference/v.html" class="external-link">v()</a></code> function.</p><ul><li><p><strong>alpha = </strong>: The "alpha = " option will set the alpha
+value for confidence limit statistics.  Set the alpha as a decimal value
+between 0 and 1.  For example, you can set a 90% confidence limit as
+<code>alpha = 0.1</code>.</p></li>
+<li><p><strong>long</strong>: A shaping option that will transpose the output dataset
 so that statistics are in rows and variables are in columns.</p></li>
 <li><p><strong>nofreq, nonobs</strong>: Turns off the FREQ column
 on the output datasets.</p></li>
