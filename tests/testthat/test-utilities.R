@@ -541,6 +541,43 @@ test_that("utils16: get_alpha() option works as expected.", {
 
 })
 
+test_that("utils17: get_maxdec() option works as expected.", {
+
+
+  opt <- c("bork", "fork", maxdec = 2)
+
+
+  res <- get_maxdec(opt)
+
+  res
+
+  expect_equal(res, "%.2f")
+
+
+
+  opt <- c("bork", "fork")
+
+
+  res <- get_maxdec(opt)
+
+  res
+
+  expect_equal(res, "%.7f")
+
+
+  opt <- c(maxdec = 3)
+
+
+  res <- get_maxdec(opt)
+
+  res
+
+  expect_equal(res, "%.3f")
+
+
+
+})
+
 #
 # test_that("utils12: stackds() function works as expected.", {
 #

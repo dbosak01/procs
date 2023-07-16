@@ -54,12 +54,14 @@ When a \code{by} and a \code{class} are both specified, the \code{class}
 will be nested in the \code{by}.}
 
 \item{options}{A vector of optional keywords. Valid values are: "alpha =",
-"long", "noprint", "notype, "nofreq", "nonobs",
+"long", "maxdec", "noprint", "notype, "nofreq", "nonobs",
 "stacked", and "wide".  The "wide", "long", and "stacked" keywords are data
 shaping options that control the structure of the output data.
 The "notype", "nofreq", and "nonobs" keywords will turn
 off columns on the output datasets.  The "alpha = " option will set the alpha
-value for confidence limit statistics.  The default is 95\% (alpha = 0.05).}
+value for confidence limit statistics.  The default is 95\% (alpha = 0.05).
+The "maxdec = " option sets the maximum number of decimal places displayed
+on report output.}
 
 \item{titles}{A vector of one or more titles to use for the report output.}
 }
@@ -162,6 +164,11 @@ between 0 and 1.  For example, you can set a 90\% confidence limit as
 }
 \item{\strong{long}: A shaping option that will transpose the output dataset
 so that statistics are in rows and variables are in columns.
+}
+\item{\strong{maxdec = }: The "maxdec = " option will set the maximum
+of decimal places displayed on report output. For example, you can set 4 decimal
+places as follows: \code{maxdec = 4}.  Default is 7 decimal places.
+This option will not round any values on the output dataset.
 }
 \item{\strong{nofreq, nonobs}: Turns off the FREQ column
 on the output datasets.

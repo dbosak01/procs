@@ -1136,7 +1136,24 @@ test_that("means50: check more confidence limit options", {
 })
 
 
+test_that("means50: check maxdec option", {
 
+  # 2-sided 95%
+  res <- proc_means(datm, var = v(PresentScore, TasteScore),
+                    stats = v(mean, clm),
+                    options = v(nonobs, notype, maxdec = 2),
+                    titles = "My first title for Means")
+
+  res
+
+  expect_equal("data.frame" %in% class(res), TRUE)
+  expect_equal(ncol(res), 4)
+
+  expect_equal(res[2, "MEAN"], 81.35)
+  expect_equal(res[2, "UCLM"], 84.44432)
+  expect_equal(res[2, "LCLM"], 78.25568)
+
+})
 
 # test_that("means50: where works before and after rename.", {
 #

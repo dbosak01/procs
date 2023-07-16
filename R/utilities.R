@@ -590,3 +590,31 @@ get_alpha <- function(opts) {
 
   return(ret)
 }
+
+
+get_maxdec <- function(opts) {
+
+  ret <- "%.7f"
+
+  if (!is.null(opts)) {
+
+    nms <- tolower(names(opts))
+    if ("maxdec" %in% nms) {
+
+      tmp <- opts[["maxdec"]]
+
+      if (!is.numeric(tmp)) {
+
+        tmp <- as.numeric(tmp)
+      }
+
+      if (is.numeric(tmp)) {
+
+        ret <- paste0("%.", tmp, "f")
+      }
+    }
+
+  }
+
+  return(ret)
+}
