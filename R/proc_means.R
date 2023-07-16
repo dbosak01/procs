@@ -264,7 +264,7 @@ proc_means <- function(data,
                   error = function(cond) {ostats})
 
   oopt <- deparse(substitute(options, env = environment()))
-  options <- tryCatch({if (typeof(options) %in% c("character", "NULL")) options else oopt},
+  options <- tryCatch({if (typeof(options) %in% c("double", "character", "NULL")) options else oopt},
                       error = function(cond) {oopt})
 
   oout <- deparse(substitute(output, env = environment()))

@@ -528,6 +528,16 @@ test_that("utils16: get_alpha() option works as expected.", {
   expect_equal(res, 0.05)
 
 
+  opt <- c(alpha = 0.1)
+
+
+  res <- get_alpha(opt)
+
+  res
+
+  expect_equal(res, 0.1)
+
+
 
 })
 
