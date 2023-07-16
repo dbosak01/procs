@@ -73,6 +73,12 @@
 #'   \item{\strong{sum}: The sum of variable values.}
 #'   \item{\strong{var}: The variance.}
 #' }
+#' The function supports the following keywords to perform hypothesis testing:
+#' \itemize{
+#'   \item{\strong{t}: Student's t statistic.}
+#'   \item{\strong{prt/probt}: A two-tailed p-value for the Student's t statistic.}
+#'   \item{\strong{df}: Degrees of freedom for the Student's t statistic.}
+#' }
 #'
 #' @section Options:
 #' The \code{proc_means} function recognizes the following options.  Options may
@@ -126,7 +132,8 @@
 #' "p1", "p5", "p10", "p20", "p25", "p30", "p40",
 #' "p50", "p60", "p70", "p75", "p80", "p90",
 #' "p95", "p99", "q1", "q3", "qrange", "range", "std", "stderr", "sum",
-#' "uclm", and "var".
+#' "uclm", and "var". For hypothesis testing, the function supports "t", "prt",
+#' "probt", and "df".
 #' Default statistics are: "n", "mean", "std",
 #' "min", and "max".
 #' @param output Whether or not to return datasets from the function. Valid
@@ -325,7 +332,7 @@ proc_means <- function(data,
              "lclm","mode", "q1", "q3", "p1", "p5", "p10", "p20",
              "p25", "p30", "p40",
              "p50", "p60", "p70", "p75", "p80", "p90",
-             "p95", "p99", "qrange")
+             "p95", "p99", "qrange", "t", "prt", "probt", "df")
     if (!all(tolower(stats) %in% st)) {
 
       stop(paste("Invalid stat name: ", stats[!tolower(stats) %in% st], "\n"))
@@ -770,6 +777,45 @@ get_summaries <- function(data, var, stats, missing = FALSE,
           }
         }
 
+        if (st == "t") {
+
+          alph <- get_alpha(opts)
+
+          tmp <- get_t(var, alpha = alph)
+
+          rw[["T"]] <- tmp[["T"]]
+
+        }
+
+        if (st == "prt") {
+
+          alph <- get_alpha(opts)
+
+          tmp <- get_t(var, alpha = alph)
+
+          rw[["PRT"]] <- tmp[["PRT"]]
+
+        }
+
+        if (st == "probt") {
+
+          alph <- get_alpha(opts)
+
+          tmp <- get_t(var, alpha = alph)
+
+          rw[["PROBT"]] <- tmp[["PRT"]]
+
+        }
+
+        if (st == "df") {
+
+          alph <- get_alpha(opts)
+
+          tmp <- get_t(var, alpha = alph)
+
+          rw[["DF"]] <- tmp[["DF"]]
+
+        }
 
 
         if (st == "uss") {
@@ -943,7 +989,8 @@ mlbls <- list(MEAN = "Mean", STD = "Std Dev", MEDIAN = "Median", MIN = "Minimum"
               STAT = "Statistics", VARI = "Variance", QRANGE = "Quantile Range",
               RANGE = "Range", MODE = "Mode", NMISS = "NMiss",
               LCLM = "Lower %s%% CL for Mean", UCLM = "Upper %s%% CL for Mean",
-              TYPE = "Type", FREQ = "Frequency", SUM = "Sum")
+              TYPE = "Type", FREQ = "Frequency", SUM = "Sum", "T" = "t Value",
+              PRT = "Pr > |t|", PROBT = "Pr > |t|", DF = "DF")
 
 #' @import common
 gen_report_means <- function(data,

@@ -103,6 +103,39 @@ get_stderr <- function(x, narm = TRUE) {
 
 }
 
+get_t <- function(x, y = NULL, narm = TRUE, alpha = 0.05, paired = FALSE) {
+
+  if (!is.numeric(alpha))
+    alpha <- as.numeric(alpha)
+
+  onesided = FALSE
+  if (onesided) {
+    alp <- 1 - alpha
+  } else {
+    alp <- 1 - (alpha / 2)
+  }
+
+  ret <- NULL
+
+  if (is.null(y) & paired == FALSE) {
+
+
+    res <- unclass(t.test(x, paired = FALSE, conf.level = alp))
+
+    names(res[["statistic"]]) <- NULL
+    names(res[["p.value"]]) <- NULL
+    names(res[["parameter"]]) <- NULL
+
+    ret <- c("T" = res[["statistic"]],
+             PRT = res[["p.value"]],
+             DF = res[["parameter"]])
+
+
+  }
+
+  return(ret)
+}
+
 
 #' @noRd
 get_clm <- function(x, narm = TRUE, alpha = 0.05, onesided = FALSE) {
@@ -295,6 +328,8 @@ get_chisq <- function(x, y, wgt = NULL, corrct = FALSE, bylbl = "", output = FAL
 
 
 }
+
+
 
 # get_cmh <- function(x, y, wgt = NULL, corrct = FALSE, bylbl = "", output = FALSE) {
 #

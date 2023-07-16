@@ -236,6 +236,33 @@ test_that("stat11: aov works with 2 classes without weight", {
 })
 
 
+test_that("stat12: get_t() works as expected.", {
+
+  dt <- c(-10, -21, -12,  -5,   1, -70, -41, -24)
+
+  res <- get_t(dt)
+
+  res
+
+  expect_equal(res[["T"]], -2.78847393)
+  expect_equal(res[["PRT"]], 0.026967454)
+  expect_equal(res[["DF"]],  7.00000000)
+
+
+  dt <- c(-10, -21, -12,  -5,   1, -70, -41, -24)
+
+
+  # Change in alpha does not change t test results
+  res <- get_t(dt, alpha = 0.1)
+
+  res
+
+  expect_equal(res[["T"]], -2.78847393)
+  expect_equal(res[["PRT"]], 0.026967454)
+  expect_equal(res[["DF"]],  7.00000000)
+
+
+})
 
 
 #

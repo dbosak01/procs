@@ -1155,6 +1155,36 @@ test_that("means50: check maxdec option", {
 
 })
 
+
+test_that("means51: t and probt work as expected.", {
+
+
+  datp <- read.table(header = TRUE, text = '
+  WBEFORE WAFTER
+  200 190
+  175 154
+  188 176
+  198 193
+  197 198
+  310 240
+  245 204
+  202 178')
+
+  datp$WLOSS <- datp$WAFTER - datp$WBEFORE
+
+  res <- proc_means(datp, var = WLOSS,
+                    stats = v(n, mean, t, prt, probt, df),
+                    titles = c("Paired t-test example"))
+
+  expect_equal(res[1, "N"], 8)
+  expect_equal(res[1, "MEAN"], -22.75)
+  expect_equal(res[1, "T"], -2.7884739)
+  expect_equal(res[1, "PRT"], 0.026967454)
+  expect_equal(res[1, "PROBT"], 0.026967454)
+  expect_equal(res[1, "DF"], 7)
+
+})
+
 # test_that("means50: where works before and after rename.", {
 #
 #   var1 <- c("Age", "PresentScore", "TasteScore")
