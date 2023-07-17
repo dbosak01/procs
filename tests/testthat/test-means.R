@@ -1185,6 +1185,34 @@ test_that("means51: t and probt work as expected.", {
 
 })
 
+
+test_that("means52: default statistics work as expected.", {
+
+  res <- proc_means(datm, var = v(Age, PresentScore, TasteScore, Layers),
+                    titles = c("Test"))
+
+  expect_equal(names(res), c("TYPE", "FREQ", "VAR", "N", "MEAN", "STD", "MIN", "MAX" ))
+
+})
+
+
+test_that("means53: various statistics work as expected.", {
+
+  res <- proc_means(datm, var = v(Age, PresentScore, TasteScore, Layers),
+                    stats = v(n, mean,  uss, var, sum, nobs, cv, css),
+                    titles = c("Test"))
+
+  expect_equal(res[1, "N"], 20)
+  expect_equal(res[1, "MEAN"], 40.2)
+  expect_equal(res[1, "USS"], 36498)
+  expect_equal(res[1, "VARI"], 219.8526316)
+  expect_equal(res[1, "SUM"], 804)
+  expect_equal(res[1, "CV"], 36.8841501)
+  expect_equal(res[1, "CSS"], 4177.2)
+})
+
+
+
 # test_that("means50: where works before and after rename.", {
 #
 #   var1 <- c("Age", "PresentScore", "TasteScore")

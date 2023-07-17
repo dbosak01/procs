@@ -2,7 +2,7 @@
 
 * Added alpha = option for confidence limits.
 * Differentiated between one-side and two-sided confidence limits.
-* Added codecov
+* Added codecov.
 
 # procs 0.0.9007
 

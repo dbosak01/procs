@@ -4,93 +4,93 @@
 pfmt <- value(condition(x < .0001, "<.0001"),
               condition(TRUE, "%.4f"), log = FALSE)
 
-#' @import stats
-get_aov <- function(data, var1, byvars, wgt = NULL,
-                    bylbl = NULL, output = FALSE, resid = TRUE) {
-
-
-  bv <- paste(byvars, sep = "", collapse = "+")
-
-  if (is.null(wgt)) {
-    res <- aov(as.formula(paste(var1, "~", bv)),
-               data = data, weights = wgt)
-    ret <- summary(res)[[1]]
-
-  } else {
-
-    res <- aov(as.formula(paste(var1, "~", bv)), data = data)
-
-    ret <- summary(res)[[1]]
-
-  }
-
-  nms <- c("AOV.DF", "AOV.SUMSQ", "AOV.MEANSQ", "AOV.F", "AOV.P")
-
-
-  lbls <- names(ret)
-  if (output) {
-
-    if (ncol(ret) == 3) {
-      ret <- data.frame("VAR" = var1, "CLASS" = trimws(rownames(ret)), ret,
-                        AOV.F = NA, AOV.P = NA,
-                        stringsAsFactors = FALSE)
-    } else {
-      ret <- data.frame("VAR" = var1, "CLASS" = trimws(rownames(ret)), ret,
-                        stringsAsFactors = FALSE)
-    }
-    names(ret) <- c("VAR", "CLASS", nms)
-
-    if (resid == FALSE) {
-      ret <- subset(ret, ret[["CLASS"]] != "Residuals")
-    }
-
-    rownames(ret) <- NULL
-    lblsl <- as.list(c("Variable", "Class", lbls))
-    names(lblsl) <- c("VAR", "CLASS", nms)
-    labels(ret) <- lblsl
-
-  } else {
-
-    if (ncol(ret) == length(nms))
-      nms <- nms[seq(1, ncol(ret))]
-
-    ret <- data.frame("CLASS" = trimws(rownames(ret)), ret, stringsAsFactors = FALSE)
-
-    names(ret) <- c("CLASS", nms)
-
-    if (resid == FALSE) {
-      ret <- subset(ret, ret[["CLASS"]] != "Residuals")
-    }
-
-    rownames(ret) <- NULL
-    lblsl <- as.list(c("Class", lbls))
-    names(lblsl) <- c("CLASS", nms)
-    labels(ret) <- lblsl
-
-  }
-
-  spns <- list()
-  if (!is.null(bylbl)) {
-    spns[[1]] <- span(1, ncol(ret),
-                      bylbl,
-                      level = 1)
-  }
-
-  spns[[length(spns) + 1]] <- span(1, ncol(ret),
-                    paste0("Analysis Of Variance - ", var1),
-                    level = length(spns) + 1)
-
-  attr(ret, "spans") <- spns
-
-  formats(ret) <- list(AOV.SUMSQ = "%.4f",
-                       AOV.MEANSQ = "%.4f",
-                       AOV.F = pfmt,
-                       AOV.P = pfmt)
-
-
-
-  return(ret)
-}
+# @import stats
+# get_aov <- function(data, var1, byvars, wgt = NULL,
+#                     bylbl = NULL, output = FALSE, resid = TRUE) {
+#
+#
+#   bv <- paste(byvars, sep = "", collapse = "+")
+#
+#   if (is.null(wgt)) {
+#     res <- aov(as.formula(paste(var1, "~", bv)),
+#                data = data, weights = wgt)
+#     ret <- summary(res)[[1]]
+#
+#   } else {
+#
+#     res <- aov(as.formula(paste(var1, "~", bv)), data = data)
+#
+#     ret <- summary(res)[[1]]
+#
+#   }
+#
+#   nms <- c("AOV.DF", "AOV.SUMSQ", "AOV.MEANSQ", "AOV.F", "AOV.P")
+#
+#
+#   lbls <- names(ret)
+#   if (output) {
+#
+#     if (ncol(ret) == 3) {
+#       ret <- data.frame("VAR" = var1, "CLASS" = trimws(rownames(ret)), ret,
+#                         AOV.F = NA, AOV.P = NA,
+#                         stringsAsFactors = FALSE)
+#     } else {
+#       ret <- data.frame("VAR" = var1, "CLASS" = trimws(rownames(ret)), ret,
+#                         stringsAsFactors = FALSE)
+#     }
+#     names(ret) <- c("VAR", "CLASS", nms)
+#
+#     if (resid == FALSE) {
+#       ret <- subset(ret, ret[["CLASS"]] != "Residuals")
+#     }
+#
+#     rownames(ret) <- NULL
+#     lblsl <- as.list(c("Variable", "Class", lbls))
+#     names(lblsl) <- c("VAR", "CLASS", nms)
+#     labels(ret) <- lblsl
+#
+#   } else {
+#
+#     if (ncol(ret) == length(nms))
+#       nms <- nms[seq(1, ncol(ret))]
+#
+#     ret <- data.frame("CLASS" = trimws(rownames(ret)), ret, stringsAsFactors = FALSE)
+#
+#     names(ret) <- c("CLASS", nms)
+#
+#     if (resid == FALSE) {
+#       ret <- subset(ret, ret[["CLASS"]] != "Residuals")
+#     }
+#
+#     rownames(ret) <- NULL
+#     lblsl <- as.list(c("Class", lbls))
+#     names(lblsl) <- c("CLASS", nms)
+#     labels(ret) <- lblsl
+#
+#   }
+#
+#   spns <- list()
+#   if (!is.null(bylbl)) {
+#     spns[[1]] <- span(1, ncol(ret),
+#                       bylbl,
+#                       level = 1)
+#   }
+#
+#   spns[[length(spns) + 1]] <- span(1, ncol(ret),
+#                     paste0("Analysis Of Variance - ", var1),
+#                     level = length(spns) + 1)
+#
+#   attr(ret, "spans") <- spns
+#
+#   formats(ret) <- list(AOV.SUMSQ = "%.4f",
+#                        AOV.MEANSQ = "%.4f",
+#                        AOV.F = pfmt,
+#                        AOV.P = pfmt)
+#
+#
+#
+#   return(ret)
+# }
 
 
 #' Include missing values

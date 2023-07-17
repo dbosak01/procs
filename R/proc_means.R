@@ -71,6 +71,7 @@
 #'   \item{\strong{std}: Standard deviation.}
 #'   \item{\strong{stderr}: Standard error.}
 #'   \item{\strong{sum}: The sum of variable values.}
+#'   \item{\strong{uss}: Uncorrected sum of squares.}
 #'   \item{\strong{var}: The variance.}
 #' }
 #' The function supports the following keywords to perform hypothesis testing:
@@ -132,8 +133,8 @@
 #' "p1", "p5", "p10", "p20", "p25", "p30", "p40",
 #' "p50", "p60", "p70", "p75", "p80", "p90",
 #' "p95", "p99", "q1", "q3", "qrange", "range", "std", "stderr", "sum",
-#' "uclm", and "var". For hypothesis testing, the function supports "t", "prt",
-#' "probt", and "df".
+#' "uclm", "uss", and "var". For hypothesis testing, the function
+#' supports "t", "prt", "probt", and "df".
 #' Default statistics are: "n", "mean", "std",
 #' "min", and "max".
 #' @param output Whether or not to return datasets from the function. Valid
@@ -332,7 +333,7 @@ proc_means <- function(data,
              "lclm","mode", "q1", "q3", "p1", "p5", "p10", "p20",
              "p25", "p30", "p40",
              "p50", "p60", "p70", "p75", "p80", "p90",
-             "p95", "p99", "qrange", "t", "prt", "probt", "df")
+             "p95", "p99", "qrange", "t", "prt", "probt", "df", "uss")
     if (!all(tolower(stats) %in% st)) {
 
       stop(paste("Invalid stat name: ", stats[!tolower(stats) %in% st], "\n"))
@@ -491,22 +492,22 @@ get_output_specs_means <- function(outs, stats, opts) {
   # } else {
     outreq <- outs
     if (length(outreq) >= 1) {
-      for (nm in names(outreq)) {
-        if ("out_req" %in% class(outreq[[nm]])) {
-          if (is.null(outreq[[nm]]$stats)) {
-
-            outreq[[nm]]$stats <- stats
-          }
-          if (is.null(outreq[[nm]]$shape)) {
-
-            outreq[[nm]]$shape <- "wide"
-          }
-        } else {
-
-          warning("proc_means: Unknown parameter '" %p% nm %p% "'")
-          outreq[[nm]] <- out(shape = "wide")
-        }
-      }
+      # for (nm in names(outreq)) {
+      #   if ("out_req" %in% class(outreq[[nm]])) {
+      #     if (is.null(outreq[[nm]]$stats)) {
+      #
+      #       outreq[[nm]]$stats <- stats
+      #     }
+      #     if (is.null(outreq[[nm]]$shape)) {
+      #
+      #       outreq[[nm]]$shape <- "wide"
+      #     }
+      #   } else {
+      #
+      #     warning("proc_means: Unknown parameter '" %p% nm %p% "'")
+      #     outreq[[nm]] <- out(shape = "wide")
+      #   }
+      # }
     } else {
 
       if (option_true(opts, "long")) {
@@ -990,7 +991,9 @@ mlbls <- list(MEAN = "Mean", STD = "Std Dev", MEDIAN = "Median", MIN = "Minimum"
               RANGE = "Range", MODE = "Mode", NMISS = "NMiss",
               LCLM = "Lower %s%% CL for Mean", UCLM = "Upper %s%% CL for Mean",
               TYPE = "Type", FREQ = "Frequency", SUM = "Sum", "T" = "t Value",
-              PRT = "Pr > |t|", PROBT = "Pr > |t|", DF = "DF")
+              PRT = "Pr > |t|", PROBT = "Pr > |t|", DF = "DF",
+              USS = "Uncorrected SS", CV = "Coeff of Variation",
+              CSS = "Corrected SS", VARI = "Variance")
 
 #' @import common
 gen_report_means <- function(data,
@@ -1291,38 +1294,38 @@ gen_output_means <- function(data,
         }
       }
 
-      # Where Before
-      if (!is.null(outp$where)) {
-        tmpres <- tryCatch({subset(tmpres, eval(outp$where))},
-                           error = function(cond){tmpres})
-      }
-
-      # Drop
-      if (!is.null(outp$drop)) {
-        tnms <- names(tmpres)
-        tmpres <- tmpres[ , !tnms %in% outp$drop]
-      }
-
-      # Keep
-      if (!is.null(outp$keep)) {
-        tnms <- names(tmpres)
-        tmpres <- tmpres[ , tnms %in% outp$keep]
-      }
-
-      # Rename
-      if (!is.null(outp$rename)) {
-        tnms <- names(tmpres)
-        rnm <- names(outp$rename)
-        nnms <- replace(tnms, match(rnm, tnms), outp$rename)
-        names(tmpres) <- nnms
-      }
-
-      # Where After
-      if (!is.null(outp$where)) {
-        tmpres <- tryCatch({subset(tmpres, eval(outp$where))},
-                           error = function(cond){tmpres})
-
-      }
+      # # Where Before
+      # if (!is.null(outp$where)) {
+      #   tmpres <- tryCatch({subset(tmpres, eval(outp$where))},
+      #                      error = function(cond){tmpres})
+      # }
+      #
+      # # Drop
+      # if (!is.null(outp$drop)) {
+      #   tnms <- names(tmpres)
+      #   tmpres <- tmpres[ , !tnms %in% outp$drop]
+      # }
+      #
+      # # Keep
+      # if (!is.null(outp$keep)) {
+      #   tnms <- names(tmpres)
+      #   tmpres <- tmpres[ , tnms %in% outp$keep]
+      # }
+      #
+      # # Rename
+      # if (!is.null(outp$rename)) {
+      #   tnms <- names(tmpres)
+      #   rnm <- names(outp$rename)
+      #   nnms <- replace(tnms, match(rnm, tnms), outp$rename)
+      #   names(tmpres) <- nnms
+      # }
+      #
+      # # Where After
+      # if (!is.null(outp$where)) {
+      #   tmpres <- tryCatch({subset(tmpres, eval(outp$where))},
+      #                      error = function(cond){tmpres})
+      #
+      # }
 
       # System Labels
       labels(tmpres) <- append(mlbls, bylbls)
@@ -1389,21 +1392,21 @@ get_class <- function(data, var, class, outp, freq = TRUE,
     # AOV requires all the class variables, therefore
     # they can't be calculated in get_summaries.
     if (any("aov" %in% outp$stats)) {
-      for (vr in var) {
-        if (is.null(weight)) {
-          tmpaov <- get_aov(data, vr, class, bylbl = byvals,
-                            output = TRUE, resid = FALSE)
-        } else {
-          tmpaov <- get_aov(data, vr, class, weight, bylbl = byvals,
-                            output = TRUE, resid = FALSE)
-        }
-
-        if (is.null(aovds))
-          aovds <- tmpaov
-        else
-          aovds <- rbind(aovds, tmpaov)
-
-      }
+    #   for (vr in var) {
+    #     if (is.null(weight)) {
+    #       tmpaov <- get_aov(data, vr, class, bylbl = byvals,
+    #                         output = TRUE, resid = FALSE)
+    #     } else {
+    #       tmpaov <- get_aov(data, vr, class, weight, bylbl = byvals,
+    #                         output = TRUE, resid = FALSE)
+    #     }
+    #
+    #     if (is.null(aovds))
+    #       aovds <- tmpaov
+    #     else
+    #       aovds <- rbind(aovds, tmpaov)
+    #
+    #   }
     }
   }
 
@@ -1421,26 +1424,26 @@ get_class <- function(data, var, class, outp, freq = TRUE,
 
     if (!is.null(aovds)) {
 
-      tmpres <- get_output(clslist[[k]], var = var,
-                           by = byvals,
-                           class = cnmv,
-                           stats = outp$stats,
-                           shape = "wide",
-                           freq = freq,
-                           type = type,
-                           opts = opts)
-
-      tmpres <- cbind(tmpres, aovds[ , c("AOV.DF", "AOV.SUMSQ",
-                                         "AOV.MEANSQ", "AOV.F", "AOV.P")])
-
-      cpvars <- c("CLASS")
-      if (!is.null(type))
-        cpvars[length(cpvars) + 1] <- "TYPE"
-
-      if (freq == TRUE)
-        cpvars[length(cpvars) + 1] <- "FREQ"
-
-      tmpres <- shape_means_data(tmpres, outp$shape, cpvars)
+      # tmpres <- get_output(clslist[[k]], var = var,
+      #                      by = byvals,
+      #                      class = cnmv,
+      #                      stats = outp$stats,
+      #                      shape = "wide",
+      #                      freq = freq,
+      #                      type = type,
+      #                      opts = opts)
+      #
+      # tmpres <- cbind(tmpres, aovds[ , c("AOV.DF", "AOV.SUMSQ",
+      #                                    "AOV.MEANSQ", "AOV.F", "AOV.P")])
+      #
+      # cpvars <- c("CLASS")
+      # if (!is.null(type))
+      #   cpvars[length(cpvars) + 1] <- "TYPE"
+      #
+      # if (freq == TRUE)
+      #   cpvars[length(cpvars) + 1] <- "FREQ"
+      #
+      # tmpres <- shape_means_data(tmpres, outp$shape, cpvars)
 
 
     } else {

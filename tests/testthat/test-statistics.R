@@ -186,54 +186,54 @@ test_that("stat9: fisher works with weight", {
 })
 
 
-test_that("stat10: aov works with one class without weight", {
-
-
-
-  res <- get_aov(adsl, "AGE", "ARM", output = TRUE)
-
-
-  res
-
-  expect_equal(res$AOV.F[1], 0.29836512)
-  expect_equal(res$AOV.P[1], 0.82594862)
-
-  res <- get_aov(adsl, "AGE", "ARM", output = FALSE)
-
-
-  res
-
-  # proc_print(res)
-
-  expect_equal(res$AOV.F[1], 0.29836512)
-  expect_equal(res$AOV.P[1], 0.82594862)
-
-
-})
-
-test_that("stat11: aov works with 2 classes without weight", {
-
-
-
-  res <- get_aov(adsl, "AGE", c("SEX", "ARM"), output = TRUE)
-
-  res
-  expect_equal(res$AOV.F[1], 4.3420586)
-  expect_equal(res$AOV.P[1], 0.061298422)
-
-
-  res <- get_aov(adsl, "AGE", c("SEX", "ARM"), output = FALSE)
-
-
-  res
-
-  # proc_print(res)
-
-  expect_equal(res$AOV.F[1], 4.3420586)
-  expect_equal(res$AOV.P[1], 0.061298422)
-
-
-})
+# test_that("stat10: aov works with one class without weight", {
+#
+#
+#
+#   res <- get_aov(adsl, "AGE", "ARM", output = TRUE)
+#
+#
+#   res
+#
+#   expect_equal(res$AOV.F[1], 0.29836512)
+#   expect_equal(res$AOV.P[1], 0.82594862)
+#
+#   res <- get_aov(adsl, "AGE", "ARM", output = FALSE)
+#
+#
+#   res
+#
+#   # proc_print(res)
+#
+#   expect_equal(res$AOV.F[1], 0.29836512)
+#   expect_equal(res$AOV.P[1], 0.82594862)
+#
+#
+# })
+#
+# test_that("stat11: aov works with 2 classes without weight", {
+#
+#
+#
+#   res <- get_aov(adsl, "AGE", c("SEX", "ARM"), output = TRUE)
+#
+#   res
+#   expect_equal(res$AOV.F[1], 4.3420586)
+#   expect_equal(res$AOV.P[1], 0.061298422)
+#
+#
+#   res <- get_aov(adsl, "AGE", c("SEX", "ARM"), output = FALSE)
+#
+#
+#   res
+#
+#   # proc_print(res)
+#
+#   expect_equal(res$AOV.F[1], 4.3420586)
+#   expect_equal(res$AOV.P[1], 0.061298422)
+#
+#
+# })
 
 
 test_that("stat12: get_t() works as expected.", {

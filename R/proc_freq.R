@@ -1988,39 +1988,39 @@ gen_output_freq <- function(data,
       }
 
 
-      # Where Before
-      if (!is.null(outp$where)) {
-        tmpres <- tryCatch({subset(tmpres, eval(outp$where))},
-                           error = function(cond){tmpres})
-
-      }
-
-      # Drop
-      if (!is.null(outp$drop)) {
-        tnms <- names(tmpres)
-        tmpres <- tmpres[ , !tnms %in% outp$drop]
-      }
-
-      # Keep
-      if (!is.null(outp$keep)) {
-        tnms <- names(tmpres)
-        tmpres <- tmpres[ , tnms %in% outp$keep]
-      }
-
-      # Rename
-      if (!is.null(outp$rename)) {
-        tnms <- names(tmpres)
-        rnm <- names(outp$rename)
-        nnms <- replace(tnms, match(rnm, tnms), outp$rename)
-        names(tmpres) <- nnms
-      }
-
-      # Where After
-      if (!is.null(outp$where)) {
-        tmpres <- tryCatch({subset(tmpres, eval(outp$where))},
-                           error = function(cond){tmpres})
-
-      }
+      # # Where Before
+      # if (!is.null(outp$where)) {
+      #   tmpres <- tryCatch({subset(tmpres, eval(outp$where))},
+      #                      error = function(cond){tmpres})
+      #
+      # }
+      #
+      # # Drop
+      # if (!is.null(outp$drop)) {
+      #   tnms <- names(tmpres)
+      #   tmpres <- tmpres[ , !tnms %in% outp$drop]
+      # }
+      #
+      # # Keep
+      # if (!is.null(outp$keep)) {
+      #   tnms <- names(tmpres)
+      #   tmpres <- tmpres[ , tnms %in% outp$keep]
+      # }
+      #
+      # # Rename
+      # if (!is.null(outp$rename)) {
+      #   tnms <- names(tmpres)
+      #   rnm <- names(outp$rename)
+      #   nnms <- replace(tnms, match(rnm, tnms), outp$rename)
+      #   names(tmpres) <- nnms
+      # }
+      #
+      # # Where After
+      # if (!is.null(outp$where)) {
+      #   tmpres <- tryCatch({subset(tmpres, eval(outp$where))},
+      #                      error = function(cond){tmpres})
+      #
+      # }
 
       # System Labels
       #labels(tmpres) <- append(mlbls, bylbls)

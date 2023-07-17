@@ -190,35 +190,35 @@ show_viewer <- function(path) {
 }
 
 #' @noRd
-get_location <- function(proc_type, location) {
-
-  ret <- c(dir_name = "",
-           file_name = "")
-
-  if (is.null(location)) {
-
-    ret["dir_name"] <- tempdir()
-    ret["file_name"] <- proc_type
-
-  } else if (dir.exists(location)) {
-
-    ret["dir_name"] <- location
-    ret["file_name"] <- proc_type
-
-  } else {
-    ret["dir_name"] <- dirname(location)
-    ret["file_name"] <- filenm(location)
-  }
-
-  if (dir.exists(ret["dir_name"] ) == FALSE) {
-    dir.create(ret["dir_name"] )
-
-  }
-
-
-  return(ret)
-
-}
+# get_location <- function(proc_type, location) {
+#
+#   ret <- c(dir_name = "",
+#            file_name = "")
+#
+#   if (is.null(location)) {
+#
+#     ret["dir_name"] <- tempdir()
+#     ret["file_name"] <- proc_type
+#
+#   } else if (dir.exists(location)) {
+#
+#     ret["dir_name"] <- location
+#     ret["file_name"] <- proc_type
+#
+#   } else {
+#     ret["dir_name"] <- dirname(location)
+#     ret["file_name"] <- filenm(location)
+#   }
+#
+#   if (dir.exists(ret["dir_name"] ) == FALSE) {
+#     dir.create(ret["dir_name"] )
+#
+#   }
+#
+#
+#   return(ret)
+#
+# }
 
 
 #' @noRd
@@ -255,27 +255,27 @@ has_report <- function(outreq) {
 
 }
 
-get_report_name <- function(outreq) {
-
-  ret <- ""
-
-  if (!is.null(outreq)) {
-
-    nms <- names(outreq)
-    for (nm in nms) {
-
-      if (!is.null(outreq[[nm]]$report)) {
-        if (outreq[[nm]]$report == TRUE)
-          ret <- nm
-
-      }
-    }
-  }
-
-
-  return(ret)
-
-}
+# get_report_name <- function(outreq) {
+#
+#   ret <- ""
+#
+#   if (!is.null(outreq)) {
+#
+#     nms <- names(outreq)
+#     for (nm in nms) {
+#
+#       if (!is.null(outreq[[nm]]$report)) {
+#         if (outreq[[nm]]$report == TRUE)
+#           ret <- nm
+#
+#       }
+#     }
+#   }
+#
+#
+#   return(ret)
+#
+# }
 
 
 # Option utilities --------------------------------------------------------
@@ -522,14 +522,14 @@ fill_missing <- function(ds, num) {
 
 }
 
-get_by_ds <- function(byvals) {
-
-  ret <- as.data.frame(I(byvals), stringsAsFactors = FALSE)
-  names(ret) <- names(byvals)
-  rownames(ret) <- NULL
-
-  return(ret)
-}
+# get_by_ds <- function(byvals) {
+#
+#   ret <- as.data.frame(I(byvals), stringsAsFactors = FALSE)
+#   names(ret) <- names(byvals)
+#   rownames(ret) <- NULL
+#
+#   return(ret)
+# }
 
 
 #' @noRd
@@ -558,15 +558,15 @@ log_output <- function() {
 }
 
 
-parse_tables <- function(nms, tstr) {
-
- vl <- "D * (A--C)"
-
-  rng <- regexec("[a-zA-Z0-9.]+\\-\\-[a-zA-Z0-9.]+", vl)
-
-  rng
-
-}
+# parse_tables <- function(nms, tstr) {
+#
+#  vl <- "D * (A--C)"
+#
+#   rng <- regexec("[a-zA-Z0-9.]+\\-\\-[a-zA-Z0-9.]+", vl)
+#
+#   rng
+#
+# }
 
 
 get_alpha <- function(opts) {

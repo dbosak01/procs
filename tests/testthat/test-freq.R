@@ -62,7 +62,7 @@ prt2 <- read.table(header = TRUE, text = '
 
 
 options("logr.output" = FALSE)
-#options("procs.print" = FALSE)
+options("procs.print" = FALSE)
 #options("procs.print" = NULL)
 
 test_that("freq1: Simple proc_freq no output works.", {
@@ -1783,3 +1783,43 @@ test_that("freq58: proc_freq missing option works.", {
 
 
 })
+
+test_that("freq32: chi sqr works without weight.", {
+
+  res <- proc_freq(prt, tables = "internship * enrollment",
+                   output = report,
+                   options = chisq)
+
+  res
+
+  expect_equal(length(res), 2)
+
+  res2 <- res[[2]]
+  expect_equal(res2[1, 2], 0.0)
+  expect_equal(res2[2, 2], 1)
+  expect_equal(res2[3, 2], 1.0)
+
+})
+
+
+test_that("freq33: fisher's works without weight.", {
+
+  res <- proc_freq(prt, tables = "internship * enrollment",
+                   output = report,
+                   options = fisher)
+
+  res
+
+  expect_equal(length(res), 2)
+
+  res2 <- res[[2]]
+  expect_equal(res2[1, 2], 2)
+  expect_equal(res2[2, 2], 0.75714286)
+  expect_equal(res2[3, 2], 0.75714286)
+  expect_equal(res2[4, 2], 1)
+
+  #expect_equal(nrow(res[[1]]), 14)
+
+})
+
+

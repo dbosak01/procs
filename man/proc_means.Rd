@@ -32,8 +32,8 @@ keywords are: "css", "clm", "cv", "lclm", "mean", "median", "mode",
 "p1", "p5", "p10", "p20", "p25", "p30", "p40",
 "p50", "p60", "p70", "p75", "p80", "p90",
 "p95", "p99", "q1", "q3", "qrange", "range", "std", "stderr", "sum",
-"uclm", and "var". For hypothesis testing, the function supports "t", "prt",
-"probt", and "df".
+"uclm", "uss", and "var". For hypothesis testing, the function
+supports "t", "prt", "probt", and "df".
 Default statistics are: "n", "mean", "std",
 "min", and "max".}
 
@@ -148,6 +148,7 @@ of 5.}
 \item{\strong{std}: Standard deviation.}
 \item{\strong{stderr}: Standard error.}
 \item{\strong{sum}: The sum of variable values.}
+\item{\strong{uss}: Uncorrected sum of squares.}
 \item{\strong{var}: The variance.}
 }
 The function supports the following keywords to perform hypothesis testing:
