@@ -55,6 +55,7 @@
 #'   \item{\strong{css}: Corrected Sum of Squares.}
 #'   \item{\strong{clm, lclm, uclm}: Upper and lower confidence limits.}
 #'   \item{\strong{cv}: Coefficient of Variation.}
+#'   \item{\strong{kurt/kurtosis}: The Kurtosis description of the distribution tails.}
 #'   \item{\strong{mean}: The arithmetic mean.}
 #'   \item{\strong{median}: The median.}
 #'   \item{\strong{mode}: The mode of the target variable.}
@@ -68,6 +69,7 @@
 #'   of 5.}
 #'   \item{\strong{qrange, q1, q3}: Quantile ranges for the first and third quantiles.}
 #'   \item{\strong{range}: Difference between the minimum and maximum values.}
+#'   \item{\strong{skew/skewness}: A measure of distribution skewness.}
 #'   \item{\strong{std}: Standard deviation.}
 #'   \item{\strong{stderr}: Standard error.}
 #'   \item{\strong{sum}: The sum of variable values.}
@@ -127,12 +129,14 @@
 #' summary statistics will be generated for all numeric variables on the
 #' input data frame.
 #' @param stats A vector of summary statistics keywords.  Valid
-#' keywords are: "css", "clm", "cv", "lclm", "mean", "median", "mode",
+#' keywords are: "css", "clm", "cv", "kurt", "kurtosis",
+#' "lclm", "mean", "median", "mode",
 #' "min", "max", "n",
 #' "nmiss", "nobs",
 #' "p1", "p5", "p10", "p20", "p25", "p30", "p40",
 #' "p50", "p60", "p70", "p75", "p80", "p90",
-#' "p95", "p99", "q1", "q3", "qrange", "range", "std", "stderr", "sum",
+#' "p95", "p99", "q1", "q3", "qrange", "range", "skew", "skewness",
+#' "std", "stderr", "sum",
 #' "uclm", "uss", and "var". For hypothesis testing, the function
 #' supports "t", "prt", "probt", and "df".
 #' Default statistics are: "n", "mean", "std",
@@ -333,7 +337,8 @@ proc_means <- function(data,
              "lclm","mode", "q1", "q3", "p1", "p5", "p10", "p20",
              "p25", "p30", "p40",
              "p50", "p60", "p70", "p75", "p80", "p90",
-             "p95", "p99", "qrange", "t", "prt", "probt", "df", "uss")
+             "p95", "p99", "qrange", "t", "prt", "probt", "df", "uss", "skew",
+             "skewness", "kurt", "kurtosis")
     if (!all(tolower(stats) %in% st)) {
 
       stop(paste("Invalid stat name: ", stats[!tolower(stats) %in% st], "\n"))
@@ -933,6 +938,18 @@ get_summaries <- function(data, var, stats, missing = FALSE,
 
         }
 
+        if (st %in% c("skew", "skewness")) {
+
+          rw[["SKEW"]] <- get_skewness(var)
+
+        }
+
+        if (st %in% c("kurt", "kurtosis")) {
+
+          rw[["KURT"]] <- get_kurtosis(var)
+
+        }
+
 
       }
 
@@ -993,7 +1010,8 @@ mlbls <- list(MEAN = "Mean", STD = "Std Dev", MEDIAN = "Median", MIN = "Minimum"
               TYPE = "Type", FREQ = "Frequency", SUM = "Sum", "T" = "t Value",
               PRT = "Pr > |t|", PROBT = "Pr > |t|", DF = "DF",
               USS = "Uncorrected SS", CV = "Coeff of Variation",
-              CSS = "Corrected SS", VARI = "Variance")
+              CSS = "Corrected SS", VARI = "Variance", SKEW = "Skewness",
+              KURT = "Kurtosis")
 
 #' @import common
 gen_report_means <- function(data,

@@ -57,7 +57,7 @@ time frame.
 production. Is the **procs** package validated?
 
 **A:** Yes.  The functions were validated by comparing to SAS®. The validation
-documentation is [here](https://r-sassy.org/validation/Procs%20Validation.docx).
+documentation is [here](https://github.com/dbosak01/procs/Proc_Validation.docx).
 
 [top](#top) 
 

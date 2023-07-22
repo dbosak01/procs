@@ -120,12 +120,14 @@ input data frame.</p></dd>
 
 <dt>stats</dt>
 <dd><p>A vector of summary statistics keywords.  Valid
-keywords are: "css", "clm", "cv", "lclm", "mean", "median", "mode",
+keywords are: "css", "clm", "cv", "kurt", "kurtosis",
+"lclm", "mean", "median", "mode",
 "min", "max", "n",
 "nmiss", "nobs",
 "p1", "p5", "p10", "p20", "p25", "p30", "p40",
 "p50", "p60", "p70", "p75", "p80", "p90",
-"p95", "p99", "q1", "q3", "qrange", "range", "std", "stderr", "sum",
+"p95", "p99", "q1", "q3", "qrange", "range", "skew", "skewness",
+"std", "stderr", "sum",
 "uclm", "uss", and "var". For hypothesis testing, the function
 supports "t", "prt", "probt", and "df".
 Default statistics are: "n", "mean", "std",
@@ -233,6 +235,7 @@ the same as the statistic keyword. You may pass statistic keywords as a
 quoted vector of strings, or an unquoted vector using the <code><a href="https://common.r-sassy.org/reference/v.html" class="external-link">v()</a></code> function.</p><ul><li><p><strong>css</strong>: Corrected Sum of Squares.</p></li>
 <li><p><strong>clm, lclm, uclm</strong>: Upper and lower confidence limits.</p></li>
 <li><p><strong>cv</strong>: Coefficient of Variation.</p></li>
+<li><p><strong>kurt/kurtosis</strong>: The Kurtosis description of the distribution tails.</p></li>
 <li><p><strong>mean</strong>: The arithmetic mean.</p></li>
 <li><p><strong>median</strong>: The median.</p></li>
 <li><p><strong>mode</strong>: The mode of the target variable.</p></li>
@@ -246,6 +249,7 @@ missing or non-missing.</p></li>
 of 5.</p></li>
 <li><p><strong>qrange, q1, q3</strong>: Quantile ranges for the first and third quantiles.</p></li>
 <li><p><strong>range</strong>: Difference between the minimum and maximum values.</p></li>
+<li><p><strong>skew/skewness</strong>: A measure of distribution skewness.</p></li>
 <li><p><strong>std</strong>: Standard deviation.</p></li>
 <li><p><strong>stderr</strong>: Standard error.</p></li>
 <li><p><strong>sum</strong>: The sum of variable values.</p></li>

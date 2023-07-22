@@ -26,12 +26,14 @@ summary statistics will be generated for all numeric variables on the
 input data frame.}
 
 \item{stats}{A vector of summary statistics keywords.  Valid
-keywords are: "css", "clm", "cv", "lclm", "mean", "median", "mode",
+keywords are: "css", "clm", "cv", "kurt", "kurtosis",
+"lclm", "mean", "median", "mode",
 "min", "max", "n",
 "nmiss", "nobs",
 "p1", "p5", "p10", "p20", "p25", "p30", "p40",
 "p50", "p60", "p70", "p75", "p80", "p90",
-"p95", "p99", "q1", "q3", "qrange", "range", "std", "stderr", "sum",
+"p95", "p99", "q1", "q3", "qrange", "range", "skew", "skewness",
+"std", "stderr", "sum",
 "uclm", "uss", and "var". For hypothesis testing, the function
 supports "t", "prt", "probt", and "df".
 Default statistics are: "n", "mean", "std",
@@ -132,6 +134,7 @@ quoted vector of strings, or an unquoted vector using the \code{v()} function.
 \item{\strong{css}: Corrected Sum of Squares.}
 \item{\strong{clm, lclm, uclm}: Upper and lower confidence limits.}
 \item{\strong{cv}: Coefficient of Variation.}
+\item{\strong{kurt/kurtosis}: The Kurtosis description of the distribution tails.}
 \item{\strong{mean}: The arithmetic mean.}
 \item{\strong{median}: The median.}
 \item{\strong{mode}: The mode of the target variable.}
@@ -145,6 +148,7 @@ missing or non-missing.}
 of 5.}
 \item{\strong{qrange, q1, q3}: Quantile ranges for the first and third quantiles.}
 \item{\strong{range}: Difference between the minimum and maximum values.}
+\item{\strong{skew/skewness}: A measure of distribution skewness.}
 \item{\strong{std}: Standard deviation.}
 \item{\strong{stderr}: Standard error.}
 \item{\strong{sum}: The sum of variable values.}

@@ -265,6 +265,34 @@ test_that("stat12: get_t() works as expected.", {
 })
 
 
+test_that("stat13: get_skewness() works as expected.", {
+
+  d <- c(27, 32, 46, 38, 23, 51, 19, 57, 33, 62,
+         26, 43, 28, 69, 55, 28, 42, 36, 27, 62)
+
+
+  res <- get_skewness(d)
+
+
+  expect_equal(res, 0.49070401)
+
+})
+
+
+test_that("stat14: get_kurtosis() works as expected.", {
+
+
+  d <- c(27, 32, 46, 38, 23, 51, 19, 57, 33, 62,
+         26, 43, 28, 69, 55, 28, 42, 36, 27, 62)
+
+
+  res <- get_kurtosis(d)
+
+
+  expect_equal(res, -0.96131045)
+
+})
+
 #
 # # Matches SAS?
 # test_that("stat10: cmh works no weight uncorrected", {

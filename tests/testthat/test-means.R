@@ -1211,7 +1211,24 @@ test_that("means53: various statistics work as expected.", {
   expect_equal(res[1, "CSS"], 4177.2)
 })
 
+test_that("means54: skewness and kurtosis work as expected.", {
 
+
+  res <- proc_means(datm, var = v(Age, PresentScore, TasteScore, Layers),
+                    stats = v(n, mean,  skew, kurt),
+                    titles = c("Test"),
+                    options = c(maxdec = 8))
+
+
+  expect_equal(res[2, "N"], 20)
+  expect_equal(res[2, "MEAN"], 76.15)
+  expect_equal(res[2, "SKEW"], -0.36762986)
+  expect_equal(res[2, "KURT"], -0.30448351)
+
+
+
+
+})
 
 # test_that("means50: where works before and after rename.", {
 #
