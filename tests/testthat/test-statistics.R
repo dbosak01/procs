@@ -31,7 +31,25 @@ adsl <- read.table(header = TRUE, text = '
   "015"   "ARM C" "M"  "WHITE" 36   "30-39 years"
   "016"   "ARM A" "M"  "WHITE" 40   "40-49 years"')
 
+# data Migraine;
+# input Gender $ Treatment $ Response $ Count @@;
+# datalines;
+# female Active  Better 16   female Active  Same 11
+# female Placebo Better  5   female Placebo Same 20
+# male   Active  Better 12   male   Active  Same 16
+# male   Placebo Better  7   male   Placebo Same 19
+# ;
 
+migraine <- read.table(header = TRUE, text = '
+Gender Treatment Response Count
+female Active  Better 16
+female Active  Same 11
+female Placebo Better  5
+female Placebo Same 20
+male   Active  Better 12
+male   Active  Same 16
+male   Placebo Better  7
+male   Placebo Same 19')
 
 test_that("stats1: Standard error works.", {
 
@@ -293,8 +311,8 @@ test_that("stat14: get_kurtosis() works as expected.", {
 
 })
 
-#
-# # Matches SAS?
+
+# Matches SAS?
 # test_that("stat10: cmh works no weight uncorrected", {
 #
 #
@@ -302,14 +320,23 @@ test_that("stat14: get_kurtosis() works as expected.", {
 #
 #   res
 #
+#   prt
+#
+#   mantelhaen.test(migraine$Gender, migraine$Treatment, migraine$Response)
+#
+#   sasLM::ORcmh(
+#
+#   res <- mantelhaen.test(prt$sex, prt$enrollment, prt$internship)
+#
+#
 #   # expect_equal(res[1, 2], 0)
 #   # expect_equal(res[2, 2], 1)
 #   # expect_equal(res[3, 2], 1)
 #
 # })
-#
-#
-# # Matches SAS?
+
+
+# Matches SAS?
 # test_that("stat11: cmh works with weight uncorrected", {
 #
 #   res <- get_chisq(prt$internship, prt$enrollment, prt$count)
@@ -323,27 +350,7 @@ test_that("stat14: get_kurtosis() works as expected.", {
 #
 #
 # })
-#
-#
-# test_that("stat12: chisq works with weight corrected", {
-#
-#   res <- get_chisq(prt$internship, prt$enrollment, prt$count, TRUE)
-#
-#   res
-#
-#   # expect_equal(res[1, 2], 0.58989261)
-#   # expect_equal(res[2, 2], 1)
-#   # expect_equal(res[3, 2], 0.44246065)
-#
-#
-#
-# })
 
-# test_that("stat10: Chisq works as output.", {
-#
-#
-#
-# })
 
 
 
