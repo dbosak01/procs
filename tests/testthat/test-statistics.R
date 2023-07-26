@@ -195,7 +195,7 @@ test_that("stat9: fisher works with weight", {
 
   res
 
-  expect_equal(res[1, 2], 67)
+  expect_equal(res[1, 2], 50)
   expect_equal(res[2, 2], 0.85127668)
   expect_equal(res[3, 2], 0.22133142)
   expect_equal(res[4, 2], 0.41215159)

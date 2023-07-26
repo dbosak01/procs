@@ -856,7 +856,7 @@ test_that("freq33: fisher's works with weight.", {
   expect_equal(length(res), 2)
 
   res2 <- res[[2]]
-  expect_equal(res2[1, 2],67)
+  expect_equal(res2[1, 2], 50)
   expect_equal(res2[2, 2], 0.85127668)
   expect_equal(res2[3, 2], 0.22133142)
   expect_equal(res2[4, 2], 0.41215159)
@@ -869,7 +869,7 @@ test_that("freq34: fisher's works with weight and by.", {
 
   res <- proc_freq(prt, tables = "internship * enrollment",
                    output = report,
-                   options = v(fisher, list),
+                   options = v(fisher),
                    by = "sex",
                    weight = "count")
 
@@ -878,13 +878,13 @@ test_that("freq34: fisher's works with weight and by.", {
   expect_equal(length(res), 4)
 
   res2 <- res[[2]]
-  expect_equal(res2[1, 2], 35)
+  expect_equal(res2[1, 2], 27)
   expect_equal(res2[2, 2], 0.98846024)
   expect_equal(res2[3, 2], 0.03111341)
   expect_equal(res2[4, 2], 0.046665258)
 
   res4 <- res[[4]]
-  expect_equal(res4[1, 2], 32)
+  expect_equal(res4[1, 2], 23)
   expect_equal(res4[2, 2], 0.83173972)
   expect_equal(res4[3, 2], 0.29935132)
   expect_equal(res4[4, 2], 0.524477809)
@@ -902,11 +902,11 @@ test_that("freq34: fisher's works with weight and by.", {
   expect_equal(length(res), 2)
 
   res2 <- res[[2]]
-  expect_equal(res2[1, 2], 35)
+  expect_equal(res2[1, 2], 27)
   expect_equal(res2[1, 3], 0.98846024)
   expect_equal(res2[1, 4], 0.03111341)
   expect_equal(res2[1, 5], 0.046665258)
-  expect_equal(res2[2, 2], 32)
+  expect_equal(res2[2, 2], 23)
   expect_equal(res2[2, 3], 0.83173972)
   expect_equal(res2[2, 4], 0.29935132)
   expect_equal(res2[2, 5], 0.524477809)
@@ -1784,7 +1784,7 @@ test_that("freq58: proc_freq missing option works.", {
 
 })
 
-test_that("freq32: chi sqr works without weight.", {
+test_that("freq59: chi sqr works without weight.", {
 
   res <- proc_freq(prt, tables = "internship * enrollment",
                    output = report,
@@ -1802,7 +1802,7 @@ test_that("freq32: chi sqr works without weight.", {
 })
 
 
-test_that("freq33: fisher's works without weight.", {
+test_that("freq60: fisher's works without weight.", {
 
   res <- proc_freq(prt, tables = "internship * enrollment",
                    output = report,
@@ -1822,7 +1822,7 @@ test_that("freq33: fisher's works without weight.", {
 
 })
 
-test_that("freq34: factors and ordering with crosstab output works.", {
+test_that("freq61: factors and ordering with crosstab output works.", {
 
 
   res1 <- proc_freq(dat, tables = c("Eyes", "Hair", comb = "Eyes * Hair"),
@@ -1852,7 +1852,7 @@ test_that("freq34: factors and ordering with crosstab output works.", {
 
 })
 
-test_that("freq34: factors and ordering with list output works.", {
+test_that("freq62: factors and ordering with list output works.", {
 
 
   res1 <- proc_freq(dat, tables = c("Eyes", "Hair", comb = "Eyes * Hair"),
@@ -1890,7 +1890,7 @@ test_that("freq34: factors and ordering with list output works.", {
 })
 
 
-test_that("freq34: totals always end up at bottom.", {
+test_that("freq63: totals always end up at bottom.", {
 
 
 
@@ -1923,3 +1923,42 @@ test_that("freq34: totals always end up at bottom.", {
   expect_equal(unique(as.character(res2$comb$CAT1)), c("green", "zed", "brown"))
 
 })
+
+test_that("freq64: Fisher with sort works as expected.", {
+
+  prtsp <- prt
+
+  prtsp$enrollment <- factor(prtsp$enrollment, c("yes", "no"))
+  prtsp$internship <- factor(prtsp$internship, c("yes", "no"))
+
+  res <- proc_freq(prtsp, tables = c(comb = "internship * enrollment"),
+            options = Fisher,
+            by = "sex",
+            weight = "count")
+
+  expect_equal(res$`fisher:comb`$FISHER.1.1[1], 35)
+  expect_equal(res$`fisher:comb`$FISHER.1.1[2], 32)
+  expect_equal(res$`fisher:comb`$FISHER.LS[1], 0.98846024)
+  expect_equal(res$`fisher:comb`$FISHER.LS[2], 0.83173972)
+  expect_equal(res$`fisher:comb`$FISHER.RS[1], 0.03111341)
+  expect_equal(res$`fisher:comb`$FISHER.RS[2], 0.29935132)
+
+})
+
+test_that("freq65: Fisher without sort works as expected.", {
+
+  res <- proc_freq(prt, tables = c(comb = "internship * enrollment"),
+                   options = Fisher,
+                   by = "sex",
+                   weight = "count")
+
+  expect_equal(res$`fisher:comb`$FISHER.1.1[1], 27)
+  expect_equal(res$`fisher:comb`$FISHER.1.1[2], 23)
+  expect_equal(res$`fisher:comb`$FISHER.LS[1], 0.98846024)
+  expect_equal(res$`fisher:comb`$FISHER.LS[2], 0.83173972)
+  expect_equal(res$`fisher:comb`$FISHER.RS[1], 0.03111341)
+  expect_equal(res$`fisher:comb`$FISHER.RS[2], 0.29935132)
+
+})
+
+
