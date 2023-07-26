@@ -30,6 +30,9 @@ Anderson    27 87 85  Chocolate  1
 Merritt     62 73 84  Chocolate  1
 ')
 
+options("logr.output" = FALSE)
+options("procs.print" = FALSE)
+
 test_that("means0: get_summaries works as expected for 1 variable.", {
 
 
@@ -1227,6 +1230,17 @@ test_that("means54: skewness and kurtosis work as expected.", {
 
 
 
+
+})
+
+
+test_that("means52: default variables work as expected.", {
+
+  res <- proc_means(datm,
+                    titles = c("Test"))
+
+  expect_equal(names(res), c("TYPE", "FREQ", "VAR", "N", "MEAN", "STD", "MIN", "MAX" ))
+  expect_equal(as.character(res$VAR), c("Age", "PresentScore", "TasteScore", "Layers"))
 
 })
 

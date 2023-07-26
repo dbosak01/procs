@@ -1822,4 +1822,104 @@ test_that("freq33: fisher's works without weight.", {
 
 })
 
+test_that("freq34: factors and ordering with crosstab output works.", {
 
+
+  res1 <- proc_freq(dat, tables = c("Eyes", "Hair", comb = "Eyes * Hair"),
+                   output = all,
+                   titles = "Eye and Hair Color of European Children")
+
+  res1
+
+
+  datsp <- dat
+
+  datsp$Eyes <- factor(dat$Eyes, levels = c("green", "brown", "blue"))
+  datsp$Hair <- factor(dat$Hair, levels = c("fair", "medium", "red", "dark", "black"))
+
+
+  res2 <- proc_freq(datsp, tables = c("Eyes", "Hair", comb = "Eyes * Hair"),
+                    output = all,
+                    titles = "Eye and Hair Color of European Children")
+
+  res2
+
+
+  expect_equal(as.character(res1$Eyes$CAT), c("blue", "brown", "green"))
+  expect_equal(as.character(res2$Eyes$CAT), c("green", "brown", "blue"))
+  expect_equal(unique(as.character(res1$comb$CAT1)), c("blue", "brown", "green"))
+  expect_equal(unique(as.character(res2$comb$CAT1)), c("green", "brown", "blue"))
+
+})
+
+test_that("freq34: factors and ordering with list output works.", {
+
+
+  res1 <- proc_freq(dat, tables = c("Eyes", "Hair", comb = "Eyes * Hair"),
+                    output = all,
+                    options = list,
+                    titles = "Eye and Hair Color of European Children")
+
+  res1
+
+
+  datsp <- dat
+
+  datsp$Eyes <- factor(dat$Eyes, levels = c("green", "brown", "blue"))
+  datsp$Hair <- factor(dat$Hair, levels = c("fair", "medium", "red", "dark", "black"))
+
+
+  res2 <- proc_freq(datsp, tables = c("Eyes", "Hair", comb = "Eyes * Hair"),
+                    output = all,
+                    options = list,
+                    titles = "Eye and Hair Color of European Children")
+
+  res2
+
+
+  expect_equal(as.character(res1$Eyes$CAT), c("blue", "brown", "green"))
+  expect_equal(as.character(res2$Eyes$CAT), c("green", "brown", "blue"))
+  expect_equal(as.character(res1$Hair$CAT), c("black", "dark", "fair", "medium", "red"))
+  expect_equal(as.character(res2$Hair$CAT), c("fair", "medium", "red", "dark", "black"))
+  expect_equal(unique(as.character(res1$comb$CAT1)), c("blue", "brown", "green"))
+  expect_equal(unique(as.character(res2$comb$CAT1)), c("green", "brown", "blue"))
+  expect_equal(unique(as.character(res1$comb$CAT2)),  c("black", "dark", "fair", "medium", "red"))
+  expect_equal(unique(as.character(res2$comb$CAT2)), c("fair", "medium", "red", "dark", "black"))
+
+
+})
+
+
+test_that("freq34: totals always end up at bottom.", {
+
+
+
+  datsp <- dat
+
+  datsp$Eyes <- sub("blue", "zed", datsp$Eyes, fixed = TRUE)
+
+  res1 <- proc_freq(datsp, tables = c("Eyes", "Hair", comb = "Eyes * Hair"),
+                    output = all,
+                    titles = "Eye and Hair Color of European Children")
+
+  res1
+
+  expect_equal(as.character(res1$Eyes$CAT), c("brown", "green", "zed"))
+  expect_equal(unique(as.character(res1$comb$CAT1)), c("brown", "green","zed"))
+
+
+  datsp$Eyes <- factor(datsp$Eyes, levels = c("green", "zed", "brown"))
+  datsp$Hair <- factor(datsp$Hair, levels = c("fair", "medium", "red", "dark", "black"))
+
+
+  res2 <- proc_freq(datsp, tables = c("Eyes", "Hair", comb = "Eyes * Hair"),
+                    output = all,
+                    titles = "Eye and Hair Color of European Children")
+
+  res2
+
+
+  expect_equal(as.character(res2$Eyes$CAT), c("green", "zed", "brown"))
+  expect_equal(unique(as.character(res2$comb$CAT1)), c("green", "zed", "brown"))
+
+})

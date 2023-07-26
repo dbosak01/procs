@@ -697,16 +697,24 @@ freq_twoway <- function(data, tb1, tb2, weight, options,
   if (is.null(weight) | weight != "__cnt")
     data[["__cnt"]] <- 1
 
-  # Get target variables into vectors
-  if (is.factor(data[[tb1]]))
-    v1 <- as.character(data[[tb1]])
-  else
-    v1 <- data[[tb1]]
+  l1 <- NULL
+  l2 <- NULL
 
-  if (is.factor(data[[tb1]]))
+  # Get target variables into vectors
+  if (is.factor(data[[tb1]])) {
+    l1 <- levels(data[[tb1]])
+    v1 <- as.character(data[[tb1]])
+
+  } else {
+    v1 <- data[[tb1]]
+  }
+
+  if (is.factor(data[[tb1]])) {
+    l2 <- levels(data[[tb2]])
     v2 <- as.character(data[[tb2]])
-  else
+  } else {
     v2 <- data[[tb2]]
+  }
 
   # Deal with missing
   if (has_option(options, "missing")) {
@@ -762,8 +770,22 @@ freq_twoway <- function(data, tb1, tb2, weight, options,
                        "PCT" = percentages,
                        stringsAsFactors = FALSE)
 
-  # Sort result data frame
-  result <- result[order(result$CAT1, result$CAT2), ]
+  # Restore factors if necessary
+  if (!is.null(l1)) {
+    result$CAT1 <- factor(result$CAT1, levels = l1)
+  }
+  if (!is.null(l2)) {
+    result$CAT2 <- factor(result$CAT2, levels = l2)
+  }
+
+  # if (!is.null(l1) || !is.null(l2)) {
+    # Sort result data frame
+    result <- sort(result, by = c("CAT1", "CAT2"))
+  # } else {
+  #
+  #
+  #   result <- result[order(result$CAT1, result$CAT2), ]
+  # }
 
   # Kill rownames
   rownames(result) <- NULL
