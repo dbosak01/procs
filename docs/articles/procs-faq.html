@@ -40,7 +40,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">procs</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.0.9008</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.0.0</span>
       </span>
     </div>
 
@@ -134,6 +134,7 @@ Statistics?</a></li>
 coming?</a></li>
 <li><a href="#outputs">How do I get my statistics into a
 report?</a></li>
+<li><a href="#order">How do I order my frequencies?</a></li>
 </ul>
 </div>
 <div class="section level2">
@@ -161,7 +162,7 @@ frame.</p>
 validated before using in production. Is the <strong>procs</strong>
 package validated?</p>
 <p><strong>A:</strong> Yes. The functions were validated by comparing to
-SAS®. The validation documentation is <a href="https://github.com/dbosak01/procs/blob/master/Procs_Validation.docx" class="external-link">here</a>.</p>
+SAS®. The validation documentation is <a href="https://r-sassy.org/validation/Procs_Validation.pdf" class="external-link">here</a>.</p>
 <p><a href="#top">top</a></p>
 <hr>
 </div>
@@ -254,6 +255,43 @@ the <strong>procs</strong> package?</p>
 titles, the output location, and the output type. The function supports
 PDF, RTF, HTML, DOCX, and TXT. For more advanced reporting features, see
 the <a href="https://reporter.r-sassy.org/" class="external-link">reporter</a> package.</p>
+<p><a href="#top">top</a></p>
+<hr>
+</div>
+<div class="section level3">
+<h3 id="order">How do I order my frequencies?<a class="anchor" aria-label="anchor" href="#order"></a>
+</h3>
+<p><strong>Q:</strong> The <code><a href="../reference/proc_freq.html">proc_freq()</a></code> function seems to
+always order the categories alphabetically. But I have a specific order
+in mind that is not alphabetical. Is there a way to order the frequency
+categories in a specific way?</p>
+<p><strong>A:</strong> Yes. If your frequency variable is defined as a
+factor, the <code><a href="../reference/proc_freq.html">proc_freq()</a></code> function will order the frequency
+categories by that factor. Here is an example:</p>
+<pre><code><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://procs.r-sassy.org">procs</a></span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Turn off printing for CRAN checks</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">options</a></span><span class="op">(</span><span class="st">"procs.print"</span> <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Create sample data</span></span>
+<span><span class="va">df</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/as.data.frame.html" class="external-link">as.data.frame</a></span><span class="op">(</span><span class="va">HairEyeColor</span>, stringsAsFactors <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Assign factor for ordering</span></span>
+<span><span class="va">df</span><span class="op">$</span><span class="va">Eye</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">factor</a></span><span class="op">(</span><span class="va">df</span><span class="op">$</span><span class="va">Eye</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Green"</span>, <span class="st">"Hazel"</span>, <span class="st">"Blue"</span>, <span class="st">"Brown"</span><span class="op">)</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Use factor in tables parameter</span></span>
+<span><span class="va">res</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/proc_freq.html">proc_freq</a></span><span class="op">(</span><span class="va">df</span>,</span>
+<span>                 tables <span class="op">=</span> <span class="va">Eye</span>,</span>
+<span>                 weight <span class="op">=</span> <span class="va">Freq</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Output is now ordered by the factor</span></span>
+<span><span class="va">res</span></span>
+<span><span class="co">#   VAR   CAT   N CNT      PCT</span></span>
+<span><span class="co"># 1 Eye Green 592  64 10.81081</span></span>
+<span><span class="co"># 2 Eye Hazel 592  93 15.70946</span></span>
+<span><span class="co"># 3 Eye  Blue 592 215 36.31757</span></span>
+<span><span class="co"># 4 Eye Brown 592 220 37.16216</span></span>
+<span></span></code></pre>
 <p><a href="#top">top</a></p>
 <hr>
 <!-- ### Question 2? {#q2} --><!-- **Q:** Question here. --><!-- **A:** Answer here. --><!-- [top](#top) --><!-- ****** --><!-- ### Question 1? {#q1} --><!-- **Q:** Question here. --><!-- **A:** Answer here. --><!-- [top](#top)  --><!-- ****** -->

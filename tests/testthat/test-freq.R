@@ -1961,4 +1961,26 @@ test_that("freq65: Fisher without sort works as expected.", {
 
 })
 
+test_that("freq66: nonobs keyword works as expected.", {
 
+  res <- proc_freq(prt, tables = v(internship),
+                   options = v(nonobs),
+                   weight = "count")
+
+
+  expect_equal("N" %in% names(res), FALSE)
+
+})
+
+
+# test_that("freq67: outexpect keyword works as expected.", {
+#
+#   res <- proc_freq(dat, tables = v(Eyes * Hair),
+#                    options = v(outexpect, list),
+#                    weight = "Count")
+#
+#   sum(res$CNT)
+#
+#   expect_equal("N" %in% names(res), FALSE)
+#
+# })

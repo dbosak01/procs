@@ -54,6 +54,9 @@
 #' output datasets are not rounded or formatted
 #' to give you the most accurate statistical results.
 #'
+#' If you want to order the frequency categories, define the tables
+#' variable as a factor in the desired order.
+#'
 #' @section Frequency Weight:
 #' Normally the \code{proc_freq} function counts each row in the
 #' input data equally. In some cases, however, each row in the data
@@ -349,17 +352,17 @@ proc_freq <- function(data,
   kopts <- c("noprint",
              "list", "nocol", "nocum", "nofreq", "nopercent",
              "norow", "nosparse", "outcum",
-             "sparse", "totpct",  "crosstab",
+             "sparse", "crosstab",
              "notable", "nonobs", "missing", "nlevels",
-             "wide", "long", "stacked")
+             "wide", "long", "stacked")  # vector not used
 
   outopts <- c("all", "report", "none")
 
   # "expected", "outexpect", "missprint"
 
-  vstats <- c("chisq", "cl", "fisher")
+  vstats <- c("chisq", "cl", "fisher") # vector not used
 
-  nopts <- c("alpha", "maxlevels", "out")
+  nopts <- c("alpha", "maxlevels", "out") # vector not used
 
   # Deal with single value unquoted parameter values
   oby <- deparse(substitute(by, env = environment()))
@@ -778,14 +781,10 @@ freq_twoway <- function(data, tb1, tb2, weight, options,
     result$CAT2 <- factor(result$CAT2, levels = l2)
   }
 
-  # if (!is.null(l1) || !is.null(l2)) {
-    # Sort result data frame
-    result <- sort(result, by = c("CAT1", "CAT2"))
-  # } else {
-  #
-  #
-  #   result <- result[order(result$CAT1, result$CAT2), ]
-  # }
+
+  # Sort result data frame
+  result <- sort(result, by = c("CAT1", "CAT2"))
+
 
   # Kill rownames
   rownames(result) <- NULL

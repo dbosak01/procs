@@ -121,6 +121,9 @@ Column names have been standardized, and additional variables may
 be present to help with data manipulation.  In addition, data values in the
 output datasets are not rounded or formatted
 to give you the most accurate statistical results.
+
+If you want to order the frequency categories, define the tables
+variable as a factor in the desired order.
 }
 
 \section{Frequency Weight}{

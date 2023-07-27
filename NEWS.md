@@ -1,8 +1,15 @@
+# procs 1.0.0
+
+* Prepare for initial release.
+
 # procs 0.0.9008
 
 * Added alpha = option for confidence limits.
 * Differentiated between one-side and two-sided confidence limits.
 * Added codecov.
+* Various fixes.
+* Added validation document.
+* Allowed ordering of frequencies using factors.
 
 # procs 0.0.9007
 

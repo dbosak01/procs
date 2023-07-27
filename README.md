@@ -46,7 +46,7 @@ it makes it much easier to rewrite
 SAS® programs in R. This pre-validation will
 ultimately save the industry tens of thousands of hours of effort. Validation
 documentation is available 
-[here](https://github.com/dbosak01/procs/blob/master/Procs_Validation.docx).
+[here](https://r-sassy.org/validation/Procs_Validation.pdf).
 
 **3) Ease of Adoption:** Another important aspect of the package is to 
 facilitate the adoption of R by SAS® programmers.
@@ -104,7 +104,7 @@ If you encounter a bug or have a feature request, please submit an issue
 [here](https://github.com/dbosak01/procs/issues).
 
 The **procs** packages has been validated, and the validation documentation
-is [here](https://r-sassy.org/validation/Procs%20Validation.docx).
+is [here](https://r-sassy.org/validation/Procs_Validation.pdf).
 
 
 ### See Also

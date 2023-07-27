@@ -31,6 +31,7 @@ on the links below to navigate to the full question and answer content.
 * [What about PROC COMPARE?](#compare)
 * [Are there any other statistics procedures coming?](#other)
 * [How do I get my statistics into a report?](#outputs)
+* [How do I order my frequencies?](#order)
 
 
 ## Content
@@ -57,7 +58,7 @@ time frame.
 production. Is the **procs** package validated?
 
 **A:** Yes.  The functions were validated by comparing to SAS®. The validation
-documentation is [here](https://github.com/dbosak01/procs/blob/master/Procs_Validation.docx).
+documentation is [here](https://r-sassy.org/validation/Procs_Validation.pdf).
 
 [top](#top) 
 
@@ -163,7 +164,46 @@ reporting features, see the [reporter](https://reporter.r-sassy.org/) package.
 
 ****** 
 
+### How do I order my frequencies? {#order}
 
+**Q:** The `proc_freq()` function seems to always order the categories alphabetically.
+But I have a specific order in mind that is not alphabetical.  Is there a way
+to order the frequency categories in a specific way?
+
+**A:** Yes.  If your frequency variable is defined as a factor, the 
+`proc_freq()` function will order the frequency categories by that factor.
+Here is an example: 
+```
+library(procs)
+
+# Turn off printing for CRAN checks
+options("procs.print" = FALSE)
+
+# Create sample data
+df <- as.data.frame(HairEyeColor, stringsAsFactors = FALSE)
+
+# Assign factor for ordering
+df$Eye <- factor(df$Eye, c("Green", "Hazel", "Blue", "Brown"))
+
+# Use factor in tables parameter
+res <- proc_freq(df,
+                 tables = Eye,
+                 weight = Freq)
+
+# Output is now ordered by the factor
+res
+#   VAR   CAT   N CNT      PCT
+# 1 Eye Green 592  64 10.81081
+# 2 Eye Hazel 592  93 15.70946
+# 3 Eye  Blue 592 215 36.31757
+# 4 Eye Brown 592 220 37.16216
+
+
+```
+
+[top](#top)
+
+****** 
 
 <!-- ### Question 2? {#q2} -->
 
