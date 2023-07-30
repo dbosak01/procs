@@ -153,7 +153,7 @@ by additional columns.
 The \code{options} parameter accepts a vector of options.  Normally, these
 options must be quoted.  But you may pass them unquoted using the \code{v()}
 function.  For example, you can request report datasets and the Chi-Square
-statistic like this: \code{options = v(report, chisq)}.
+statistic like this: \code{options = v(nlevels, chisq)}.
 
 Below are all the available options and a description of each:
 \itemize{
