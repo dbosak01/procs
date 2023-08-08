@@ -250,13 +250,13 @@ proc_transpose(race_comb, id = BY, var = CNTPCT,
 
 put("Clean up")
            
+datastep(race_trans, drop = NAME,
+         where = expression(del == FALSE),
+         {
            LABEL <- fapply(LABEL, fc$RACE)
            LABEL <- factor(LABEL, levels = levels(fc$RACE))
            
          }) -> race_cnts 
-datastep(race_trans, drop = NAME,
-         where = expression(del == FALSE),
-         {
 
 put("Sort by label")
 proc_sort(race_cnts, by = LABEL) -> race_cnts 
@@ -377,9 +377,6 @@ res <- write_report(rpt)
 
 # Clean Up ----------------------------------------------------------------
 sep("Clean Up")
-
-put("Unload libname")
-lib_unload(sdtm)
 
 put("Close log")
 log_close()

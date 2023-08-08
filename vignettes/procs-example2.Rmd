@@ -36,13 +36,16 @@ tmp <- tempdir()
 # Open log
 lf <- log_open(file.path(tmp, "example2.log"))
 
+# Get data
+dir <- system.file("extdata", package = "sassy")
+
 
 # Get Data ----------------------------------------------------------------
 
 sep("Prepare Data")
 
 # Create libname for csv data
-libname(sdtm, "./data", "csv", quiet = TRUE) 
+libname(sdtm, dir, "csv", quiet = TRUE) 
 
 # Load data into workspace
 lib_load(sdtm) 

@@ -178,7 +178,7 @@ the two function calls.
 ```{r eval=FALSE, echo=TRUE} 
 # Class grouping
 res1 <- proc_means(dat, stats = v(median, sum, q1, q3),
-                   class = y)
+                   class = y, options = v(maxdec = 4))
 ```
 <img src="../man/images/meanstut3.png"/>
 
@@ -207,7 +207,7 @@ parameter:
 ```{r eval=FALSE, echo=TRUE} 
 # By grouping
 res2 <- proc_means(dat, stats = v(median, sum, q1, q3),
-                   by = y)
+                   by = y, options = v(maxdec = 4))
 
 ```
 <img src="../man/images/meanstut4.png"/>
@@ -241,7 +241,7 @@ the `class` parameter:
 ```{r eval=FALSE, echo=TRUE} 
 # Class grouping - two variables
 res1 <- proc_means(dat, stats = v(median, sum, q1, q3),
-                   class = v(g, y))
+                   class = v(g, y), options = v(maxdec = 0))
 ```
 <img src="../man/images/meanstut5.png"/>
 
@@ -268,7 +268,7 @@ two variables:
 ```{r eval=FALSE, echo=TRUE} 
 # By grouping - two variables
 res2 <- proc_means(dat, stats = v(median, sum, q1, q3),
-                   by = v(g, y))
+                   by = v(g, y), options = v(maxdec = 0))
 ```
 <img src="../man/images/meanstut6.png"/>
 
@@ -294,9 +294,10 @@ parameters:
 # By grouping - by and class
 res3 <- proc_means(dat, stats = v(median, sum, q1, q3),
                    by = g,
-                   class = y)
+                   class = y, 
+                   options = v(maxdec = 0))
 ```
-<img src="../man/images/meanstut6.png"/>
+<img src="../man/images/meanstut7.png"/>
 
 ```{r eval=FALSE, echo=TRUE} 
 # View results - by and class
@@ -343,7 +344,7 @@ res1
 
 # Shape long
 res2 <- proc_means(dat, stats = v(median, sum, q1, q3),
-                   options = long))
+                   options = long)
 
 # Long results
 res2

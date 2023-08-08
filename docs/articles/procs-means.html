@@ -395,7 +395,7 @@ function calls.</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Class grouping</span></span>
 <span><span class="va">res1</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/proc_means.html">proc_means</a></span><span class="op">(</span><span class="va">dat</span>, stats <span class="op">=</span> <span class="fu"><a href="https://common.r-sassy.org/reference/v.html" class="external-link">v</a></span><span class="op">(</span><span class="va">median</span>, <span class="va">sum</span>, <span class="va">q1</span>, <span class="va">q3</span><span class="op">)</span>,</span>
-<span>                   class <span class="op">=</span> <span class="va">y</span><span class="op">)</span></span></code></pre></div>
+<span>                   class <span class="op">=</span> <span class="va">y</span>, options <span class="op">=</span> <span class="fu"><a href="https://common.r-sassy.org/reference/v.html" class="external-link">v</a></span><span class="op">(</span>maxdec <span class="op">=</span> <span class="fl">4</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <p><img src="../man/images/meanstut3.png"></p>
 <p>Below is the output dataset from the <code>class</code> parameter.
 Notice that summary values have been provided for each variable, in
@@ -422,7 +422,7 @@ of the <code>class</code> parameter:</p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># By grouping</span></span>
 <span><span class="va">res2</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/proc_means.html">proc_means</a></span><span class="op">(</span><span class="va">dat</span>, stats <span class="op">=</span> <span class="fu"><a href="https://common.r-sassy.org/reference/v.html" class="external-link">v</a></span><span class="op">(</span><span class="va">median</span>, <span class="va">sum</span>, <span class="va">q1</span>, <span class="va">q3</span><span class="op">)</span>,</span>
-<span>                   by <span class="op">=</span> <span class="va">y</span><span class="op">)</span></span></code></pre></div>
+<span>                   by <span class="op">=</span> <span class="va">y</span>, options <span class="op">=</span> <span class="fu"><a href="https://common.r-sassy.org/reference/v.html" class="external-link">v</a></span><span class="op">(</span>maxdec <span class="op">=</span> <span class="fl">4</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <p><img src="../man/images/meanstut4.png"></p>
 <p>Notice that with the <code>by</code> parameter, separate tables are
 created for each by group on the interactive report.</p>
@@ -457,7 +457,7 @@ parameter:</p>
 <div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Class grouping - two variables</span></span>
 <span><span class="va">res1</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/proc_means.html">proc_means</a></span><span class="op">(</span><span class="va">dat</span>, stats <span class="op">=</span> <span class="fu"><a href="https://common.r-sassy.org/reference/v.html" class="external-link">v</a></span><span class="op">(</span><span class="va">median</span>, <span class="va">sum</span>, <span class="va">q1</span>, <span class="va">q3</span><span class="op">)</span>,</span>
-<span>                   class <span class="op">=</span> <span class="fu"><a href="https://common.r-sassy.org/reference/v.html" class="external-link">v</a></span><span class="op">(</span><span class="va">g</span>, <span class="va">y</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<span>                   class <span class="op">=</span> <span class="fu"><a href="https://common.r-sassy.org/reference/v.html" class="external-link">v</a></span><span class="op">(</span><span class="va">g</span>, <span class="va">y</span><span class="op">)</span>, options <span class="op">=</span> <span class="fu"><a href="https://common.r-sassy.org/reference/v.html" class="external-link">v</a></span><span class="op">(</span>maxdec <span class="op">=</span> <span class="fl">0</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <p><img src="../man/images/meanstut5.png"></p>
 <p>Here is the output dataset:</p>
 <div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
@@ -483,7 +483,7 @@ with two variables:</p>
 <div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># By grouping - two variables</span></span>
 <span><span class="va">res2</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/proc_means.html">proc_means</a></span><span class="op">(</span><span class="va">dat</span>, stats <span class="op">=</span> <span class="fu"><a href="https://common.r-sassy.org/reference/v.html" class="external-link">v</a></span><span class="op">(</span><span class="va">median</span>, <span class="va">sum</span>, <span class="va">q1</span>, <span class="va">q3</span><span class="op">)</span>,</span>
-<span>                   by <span class="op">=</span> <span class="fu"><a href="https://common.r-sassy.org/reference/v.html" class="external-link">v</a></span><span class="op">(</span><span class="va">g</span>, <span class="va">y</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<span>                   by <span class="op">=</span> <span class="fu"><a href="https://common.r-sassy.org/reference/v.html" class="external-link">v</a></span><span class="op">(</span><span class="va">g</span>, <span class="va">y</span><span class="op">)</span>, options <span class="op">=</span> <span class="fu"><a href="https://common.r-sassy.org/reference/v.html" class="external-link">v</a></span><span class="op">(</span>maxdec <span class="op">=</span> <span class="fl">0</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <p><img src="../man/images/meanstut6.png"></p>
 <p>Here is the output dataset for the <code>by</code> parameter:</p>
 <div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
@@ -508,8 +508,9 @@ and <code>class</code> parameters:</p>
 <code class="sourceCode R"><span><span class="co"># By grouping - by and class</span></span>
 <span><span class="va">res3</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/proc_means.html">proc_means</a></span><span class="op">(</span><span class="va">dat</span>, stats <span class="op">=</span> <span class="fu"><a href="https://common.r-sassy.org/reference/v.html" class="external-link">v</a></span><span class="op">(</span><span class="va">median</span>, <span class="va">sum</span>, <span class="va">q1</span>, <span class="va">q3</span><span class="op">)</span>,</span>
 <span>                   by <span class="op">=</span> <span class="va">g</span>,</span>
-<span>                   class <span class="op">=</span> <span class="va">y</span><span class="op">)</span></span></code></pre></div>
-<p><img src="../man/images/meanstut6.png"></p>
+<span>                   class <span class="op">=</span> <span class="va">y</span>, </span>
+<span>                   options <span class="op">=</span> <span class="fu"><a href="https://common.r-sassy.org/reference/v.html" class="external-link">v</a></span><span class="op">(</span>maxdec <span class="op">=</span> <span class="fl">0</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<p><img src="../man/images/meanstut7.png"></p>
 <div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># View results - by and class</span></span>
 <span><span class="va">res3</span></span>
@@ -541,43 +542,44 @@ variables in columns. The “stacked” option has both statistics and
 variables in rows.</p>
 <p>The following example illustrates the differences between these data
 shaping options:</p>
-<div class="sourceCode" id="cb17"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" tabindex="-1"></a><span class="co"># Shape wide</span></span>
-<span id="cb17-2"><a href="#cb17-2" tabindex="-1"></a>res1 <span class="ot">&lt;-</span> <span class="fu">proc_means</span>(dat, <span class="at">stats =</span> <span class="fu">v</span>(median, sum, q1, q3),</span>
-<span id="cb17-3"><a href="#cb17-3" tabindex="-1"></a>                   <span class="at">options =</span> wide)</span>
-<span id="cb17-4"><a href="#cb17-4" tabindex="-1"></a></span>
-<span id="cb17-5"><a href="#cb17-5" tabindex="-1"></a><span class="co"># Wide results</span></span>
-<span id="cb17-6"><a href="#cb17-6" tabindex="-1"></a>res1</span>
-<span id="cb17-7"><a href="#cb17-7" tabindex="-1"></a><span class="co">#   TYPE FREQ VAR MEDIAN SUM   Q1   Q3</span></span>
-<span id="cb17-8"><a href="#cb17-8" tabindex="-1"></a><span class="co"># 1    0    8   x      3  29  2.0  5.5</span></span>
-<span id="cb17-9"><a href="#cb17-9" tabindex="-1"></a><span class="co"># 2    0    8   z     65 506 57.5 75.5</span></span>
-<span id="cb17-10"><a href="#cb17-10" tabindex="-1"></a></span>
-<span id="cb17-11"><a href="#cb17-11" tabindex="-1"></a><span class="co"># Shape long</span></span>
-<span id="cb17-12"><a href="#cb17-12" tabindex="-1"></a>res2 <span class="ot">&lt;-</span> <span class="fu">proc_means</span>(dat, <span class="at">stats =</span> <span class="fu">v</span>(median, sum, q1, q3),</span>
-<span id="cb17-13"><a href="#cb17-13" tabindex="-1"></a>                   <span class="at">options =</span> long)<span class="er">)</span></span>
-<span id="cb17-14"><a href="#cb17-14" tabindex="-1"></a></span>
-<span id="cb17-15"><a href="#cb17-15" tabindex="-1"></a><span class="co"># Long results</span></span>
-<span id="cb17-16"><a href="#cb17-16" tabindex="-1"></a>res2</span>
-<span id="cb17-17"><a href="#cb17-17" tabindex="-1"></a><span class="co">#   TYPE FREQ   STAT    x     z</span></span>
-<span id="cb17-18"><a href="#cb17-18" tabindex="-1"></a><span class="co"># 1    0    8 MEDIAN  3.0  65.0</span></span>
-<span id="cb17-19"><a href="#cb17-19" tabindex="-1"></a><span class="co"># 2    0    8    SUM 29.0 506.0</span></span>
-<span id="cb17-20"><a href="#cb17-20" tabindex="-1"></a><span class="co"># 3    0    8     Q1  2.0  57.5</span></span>
-<span id="cb17-21"><a href="#cb17-21" tabindex="-1"></a><span class="co"># 4    0    8     Q3  5.5  75.5</span></span>
-<span id="cb17-22"><a href="#cb17-22" tabindex="-1"></a></span>
-<span id="cb17-23"><a href="#cb17-23" tabindex="-1"></a><span class="co"># Shape stacked</span></span>
-<span id="cb17-24"><a href="#cb17-24" tabindex="-1"></a>res3 <span class="ot">&lt;-</span> <span class="fu">proc_means</span>(dat, <span class="at">stats =</span> <span class="fu">v</span>(median, sum, q1, q3),</span>
-<span id="cb17-25"><a href="#cb17-25" tabindex="-1"></a>                   <span class="at">options =</span> stacked)</span>
-<span id="cb17-26"><a href="#cb17-26" tabindex="-1"></a></span>
-<span id="cb17-27"><a href="#cb17-27" tabindex="-1"></a><span class="co"># Stacked results</span></span>
-<span id="cb17-28"><a href="#cb17-28" tabindex="-1"></a>res3</span>
-<span id="cb17-29"><a href="#cb17-29" tabindex="-1"></a><span class="co">#   TYPE FREQ VAR   STAT VALUES</span></span>
-<span id="cb17-30"><a href="#cb17-30" tabindex="-1"></a><span class="co"># 1    0    8   x MEDIAN    3.0</span></span>
-<span id="cb17-31"><a href="#cb17-31" tabindex="-1"></a><span class="co"># 2    0    8   x    SUM   29.0</span></span>
-<span id="cb17-32"><a href="#cb17-32" tabindex="-1"></a><span class="co"># 3    0    8   x     Q1    2.0</span></span>
-<span id="cb17-33"><a href="#cb17-33" tabindex="-1"></a><span class="co"># 4    0    8   x     Q3    5.5</span></span>
-<span id="cb17-34"><a href="#cb17-34" tabindex="-1"></a><span class="co"># 5    0    8   z MEDIAN   65.0</span></span>
-<span id="cb17-35"><a href="#cb17-35" tabindex="-1"></a><span class="co"># 6    0    8   z    SUM  506.0</span></span>
-<span id="cb17-36"><a href="#cb17-36" tabindex="-1"></a><span class="co"># 7    0    8   z     Q1   57.5</span></span>
-<span id="cb17-37"><a href="#cb17-37" tabindex="-1"></a><span class="co"># 8    0    8   z     Q3   75.5</span></span></code></pre></div>
+<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Shape wide</span></span>
+<span><span class="va">res1</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/proc_means.html">proc_means</a></span><span class="op">(</span><span class="va">dat</span>, stats <span class="op">=</span> <span class="fu"><a href="https://common.r-sassy.org/reference/v.html" class="external-link">v</a></span><span class="op">(</span><span class="va">median</span>, <span class="va">sum</span>, <span class="va">q1</span>, <span class="va">q3</span><span class="op">)</span>,</span>
+<span>                   options <span class="op">=</span> <span class="va">wide</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Wide results</span></span>
+<span><span class="va">res1</span></span>
+<span><span class="co">#   TYPE FREQ VAR MEDIAN SUM   Q1   Q3</span></span>
+<span><span class="co"># 1    0    8   x      3  29  2.0  5.5</span></span>
+<span><span class="co"># 2    0    8   z     65 506 57.5 75.5</span></span>
+<span></span>
+<span><span class="co"># Shape long</span></span>
+<span><span class="va">res2</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/proc_means.html">proc_means</a></span><span class="op">(</span><span class="va">dat</span>, stats <span class="op">=</span> <span class="fu"><a href="https://common.r-sassy.org/reference/v.html" class="external-link">v</a></span><span class="op">(</span><span class="va">median</span>, <span class="va">sum</span>, <span class="va">q1</span>, <span class="va">q3</span><span class="op">)</span>,</span>
+<span>                   options <span class="op">=</span> <span class="va">long</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Long results</span></span>
+<span><span class="va">res2</span></span>
+<span><span class="co">#   TYPE FREQ   STAT    x     z</span></span>
+<span><span class="co"># 1    0    8 MEDIAN  3.0  65.0</span></span>
+<span><span class="co"># 2    0    8    SUM 29.0 506.0</span></span>
+<span><span class="co"># 3    0    8     Q1  2.0  57.5</span></span>
+<span><span class="co"># 4    0    8     Q3  5.5  75.5</span></span>
+<span></span>
+<span><span class="co"># Shape stacked</span></span>
+<span><span class="va">res3</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/proc_means.html">proc_means</a></span><span class="op">(</span><span class="va">dat</span>, stats <span class="op">=</span> <span class="fu"><a href="https://common.r-sassy.org/reference/v.html" class="external-link">v</a></span><span class="op">(</span><span class="va">median</span>, <span class="va">sum</span>, <span class="va">q1</span>, <span class="va">q3</span><span class="op">)</span>,</span>
+<span>                   options <span class="op">=</span> <span class="va">stacked</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Stacked results</span></span>
+<span><span class="va">res3</span></span>
+<span><span class="co">#   TYPE FREQ VAR   STAT VALUES</span></span>
+<span><span class="co"># 1    0    8   x MEDIAN    3.0</span></span>
+<span><span class="co"># 2    0    8   x    SUM   29.0</span></span>
+<span><span class="co"># 3    0    8   x     Q1    2.0</span></span>
+<span><span class="co"># 4    0    8   x     Q3    5.5</span></span>
+<span><span class="co"># 5    0    8   z MEDIAN   65.0</span></span>
+<span><span class="co"># 6    0    8   z    SUM  506.0</span></span>
+<span><span class="co"># 7    0    8   z     Q1   57.5</span></span>
+<span><span class="co"># 8    0    8   z     Q3   75.5</span></span></code></pre></div>
 <p>Next: <a href="procs-dm.html">Data Manipulation</a></p>
 </div>
   </div>

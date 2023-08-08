@@ -138,6 +138,7 @@ values.  Note that any class groupings are nested in the by.
 res2 <- proc_means(dt, var = Freq, 
                    class = Hair,
                    by = Sex,
+                   options = c(maxdec = 4),
                    titles = "Hair and Eye Summary Statistics by Sex")
 
 ```
