@@ -248,10 +248,10 @@ log_close()
 
 
 # Uncomment to view report
-file.show(res$modified_path)
+# file.show(res$modified_path)
 
 # Uncomment to view log
-file.show(lf)
+# file.show(lf)
 
 ```
 ## Output
