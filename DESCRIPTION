@@ -29,7 +29,7 @@ Description: Contains functions to simulate the most commonly used
     all statistics with the highest fidelity possible. 
 License: CC0
 Encoding: UTF-8
-URL: https://procs.r-sassy.org
+URL: https://procs.r-sassy.org, https://github.com/dbosak01/procs
 BugReports: https://github.com/dbosak01/procs/issues
 Depends: R (>= 3.6.0),
          common

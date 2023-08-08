@@ -126,8 +126,8 @@ package.
 PROC COMPARE?
 
 **A:** There are already several dataset comparison packages in R, such as
-[diffdf](https://cran.r-project.org/web/packages/diffdf/vignettes/diffdf-basic.html)
-and [comparedf](https://cran.r-project.org/web/packages/arsenal/vignettes/comparedf.html).
+[diffdf](https://cran.r-project.org/package=diffdf)
+and [comparedf](https://cran.r-project.org/package=compareDF).
 The functionality of these packages is also similar to SAS® PROC COMPARE.
 If you wish to do dataset comparisons, please research these existing packages.
 
