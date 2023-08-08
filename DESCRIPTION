@@ -1,6 +1,6 @@
 Package: procs
 Type: Package
-Title: Recreates some SAS® procedures in R
+Title: Recreates Some SAS® Procedures in R
 Version: 1.0.0
 Authors@R: c(
     person(given = "David",
