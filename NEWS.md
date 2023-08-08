@@ -1,6 +1,6 @@
-# procs 1.0.0
+# procs 1.0.1
 
-* Prepare for initial release.
+* Release to CRAN.
 
 # procs 0.0.9008
 
