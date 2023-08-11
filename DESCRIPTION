@@ -1,7 +1,7 @@
 Package: procs
 Type: Package
-Title: Recreates Some SAS® Procedures in R
-Version: 1.0.1
+Title: Recreates Some 'SAS®' Procedures in 'R'
+Version: 1.0.2
 Authors@R: c(
     person(given = "David",
            family = "Bosak",
@@ -15,6 +15,10 @@ Authors@R: c(
            family = "Varney",
            role = c("ctb"),
            email = "brian.varney@experis.com"),
+    person(given = "Duong",
+           family = "Tran",
+           role = c("ctb"),
+           email = "trand000@aol.com"),
     person(given = "Yifei",
            family = "Chen",
            role = c("ctb"),
@@ -22,8 +26,8 @@ Authors@R: c(
            )
 Maintainer: David Bosak <dbosak01@gmail.com>
 Description: Contains functions to simulate the most commonly used 
-    SAS® procedures.  Specifically, the package aims to 
-    simulate the functionality of SAS® 'proc freq', 'proc means',
+    'SAS®' procedures.  Specifically, the package aims to 
+    simulate the functionality of 'proc freq', 'proc means',
     'proc transpose', 'proc sort', and 'proc print'. 
     The simulation will include recreating 
     all statistics with the highest fidelity possible. 

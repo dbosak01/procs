@@ -23,7 +23,7 @@ requested tables in a named list."><meta property="og:image" content="https://pr
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">procs</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.0.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.0.2</span>
       </span>
     </div>
 
@@ -221,8 +221,6 @@ Column names have been standardized, and additional variables may
 be present to help with data manipulation.  In addition, data values in the
 output datasets are not rounded or formatted
 to give you the most accurate statistical results.</p>
-<p>If you want to order the frequency categories, define the tables
-variable as a factor in the desired order.</p>
     </div>
     <div id="frequency-weight">
     <h2>Frequency Weight</h2>
@@ -292,8 +290,9 @@ column on the output and interactive tables.  By default, the N column
 will be included.  The "nonobs" option turns it off.</p></li>
 <li><p><strong>norow</strong>: Whether to include the row percentages on two-way
 crosstab tables. The "norow" option will turn them off.</p></li>
-<li><p><strong>nosparse</strong>: Whether to include categories for which there are no
-frequency counts.  Zero-count categories will be included by default.  If the
+<li><p><strong>nosparse/sparse</strong>: Whether to include categories for which there are no
+frequency counts.  Zero-count categories will be included by default, which
+is the "sparse" option.  If the
 "nosparse" option is present, zero-count categories will be removed.</p></li>
 <li><p><strong>notable</strong>: Whether to include the frequency table in the output
 dataset list. Normally, the frequency table is included.  You may want to
@@ -309,6 +308,28 @@ are in rows.</p></li>
 be returned in "wide" form, such that statistics are across the top in
 columns, and levels are in rows.</p></li>
 </ul></div>
+    <div id="using-factors">
+    <h2>Using Factors</h2>
+    
+
+<p>There are some occasions when you may want to define the <code>tables</code> variable
+or <code>by</code> variables as a factor. One occasion is for sorting/ordering,
+and the other is for obtaining zero-counts on sparse data.</p>
+<p>To order the frequency categories in the frequency output, define the
+<code>tables</code> variable as a factor in the desired order. The function will
+then retain that order for the frequency categories in the output dataset
+and report.</p>
+<p>You may also wish to
+define the tables variable as a factor if you are dealing with sparse data
+and some of the frequency categories are not present in the data. To ensure
+these categories are displayed with zero-counts, define the <code>tables</code> variable
+or <code>by</code> variable
+as a factor and use the "sparse" option.  Note
+that the "sparse" option is actually the default.</p>
+<p>If you do not want to
+show the zero-count categories on a variable that is defined as a factor,
+pass the "nosparse" keyword on the <code>options</code> parameter.</p>
+    </div>
     <div id="see-also">
     <h2>See also</h2>
     <div class="dont-index"><p>For summary statistics, see <code><a href="proc_means.html">proc_means</a></code>.  To pivot

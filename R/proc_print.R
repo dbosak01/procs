@@ -68,7 +68,7 @@ proc_print <- function(data, file_path = NULL, output_type = "HTML",
 
   }
 
-  if (view == TRUE) {
+  if (view == TRUE && interactive()) {
 
 
     vrfl <- tempfile()

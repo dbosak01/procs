@@ -54,9 +54,6 @@
 #' output datasets are not rounded or formatted
 #' to give you the most accurate statistical results.
 #'
-#' If you want to order the frequency categories, define the tables
-#' variable as a factor in the desired order.
-#'
 #' @section Frequency Weight:
 #' Normally the \code{proc_freq} function counts each row in the
 #' input data equally. In some cases, however, each row in the data
@@ -133,8 +130,9 @@
 #' \item{\strong{norow}: Whether to include the row percentages on two-way
 #' crosstab tables. The "norow" option will turn them off.
 #' }
-#' \item{\strong{nosparse}: Whether to include categories for which there are no
-#' frequency counts.  Zero-count categories will be included by default.  If the
+#' \item{\strong{nosparse/sparse}: Whether to include categories for which there are no
+#' frequency counts.  Zero-count categories will be included by default, which
+#' is the "sparse" option.  If the
 #' "nosparse" option is present, zero-count categories will be removed.
 #' }
 #' \item{\strong{notable}: Whether to include the frequency table in the output
@@ -155,6 +153,28 @@
 #' columns, and levels are in rows.
 #' }
 #' }
+#' @section Using Factors:
+#' There are some occasions when you may want to define the \code{tables} variable
+#' or \code{by} variables as a factor. One occasion is for sorting/ordering,
+#' and the other is for obtaining zero-counts on sparse data.
+#'
+#' To order the frequency categories in the frequency output, define the
+#' \code{tables} variable as a factor in the desired order. The function will
+#' then retain that order for the frequency categories in the output dataset
+#' and report.
+#'
+#' You may also wish to
+#' define the tables variable as a factor if you are dealing with sparse data
+#' and some of the frequency categories are not present in the data. To ensure
+#' these categories are displayed with zero-counts, define the \code{tables} variable
+#' or \code{by} variable
+#' as a factor and use the "sparse" option.  Note
+#' that the "sparse" option is actually the default.
+#'
+#' If you do not want to
+#' show the zero-count categories on a variable that is defined as a factor,
+#' pass the "nosparse" keyword on the \code{options} parameter.
+#'
 #' @param data The input data frame to perform frequency calculations on.
 #' Input data as the first parameter makes this function pipe-friendly.
 #' @param tables The variable or variables to perform frequency counts on.
@@ -429,7 +449,7 @@ proc_freq <- function(data,
     rptflg <- TRUE
   }
 
-  if (has_view(options))
+  if (has_view(options) && interactive())
     view <- TRUE
   else
     view <- FALSE
@@ -1426,53 +1446,74 @@ get_nlevels <- function(data, var1, var2 = NULL, byvars = NULL,
 
 # Appends missing combination to data frame and
 # adds a variable __cnt by which you can count correctly.
-get_nway_zero_fills <- function(data, outs, by, weight = NULL) {
+get_nway_zero_fills <- function(data, outs, by = NULL, weight = NULL, options = NULL) {
 
-  # Get table variable vectors
-  if ("list" %in% class(outs))
-    ots <- get_output_tables(outs)
-  else
-    ots <- outs
 
-  # Split into vectors
-  tbls <- get_table_list(ots)
+  if (option_true(options, "nosparse", FALSE) ) {
 
-  # Set count value on existing records
-  if (is.null(weight)) {
+    if (is.null(weight))
+      data[["__cnt"]] <- 1
+    else
+      data[["__cnt"]] <- data[[weight]]
 
-    data[["__cnt"]] <- 1
+    ret <- data
+
   } else {
-    data[["__cnt"]] <- data[[weight]]
-  }
 
-  ret <- data
+    # Get table variable vectors
+    if ("list" %in% class(outs))
+      ots <- get_output_tables(outs)
+    else
+      ots <- outs
 
-  for (i in seq_len(length(tbls))) {
+    # Split into vectors
+    tbls <- get_table_list(ots)
 
-    tb <- tbls[[i]]
+    # Set count value on existing records
+    if (is.null(weight)) {
 
-    v1 <- list()
-    # Get unique values of target var
-    for (i in seq_len(length(tb))) {
-      v1[[tb[i]]] <- names(sort(table(as.character(data[[tb[i]]]))))
+      data[["__cnt"]] <- 1
+    } else {
+      data[["__cnt"]] <- data[[weight]]
     }
 
-    # Get unique by values
-    if (!is.null(by)) {
-      for (i in seq_len(length(by))) {
+    ret <- data
 
-        v1[[by[i]]] <- names(sort(table(as.character(data[[by[i]]]))))
+    for (i in seq_len(length(tbls))) {
+
+      tb <- tbls[[i]]
+
+      v1 <- list()
+      # Get unique values of target var
+      for (i in seq_len(length(tb))) {
+        if (is.factor(data[[tb[i]]])) {
+          v1[[tb[i]]] <- levels(data[[tb[i]]])
+        } else {
+          v1[[tb[i]]] <- names(sort(table(as.character(data[[tb[i]]]))))
+        }
       }
+
+      # Get unique by values
+      if (!is.null(by)) {
+        for (i in seq_len(length(by))) {
+          if (is.factor(data[[by[i]]])) {
+            v1[[by[i]]] <- levels(data[[by[i]]])
+          } else {
+            v1[[by[i]]] <- names(sort(table(as.character(data[[by[i]]]))))
+          }
+        }
+      }
+
+      # Expand combinations
+      ex <- expand.grid(v1, stringsAsFactors = FALSE)
+
+      # Zero fill combinations
+      ex[["__cnt"]] <- 0
+
+      # Merge combinations onto original data
+      ret <- merge(ret, ex, sort = FALSE, all = TRUE)
     }
 
-    # Expand combinations
-    ex <- expand.grid(v1, stringsAsFactors = FALSE)
-
-    # Zero fill combinations
-    ex[["__cnt"]] <- 0
-
-    # Merge combinations onto original data
-    ret <- merge(ret, ex, sort = FALSE, all = TRUE)
   }
 
   return(ret)
@@ -1532,16 +1573,8 @@ gen_report_freq <- function(data,
   # print(print_location)
   # browser()
 
-  dta <- data
   # Deal with sparse option
-  if (!option_true(options, "nosparse", FALSE) & !is.null(by)) {
-    dta <- get_nway_zero_fills(data, tables, by, weight)
-  } else {
-    if (is.null(weight))
-      dta[["__cnt"]] <- 1
-    else
-      dta[["__cnt"]] <- dta[[weight]]
-  }
+  dta <- get_nway_zero_fills(data, tables, by, weight, options)
   wgt <- "__cnt"
 
   bylbls <- c()
@@ -1749,16 +1782,8 @@ gen_output_freq <- function(data,
                             weight = NULL,
                             output = NULL) {
 
-  dta <- data
   # Deal with sparse option
-  if (!option_true(options, "nosparse", FALSE) & !is.null(by)) {
-    dta <- get_nway_zero_fills(data, output, by, weight)
-  } else {
-   if (is.null(weight))
-     dta[["__cnt"]] <- 1
-   else
-     dta[["__cnt"]] <- dta[[weight]]
-  }
+  dta <- get_nway_zero_fills(data, output, by, weight, options)
   wgt <- "__cnt"
 
   byvals <- list()

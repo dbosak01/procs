@@ -1,6 +1,10 @@
-# procs 1.0.1
+# procs 1.0.2
 
-* Release to CRAN.
+* Fixed 'class' parameter on 'proc_freq()'.
+* Fixed sparse output when variables are defined as factors.
+* Put interactive() condition on viewer functions so as not to produce 
+unnecessary temp files in batch sessions.
+* Released to CRAN.
 
 # procs 0.0.9008
 

@@ -1973,6 +1973,38 @@ test_that("freq66: nonobs keyword works as expected.", {
 })
 
 
+test_that("freq67: factor with sparse show zero counts.", {
+
+
+  datsp <- dat
+
+  datsp$Eyes <- ifelse(datsp$Eyes == "green", "brown", datsp$Eyes)
+
+
+  datsp$Eyes <- factor(datsp$Eyes, levels = c("green", "brown", "blue"))
+
+
+  res1 <- proc_freq(datsp, tables = c("Eyes"),
+                    output = all,
+                    options = nosparse,
+                    titles = "Eye and Hair Color of European Children")
+
+  res1
+
+
+  res2 <- proc_freq(datsp, tables = c("Eyes"),
+                    output = all,
+                    options = sparse,
+                    titles = "Eye and Hair Color of European Children")
+
+  res2
+
+  expect_equal(as.character(res1$CAT), c("brown", "blue"))
+  expect_equal(as.character(res2$CAT), c("green", "brown", "blue"))
+
+
+})
+
 # test_that("freq67: outexpect keyword works as expected.", {
 #
 #   res <- proc_freq(dat, tables = v(Eyes * Hair),

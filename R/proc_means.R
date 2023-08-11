@@ -362,7 +362,7 @@ proc_means <- function(data,
     rptnm <- "report"
   }
 
-  if (has_view(options))
+  if (has_view(options) && interactive())
     view <- TRUE
   else
     view <- FALSE

@@ -121,9 +121,6 @@ Column names have been standardized, and additional variables may
 be present to help with data manipulation.  In addition, data values in the
 output datasets are not rounded or formatted
 to give you the most accurate statistical results.
-
-If you want to order the frequency categories, define the tables
-variable as a factor in the desired order.
 }
 
 \section{Frequency Weight}{
@@ -207,8 +204,9 @@ will be included.  The "nonobs" option turns it off.
 \item{\strong{norow}: Whether to include the row percentages on two-way
 crosstab tables. The "norow" option will turn them off.
 }
-\item{\strong{nosparse}: Whether to include categories for which there are no
-frequency counts.  Zero-count categories will be included by default.  If the
+\item{\strong{nosparse/sparse}: Whether to include categories for which there are no
+frequency counts.  Zero-count categories will be included by default, which
+is the "sparse" option.  If the
 "nosparse" option is present, zero-count categories will be removed.
 }
 \item{\strong{notable}: Whether to include the frequency table in the output
@@ -229,6 +227,30 @@ be returned in "wide" form, such that statistics are across the top in
 columns, and levels are in rows.
 }
 }
+}
+
+\section{Using Factors}{
+
+There are some occasions when you may want to define the \code{tables} variable
+or \code{by} variables as a factor. One occasion is for sorting/ordering,
+and the other is for obtaining zero-counts on sparse data.
+
+To order the frequency categories in the frequency output, define the
+\code{tables} variable as a factor in the desired order. The function will
+then retain that order for the frequency categories in the output dataset
+and report.
+
+You may also wish to
+define the tables variable as a factor if you are dealing with sparse data
+and some of the frequency categories are not present in the data. To ensure
+these categories are displayed with zero-counts, define the \code{tables} variable
+or \code{by} variable
+as a factor and use the "sparse" option.  Note
+that the "sparse" option is actually the default.
+
+If you do not want to
+show the zero-count categories on a variable that is defined as a factor,
+pass the "nosparse" keyword on the \code{options} parameter.
 }
 
 \examples{
