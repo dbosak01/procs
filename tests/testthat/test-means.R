@@ -522,10 +522,21 @@ test_that("means22: gen_output_means works.", {
 
 test_that("means23: get_class works.", {
 
-  res <- get_class(datm, var = c("PresentScore", "TasteScore"),
+  res <- get_class_report(datm, var = c("PresentScore", "TasteScore"),
                    class = "Layers",
                    outp = out(stats = c("n", "mean", "min", "max"),
                                  shape = "wide"))
+
+
+  res
+
+  expect_equal(nrow(res), 6)
+
+
+  res <- get_class_output(datm, var = c("PresentScore", "TasteScore"),
+                   class = "Layers",
+                   outp = out(stats = c("n", "mean", "min", "max"),
+                              shape = "wide"))
 
 
   res
@@ -664,7 +675,7 @@ test_that("means29: 2 class vars works.", {
 
   res
 
-  expect_equal(nrow(res), 50)
+  expect_equal(nrow(res), 85)
   expect_equal(ncol(res), 8)
 
 })
@@ -687,7 +698,7 @@ test_that("means30: by and 2 class vars works.", {
 
   res
 
-  expect_equal(nrow(res), 65)
+  expect_equal(nrow(res), 125)
   expect_equal(ncol(res), 9)
   expect_equal(all(c("BY") %in% names(res)), TRUE)
 
@@ -720,7 +731,17 @@ test_that("means32: get_class works with empty data frame.", {
 
   dftmp <- datm[datm$Layers == 42, ]
 
-  res <- get_class(dftmp, var = c("PresentScore", "TasteScore"),
+  res <- get_class_report(dftmp, var = c("PresentScore", "TasteScore"),
+                   class = "Layers",
+                   outp = out(stats = c("n", "mean", "min", "max"),
+                              shape = "wide"))
+
+
+  res
+
+  expect_equal(nrow(res), 2)
+
+  res <- get_class_output(dftmp, var = c("PresentScore", "TasteScore"),
                    class = "Layers",
                    outp = out(stats = c("n", "mean", "min", "max"),
                               shape = "wide"))
@@ -1202,7 +1223,7 @@ test_that("means52: default statistics work as expected.", {
 test_that("means53: various statistics work as expected.", {
 
   res <- proc_means(datm, var = v(Age, PresentScore, TasteScore, Layers),
-                    stats = v(n, mean,  uss, var, sum, nobs, cv, css),
+                    stats = v(n, mean,  uss, vari, sum, nobs, cv, css),
                     titles = c("Test"))
 
   expect_equal(res[1, "N"], 20)
@@ -1244,52 +1265,92 @@ test_that("means52: default variables work as expected.", {
 
 })
 
-# test_that("means50: where works before and after rename.", {
-#
-#   var1 <- c("Age", "PresentScore", "TasteScore")
-#   var2 <- c("n", "min", "max", "mean", "std")
-#
-#   res <- proc_means(datm, var = var1,
-#                     stats = var2,
-#                     class = Layers,
-#                     titles = "My first title for Means",
-#                     out = out(shape = "wide",
-#                               rename = list(CLASS = "Layers"),
-#                               where = expression(Layers == 2)))
-#   res
-#
-#   expect_equal(nrow(res), 3)
-#
-#   res <- proc_means(datm, var = var1,
-#                     stats = var2,
-#                     class = Layers,
-#                     titles = "My first title for Means",
-#                     out = out(shape = "wide",
-#                               rename = list(CLASS = "Layers"),
-#                               where = expression(CLASS == 2)))
-#   res
-#
-#   expect_equal(nrow(res), 3)
-#
-# })
+test_that("means53: Multiple class vars match SAS.", {
+
+  datmr <- read.table(header = TRUE, text = '
+    LastName  Age PresentScore TasteScore Flavor Layers Region
+    Orlando     27 93 80  Vanilla    1 1
+    Ramey       32 84 72  Rum        2 1
+    Goldston    46 68 75  Vanilla    1 1
+    Roe         38 79 73  Vanilla    2 1
+    Larsen      23 77 84  Chocolate  3 1
+    Davis       51 86 91  Spice      3 1
+    Strickland  19 82 79  Chocolate  1 1
+    Nguyen      57 77 84  Vanilla    3 1
+    Hildenbrand 33 81 83  Chocolate  1 1
+    Byron       62 72 87  Vanilla    2 1
+    Sanders     26 56 79  Chocolate  1 2
+    Jaeger      43 66 74  NA         1 2
+    Davis       28 69 75  Chocolate  2 2
+    Conrad      69 85 94  Vanilla    1 2
+    Walters     55 67 72  Chocolate  2 2
+    Rossburger  28 78 81  Spice      2 2
+    Matthew     42 81 92  Chocolate  2 2
+    Becker      36 62 83  Spice      2 2
+    Anderson    27 87 85  Chocolate  1 2
+    Merritt     62 73 84  Chocolate  1 2
+    ')
 
 
 
+  res <- proc_means(datmr,
+                    var = c("Age", "PresentScore", "TasteScore"),
+                    stats = c("n", "min", "max", "mean", "std"),
+                    output = c("all", "report"),
+                    class = c("Region", "Layers"),
+                    titles = "My first title for Means",
+                    options = c("long", maxdec = 4))
+
+  res
+
+
+  expect_equal(nrow(res$out), 55)
+  expect_equal(ncol(res$out), 8)
+
+  expect_equal(nrow(res$report[[1]]), 15)
+  expect_equal(ncol(res$report[[1]]), 8)
+
+
+
+  res <- proc_means(datmr,
+                    var = c("Age", "PresentScore", "TasteScore"),
+                    stats = c("n", "min", "max", "mean", "std"),
+                    output = c("all", "report"),
+                    class = c("Region", "Layers", "Flavor"),
+                    titles = "My first title for Means",
+                    options = c("long", maxdec = 4))
+
+  res
+
+
+  expect_equal(nrow(res$out), 210)
+  expect_equal(ncol(res$out), 9)
+
+  expect_equal(nrow(res$report[[1]]), 33)
+  expect_equal(ncol(res$report[[1]]), 9)
+
+
+})
+
+
+
+# proc_means(datm, var = v(Age, PresentScore, TasteScore, Layers),
+#            stats = c("css", "cv", "lclm", "mode",  "nobs"),
+#            options = v(maxdec = 4),
+#            titles = "Summary of Presentation and Taste Scores")
 #
-# test_that("means47: aov statistic works with by.", {
+# proc_means(datm, var = v(Age, PresentScore, TasteScore, Layers),
+#            stats = c("p1", "p5", "p10", "p20", "p25", "p30", "p40", "p50"),
+#            options = v(maxdec = 4),
+#            titles = "Summary of Presentation and Taste Scores")
 #
-#   var1 <- c("Age", "PresentScore", "TasteScore")
-#   var2 <- c("n", "min", "max", "mean", "std", "aov")
-#
-#   res <- proc_means(datm, var = var1,
-#                     stats = var2,
-#                     by = Layers,
-#                     titles = "My first title for Means",
-#                     out = out())
-#
-#   res
-#
-#   expect_equal(1, 1)
-#
-# })
-#
+# proc_means(datm, var = v(Age, PresentScore, TasteScore, Layers),
+#            stats = c("p60", "p70", "p75", "p80", "p90", "p95", "p99"),
+#            options = v(maxdec = 4),
+#            titles = "Summary of Presentation and Taste Scores")
+# proc_means(datm, var = v(Age, PresentScore, TasteScore, Layers),
+#            stats = c("q1", "q3", "qrange", "range", "sum", "uclm", "vari"),
+#            options = v(maxdec = 4),
+#            titles = "Summary of Presentation and Taste Scores")
+
+

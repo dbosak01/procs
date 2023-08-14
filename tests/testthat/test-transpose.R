@@ -313,7 +313,7 @@ test_that("transpose13: copy parameter works recycle smaller", {
 
   mns <- proc_means(datm, stats = c("n", "mean", "median", "min", "max"),
                     var = "Age", class = "Flavor",
-                    options = v(out, notype, nonobs))
+                    options = v(notype, nonobs))
 
   mns[1, 1] <- "Total"
   mns

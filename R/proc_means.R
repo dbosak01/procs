@@ -74,7 +74,7 @@
 #'   \item{\strong{stderr}: Standard error.}
 #'   \item{\strong{sum}: The sum of variable values.}
 #'   \item{\strong{uss}: Uncorrected sum of squares.}
-#'   \item{\strong{var}: The variance.}
+#'   \item{\strong{vari}: The variance.}
 #' }
 #' The function supports the following keywords to perform hypothesis testing:
 #' \itemize{
@@ -137,7 +137,7 @@
 #' "p50", "p60", "p70", "p75", "p80", "p90",
 #' "p95", "p99", "q1", "q3", "qrange", "range", "skew", "skewness",
 #' "std", "stderr", "sum",
-#' "uclm", "uss", and "var". For hypothesis testing, the function
+#' "uclm", "uss", and "vari". For hypothesis testing, the function
 #' supports "t", "prt", "probt", and "df".
 #' Default statistics are: "n", "mean", "std",
 #' "min", and "max".
@@ -333,7 +333,7 @@ proc_means <- function(data,
     stop("stats parameter is required.")
   } else {
     st <- c( "css", "cv", "n", "mean", "median", "std", "min", "max",
-             "nmiss", "nobs", "range", "sum", "stderr", "var", "clm", "uclm",
+             "nmiss", "nobs", "range", "sum", "stderr", "vari", "clm", "uclm",
              "lclm","mode", "q1", "q3", "p1", "p5", "p10", "p20",
              "p25", "p30", "p40",
              "p50", "p60", "p70", "p75", "p80", "p90",
@@ -539,7 +539,8 @@ get_output_specs_means <- function(outs, stats, opts) {
 # These subsets will get stacked up in the driver function.
 get_output <- function(data, var, stats, missing = FALSE,
                              shape = "wide", type = NULL, freq = FALSE,
-                             by = NULL, class = NULL, opts = NULL) {
+                             by = NULL, class = NULL, opts = NULL,
+                             keep_names = FALSE) {
 
   if (is.null(stats))
     stats <- c("n", "mean", "std", "min", "max")
@@ -559,10 +560,15 @@ get_output <- function(data, var, stats, missing = FALSE,
     # Create a new vector of class names and values
     cv <- class
 
-    if (length(cv) == 1)
-      cnms <- "CLASS"
-    else
-      cnms <- paste0("CLASS", seq(1, length(cv)))
+    if (keep_names) {
+      cnms <- names(class)
+    } else {
+      if (length(cv) == 1)
+        cnms <- "CLASS"
+      else
+        cnms <- paste0("CLASS", seq(1, length(cv)))
+
+    }
 
     names(cv) <- cnms
 
@@ -731,7 +737,7 @@ get_summaries <- function(data, var, stats, missing = FALSE,
           }
         }
 
-        if (st == "var") {
+        if (st == "vari") {
 
           rw[["VARI"]] <- var(var, na.rm = narm)
         }
@@ -1004,14 +1010,20 @@ sprintf("hello %s%% there", 23)
 # Drivers --------------------------------------------------------------------
 mlbls <- list(MEAN = "Mean", STD = "Std Dev", MEDIAN = "Median", MIN = "Minimum",
               MAX = "Maximum", VAR = "Variable", STDERR = "Std Err",
-              STAT = "Statistics", VARI = "Variance", QRANGE = "Quantile Range",
+              STAT = "Statistics", VARI = "Variance", QRANGE = "Quartile Range",
               RANGE = "Range", MODE = "Mode", NMISS = "NMiss",
               LCLM = "Lower %s%% CL for Mean", UCLM = "Upper %s%% CL for Mean",
               TYPE = "Type", FREQ = "Frequency", SUM = "Sum", "T" = "t Value",
               PRT = "Pr > |t|", PROBT = "Pr > |t|", DF = "DF",
               USS = "Uncorrected SS", CV = "Coeff of Variation",
               CSS = "Corrected SS", VARI = "Variance", SKEW = "Skewness",
-              KURT = "Kurtosis")
+              KURT = "Kurtosis", P1 = "1st Pctl", P5 = "5th Pctl", P10 = "10th Pctl",
+              P20 = "20th Pctl", P25 = "25th Pctl", P30 = "30th Pctl",
+              P40 = "40th Pctl", P50 = "50th Pctl", P60 = "60th Pctl",
+              P70 = "70th Pctl", P75 = "75th Pctl", P80 = "80th Pctl",
+              P90 = "90th Pctl", P95 = "95th Pctl", P99 = "99th Pctl",
+              Q1 = "Lower Quartile", Q3 = "Upper Quartile"
+              )
 
 #' @import common
 gen_report_means <- function(data,
@@ -1076,7 +1088,7 @@ gen_report_means <- function(data,
     # data, var, class, outp, freq = TRUE,
     # type = NULL, byvals = NULL
     outp <- out(stats = stats, shape = "wide")
-    smtbl <- get_class(dt, var, class, outp, freq = FALSE, opts = opts)
+    smtbl <- get_class_report(dt, var, class, outp, freq = FALSE, opts = opts)
 
     aov <- NULL
     # Get aov if requested
@@ -1178,6 +1190,77 @@ gen_report_means <- function(data,
   return(res)
 
 }
+
+
+
+get_class_report <- function(data, var, class, outp, freq = TRUE,
+                             type = NULL, byvals = NULL, weight = NULL, opts = NULL) {
+
+
+  res <- NULL
+  aovds <- NULL
+
+  clslist <- list(data)
+  cnms <- NULL
+  if (!is.null(class)) {
+    clslist <- split(data, data[ , class], sep = "|", drop = TRUE)
+    cnms <- names(clslist)
+    if (length(clslist) == 0) {
+
+      clslist <- list(data)
+      cnms <- class
+
+    }
+
+  }
+
+
+
+
+  for (k in seq_len(length(clslist))) {
+
+    cnmv <- NULL
+    if (!is.null(cnms)) {
+      cnmv <- strsplit(cnms[k], "|", fixed = TRUE)[[1]]
+      names(cnmv) <- class
+
+    }
+
+
+    tmpres <- get_output(clslist[[k]], var = var,
+                         by = byvals,
+                         class = cnmv,
+                         stats = outp$stats,
+                         shape = outp$shape,
+                         freq = freq,
+                         type = type,
+                         opts = opts)
+
+
+
+
+    if (!is.null(res))
+      res <- rbind(res, tmpres)
+    else
+      res <- tmpres
+  }
+
+  if (!is.null(class)) {
+    clsnms <- "CLASS"
+    if (length(class) > 1) {
+
+      clsnms <- paste0("CLASS", seq(1, length(class)))
+    }
+
+    res <-  sort(res, by = clsnms)
+    rownames(res) <- NULL
+  }
+
+
+  return(res)
+}
+
+
 #' @import fmtr
 #' @import common
 gen_output_means <- function(data,
@@ -1255,13 +1338,13 @@ gen_output_means <- function(data,
 
         # Always add type 0
         tmpby <- get_output(dat, var = var,
-                             by = bynm,
-                             class = cls,
-                             stats = outp$stats,
-                             shape = outp$shape,
-                             freq = frq,
-                             type = tp,
-                             opts = opts)
+                            by = bynm,
+                            class = cls,
+                            stats = outp$stats,
+                            shape = outp$shape,
+                            freq = frq,
+                            type = tp,
+                            opts = opts)
 
         if (is.null(tmpres))
           tmpres <- tmpby
@@ -1274,41 +1357,14 @@ gen_output_means <- function(data,
           if (!is.null(tp))
             tp <- 1
 
-          # if (all(outp$stats == "aov")) {
-          #
-          #
-          #   bylbl <- NULL
-          #   if (!is.null(by))
-          #     bylbl <- bylbls[j]
-          #
-          #   for (vr in var) {
-          #     if (is.null(weight)) {
-          #       tmpaov <- get_aov(dat, vr, class, bylbl = bylbl, output = TRUE)
-          #     } else {
-          #       tmpaov <- get_aov(dat, vr, class, weight, bylbl = bylbl,
-          #                         output = TRUE)
-          #     }
-          #
-          #     tmpres <- rbind(tmpres, tmpaov)
-          #
-          #   }
-          #
-          # } else if (any(outp$stats == "aov")) {
-          #
-          #     tmpcls <- get_class(dat, var = var,
-          #                         class = class, outp = outp,
-          #                         freq = frq, type = tp, byvals = bynm)
-          #
-          #     tmpres <- rbind(tmpres, tmpcls)
-          #
-          #
-          # } else {
-            tmpcls <- get_class(dat, var = var,
-                                class = class, outp = outp,
-                                freq = frq, type = tp, byvals = bynm, opts = opts)
 
-            tmpres <- rbind(tmpres, tmpcls)
-          #}
+          tmpcls <- get_class_output(dat, var = var,
+                              class = class, outp = outp,
+                              freq = frq, type = tp, byvals = bynm, opts = opts,
+                              stats = outp$stats)
+
+          tmpres <- rbind(tmpres, tmpcls)
+
         }
       }
 
@@ -1386,104 +1442,140 @@ gen_output_means <- function(data,
 
 }
 
-
-get_class <- function(data, var, class, outp, freq = TRUE,
-                      type = NULL, byvals = NULL, weight = NULL, opts = NULL) {
+#' @import utils
+get_class_output <- function(data, var, class, outp, freq = TRUE,
+                      type = NULL, byvals = NULL, weight = NULL,
+                      opts = NULL, stats = NULL) {
 
 
   res <- NULL
-  aovds <- NULL
 
-  clslist <- list(data)
-  cnms <- NULL
-  if (!is.null(class)) {
-    clslist <- split(data, data[ , class], sep = "|", drop = TRUE)
-    cnms <- names(clslist)
-    if (length(clslist) == 0) {
+  if (is.null(class)) {
 
-      clslist <- list(data)
-      cnms <- class
+    res <- get_output(data, var = var,
+                         by = byvals,
+                         class = NULL,
+                         stats = outp$stats,
+                         shape = outp$shape,
+                         freq = freq,
+                         type = type,
+                         opts = opts)
+
+
+  } else {
+
+    # Create name lookup
+    if (length(class) == 1)
+      clsnms <- "CLASS"
+    else
+      clsnms <- paste0("CLASS", seq(1, length(class)))
+
+    names(clsnms) <- class
+
+    tp <- 1
+
+    for (i in seq_len(length(class))) {
+
+      cbm <- combn(class, i, simplify = FALSE)
+
+      #for (j in seq_len(length(cbm))) {
+      for (j in seq(length(cbm), 1, -1)) {
+
+        tmpcls <- cbm[[j]]
+
+        clslist <- split(data, data[ , tmpcls], sep = "|", drop = TRUE)
+        cnms <- names(clslist)
+        if (length(clslist) == 0) {
+
+          clslist <- list(data)
+          cnms <- tmpcls
+
+        }
+
+
+        for (k in seq_len(length(clslist))) {
+
+          cnmv <- NULL
+          if (!is.null(cnms)) {
+            cnmv <- strsplit(cnms[k], "|", fixed = TRUE)[[1]]
+            names(cnmv) <- tmpcls
+
+          }
+
+
+          tmpres <- get_output(clslist[[k]], var = var,
+                               by = byvals,
+                               class = cnmv,
+                               stats = outp$stats,
+                               shape = outp$shape,
+                               freq = freq,
+                               type = tp,
+                               opts = opts,
+                               keep_names = TRUE)
+
+          # Translate names so they merge properly
+          tmpnms <- names(tmpres)
+          names(tmpres) <- ifelse(tmpnms %in% class, clsnms[tmpnms], tmpnms)
+
+
+          if (!is.null(res))
+            res <- merge(res, tmpres, all = TRUE, no.dups = FALSE)
+          else
+            res <- tmpres
+        }
+
+        tp <- tp + 1
+
+      }
+
+
+
 
     }
 
-    # Append aov stats here
-    # AOV requires all the class variables, therefore
-    # they can't be calculated in get_summaries.
-    if (any("aov" %in% outp$stats)) {
-    #   for (vr in var) {
-    #     if (is.null(weight)) {
-    #       tmpaov <- get_aov(data, vr, class, bylbl = byvals,
-    #                         output = TRUE, resid = FALSE)
-    #     } else {
-    #       tmpaov <- get_aov(data, vr, class, weight, bylbl = byvals,
-    #                         output = TRUE, resid = FALSE)
-    #     }
-    #
-    #     if (is.null(aovds))
-    #       aovds <- tmpaov
-    #     else
-    #       aovds <- rbind(aovds, tmpaov)
-    #
-    #   }
-    }
-  }
+    if ("STAT" %in% names(res)) {
+        # Sort stats by supplied order
+        res[["STAT"]] <- factor(res[["STAT"]], levels = toupper(stats))
 
+        # Deal with NA values in sort
+        ccnms <- as.character(clsnms)
+        for (cnm in ccnms) {
 
+          res[[cnm]] <- ifelse(is.na(res[[cnm]]), "...", res[[cnm]])
+        }
 
+        # Sort
+        res <- sort(res, by = c("TYPE", ccnms, "STAT"))
 
-  for (k in seq_len(length(clslist))) {
+        # Restore stat column
+        res[["STAT"]] <- as.character(res[["STAT"]])
 
-    cnmv <- NULL
-    if (!is.null(cnms)) {
-      cnmv <- strsplit(cnms[k], "|", fixed = TRUE)[[1]]
-      names(cnmv) <- class
+        # Restore CLASS columns
+        for (cnm in ccnms) {
 
-    }
-
-    if (!is.null(aovds)) {
-
-      # tmpres <- get_output(clslist[[k]], var = var,
-      #                      by = byvals,
-      #                      class = cnmv,
-      #                      stats = outp$stats,
-      #                      shape = "wide",
-      #                      freq = freq,
-      #                      type = type,
-      #                      opts = opts)
-      #
-      # tmpres <- cbind(tmpres, aovds[ , c("AOV.DF", "AOV.SUMSQ",
-      #                                    "AOV.MEANSQ", "AOV.F", "AOV.P")])
-      #
-      # cpvars <- c("CLASS")
-      # if (!is.null(type))
-      #   cpvars[length(cpvars) + 1] <- "TYPE"
-      #
-      # if (freq == TRUE)
-      #   cpvars[length(cpvars) + 1] <- "FREQ"
-      #
-      # tmpres <- shape_means_data(tmpres, outp$shape, cpvars)
-
+          res[[cnm]] <- ifelse(res[[cnm]] == "...", NA, res[[cnm]])
+        }
 
     } else {
-      tmpres <- get_output(clslist[[k]], var = var,
-                           by = byvals,
-                           class = cnmv,
-                           stats = outp$stats,
-                           shape = outp$shape,
-                           freq = freq,
-                           type = type,
-                           opts = opts)
+
+      res <-  sort(res, by = c("TYPE", as.character(clsnms)))
+
+    }
+
+    if (is.null(type)) {
+
+      # Kill TYPE column if requested
+      if ("TYPE" %in% names(res)) {
+
+        res[["TYPE"]] <- NULL
+      }
     }
 
 
-
-    if (!is.null(res))
-      res <- rbind(res, tmpres)
-    else
-      res <- tmpres
   }
 
 
 
   return(res)
 }
+

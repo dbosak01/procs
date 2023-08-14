@@ -34,7 +34,7 @@ keywords are: "css", "clm", "cv", "kurt", "kurtosis",
 "p50", "p60", "p70", "p75", "p80", "p90",
 "p95", "p99", "q1", "q3", "qrange", "range", "skew", "skewness",
 "std", "stderr", "sum",
-"uclm", "uss", and "var". For hypothesis testing, the function
+"uclm", "uss", and "vari". For hypothesis testing, the function
 supports "t", "prt", "probt", and "df".
 Default statistics are: "n", "mean", "std",
 "min", and "max".}
@@ -153,7 +153,7 @@ of 5.}
 \item{\strong{stderr}: Standard error.}
 \item{\strong{sum}: The sum of variable values.}
 \item{\strong{uss}: Uncorrected sum of squares.}
-\item{\strong{var}: The variance.}
+\item{\strong{vari}: The variance.}
 }
 The function supports the following keywords to perform hypothesis testing:
 \itemize{
