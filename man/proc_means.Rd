@@ -33,7 +33,7 @@ keywords are: "css", "clm", "cv", "kurt", "kurtosis",
 "p1", "p5", "p10", "p20", "p25", "p30", "p40",
 "p50", "p60", "p70", "p75", "p80", "p90",
 "p95", "p99", "q1", "q3", "qrange", "range", "skew", "skewness",
-"std", "stderr", "sum",
+"std", "stddev", "stderr", "sum",
 "uclm", "uss", and "vari". For hypothesis testing, the function
 supports "t", "prt", "probt", and "df".
 Default statistics are: "n", "mean", "std",
@@ -149,7 +149,7 @@ of 5.}
 \item{\strong{qrange, q1, q3}: Quantile ranges for the first and third quantiles.}
 \item{\strong{range}: Difference between the minimum and maximum values.}
 \item{\strong{skew/skewness}: A measure of distribution skewness.}
-\item{\strong{std}: Standard deviation.}
+\item{\strong{std/stddev}: Standard deviation.}
 \item{\strong{stderr}: Standard error.}
 \item{\strong{sum}: The sum of variable values.}
 \item{\strong{uss}: Uncorrected sum of squares.}

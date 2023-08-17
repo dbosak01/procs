@@ -815,216 +815,6 @@ test_that("means35: Stacked output works.", {
 })
 
 
-# test_that("means36: Drop, keep, and rename works.", {
-#
-#   res <- proc_means(datm,
-#                     out = out(drop = "TYPE",
-#                               keep = c("STAT", "PresentScore", "Age"),
-#                               shape = "long",
-#                               rename = c(STAT = "Statistics")))
-#
-#   res
-#
-#   expect_equal(nrow(res), 5)
-#   expect_equal(ncol(res), 3)
-#   expect_equal(names(res), c("Statistics", "Age", "PresentScore"))
-#
-# })
-
-
-# test_that("means37: format works.", {
-#
-#   res <- proc_means(datm,
-#                     out = out(drop = "TYPE",
-#                               keep = c("STAT", "PresentScore", "Age"),
-#                               rename = c(STAT = "Statistics"),
-#                               shape = "long",
-#                               format = list(Age = "%.2f",
-#                                             PresentScore = "%.1f")))
-#
-#   res
-#
-#   a1 <- attributes(res$Age)
-#   a2 <- attributes(res$PresentScore)
-#
-#   expect_equal(a1$format, "%.2f")
-#   expect_equal(a2$format, "%.1f")
-#
-# })
-
-
-# test_that("means38: where works.", {
-#
-#   res <- proc_means(datm,
-#                     out = out(drop = "TYPE",
-#                               shape = "long",
-#                               keep = c("STAT", "PresentScore", "Age"),
-#                               rename = c(STAT = "Statistics"),
-#                     where = expression(STAT %in% c("N", "MEAN", "STD"))))
-#
-#   res
-#
-#
-#   expect_equal(nrow(res), 3)
-#   expect_equal(ncol(res), 3)
-#   expect_equal(res$Statistics, c("N", "MEAN", "STD"))
-#
-# })
-
-# test_that("means39: label works.", {
-#
-#   fst <- flist(MEAN = "%1.1f",
-#                STD = "%.2f",
-#                type = "row",
-#                lookup = c("N", "MEAN", "STD", "MIN", "MIX"))
-#
-#   res <- proc_means(datm,
-#                     out = out(drop = "TYPE",
-#                               keep = c("STAT", "PresentScore", "Age"),
-#                               rename = c(STAT = "Statistics"),
-#                               shape = "long",
-#                               label = c(Age = "Age at Screening",
-#                                         PresentScore = "The Present Score"),
-#                               format = list(Age = fst, PresentScore = fst)))
-#
-#   res
-#   #proc_print(res)
-#
-#   a1 <- attributes(res$Age)
-#   a2 <- attributes(res$PresentScore)
-#
-#   expect_equal(a1$label, "Age at Screening")
-#   expect_equal(a2$label, "The Present Score")
-#
-# })
-
-#
-# test_that("means40: aov statistic option works.", {
-#
-#   var1 <- c("Age")
-#   var2 <- c("n", "min", "max", "mean", "std")
-#
-#   res <- proc_means(datm, var = var1,
-#                     stats = var2,
-#                     class = v(Flavor),
-#                     options = opts(aov = TRUE),
-#                     titles = "My first title for Means",
-#                     out = out(report = TRUE))
-#
-#   res
-#
-#   expect_equal(length(res), 2)
-#   expect_equal(nrow(res[[1]]), 4)
-#   expect_equal(nrow(res[[2]]), 2)
-#
-# })
-
-# test_that("means41: aov statistic option with by works.", {
-#
-#   var1 <- c("Age")
-#   var2 <- c("n", "min", "max", "mean", "std")
-#
-#   res <- proc_means(datm, var = var1,
-#                     stats = var2,
-#                     by = Layers,
-#                     class = Flavor,
-#                     options = opts(aov = TRUE),
-#                     titles = "My first title for Means",
-#                     out = out(report = TRUE))
-#
-#   res
-#   # print(res)
-#
-#   expect_equal(length(res), 6)
-#   expect_equal(nrow(res[[1]]), 2)
-#   expect_equal(nrow(res[[2]]), 2)
-#
-#   expect_equal(nrow(res[[3]]), 4)
-#   expect_equal(nrow(res[[4]]), 2)
-#
-#   expect_equal(nrow(res[[5]]), 3)
-#   expect_equal(nrow(res[[6]]), 1)
-#
-#
-# })
-
-
-
-
-# test_that("means42: aov statistic on output works with one class.", {
-#
-#   var1 <- c("Age", "PresentScore", "TasteScore")
-#
-#   res <- proc_means(datm, var = var1,
-#                     class = Layers,
-#                     titles = "My first title for Means",
-#                     out2 = out(stats = "aov"))
-#
-#   res
-#
-#   expect_equal(ncol(res), 7)
-#   expect_equal(nrow(res), 6)
-#
-# })
-
-
-# test_that("means43: aov statistic on output works with two classes.", {
-#
-#   var1 <- c("Age", "PresentScore", "TasteScore")
-#
-#   res <- proc_means(datm, var = var1,
-#                     class = v(Layers, Flavor),
-#                     titles = "My first title for Means",
-#                     out2 = out(stats = "aov"))
-#
-#   res
-#
-#
-#
-#   expect_equal(ncol(res), 7)
-#   expect_equal(nrow(res), 9)
-#
-# })
-
-
-# test_that("means44: aov statistic on output works with two classes with where.", {
-#
-#   var1 <- c("Age", "PresentScore", "TasteScore")
-#
-#   res <- proc_means(datm, var = var1,
-#                     class = v(Layers, Flavor),
-#                     titles = "My first title for Means",
-#                     out2 = out(stats = "aov",
-#                                where = expression(CLASS != "Residuals")))
-#
-#   res
-#
-#   expect_equal(ncol(res), 7)
-#   expect_equal(nrow(res), 6)
-#
-# })
-
-
-
-# test_that("means46: aov statistic on stats works.", {
-#
-#   var1 <- c("Age", "PresentScore", "TasteScore")
-#   var2 <- c("n", "min", "max", "mean", "std", "aov")
-#
-#   res <- proc_means(datm, var = var1,
-#                     stats = var2,
-#                     class = Layers,
-#                     titles = "My first title for Means",
-#                     out = out())
-#
-#   res
-#
-#   expect_equal(nrow(res), 35)
-#   expect_equal(ncol(res), 7)
-#
-#
-# })
-
 test_that("means47: log_means() works as expected.", {
 
 
@@ -1064,7 +854,8 @@ test_that("means49: view can be FALSE without error.", {
   res <- proc_means(datm, var = var1,
                     stats = var2,
                     class = Layers,
-                    titles = "My first title for Means")
+                    titles = "My first title for Means",
+                    options = noprint)
 
 
   expect_equal(is.null(res), FALSE)
@@ -1333,12 +1124,32 @@ test_that("means53: Multiple class vars match SAS.", {
 })
 
 
+test_that("means54: check alternate keywords work.", {
+
+
+
+  res <- proc_means(datm, var = c("PresentScore", "TasteScore"),
+                    stats = c("n", "mean", "stddev", "skewness", "kurtosis"),
+                    titles = "My first title for Means",
+                    options = v(notype, nonobs))
+
+  res
+
+
+  expect_equal("data.frame" %in% class(res), TRUE)
+  expect_equal(ncol(res), 6)
+
+  expect_equal(res[2, "STD"], 6.6115926897)
+  expect_equal(res[1, "SKEW"], -0.36762986)
+  expect_equal(res[1, "KURT"], -0.30448351)
+
+})
 
 # proc_means(datm, var = v(Age, PresentScore, TasteScore, Layers),
-#            stats = c("css", "cv", "lclm", "mode",  "nobs"),
+#            stats = c("css", "cv", "lclm", "mode",  "nobs", "stddev"),
 #            options = v(maxdec = 4),
 #            titles = "Summary of Presentation and Taste Scores")
-#
+
 # proc_means(datm, var = v(Age, PresentScore, TasteScore, Layers),
 #            stats = c("p1", "p5", "p10", "p20", "p25", "p30", "p40", "p50"),
 #            options = v(maxdec = 4),

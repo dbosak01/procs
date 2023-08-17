@@ -163,6 +163,8 @@ show_viewer <- function(path) {
 
   pth <- ""
 
+  #print(paste0("path: ", path))
+
   if (file.exists(path)) {
 
     opts <- options("procs.print")[[1]]
