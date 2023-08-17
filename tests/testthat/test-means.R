@@ -1145,6 +1145,39 @@ test_that("means54: check alternate keywords work.", {
 
 })
 
+
+test_that("means55: nway option works.", {
+
+
+
+  res <- proc_means(datm, var = c("PresentScore", "TasteScore"),
+                    titles = "My first title for Means",
+                    class = c("Layers", "Flavor"),
+                    options = c("nway"))
+
+  res
+
+  expect_equal("data.frame" %in% class(res), TRUE)
+  expect_equal(ncol(res), 10)
+  expect_equal(nrow(res), 18)
+
+
+
+  res <- proc_means(datm, var = c("PresentScore", "TasteScore"),
+                    titles = "My first title for Means",
+                    class = c("Layers", "Flavor"),
+                    options = c("nway", "notype"))
+
+  res
+
+  expect_equal("data.frame" %in% class(res), TRUE)
+  expect_equal(ncol(res), 9)
+  expect_equal(nrow(res), 18)
+
+})
+
+
+
 # proc_means(datm, var = v(Age, PresentScore, TasteScore, Layers),
 #            stats = c("css", "cv", "lclm", "mode",  "nobs", "stddev"),
 #            options = v(maxdec = 4),

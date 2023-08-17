@@ -192,6 +192,9 @@ option will inhibit printing.
 \item{\strong{notype}: Turns off the TYPE column on the output
 dataset.
 }
+\item{\strong{nway}: Returns only the highest level TYPE combination.  By
+default, the function return all TYPE combinations.
+}
 \item{\strong{stacked}: Requests that output datasets be returned in "stacked"
 form, such that both statistics and variables are in rows.
 }

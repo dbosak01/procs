@@ -111,6 +111,9 @@
 #' \item{\strong{notype}: Turns off the TYPE column on the output
 #' dataset.
 #' }
+#' \item{\strong{nway}: Returns only the highest level TYPE combination.  By
+#' default, the function return all TYPE combinations.
+#' }
 #' \item{\strong{stacked}: Requests that output datasets be returned in "stacked"
 #' form, such that both statistics and variables are in rows.
 #' }
@@ -1336,20 +1339,27 @@ gen_output_means <- function(data,
         }
 
 
-        # Always add type 0
-        tmpby <- get_output(dat, var = var,
-                            by = bynm,
-                            class = cls,
-                            stats = outp$stats,
-                            shape = outp$shape,
-                            freq = frq,
-                            type = tp,
-                            opts = opts)
+        if (has_option(opts, "nway") == FALSE ||
+           (has_option(opts, "nway") == TRUE && is.null(class))) {
 
-        if (is.null(tmpres))
-          tmpres <- tmpby
-        else
-          tmpres <- rbind(tmpres, tmpby)
+            # Always add type 0
+            tmpby <- get_output(dat, var = var,
+                                by = bynm,
+                                class = cls,
+                                stats = outp$stats,
+                                shape = outp$shape,
+                                freq = frq,
+                                type = tp,
+                                opts = opts)
+
+
+
+          if (is.null(tmpres))
+            tmpres <- tmpby
+          else
+            tmpres <- rbind(tmpres, tmpby)
+
+        }
 
 
         if (!is.null(class)) {
@@ -1363,43 +1373,14 @@ gen_output_means <- function(data,
                               freq = frq, type = tp, byvals = bynm, opts = opts,
                               stats = outp$stats)
 
-          tmpres <- rbind(tmpres, tmpcls)
+          if (is.null(tmpres))
+            tmpres <- tmpcls
+          else
+            tmpres <- rbind(tmpres, tmpcls)
 
         }
       }
 
-      # # Where Before
-      # if (!is.null(outp$where)) {
-      #   tmpres <- tryCatch({subset(tmpres, eval(outp$where))},
-      #                      error = function(cond){tmpres})
-      # }
-      #
-      # # Drop
-      # if (!is.null(outp$drop)) {
-      #   tnms <- names(tmpres)
-      #   tmpres <- tmpres[ , !tnms %in% outp$drop]
-      # }
-      #
-      # # Keep
-      # if (!is.null(outp$keep)) {
-      #   tnms <- names(tmpres)
-      #   tmpres <- tmpres[ , tnms %in% outp$keep]
-      # }
-      #
-      # # Rename
-      # if (!is.null(outp$rename)) {
-      #   tnms <- names(tmpres)
-      #   rnm <- names(outp$rename)
-      #   nnms <- replace(tnms, match(rnm, tnms), outp$rename)
-      #   names(tmpres) <- nnms
-      # }
-      #
-      # # Where After
-      # if (!is.null(outp$where)) {
-      #   tmpres <- tryCatch({subset(tmpres, eval(outp$where))},
-      #                      error = function(cond){tmpres})
-      #
-      # }
 
       # System Labels
       labels(tmpres) <- append(mlbls, bylbls)
@@ -1561,6 +1542,14 @@ get_class_output <- function(data, var, class, outp, freq = TRUE,
       res <-  sort(res, by = c("TYPE", as.character(clsnms)))
 
     }
+
+    if (has_option(opts, "nway")) {
+
+       res <- res[res$TYPE == max(res$TYPE), ]
+    }
+
+    rnms <- names(res)
+    res <- res[ , c(clsnms, rnms[!rnms %in% clsnms])]
 
     if (is.null(type)) {
 
