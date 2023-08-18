@@ -1268,6 +1268,41 @@ test_that("means56: factors work as expected.", {
 
 })
 
+
+test_that("freq68: two by as factors work.", {
+
+  datsp <- datm
+  datsp$Flavor <- factor(datsp$Flavor, levels = c("Vanilla", "Chocolate", "Spice", "Rum"))
+  datsp$Layers <- factor(datsp$Layers, levels = c("3", "2", "1"))
+
+
+  res1 <- proc_means(datsp, var = c("Age", "PresentScore", "TasteScore"),
+                    output = all,
+                    by = c("Layers", "Flavor"))
+
+  res1
+
+
+  expect_equal(nrow(res1), 27)
+  expect_equal(ncol(res1), 10)
+
+  res1 <- proc_means(datsp, var = c("Age", "PresentScore", "TasteScore"),
+                     output = all,
+                     by = c("Layers"),
+                     class = "Flavor")
+
+  res1
+
+  #labels(res1)
+
+
+  expect_equal(nrow(res1), 36)
+  expect_equal(ncol(res1), 10)
+
+})
+
+
+
 # proc_means(datm, var = v(Age, PresentScore, TasteScore, Layers),
 #            stats = c("css", "cv", "lclm", "mode",  "nobs", "stddev"),
 #            options = v(maxdec = 4),
