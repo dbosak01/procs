@@ -585,10 +585,18 @@ freq_oneway <- function(data, tb, weight, options, out = FALSE, stats = NULL) {
   } else {
 
 
-    cnts <- aggregate(data[[weight]], list(var), FUN = sum)
+    if (nrow(data) == 0) {
+      cnts <- 0
+      categories <- ""
+      frequencies <- 0
 
-    categories <- cnts$Group.1
-    frequencies <- cnts$x
+
+    } else {
+      cnts <- aggregate(data[[weight]], list(var), FUN = sum)
+
+      categories <- cnts$Group.1
+      frequencies <- cnts$x
+    }
 
 
   }
@@ -1835,6 +1843,8 @@ gen_output_freq <- function(data,
         # Get table for this by group
         dt <- dtlst[[j]]
 
+        if (nrow(dt) > 0 || has_option(options, "nosparse") == FALSE) {
+
         crstab <- NULL
         tmpchisq <- NULL
         tmpfisher <- NULL
@@ -1930,21 +1940,7 @@ gen_output_freq <- function(data,
                 fisher <- rbind(fisher, tmpfisher)
 
 
-              # if (all(outp$stats == 'fisher')) {
-              #
-              #   # Prepare ds with vars
-              #   result <- data.frame(VAR1 = splt[[1]], VAR2 = splt[[2]],
-              #                        stringsAsFactors = FALSE)
-              #
-              #   if (length(byvals) > 0) {
-              #     result <- cbind(get_by_ds(byvals[[j]]), result, fisher)
-              #   } else {
-              #     result <- cbind(result, fisher)
-              #   }
-              #
-              # } else {
-              #   result <- cbind(result, fisher)
-              # }
+
             }
 
             if (option_true(options, "chisq", FALSE)) {
@@ -1961,21 +1957,6 @@ gen_output_freq <- function(data,
               else
                 chisq <- rbind(chisq, tmpchisq)
 
-              # if (all(outp$stats == "chisq")) {
-              #
-              #   # Prepare ds with vars
-              #   result <- data.frame(VAR1 = splt[[1]], VAR2 = splt[[2]],
-              #                        stringsAsFactors = FALSE)
-              #
-              #   if (length(byvals) > 0) {
-              #     result <- cbind(get_by_ds(byvals[[j]]), result, chisq)
-              #   } else {
-              #     result <- cbind(result, chisq)
-              #   }
-              #
-              # } else {
-              #   result <- cbind(result, chisq)
-              # }
 
             }
           }
@@ -2014,59 +1995,12 @@ gen_output_freq <- function(data,
         else
           tmpres <- result
 
-        #}
+        }
 
-        # if (!is.null(chisq)) {
-        #
-        #   # if (!is.null(res[[nm]]))
-        #   #   res[[nm]] <- rbind(res[[nm]], chisq)
-        #   # else
-        #     res[[paste0("chisq:", nm)]] <- chisq
-        # }
-
-#         if (!is.null(fisher)) {
-# #
-# #           if (!is.null(res[[nm]]))
-# #             res[[nm]] <- rbind(res[[nm]], fisher)
-# #           else
-#             res[[paste0("fisher:", nm)]] <- result
-#         }
       }
 
 
-      # # Where Before
-      # if (!is.null(outp$where)) {
-      #   tmpres <- tryCatch({subset(tmpres, eval(outp$where))},
-      #                      error = function(cond){tmpres})
-      #
-      # }
-      #
-      # # Drop
-      # if (!is.null(outp$drop)) {
-      #   tnms <- names(tmpres)
-      #   tmpres <- tmpres[ , !tnms %in% outp$drop]
-      # }
-      #
-      # # Keep
-      # if (!is.null(outp$keep)) {
-      #   tnms <- names(tmpres)
-      #   tmpres <- tmpres[ , tnms %in% outp$keep]
-      # }
-      #
-      # # Rename
-      # if (!is.null(outp$rename)) {
-      #   tnms <- names(tmpres)
-      #   rnm <- names(outp$rename)
-      #   nnms <- replace(tnms, match(rnm, tnms), outp$rename)
-      #   names(tmpres) <- nnms
-      # }
-      #
-      # # Where After
-      # if (!is.null(outp$where)) {
-      #   tmpres <- tryCatch({subset(tmpres, eval(outp$where))},
-      #                      error = function(cond){tmpres})
-      #
-      # }
+
 
       # System Labels
       #labels(tmpres) <- append(mlbls, bylbls)

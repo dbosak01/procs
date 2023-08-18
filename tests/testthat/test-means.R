@@ -1176,7 +1176,97 @@ test_that("means55: nway option works.", {
 
 })
 
+test_that("means56: factors work as expected.", {
 
+  datmr <- read.table(header = TRUE, text = '
+    LastName  Age PresentScore TasteScore Flavor Layers Region
+    Orlando     27 93 80  Vanilla    1 1
+    Ramey       32 84 72  Rum        2 1
+    Goldston    46 68 75  Vanilla    1 1
+    Roe         38 79 73  Vanilla    2 1
+    Larsen      23 77 84  Chocolate  3 1
+    Davis       51 86 91  Spice      3 1
+    Strickland  19 82 79  Chocolate  1 1
+    Nguyen      57 77 84  Vanilla    3 1
+    Hildenbrand 33 81 83  Chocolate  1 1
+    Byron       62 72 87  Vanilla    2 1
+    Sanders     26 56 79  Chocolate  1 2
+    Jaeger      43 66 74  NA         1 2
+    Davis       28 69 75  Chocolate  2 2
+    Conrad      69 85 94  Vanilla    1 2
+    Walters     55 67 72  Chocolate  2 2
+    Rossburger  28 78 81  Spice      2 2
+    Matthew     42 81 92  Chocolate  2 2
+    Becker      36 62 83  Spice      2 2
+    Anderson    27 87 85  Chocolate  1 2
+    Merritt     62 73 84  Chocolate  1 2
+    ')
+
+
+  datmr$Flavor <- factor(datmr$Flavor, levels = c("Rum", "Vanilla", "Chocolate", "Spice"))
+  suppressWarnings(attr(datmr[["Layers"]], "levels") <- c("Three", "Two", "One"))
+  class(datmr$Layers) <- "factor"
+  suppressWarnings(attr(datmr[["Region"]], "levels") <- c("South", "North"))
+  class(datmr$Region) <- "factor"
+
+
+  res <- proc_means(datmr,
+                    var = c("Age", "PresentScore", "TasteScore"),
+                    stats = c("n", "min", "max", "mean", "std"),
+                    output = c("all", "report"),
+                    by = "Region",
+                   #  class = c("Layers", "Flavor"),
+                    titles = "My first title for Means",
+                    options = c("long", maxdec = 4))
+
+  res
+
+
+  expect_equal(nrow(res$out), 10)
+  expect_equal(ncol(res$out), 7)
+
+  expect_equal(nrow(res$report[[1]]), 3)
+  expect_equal(ncol(res$report[[1]]), 6)
+
+
+
+  res <- proc_means(datmr,
+                    var = c("Age", "PresentScore", "TasteScore"),
+                    stats = c("n", "min", "max", "mean", "std"),
+                    output = c("all", "report"),
+                    class = c("Region", "Layers", "Flavor"),
+                    titles = "My first title for Means",
+                    options = c("long", maxdec = 4))
+
+  res
+
+
+  expect_equal(nrow(res$out), 210)
+  expect_equal(ncol(res$out), 9)
+
+  expect_equal(nrow(res$report[[1]]), 33)
+  expect_equal(ncol(res$report[[1]]), 9)
+
+
+  res <- proc_means(datmr,
+                    var = c("Age", "PresentScore", "TasteScore"),
+                    stats = c("n", "min", "max", "mean", "std"),
+                    output = c("all", "report"),
+                    by = "Region",
+                    class = c("Layers", "Flavor"),
+                    titles = "My first title for Means",
+                    options = c("long", maxdec = 4))
+
+  res
+
+
+  expect_equal(nrow(res$out), 125)
+  expect_equal(ncol(res$out), 9)
+
+  expect_equal(nrow(res$report[[1]]), 21)
+  expect_equal(ncol(res$report[[1]]), 8)
+
+})
 
 # proc_means(datm, var = v(Age, PresentScore, TasteScore, Layers),
 #            stats = c("css", "cv", "lclm", "mode",  "nobs", "stddev"),

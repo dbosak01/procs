@@ -2005,6 +2005,78 @@ test_that("freq67: factor with sparse show zero counts.", {
 
 })
 
+
+test_that("freq68: factors with by work.", {
+
+
+  datsp <- dat
+
+  datsp$Eyes <- ifelse(datsp$Eyes == "green", "brown", datsp$Eyes)
+
+
+  datsp$Eyes <- factor(datsp$Eyes, levels = c("green", "brown", "blue"))
+
+
+  res1 <- proc_freq(datsp, tables = c("Hair"),
+                    output = all,
+                    by = "Eyes",
+                    options = nosparse,
+                    titles = "Eye and Hair Color of European Children")
+
+  res1
+
+
+  res2 <- proc_freq(datsp, tables = c("Hair"),
+                    output = all,
+                    by = "Eyes",
+                    options = sparse,
+                    titles = "Eye and Hair Color of European Children")
+
+  res2
+
+  expect_equal(unique(as.character(res1$BY)), c("brown", "blue"))
+  expect_equal(unique(as.character(res2$BY)), c("green", "brown", "blue"))
+
+
+})
+
+test_that("freq68: var and by as factors work.", {
+
+
+  datsp <- dat
+
+  datsp$Eyes <- ifelse(datsp$Eyes == "green", "brown", datsp$Eyes)
+  datsp$Eyes <- factor(datsp$Eyes, levels = c("green", "brown", "blue"))
+  datsp$Hair <- ifelse(datsp$Hair == "fair", "black", datsp$Hair)
+  datsp$Hair <- factor(datsp$Hair, levels = c("red", "medium", "fair", "dark", "black"))
+
+
+  res1 <- proc_freq(datsp, tables = c("Hair"),
+                    output = all,
+                    by = "Eyes",
+                    options = nosparse,
+                    titles = "Eye and Hair Color of European Children")
+
+  res1
+
+
+  res2 <- proc_freq(datsp, tables = c("Hair"),
+                    output = all,
+                    by = "Eyes",
+                    options = sparse,
+                    titles = "Eye and Hair Color of European Children")
+
+  res2
+
+  expect_equal(unique(as.character(res1$BY)), c("brown", "blue"))
+  expect_equal(unique(as.character(res1$CAT)), c("red", "medium", "dark", "black"))
+  expect_equal(unique(as.character(res2$BY)), c("green", "brown", "blue"))
+  expect_equal(unique(as.character(res2$CAT)), c("red", "medium", "fair", "dark", "black"))
+
+
+})
+
+
 # test_that("freq67: outexpect keyword works as expected.", {
 #
 #   res <- proc_freq(dat, tables = v(Eyes * Hair),

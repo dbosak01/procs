@@ -1304,7 +1304,7 @@ gen_output_means <- function(data,
       bdat <- list(data)
       if (!is.null(by)) {
 
-        bdat <- split(data, data[ , by], sep = "|", drop = TRUE)
+        bdat <- split(data, data[ , by, drop = FALSE], sep = "|", drop = TRUE)
 
       }
       bynms <- names(bdat)
@@ -1383,7 +1383,8 @@ gen_output_means <- function(data,
 
 
       # System Labels
-      labels(tmpres) <- append(mlbls, bylbls)
+      if (!is.null(tmpres))
+        labels(tmpres) <- append(mlbls, bylbls)
 
       # Class labels
       clbls <- NULL
