@@ -134,7 +134,8 @@ quoted vector of strings, or an unquoted vector using the \code{v()} function.
 \item{\strong{css}: Corrected Sum of Squares.}
 \item{\strong{clm, lclm, uclm}: Upper and lower confidence limits.}
 \item{\strong{cv}: Coefficient of Variation.}
-\item{\strong{kurt/kurtosis}: The Kurtosis description of the distribution tails.}
+\item{\strong{kurt/kurtosis}: The Kurtosis is a description of the
+distribution tails. It requires at least 4 complete observations.}
 \item{\strong{mean}: The arithmetic mean.}
 \item{\strong{median}: The median.}
 \item{\strong{mode}: The mode of the target variable.}
@@ -148,7 +149,8 @@ missing or non-missing.}
 of 5.}
 \item{\strong{qrange, q1, q3}: Quantile ranges for the first and third quantiles.}
 \item{\strong{range}: Difference between the minimum and maximum values.}
-\item{\strong{skew/skewness}: A measure of distribution skewness.}
+\item{\strong{skew/skewness}: A measure of distribution skewness. It
+requires at least 3 complete observations.}
 \item{\strong{std/stddev}: Standard deviation.}
 \item{\strong{stderr}: Standard error.}
 \item{\strong{sum}: The sum of variable values.}

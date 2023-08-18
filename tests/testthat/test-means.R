@@ -1302,12 +1302,49 @@ test_that("freq68: two by as factors work.", {
 })
 
 
+test_that("freq69: other statistics with by works.", {
 
-# proc_means(datm, var = v(Age, PresentScore, TasteScore, Layers),
+  datsp <- datm
+  datsp$Layers[1] <- 3
+
+  res1 <- proc_means(datsp, var = c("Age", "PresentScore", "TasteScore"),
+                     stats = c("kurtosis", "skew", "cv", "clm"),
+                     output = all,
+                     by = c("Layers"),
+                     options = c(maxdec = 8)
+                     )
+
+  res1
+
+
+  expect_equal(nrow(res1), 9)
+  expect_equal(ncol(res1), 9)
+  expect_equal(res1[1, 5], -0.95194732)
+  expect_equal(res1[1, 6], 0.55802418)
+  expect_equal(res1[1, 7], 43.85482852)
+  expect_equal(res1[1, 8], 25.73043112)
+  expect_equal(res1[1, 9], 55.51956888)
+
+
+  # Not enough observations
+  expect_error(proc_means(datsp, var = c("Age", "PresentScore", "TasteScore"),
+                     stats = c("kurt", "skew", "cv", "clm"),
+                     output = all,
+                     by = c("Layers"),
+                     class = "Flavor"))
+
+
+
+})
+
+
+
+
+# res3 <- proc_means(datm, var = v(Age, PresentScore, TasteScore, Layers),
 #            stats = c("css", "cv", "lclm", "mode",  "nobs", "stddev"),
 #            options = v(maxdec = 4),
 #            titles = "Summary of Presentation and Taste Scores")
-
+#
 # proc_means(datm, var = v(Age, PresentScore, TasteScore, Layers),
 #            stats = c("p1", "p5", "p10", "p20", "p25", "p30", "p40", "p50"),
 #            options = v(maxdec = 4),
