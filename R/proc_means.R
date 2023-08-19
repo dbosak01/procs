@@ -36,7 +36,9 @@
 #'
 #' The output datasets generated are optimized for data manipulation.
 #' The column names have been standardized, and additional variables may
-#' be present to help with data manipulation.  In addition, data values in the
+#' be present to help with data manipulation.  For example, the by variable
+#' will always be named "BY", and the class variable will always be named
+#' "CLASS".  In addition, data values in the
 #' output datasets are intentionally not rounded or formatted
 #' to give you the most accurate statistical results.
 #'
@@ -367,7 +369,7 @@ proc_means <- function(data,
     rptnm <- "report"
   }
 
-  if (has_view(options) && interactive())
+  if (has_view(options))
     view <- TRUE
   else
     view <- FALSE
@@ -1010,7 +1012,6 @@ shape_means_data <- function(ds, shape, copy = NULL) {
 
 }
 
-sprintf("hello %s%% there", 23)
 
 # Drivers --------------------------------------------------------------------
 mlbls <- list(MEAN = "Mean", STD = "Std Dev", MEDIAN = "Median", MIN = "Minimum",
@@ -1178,7 +1179,7 @@ gen_report_means <- function(data,
 
   # Create viewer report if requested
   if (gv) {
-    if (view == TRUE) {
+    if (view == TRUE && interactive()) {
 
 
       vrfl <- tempfile()

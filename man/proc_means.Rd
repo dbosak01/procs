@@ -113,7 +113,9 @@ frames will be returned.
 
 The output datasets generated are optimized for data manipulation.
 The column names have been standardized, and additional variables may
-be present to help with data manipulation.  In addition, data values in the
+be present to help with data manipulation.  For example, the by variable
+will always be named "BY", and the class variable will always be named
+"CLASS".  In addition, data values in the
 output datasets are intentionally not rounded or formatted
 to give you the most accurate statistical results.
 

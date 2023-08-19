@@ -50,7 +50,9 @@
 #'
 #' The standard output datasets are optimized for data manipulation.
 #' Column names have been standardized, and additional variables may
-#' be present to help with data manipulation.  In addition, data values in the
+#' be present to help with data manipulation. For instance, the by variable will
+#' always be named "BY", and the frequency category will always be named "CAT".
+#' In addition, data values in the
 #' output datasets are not rounded or formatted
 #' to give you the most accurate statistical results.
 #'
@@ -449,7 +451,7 @@ proc_freq <- function(data,
     rptflg <- TRUE
   }
 
-  if (has_view(options) && interactive())
+  if (has_view(options))
     view <- TRUE
   else
     view <- FALSE
@@ -1763,7 +1765,7 @@ gen_report_freq <- function(data,
 
   # Create viewer report if requested
   if (gv) {
-    if (view == TRUE) {
+    if (view == TRUE && interactive()) {
 
 
       vrfl <- tempfile()
