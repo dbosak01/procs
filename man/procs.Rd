@@ -3,6 +3,7 @@
 \docType{package}
 \name{procs}
 \alias{procs}
+\alias{procs-package}
 \title{procs: Simulates Procedures from SAS®}
 \description{
 The \strong{procs} package contains functions to
