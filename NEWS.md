@@ -1,4 +1,4 @@
-# procs 1.0.2
+# procs 1.0.3
 
 * Fixed 'class' parameter on 'proc_freq()'.
 * Fixed sparse output when variables are defined as factors.

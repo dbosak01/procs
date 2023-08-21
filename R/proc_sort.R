@@ -158,8 +158,7 @@ proc_sort <- function(data,  by = NULL, keep = NULL, order = "ascending",
 
   if (log_output()) {
     log_logr(ret)
-    print(ret)
-    return(invisible(ret))
+    return(ret)
   }
 
   return(ret)
