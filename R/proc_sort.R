@@ -6,9 +6,20 @@
 #' the variables passed on the \code{by} parameter.  If no parameters are
 #' passed on the \code{by} parameter, it will sort by all variables. The
 #' direction of the sort is controlled with the \code{order} parameter.
-#' Use the \code{nodupkey} parameter to eliminate duplicate rows from
+#' Use the \code{nodupkey} option to eliminate duplicate rows from
 #' the dataset, and the \code{keep} parameter to subset columns.
 #' The parameters will accept either quoted or unquoted values.
+#' @section Options:
+#' Below are the available options for the \code{proc_sort} function:
+#' \itemize{
+#'   \item{\strong{dupkey}: This option keeps duplicate rows and discards
+#' unique rows. Duplicate rows will be identified by the key variables listed on
+#' the by parameter if passed.  This option is the opposite of 'nodupkey'.}
+#'   \item{\strong{nodupkey}: Removes duplicate rows following the sort.
+#' Duplicate rows will be identified by the key variables listed on
+#' the by parameter if passed.  Otherwise, the function will dedupe on
+#' all variables returned.}
+#' }
 #' @param data The input data to sort.
 #' @param by A vector of variables to sort by.
 #' @param keep A vector of variables on the output data to keep.  All other
@@ -18,10 +29,10 @@
 #' also be abbreviated to 'asc', 'desc', 'a', or 'd'.  You may pass
 #' a vector of order values equal to the number of variables on the by
 #' parameter.  Default is 'ascending' for all by variables.
-#' @param nodupkey Whether to remove duplicates.  Valid values are
-#' TRUE or FALSE. Duplicate rows will be identified by the variables listed on
-#' the by parameter if passed.  Otherwise, the function will dedupe on
-#' all variables returned.
+#' @param options Any options desired for the sort.  Available options
+#' are 'dupkey' and 'nodupkey'. The 'nodupkey' option removes duplicate
+#' rows from the sorted dataset.  The 'dupkey' option removes unique
+#' rows from the sorted dataset.
 #' @return The sorted dataset.  If a data frame was input, a
 #' data frame will be output.  If a tibble was input, a tibble will
 #' be output.
@@ -72,7 +83,7 @@
 #' # 29 Black Green Female    2
 #'
 #' # Get unique combinations of Eye and Sex
-#' res3 <- proc_sort(dat, keep = v(Eye, Sex), nodupkey = TRUE)
+#' res3 <- proc_sort(dat, keep = v(Eye, Sex), options = nodupkey)
 #'
 #' # View results
 #' res3
@@ -88,7 +99,7 @@
 #' @import tibble
 #' @export
 proc_sort <- function(data,  by = NULL, keep = NULL, order = "ascending",
-                      nodupkey = FALSE) {
+                      options = NULL) {
 
 
   # Deal with single value unquoted parameter values
@@ -106,6 +117,11 @@ proc_sort <- function(data,  by = NULL, keep = NULL, order = "ascending",
   oorder <- deparse(substitute(order, env = environment()))
   order <- tryCatch({if (typeof(order) %in% c("character", "NULL")) order else oorder},
                  error = function(cond) {oorder})
+
+  # Deal with single value unquoted option values
+  oopt <- deparse(substitute(options, env = environment()))
+  options <- tryCatch({if (typeof(options) %in% c("integer", "double", "character", "NULL")) options else oopt},
+                      error = function(cond) {oopt})
 
   if (!is.null(order)) {
     order <- substr(tolower(order), 1, 1)
@@ -128,10 +144,16 @@ proc_sort <- function(data,  by = NULL, keep = NULL, order = "ascending",
 
 
 
-  if (nodupkey) {
+  if (has_option(options, 'nodupkey')) {
     dt <- data[ , by]
     dups <- duplicated(dt)
     data <-  data[!dups, ]
+
+  }
+
+  if (has_option(options, 'dupkey')) {
+
+    data <-  get_dupkey(data, by)
 
   }
 
@@ -153,7 +175,7 @@ proc_sort <- function(data,  by = NULL, keep = NULL, order = "ascending",
            by = by,
            keep = keep,
            order = order,
-           nodupkey = nodupkey,
+           options = options,
            outdata = ret)
 
   if (log_output()) {
@@ -171,7 +193,7 @@ log_sort <- function(data,
                      by = NULL,
                      keep = NULL,
                      order = "ascending",
-                     nodupkey = FALSE,
+                     options = NULL,
                      outdata = NULL) {
 
   ret <- c()
@@ -192,9 +214,8 @@ log_sort <- function(data,
     ret[length(ret) + 1] <- paste0(indt, "order: ",
                                    paste(order, collapse = " "))
 
-  if (!is.null(nodupkey))
-    ret[length(ret) + 1] <- paste0(indt, "nodupkey: ",
-                                   paste(nodupkey, collapse = " "))
+  if (!is.null(options))
+    ret[length(ret) + 1] <- paste0(indt, "options: ", paste(options, collapse = " "))
 
   if (!is.null(outdata))
     ret[length(ret) + 1]  <- paste0(indt, "output data set ", nrow(outdata),
@@ -202,5 +223,56 @@ log_sort <- function(data,
 
 
   log_logr(ret)
+
+}
+
+
+# A function to return only the duplicate rows
+# This was unusually difficult to do.  All R functions assume you are trying
+# to get right of duplicates.  Here we want to keep the duplicates.
+#' @noRd
+get_dupkey <- function(dat, key = NULL) {
+
+  ret <- dat
+
+  # If no key, use all columns
+  if (is.null(key)) {
+    key <- names(dat)
+
+  }
+
+  # Subset by key
+  kdat <- dat[ , key]
+
+  # Add counting variable
+  kdat$..cnt <- 1
+
+  # Prepare list for aggregation
+  klist <- list()
+
+  # Populate aggregation list
+  for (k in key) {
+    klist[[paste0("key.", k)]] <- kdat[[k]]
+  }
+
+  # Perform aggregation to count rows by group
+  kcnt <- aggregate(kdat, klist,
+                     function(x){NROW(x)}, drop = TRUE)
+
+  kcnt
+
+  # Filter out unique rows
+  fkcnt <- kcnt[kcnt$..cnt > 1, ]
+
+  # Pull out the key columns
+  fkcnt2 <- fkcnt[ , find.names(fkcnt, "key.*")]
+
+  # Restore original key column names
+  names(fkcnt2) <- sub("key.", "", names(fkcnt2), fixed = TRUE)
+
+  # Merge filtered key columns with original data to remove unique rows
+  ret <- merge(ret, fkcnt2)
+
+  return(ret)
 
 }

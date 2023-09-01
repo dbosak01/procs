@@ -61,7 +61,7 @@ test_that("sort4: nodupkey work.", {
 
   res <- proc_sort(prt, by = c("sex", "internship"),
                    keep = c("sex", "internship"),
-                   nodupkey = TRUE)
+                   options = "nodupkey")
 
   res
 
@@ -140,7 +140,8 @@ test_that("sort9: log_sort() works as expected.", {
   res <- log_sort(mtcars, by = c("mpg", "cyl"),
                        keep = c("n", "mean", "median"),
                        order = "ascending",
-                       nodupkey = FALSE, outdata = mtcars)
+                       options = c("dupkey", "forker"),
+                       outdata = mtcars)
 
   res
 
@@ -149,5 +150,57 @@ test_that("sort9: log_sort() works as expected.", {
 })
 
 
+test_that("sort10: get_dupkey() works.", {
+
+  prtsp <- prt
+  prtsp[1, 1] <- "unk"
+
+  prtsp
+
+  res <- get_dupkey(prtsp,  c("sex", "internship"))
+
+  expect_equal(nrow(prtsp), 8)
+  expect_equal(nrow(res), 6)
+
+  tbl <- table(res$sex)
+  expect_equal(tbl[["boys"]], 2)
+  expect_equal(tbl[["girls"]], 4)
+})
+
+test_that("sort11: dupkey works.", {
+
+  prtsp <- prt
+  prtsp[1, 1] <- "unk"
+
+  prtsp
+
+  res <- proc_sort(prtsp, by = c("sex", "internship"),
+                   keep = c("sex", "internship"),
+                   options = "dupkey"
+                   )
+
+  res
+
+  expect_equal(nrow(res), 6)
+  expect_equal(ncol(res), 2)
+
+})
 
 
+test_that("sort12: dupkey without keep works.", {
+
+  prtsp <- prt
+  prtsp[1, 1] <- "unk"
+
+  prtsp
+
+  res <- proc_sort(prtsp, by = c("sex", "internship"),
+                   options = "dupkey"
+  )
+
+  res
+
+  expect_equal(nrow(res), 6)
+  expect_equal(ncol(res), 4)
+
+})

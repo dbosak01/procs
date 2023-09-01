@@ -4,7 +4,7 @@
 \alias{proc_sort}
 \title{Sorts a dataset}
 \usage{
-proc_sort(data, by = NULL, keep = NULL, order = "ascending", nodupkey = FALSE)
+proc_sort(data, by = NULL, keep = NULL, order = "ascending", options = NULL)
 }
 \arguments{
 \item{data}{The input data to sort.}
@@ -20,10 +20,10 @@ also be abbreviated to 'asc', 'desc', 'a', or 'd'.  You may pass
 a vector of order values equal to the number of variables on the by
 parameter.  Default is 'ascending' for all by variables.}
 
-\item{nodupkey}{Whether to remove duplicates.  Valid values are
-TRUE or FALSE. Duplicate rows will be identified by the variables listed on
-the by parameter if passed.  Otherwise, the function will dedupe on
-all variables returned.}
+\item{options}{Any options desired for the sort.  Available options
+are 'dupkey' and 'nodupkey'. The 'nodupkey' option removes duplicate
+rows from the sorted dataset.  The 'dupkey' option removes unique
+rows from the sorted dataset.}
 }
 \value{
 The sorted dataset.  If a data frame was input, a
@@ -35,10 +35,24 @@ The \code{proc_sort} function sorts a dataset according to
 the variables passed on the \code{by} parameter.  If no parameters are
 passed on the \code{by} parameter, it will sort by all variables. The
 direction of the sort is controlled with the \code{order} parameter.
-Use the \code{nodupkey} parameter to eliminate duplicate rows from
+Use the \code{nodupkey} option to eliminate duplicate rows from
 the dataset, and the \code{keep} parameter to subset columns.
 The parameters will accept either quoted or unquoted values.
 }
+\section{Options}{
+
+Below are the available options for the \code{proc_sort} function:
+\itemize{
+\item{\strong{dupkey}: This option keeps duplicate rows and discards
+unique rows. Duplicate rows will be identified by the key variables listed on
+the by parameter if passed.  This option is the opposite of 'nodupkey'.}
+\item{\strong{nodupkey}: Removes duplicate rows following the sort.
+Duplicate rows will be identified by the key variables listed on
+the by parameter if passed.  Otherwise, the function will dedupe on
+all variables returned.}
+}
+}
+
 \examples{
 # Prepare data subset
 dat <- data.frame(HairEyeColor, stringsAsFactors = FALSE)[1:32 \%\% 4 == 1, ]
@@ -86,7 +100,7 @@ res2
 # 29 Black Green Female    2
 
 # Get unique combinations of Eye and Sex
-res3 <- proc_sort(dat, keep = v(Eye, Sex), nodupkey = TRUE)
+res3 <- proc_sort(dat, keep = v(Eye, Sex), options = nodupkey)
 
 # View results
 res3

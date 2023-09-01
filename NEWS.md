@@ -4,6 +4,7 @@
 * Fixed sparse output when variables are defined as factors.
 * Put interactive() condition on viewer functions so as not to produce 
 unnecessary temp files in batch sessions.
+* Added 'dupkey' option to `proc_sort()`.
 * Released to CRAN.
 
 # procs 0.0.9008
