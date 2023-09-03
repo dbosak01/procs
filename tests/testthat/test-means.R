@@ -1269,7 +1269,7 @@ test_that("means56: factors work as expected.", {
 })
 
 
-test_that("freq68: two by as factors work.", {
+test_that("means68: two by as factors work.", {
 
   datsp <- datm
   datsp$Flavor <- factor(datsp$Flavor, levels = c("Vanilla", "Chocolate", "Spice", "Rum"))
@@ -1302,7 +1302,7 @@ test_that("freq68: two by as factors work.", {
 })
 
 
-test_that("freq69: other statistics with by works.", {
+test_that("means69: other statistics with by works.", {
 
   datsp <- datm
   datsp$Layers[1] <- 3
@@ -1336,6 +1336,160 @@ test_that("freq69: other statistics with by works.", {
 
 
 })
+
+
+
+test_that("means29: factor sort on class works.", {
+
+  var1 <- c("Age", "PresentScore", "TasteScore")
+  var2 <- c("n",  "mean", "std", "min", "max")
+
+  datsp <- datm
+
+  datsp$Flavor <- factor(datsp$Flavor, levels = c("Vanilla", "Chocolate", "Spice", "Rum"))
+  datsp$Layers <- factor(datsp$Layers, levels = c("4", "3", "2", "1"))
+
+  res <- proc_means(datsp, var = var1,
+                    stats = var2,
+                    #by = "Layers",
+                    class = c("Layers"),
+                    titles = "My first title for Means",
+                    options = long,
+                    output = c("all", "report"))
+
+  res
+
+  expect_equal(nrow(res$report[[1]]), 9)
+  expect_equal(ncol(res$report[[1]]), 7)
+  expect_equal(as.character(unique(res$report[[1]]$CLASS)), c("3", "2", "1"))
+
+  expect_equal(nrow(res$out), 20)
+  expect_equal(ncol(res$out), 7)
+  expect_equal(as.character(unique(res$out$CLASS)), c(NA, "3", "2", "1"))
+
+})
+
+test_that("means29: factor sort on 2 classes works.", {
+
+  var1 <- c("Age", "PresentScore", "TasteScore")
+  var2 <- c("n",  "mean", "std", "min", "max")
+
+  datsp <- datm
+
+  datsp$Flavor <- factor(datsp$Flavor, levels = c("Vanilla", "Chocolate", "Spice", "Rum"))
+  datsp$Layers <- factor(datsp$Layers, levels = c("4", "3", "2", "1"))
+
+  res <- proc_means(datsp, var = var1,
+                    stats = var2,
+                    #by = "Layers",
+                    class = c("Layers", "Flavor"),
+                    titles = "My first title for Means",
+                    options = long,
+                    output = c("all", "report"))
+
+  res
+
+  expect_equal(nrow(res$report[[1]]), 27)
+  expect_equal(ncol(res$report[[1]]), 8)
+  expect_equal(as.character(unique(res$report[[1]]$CLASS1)), c("3", "2", "1"))
+  expect_equal(as.character(unique(res$report[[1]]$CLASS2)),  c("Vanilla", "Chocolate", "Spice", "Rum"))
+
+  expect_equal(nrow(res$out), 85)
+  expect_equal(ncol(res$out), 8)
+  expect_equal(as.character(unique(res$out$CLASS1)), c(NA, "3", "2", "1"))
+  expect_equal(as.character(unique(res$out$CLASS2)),  c(NA, "Vanilla", "Chocolate", "Spice", "Rum"))
+
+})
+
+#
+# test_that("means29: completetypes on one factor works.", {
+#
+#   var1 <- c("Age", "PresentScore", "TasteScore")
+#   var2 <- c("n",  "mean", "std", "min", "max")
+#
+#   datsp <- datm
+#
+#   datsp$Flavor <- factor(datsp$Flavor, levels = c("Vanilla", "Chocolate", "Spice", "Rum"))
+#   datsp$Layers <- factor(datsp$Layers, levels = c("4", "3", "2", "1"))
+#
+#   res <- proc_means(datsp, var = var1,
+#                     stats = var2,
+#                     #by = "Layers",
+#                     class = c("Layers"),
+#                     titles = "My first title for Means",
+#                     options = "completetypes",
+#                     output = c("all", "report"))
+#
+#   res
+#
+#   expect_equal(nrow(res$report[[1]]), 9)
+#   expect_equal(ncol(res$report[[1]]), 7)
+#   expect_equal(as.character(unique(res$report[[1]]$CLASS)), c("3", "2", "1"))
+#
+#   expect_equal(nrow(res$out), 20)
+#   expect_equal(ncol(res$out), 7)
+#   expect_equal(as.character(unique(res$out$CLASS)), c(NA, "3", "2", "1"))
+#
+# })
+#
+#
+#
+#
+# test_that("means29: completetypes options works.", {
+#
+#   var1 <- c("Age", "PresentScore", "TasteScore")
+#   var2 <- c("n",  "mean", "std", "min", "max")
+#
+#   datsp <- datm
+#
+#   datsp$Flavor <- factor(datsp$Flavor, levels = c("Vanilla", "Chocolate", "Spice", "Rum"))
+#   datsp$Layers <- factor(datsp$Layers, levels = c("4", "3", "2", "1"))
+#
+#
+#
+#   res <- proc_means(datsp, var = var1,
+#                     stats = var2,
+#                     #by = "Layers",
+#                     class = c("Layers"),
+#                     titles = "My first title for Means")
+#
+#   res
+#
+#   expect_equal(nrow(res), 12)
+#   expect_equal(ncol(res), 9)
+#   expect_equal(unique(res$CLASS), c(NA, "3", "2", "1"))
+#
+#
+#   res1 <- proc_means(datsp, var = var1,
+#                     stats = var2,
+#                     #by = "Layers",
+#                     class = c("Layers"),
+#                     titles = "My first title for Means",
+#                     options = "completetypes")
+#
+#   res1
+#
+#   expect_equal(nrow(res1), 85)
+#   expect_equal(ncol(res1), 8)
+#
+#
+#
+#   res2 <- proc_means(datsp, var = var1,
+#                     stats = var2,
+#                     #by = "Layers",
+#                     class = c("Layers", "Flavor"),
+#                     titles = "My first title for Means",
+#                     options = "completetypes")
+#
+#   res2
+#
+#   expect_equal(nrow(res2), 85)
+#   expect_equal(ncol(res2), 8)
+#
+#
+#
+# })
+
 
 
 

@@ -620,3 +620,60 @@ get_maxdec <- function(opts) {
 
   return(ret)
 }
+
+
+
+restore_datatypes <- function(res, data, class, clsnms = NULL) {
+
+
+  if (is.null(clsnms))
+    clsnms <- get_class_names(class)
+
+    for (k in seq_len(length(class))) {
+      if (nrow(data) == 0) {
+
+        res[[clsnms[k]]] <- NA
+
+      } else {
+        if (all(class(data[[class[k]]]) == "factor")) {
+
+          res[[clsnms[k]]] <- factor(res[[clsnms[k]]], levels = attr(data[[class[k]]], "levels"))
+
+        } else if (all(class(data[[class[k]]]) == "Date")) {
+
+          res[[clsnms[k]]] <- as.Date(res[[clsnms[k]]])
+
+        } else if (typeof(data[[class[k]]]) == "integer") {
+
+          res[[clsnms[k]]] <- as.integer(res[[clsnms[k]]])
+
+        } else if (typeof(data[[class[k]]]) == "numeric") {
+
+          res[[clsnms[k]]] <- as.numeric(res[[clsnms[k]]])
+        }
+      }
+
+    }
+
+
+  return(res)
+}
+
+
+get_class_names <- function(class) {
+
+
+  # Create name lookup
+  if (length(class) == 1)
+    clsnms <- "CLASS"
+  else
+    clsnms <- paste0("CLASS", seq(1, length(class)))
+
+  names(clsnms) <- class
+
+  return(clsnms)
+
+}
+
+
+

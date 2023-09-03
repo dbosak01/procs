@@ -57,7 +57,7 @@ When a \code{by} and a \code{class} are both specified, the \code{class}
 will be nested in the \code{by}.}
 
 \item{options}{A vector of optional keywords. Valid values are: "alpha =",
-"long", "maxdec", "noprint", "notype, "nofreq", "nonobs",
+"completetypes", "long", "maxdec", "noprint", "notype, "nofreq", "nonobs",
 "stacked", and "wide".  The "wide", "long", and "stacked" keywords are data
 shaping options that control the structure of the output data.
 The "notype", "nofreq", and "nonobs" keywords will turn
@@ -177,6 +177,11 @@ be passed as a quoted vector of strings, or an unquoted vector using the
 value for confidence limit statistics.  Set the alpha as a decimal value
 between 0 and 1.  For example, you can set a 90\% confidence limit as
 \code{alpha = 0.1}.
+}
+\item{\strong{completetypes}: The "completetypes" option will generate
+all combinations of the available class categories in the data.  Available
+categories will be distinguished by the TYPE variable. If the variable is
+a factor, the available categories will be taken from the factor levels.
 }
 \item{\strong{long}: A shaping option that will transpose the output dataset
 so that statistics are in rows and variables are in columns.

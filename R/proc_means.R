@@ -97,6 +97,11 @@
 #' between 0 and 1.  For example, you can set a 90% confidence limit as
 #' \code{alpha = 0.1}.
 #' }
+#' \item{\strong{completetypes}: The "completetypes" option will generate
+#' all combinations of the available class categories in the data.  Available
+#' categories will be distinguished by the TYPE variable. If the variable is
+#' a factor, the available categories will be taken from the factor levels.
+#' }
 #' \item{\strong{long}: A shaping option that will transpose the output dataset
 #' so that statistics are in rows and variables are in columns.
 #' }
@@ -164,7 +169,7 @@
 #' will be nested in the \code{by}.
 # @param weight An optional weight parameter.
 #' @param options A vector of optional keywords. Valid values are: "alpha =",
-#' "long", "maxdec", "noprint", "notype, "nofreq", "nonobs",
+#' "completetypes", "long", "maxdec", "noprint", "notype, "nofreq", "nonobs",
 #' "stacked", and "wide".  The "wide", "long", and "stacked" keywords are data
 #' shaping options that control the structure of the output data.
 #' The "notype", "nofreq", and "nonobs" keywords will turn
@@ -618,6 +623,7 @@ get_output <- function(data, var, stats, missing = FALSE,
 
     ret <- cbind(df, ret)
   }
+
 
   return(ret)
 }
@@ -1153,6 +1159,28 @@ gen_report_means <- function(data,
 
     }
 
+    # Convert data types if necessary and sort
+    # for (k in seq_len(length(class))) {
+    #   if (class(data[[class[k]]]) == "factor") {
+    #
+    #     smtbl[[clsnms[k]]] <- factor(smtbl[[clsnms[k]]], levels = attr(data[[class[k]]], "levels"))
+    #
+    #   } else if (class(data[[class[k]]]) == "Date") {
+    #
+    #     smtbl[[clsnms[k]]] <- as.Date(smtbl[[class[k]]])
+    #
+    #   } else if (typeof(data[[class[k]]]) == "integer") {
+    #
+    #     smtbl[[clsnms[k]]] <- as.integer(smtbl[[class[k]]])
+    #
+    #   } else if (typeof(data[[class[k]]]) == "numeric") {
+    #
+    #     smtbl[[clsnms[k]]] <- as.numeric(smtbl[[class[k]]])
+    #   }
+    #
+    # }
+    # res <-  sort(res, by = clsnms)
+
     # Convert to tibble if incoming data is a tibble
     if ("tbl_df" %in% class(data)) {
       res[[nm]] <- as_tibble(smtbl)
@@ -1242,8 +1270,6 @@ get_class_report <- function(data, var, class, outp, freq = TRUE,
                          opts = opts)
 
 
-
-
     if (!is.null(res))
       res <- rbind(res, tmpres)
     else
@@ -1256,6 +1282,9 @@ get_class_report <- function(data, var, class, outp, freq = TRUE,
 
       clsnms <- paste0("CLASS", seq(1, length(class)))
     }
+
+
+    res <- restore_datatypes(res, data, class, clsnms)
 
     res <-  sort(res, by = clsnms)
     rownames(res) <- NULL
@@ -1354,7 +1383,7 @@ gen_output_means <- function(data,
                                 type = tp,
                                 opts = opts)
 
-
+            tmpby <- restore_datatypes(tmpby, dat, class)
 
           if (is.null(tmpres))
             tmpres <- tmpby
@@ -1449,12 +1478,7 @@ get_class_output <- function(data, var, class, outp, freq = TRUE,
   } else {
 
     # Create name lookup
-    if (length(class) == 1)
-      clsnms <- "CLASS"
-    else
-      clsnms <- paste0("CLASS", seq(1, length(class)))
-
-    names(clsnms) <- class
+    clsnms <- get_class_names(class)
 
     tp <- 1
 
@@ -1503,7 +1527,7 @@ get_class_output <- function(data, var, class, outp, freq = TRUE,
 
 
           if (!is.null(res))
-            res <- merge(res, tmpres, all = TRUE, no.dups = FALSE)
+            res <- merge(res, tmpres, all = TRUE, no.dups = FALSE, sort = FALSE)
           else
             res <- tmpres
         }
@@ -1517,30 +1541,35 @@ get_class_output <- function(data, var, class, outp, freq = TRUE,
 
     }
 
+    clsnms <- get_class_names(class)
+
+    res <- restore_datatypes(res, data, class, clsnms)
+
     if ("STAT" %in% names(res)) {
         # Sort stats by supplied order
         res[["STAT"]] <- factor(res[["STAT"]], levels = toupper(stats))
 
         # Deal with NA values in sort
         ccnms <- as.character(clsnms)
-        for (cnm in ccnms) {
-
-          res[[cnm]] <- ifelse(is.na(res[[cnm]]), "...", res[[cnm]])
-        }
+        # for (cnm in ccnms) {
+        #
+        #   res[[cnm]] <- ifelse(is.na(res[[cnm]]), "...", res[[cnm]])
+        # }
 
         # Sort
-        res <- sort(res, by = c("TYPE", ccnms, "STAT"))
+        res <- sort(res, by = c("TYPE", ccnms, "STAT"), na.last = FALSE)
 
         # Restore stat column
         res[["STAT"]] <- as.character(res[["STAT"]])
 
         # Restore CLASS columns
-        for (cnm in ccnms) {
-
-          res[[cnm]] <- ifelse(res[[cnm]] == "...", NA, res[[cnm]])
-        }
+        # for (cnm in ccnms) {
+        #
+        #   res[[cnm]] <- ifelse(res[[cnm]] == "...", NA, res[[cnm]])
+        # }
 
     } else {
+
 
       res <-  sort(res, by = c("TYPE", as.character(clsnms)))
 

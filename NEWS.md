@@ -5,6 +5,7 @@
 * Put interactive() condition on viewer functions so as not to produce 
 unnecessary temp files in batch sessions.
 * Added 'dupkey' option to `proc_sort()`.
+* Added 'completetypes' option to proc means.
 * Released to CRAN.
 
 # procs 0.0.9008
