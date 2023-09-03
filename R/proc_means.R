@@ -1101,23 +1101,6 @@ gen_report_means <- function(data,
     outp <- out(stats = stats, shape = "wide")
     smtbl <- get_class_report(dt, var, class, outp, freq = FALSE, opts = opts)
 
-    aov <- NULL
-    # Get aov if requested
-    # if (get_option(options, "aov", FALSE) & !is.null(class)) {
-    #
-    #   bylbl <- NULL
-    #   if (!is.null(by))
-    #     bylbl <- bylbls[j]
-    #
-    #   if (is.null(weight))
-    #     aov <- get_aov(dt, var, class, bylbl = bylbl )
-    #   else
-    #     aov <- get_aov(dt, var, class, weight, bylbl = bylbl)
-    #
-    # }
-    #smtbl <- get_summaries(dt, var, stats, missing)
-
-
     nm <- length(res) + 1
 
     # Add spanning headers if there are by groups
@@ -1159,44 +1142,12 @@ gen_report_means <- function(data,
 
     }
 
-    # Convert data types if necessary and sort
-    # for (k in seq_len(length(class))) {
-    #   if (class(data[[class[k]]]) == "factor") {
-    #
-    #     smtbl[[clsnms[k]]] <- factor(smtbl[[clsnms[k]]], levels = attr(data[[class[k]]], "levels"))
-    #
-    #   } else if (class(data[[class[k]]]) == "Date") {
-    #
-    #     smtbl[[clsnms[k]]] <- as.Date(smtbl[[class[k]]])
-    #
-    #   } else if (typeof(data[[class[k]]]) == "integer") {
-    #
-    #     smtbl[[clsnms[k]]] <- as.integer(smtbl[[class[k]]])
-    #
-    #   } else if (typeof(data[[class[k]]]) == "numeric") {
-    #
-    #     smtbl[[clsnms[k]]] <- as.numeric(smtbl[[class[k]]])
-    #   }
-    #
-    # }
-    # res <-  sort(res, by = clsnms)
-
     # Convert to tibble if incoming data is a tibble
     if ("tbl_df" %in% class(data)) {
       res[[nm]] <- as_tibble(smtbl)
-      if (!is.null(aov)) {
-
-        res[[paste0(nm, " aov")]] <- as_tibble(aov)
-      }
     } else {
       res[[nm]] <- smtbl
-
-      if (!is.null(aov)) {
-        res[[paste0(nm, " aov")]] <- as_tibble(aov)
-      }
     }
-
-
 
   }
 
@@ -1219,6 +1170,8 @@ gen_report_means <- function(data,
     }
   }
 
+  if (length(res) == 1)
+    res <- res[[1]]
 
   return(res)
 

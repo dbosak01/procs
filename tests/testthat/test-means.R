@@ -81,11 +81,10 @@ test_that("means2: gen_report_means works as expected with two variables.", {
 
   res
 
-  expect_equal(length(res), 1)
-  expect_equal(nrow(res[[1]]), 2)
-  expect_equal(ncol(res[[1]]), 8)
+  expect_equal(is.data.frame(res), TRUE)
+  expect_equal(nrow(res), 2)
+  expect_equal(ncol(res), 8)
 
-  res <- res[[1]]
   expect_equal(res[2, "N"], 20)
   expect_equal(res[2, "MEAN"], 81.35)
   expect_equal(res[2, "MIN"], 72)
@@ -179,9 +178,9 @@ test_that("means7: gen_report_means with single parameter values.", {
 
   res
 
-  expect_equal(length(res), 1)
-  expect_equal(nrow(res[[1]]), 1)
-  expect_equal(ncol(res[[1]]), 2)
+  expect_equal(is.data.frame(res), TRUE)
+  expect_equal(nrow(res), 1)
+  expect_equal(ncol(res), 2)
 
 })
 
@@ -1098,8 +1097,8 @@ test_that("means53: Multiple class vars match SAS.", {
   expect_equal(nrow(res$out), 55)
   expect_equal(ncol(res$out), 8)
 
-  expect_equal(nrow(res$report[[1]]), 15)
-  expect_equal(ncol(res$report[[1]]), 8)
+  expect_equal(nrow(res$report), 15)
+  expect_equal(ncol(res$report), 8)
 
 
 
@@ -1117,8 +1116,8 @@ test_that("means53: Multiple class vars match SAS.", {
   expect_equal(nrow(res$out), 210)
   expect_equal(ncol(res$out), 9)
 
-  expect_equal(nrow(res$report[[1]]), 33)
-  expect_equal(ncol(res$report[[1]]), 9)
+  expect_equal(nrow(res$report), 33)
+  expect_equal(ncol(res$report), 9)
 
 
 })
@@ -1244,8 +1243,8 @@ test_that("means56: factors work as expected.", {
   expect_equal(nrow(res$out), 210)
   expect_equal(ncol(res$out), 9)
 
-  expect_equal(nrow(res$report[[1]]), 33)
-  expect_equal(ncol(res$report[[1]]), 9)
+  expect_equal(nrow(res$report), 33)
+  expect_equal(ncol(res$report), 9)
 
 
   res <- proc_means(datmr,
@@ -1339,7 +1338,7 @@ test_that("means69: other statistics with by works.", {
 
 
 
-test_that("means29: factor sort on class works.", {
+test_that("means70: factor sort on class works.", {
 
   var1 <- c("Age", "PresentScore", "TasteScore")
   var2 <- c("n",  "mean", "std", "min", "max")
@@ -1359,9 +1358,9 @@ test_that("means29: factor sort on class works.", {
 
   res
 
-  expect_equal(nrow(res$report[[1]]), 9)
-  expect_equal(ncol(res$report[[1]]), 7)
-  expect_equal(as.character(unique(res$report[[1]]$CLASS)), c("3", "2", "1"))
+  expect_equal(nrow(res$report), 9)
+  expect_equal(ncol(res$report), 7)
+  expect_equal(as.character(unique(res$report$CLASS)), c("3", "2", "1"))
 
   expect_equal(nrow(res$out), 20)
   expect_equal(ncol(res$out), 7)
@@ -1369,7 +1368,7 @@ test_that("means29: factor sort on class works.", {
 
 })
 
-test_that("means29: factor sort on 2 classes works.", {
+test_that("means71: factor sort on 2 classes works.", {
 
   var1 <- c("Age", "PresentScore", "TasteScore")
   var2 <- c("n",  "mean", "std", "min", "max")
@@ -1389,10 +1388,10 @@ test_that("means29: factor sort on 2 classes works.", {
 
   res
 
-  expect_equal(nrow(res$report[[1]]), 27)
-  expect_equal(ncol(res$report[[1]]), 8)
-  expect_equal(as.character(unique(res$report[[1]]$CLASS1)), c("3", "2", "1"))
-  expect_equal(as.character(unique(res$report[[1]]$CLASS2)),  c("Vanilla", "Chocolate", "Spice", "Rum"))
+  expect_equal(nrow(res$report), 27)
+  expect_equal(ncol(res$report), 8)
+  expect_equal(as.character(unique(res$report$CLASS1)), c("3", "2", "1"))
+  expect_equal(as.character(unique(res$report$CLASS2)),  c("Vanilla", "Chocolate", "Spice", "Rum"))
 
   expect_equal(nrow(res$out), 85)
   expect_equal(ncol(res$out), 8)
@@ -1400,14 +1399,15 @@ test_that("means29: factor sort on 2 classes works.", {
   expect_equal(as.character(unique(res$out$CLASS2)),  c(NA, "Vanilla", "Chocolate", "Spice", "Rum"))
 
 })
-
 #
-# test_that("means29: completetypes on one factor works.", {
+#
+# test_that("means72: completetypes on one factor works.", {
 #
 #   var1 <- c("Age", "PresentScore", "TasteScore")
 #   var2 <- c("n",  "mean", "std", "min", "max")
 #
 #   datsp <- datm
+#   datsp$Age[[1]] <- NA
 #
 #   datsp$Flavor <- factor(datsp$Flavor, levels = c("Vanilla", "Chocolate", "Spice", "Rum"))
 #   datsp$Layers <- factor(datsp$Layers, levels = c("4", "3", "2", "1"))
@@ -1422,19 +1422,30 @@ test_that("means29: factor sort on 2 classes works.", {
 #
 #   res
 #
-#   expect_equal(nrow(res$report[[1]]), 9)
-#   expect_equal(ncol(res$report[[1]]), 7)
-#   expect_equal(as.character(unique(res$report[[1]]$CLASS)), c("3", "2", "1"))
+#   res1 <- proc_means(datm, var = var1,
+#                     stats = var2,
+#                     #by = "Layers",
+#                     class = c("Layers"),
+#                     titles = "My first title for Means",
+#                     options = "completetypes",
+#                     output = c("all", "report"))
+#
+#   res1
+#
+#
+#   expect_equal(nrow(res$report), 12)
+#   expect_equal(ncol(res$report), 7)
+#   expect_equal(as.character(unique(res$report$CLASS)), c("4", "3", "2", "1"))
 #
 #   expect_equal(nrow(res$out), 20)
 #   expect_equal(ncol(res$out), 7)
-#   expect_equal(as.character(unique(res$out$CLASS)), c(NA, "3", "2", "1"))
+#   expect_equal(as.character(unique(res$out$CLASS)), c(NA, "4", "3", "2", "1"))
 #
 # })
-#
-#
-#
-#
+
+
+
+
 # test_that("means29: completetypes options works.", {
 #
 #   var1 <- c("Age", "PresentScore", "TasteScore")
