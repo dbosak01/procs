@@ -1831,6 +1831,7 @@ gen_output_freq <- function(data,
   wgt <- "__cnt"
 
   byvals <- list()
+  bynms <- NULL
   if (!is.null(by)) {
     if (length(by) == 1)
       bynms <- "BY"
@@ -2035,7 +2036,11 @@ gen_output_freq <- function(data,
 
       }
 
+      if (!is.null(by)) {
 
+        tmpres <- restore_datatypes(tmpres, data, by, bynms)
+
+      }
 
 
       # System Labels

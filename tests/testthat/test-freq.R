@@ -637,7 +637,7 @@ test_that("freq25: Single by group on single table works.", {
   expect_equal("data.frame" %in% class(res), TRUE)
   expect_equal(nrow(res), 6)
   expect_equal(ncol(res), 6)
-
+  expect_equal(typeof(res$BY), 'integer')
 
 })
 
@@ -658,6 +658,8 @@ test_that("freq26: Single by group on double table works.", {
   expect_equal(length(res), 2)
   expect_equal(nrow(res[[1]]), 6)
   expect_equal(nrow(res[[2]]), 10)
+  expect_equal(typeof(res[[1]]$BY), 'integer')
+  expect_equal(typeof(res[[2]]$BY), 'integer')
 
 })
 
@@ -2014,7 +2016,8 @@ test_that("freq68: factors with by work.", {
 
   expect_equal(unique(as.character(res1$BY)), c("brown", "blue"))
   expect_equal(unique(as.character(res2$BY)), c("green", "brown", "blue"))
-
+  expect_equal(class(res1$BY), 'factor')
+  expect_equal(class(res2$BY), 'factor')
 
 })
 

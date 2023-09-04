@@ -57,7 +57,8 @@ datastep(sdtm.DM,
 
 put("Get population counts")
 proc_freq(dm, tables = ARM, 
-          options = v(long, nopercent, nonobs)) -> arm_pop 
+          output = long, 
+          options = v(nopercent, nonobs)) -> arm_pop 
 
 put ("Create lookup for AE severity")
 sevn <- c(MILD = 1, MODERATE = 2, SEVERE = 3) |> put()

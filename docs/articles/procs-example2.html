@@ -159,7 +159,8 @@ horizontally using the <code>page_wrap</code> feature of the
 <span></span>
 <span><span class="fu">put</span><span class="op">(</span><span class="st">"Get population counts"</span><span class="op">)</span></span>
 <span><span class="fu"><a href="../reference/proc_freq.html">proc_freq</a></span><span class="op">(</span><span class="va">dm</span>, tables <span class="op">=</span> <span class="va">ARM</span>, </span>
-<span>          options <span class="op">=</span> <span class="fu"><a href="https://common.r-sassy.org/reference/v.html" class="external-link">v</a></span><span class="op">(</span><span class="va">long</span>, <span class="va">nopercent</span>, <span class="va">nonobs</span><span class="op">)</span><span class="op">)</span> <span class="op">-&gt;</span> <span class="va">arm_pop</span> </span>
+<span>          output <span class="op">=</span> <span class="va">long</span>, </span>
+<span>          options <span class="op">=</span> <span class="fu"><a href="https://common.r-sassy.org/reference/v.html" class="external-link">v</a></span><span class="op">(</span><span class="va">nopercent</span>, <span class="va">nonobs</span><span class="op">)</span><span class="op">)</span> <span class="op">-&gt;</span> <span class="va">arm_pop</span> </span>
 <span></span>
 <span><span class="fu">put</span> <span class="op">(</span><span class="st">"Create lookup for AE severity"</span><span class="op">)</span></span>
 <span><span class="va">sevn</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>MILD <span class="op">=</span> <span class="fl">1</span>, MODERATE <span class="op">=</span> <span class="fl">2</span>, SEVERE <span class="op">=</span> <span class="fl">3</span><span class="op">)</span> <span class="op">|&gt;</span> <span class="fu">put</span><span class="op">(</span><span class="op">)</span></span>
