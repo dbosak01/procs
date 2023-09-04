@@ -121,7 +121,7 @@ proc_freq(ae_sub,
 
 put("Get unique SOC and PT combinations")
 proc_sort(ae_sub, keep = v(AESOC, AEDECOD), 
-          by = v(AESOC, AEDECOD), nodupkey = TRUE) -> evnts 
+          by = v(AESOC, AEDECOD), options = nodupkey) -> evnts 
 
 put("Combine columns for PT")
 datastep(ae_pt, 
