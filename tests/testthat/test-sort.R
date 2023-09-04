@@ -204,3 +204,26 @@ test_that("sort12: dupkey without keep works.", {
   expect_equal(ncol(res), 4)
 
 })
+
+test_that("sort13: Another dupkey test works.", {
+
+  spsrt <- read.table(header = TRUE, text = '
+                    ID	Name	Score
+                    1	David	 74
+                    2	Sam	   45
+                    3	Bane	 87
+                    3	Mary	 92
+                    4	Dane	 23
+                    5	Jenny	 87
+                    6	Simran 63
+                    8	Priya	 72
+                    1	David	 45
+                    2	Ram	   54
+                    3	Bane	 87
+                    5	Ken	   87')
+
+  res <- proc_sort(spsrt, by = Name, options = "dupkey")
+
+  expect_equal(res$Name, c("Bane", "Bane", "David", "David"))
+
+})

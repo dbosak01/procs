@@ -158,25 +158,59 @@ proc_freq(dat, tables = y, weight = z)
 ```
 <img src="../man/images/freqtut9.png"/>
 
+
+## Statistics Options
+The `options` parameter also accepts statistics options.  For two-way tables,
+you may request either Chi-Square or Fisher's tests of association.
+Here is an example of the Chi-Square test:
+```{r eval=FALSE, echo=TRUE} 
+# Request Chi-Square and Output datasets
+res <- proc_freq(dat, tables = y * x, options = chisq)
+```
+<img src="../man/images/freqtut10.png"/>
+
+```{r eval=FALSE, echo=TRUE} 
+# View results
+res
+# $`y * x`
+#    VAR1 VAR2 CAT1 CAT2 N CNT  PCT
+# 1     y    x    A    2 8   1 12.5
+# 2     y    x    A    3 8   0  0.0
+# 3     y    x    A    5 8   0  0.0
+# 4     y    x    A    6 8   2 25.0
+# 5     y    x    B    2 8   1 12.5
+# 6     y    x    B    3 8   1 12.5
+# 7     y    x    B    5 8   0  0.0
+# 8     y    x    B    6 8   0  0.0
+# 9     y    x    C    2 8   1 12.5
+# 10    y    x    C    3 8   1 12.5
+# 11    y    x    C    5 8   1 12.5
+# 12    y    x    C    6 8   0  0.0
+# 
+# $`chisq:y * x`
+#      CHISQ CHISQ.DF   CHISQ.P
+# 1 6.444444        6 0.3752853
+
+```
+
 ## Output Datasets
 
-You may request datasets from the `proc_freq` function using the `output`
-parameter.  This parameter takes three values: "all", "report", and "none".
-The "all" keyword requests datasets meant for output, and is the default.
+You may control datasets returned from the `proc_freq` function using the `output`
+parameter.  This parameter takes three basic values: "out", "report", and "none".
+The "out" keyword requests datasets meant for output, and is the default.
 These datasets have standardized column names, and sometimes have additional
 columns to help with data manipulation.  The "report" keyword requests
 the exact datasets used to create the interactive report. For both keywords, 
 if there is more than one dataset, they will be returned as a list of datasets.
 The name of the list item will identify the dataset. You may
-control the names of the output tables in the list by using a 
+specify the names of the output tables in the list by using a 
 named table request. 
 
-Here is an example of the
-"all" option:
+Here is an example of the "out" option:
 ```{r eval=FALSE, echo=TRUE} 
 # Request output data
 res <- proc_freq(dat, tables = v(x, y, MyCross = y * x), 
-                 output = all)
+                 output = out)
 
 # View results
 res
@@ -214,45 +248,12 @@ is much simpler than the corresponding mechanism in SAS®.  With `proc_freq`,
 by default, all requested tables and statistics will be
 returned in a list. No other output parameters are needed.
 
-## Statistics Options
-The `options` parameter also accepts statistics options.  For two-way tables,
-you may request either Chi-Square or Fisher's tests of association.
-Here is an example of the Chi-Square test:
-```{r eval=FALSE, echo=TRUE} 
-# Request Chi-Square and Output datasets
-res <- proc_freq(dat, tables = y * x, options = chisq)
-```
-<img src="../man/images/freqtut10.png"/>
-
-```{r eval=FALSE, echo=TRUE} 
-# View results
-res
-# $`y * x`
-#    VAR1 VAR2 CAT1 CAT2 N CNT  PCT
-# 1     y    x    A    2 8   1 12.5
-# 2     y    x    A    3 8   0  0.0
-# 3     y    x    A    5 8   0  0.0
-# 4     y    x    A    6 8   2 25.0
-# 5     y    x    B    2 8   1 12.5
-# 6     y    x    B    3 8   1 12.5
-# 7     y    x    B    5 8   0  0.0
-# 8     y    x    B    6 8   0  0.0
-# 9     y    x    C    2 8   1 12.5
-# 10    y    x    C    3 8   1 12.5
-# 11    y    x    C    5 8   1 12.5
-# 12    y    x    C    6 8   0  0.0
-# 
-# $`chisq:y * x`
-#      CHISQ CHISQ.DF   CHISQ.P
-# 1 6.444444        6 0.3752853
-
-```
-
 ## Data Shaping
 
 The `proc_freq` function provides three options for shaping data:
 "wide", "long", and "stacked".  These options control how the output
-data is organized.  The options are best illustrated by an example:
+data is organized.  The options are also passed on the `output` parameter.
+The shaping options are best illustrated by an example:
 ```{r eval=FALSE, echo=TRUE} 
 # Shape wide
 res1 <- proc_freq(dat, tables = y, 

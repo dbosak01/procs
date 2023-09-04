@@ -115,14 +115,14 @@ proc_means(dat, stats = v(median, sum, q1, q3))
 ## Output Datasets
 
 Similar to the `proc_freq` function, `proc_means` can return datasets.
-There are three options: "all", "report", and "none".  The 
-"all" option returns datasets meant for further manipulation and analysis, and
+There are three options: "out", "report", and "none".  The 
+"out" option returns datasets meant for further manipulation and analysis, and
 is the default.
 The "report" keyword requests the exact datasets used in the interactive
 report.  Specifying either one of these options will cause the function
 to return data.  
 
-Here is an example that shows the difference in the "report" and "all" options:
+Here is an example that shows the difference in the "report" and "out" options:
 ```{r eval=FALSE, echo=TRUE} 
 # Output dataset using "report" option
 res1 <- proc_means(dat, 
@@ -139,7 +139,7 @@ res1
 # Output dataset using "all" option
 res2 <- proc_means(dat, 
                    stats = v(median, sum, q1, q3),
-                   output = all)
+                   output = out)
 
 # View results
 res2
@@ -148,7 +148,7 @@ res2
 # 2    0    8   z     65 506 57.5 75.5
 
 ```
-As can be seen in the above example, the "all" output datasets include additional
+As can be seen in the above example, the "out" dataset includes additional
 variables for TYPE and FREQ. These additional variables can be 
 turned off with options:
 ```{r eval=FALSE, echo=TRUE} 
@@ -250,17 +250,30 @@ Here is the output dataset:
 # View results - two class variables
 res1
 #    CLASS1 CLASS2 TYPE FREQ VAR MEDIAN SUM   Q1    Q3
-# 1    <NA>   <NA>    0    8   x      3  29  2.0   5.5
-# 2    <NA>   <NA>    0    8   z     65 506 57.5  75.5
-# 3       P      A    1    3   x      6  14  2.0   6.0
-# 4       P      A    1    3   z     70 230 60.0 100.0
-# 5       P      B    1    1   x      2   2  2.0   2.0
-# 6       P      B    1    1   z     10  10 10.0  10.0
-# 7       Q      B    1    1   x      3   3  3.0   3.0
-# 8       Q      B    1    1   z     67  67 67.0  67.0
-# 9       Q      C    1    3   x      3  10  2.0   5.0
-# 10      Q      C    1    3   z     63 199 55.0  81.0
+# 1    <NA>   <NA>    0    8   x    3.0  29  2.0   5.5
+# 2    <NA>   <NA>    0    8   z   65.0 506 57.5  75.5
+# 3    <NA>      A    1    3   x    6.0  14  2.0   6.0
+# 4    <NA>      A    1    3   z   70.0 230 60.0 100.0
+# 5    <NA>      B    1    2   x    2.5   5  2.0   3.0
+# 6    <NA>      B    1    2   z   38.5  77 10.0  67.0
+# 7    <NA>      C    1    3   x    3.0  10  2.0   5.0
+# 8    <NA>      C    1    3   z   63.0 199 55.0  81.0
+# 9       P   <NA>    2    4   x    4.0  16  2.0   6.0
+# 10      P   <NA>    2    4   z   65.0 240 35.0  85.0
+# 11      Q   <NA>    2    4   x    3.0  13  2.5   4.0
+# 12      Q   <NA>    2    4   z   65.0 266 59.0  74.0
+# 13      P      A    3    3   x    6.0  14  2.0   6.0
+# 14      P      A    3    3   z   70.0 230 60.0 100.0
+# 15      P      B    3    1   x    2.0   2  2.0   2.0
+# 16      P      B    3    1   z   10.0  10 10.0  10.0
+# 17      Q      B    3    1   x    3.0   3  3.0   3.0
+# 18      Q      B    3    1   z   67.0  67 67.0  67.0
+# 19      Q      C    3    3   x    3.0  10  2.0   5.0
+# 20      Q      C    3    3   z   63.0 199 55.0  81.0
 ```
+Observe that the function produces statistics for each set of combinations
+of the `class` variable.  Each level of combinations is identified by the
+TYPE value.  To turn off the class combinations, pass the "nway" option.
 
 ### By
 Now let's see what happens when we use the `by` parameter with
@@ -325,9 +338,9 @@ shaping options can reduce the number of transformations needed to
 get to your target table.  
 
 There are three shaping options: "wide", "long", and "stacked".  The "wide"
-options is the default, and has the statistics in columns and variables in
-rows.  The "long" option has statistics in rows and variables in columns.
-The "stacked" option has both statistics and variables in rows.  
+option is the default, and places the statistics in columns and variables in
+rows.  The "long" option places statistics in rows and variables in columns.
+The "stacked" option puts both statistics and variables in rows.  
 
 The following example illustrates the differences between these data
 shaping options:

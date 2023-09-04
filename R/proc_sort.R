@@ -242,7 +242,7 @@ get_dupkey <- function(dat, key = NULL) {
   }
 
   # Subset by key
-  kdat <- dat[ , key]
+  kdat <- dat[ , key, drop = FALSE]
 
   # Add counting variable
   kdat$..cnt <- 1
@@ -259,13 +259,13 @@ get_dupkey <- function(dat, key = NULL) {
   kcnt <- aggregate(kdat, klist,
                      function(x){NROW(x)}, drop = TRUE)
 
-  kcnt
+  # kcnt
 
   # Filter out unique rows
   fkcnt <- kcnt[kcnt$..cnt > 1, ]
 
   # Pull out the key columns
-  fkcnt2 <- fkcnt[ , find.names(fkcnt, "key.*")]
+  fkcnt2 <- fkcnt[ , find.names(fkcnt, "key.*"), drop = FALSE]
 
   # Restore original key column names
   names(fkcnt2) <- sub("key.", "", names(fkcnt2), fixed = TRUE)

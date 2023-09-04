@@ -78,11 +78,10 @@ res
 
 ### Prefix and Suffix
 
-Notice that in the default usage, all output column names have been assigned
-generic names.  You may control the output column names using the `prefix`, 
+You may control the output column names using the `prefix`, 
 `suffix`, and `name` parameters.  The `prefix` and `suffix` will be used to
 construct the new transposed column names.  The `name` parameter value will
-be used as the name of the generic "NAME" column which identify 
+be used as the name of the generic "NAME" column, which identify 
 the `var` parameter values:
 ```{r eval=FALSE, echo=TRUE} 
 # With prefix
@@ -244,18 +243,18 @@ some sample data:
 # Create sample data
 dat <- read.table(header = TRUE, text = '
                     ID	Name	Score
-                    1	David	74
-                    2	Sam	45
-                    3	Bane	87
-                    3	Mary	92
-                    4	Dane	23
-                    5	Jenny	87
-                    6	Simran	63
-                    8	Priya	72 
-                    1	David	45
-                    2	Ram	54
-                    3	Bane	87
-                    5	Ken	87')
+                    1	David	 74
+                    2	Sam	   45
+                    3	Bane	 87
+                    3	Mary	 92
+                    4	Dane	 23
+                    5	Jenny	 87
+                    6	Simran 63
+                    8	Priya	 72 
+                    1	David	 45
+                    2	Ram	   54
+                    3	Bane	 87
+                    5	Ken	   87')
 
 # View data
 dat
@@ -275,7 +274,7 @@ dat
 ```
 
 Like `proc_transpose`, the function has a default
-usage, which will sort by all variables:
+usage, which is to sort by all variables:
 ```{r eval=FALSE, echo=TRUE} 
 # Default sort
 res <- proc_sort(dat)
@@ -416,14 +415,14 @@ res
 
 ```
 
-### Nodupkey
-Another convenient feature of `proc_sort` is the `nodupkey` parameter.  This 
-parameter will eliminate duplicates based on the unique combination of values
+### Options
+Another convenient feature of `proc_sort` is the `nodupkey` option.  This 
+option will eliminate duplicates based on the unique combination of values
 of the `by` variables. For instance, to get a unique list of students, you
-could use `keep` and `nodupkey = TRUE`:
+could use `keep` and `options = nodupkey`:
 ```{r eval=FALSE, echo=TRUE} 
 # Keep and Nodupkey
-res <- proc_sort(dat, by = Name, keep = Name, nodupkey = TRUE)
+res <- proc_sort(dat, by = Name, keep = Name, options = nodupkey)
 
 # View results
 res
@@ -439,5 +438,21 @@ res
 # 2     Sam
 # 7  Simran
 ```
+There is also a `dupkey` option to retain only records with duplicate
+key values. This feature
+would allow you to easily find students who took the exam twice, and show
+the scores for each attempt.
+```{r eval=FALSE, echo=TRUE} 
+# Keep and dupkey
+res <- proc_sort(dat, by = Name, options = dupkey)
 
-
+# View results
+res
+#   ID  Name Score
+# 1  3  Bane    87
+# 2  3  Bane    87
+# 3  1 David    74
+# 4  1 David    45
+```
+Note that the above `dupkey` option is not available in SAS®.  This option
+has been added to the `proc_sort()` function for convenience.
