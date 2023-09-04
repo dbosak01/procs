@@ -53,6 +53,9 @@ requested tables in a named list."><meta property="og:image" content="https://pr
       <a href="../articles/procs-example2.html">Example 2: Adverse Events</a>
     </li>
     <li>
+      <a href="../articles/procs-example3.html">Example 3: Disposition</a>
+    </li>
+    <li>
       <a href="../articles/procs-faq.html">Frequently Asked Questions</a>
     </li>
   </ul></li>
@@ -264,8 +267,6 @@ statistic like this: <code>options = v(nlevels, chisq)</code>.</p>
 This option is only valid on two-way tables.</p></li>
 <li><p><strong>crosstab</strong>: Two-way output tables are a list style by default.
 If you want a crosstab style, pass the "crosstab" option.</p></li>
-<li><p><strong>fisher</strong>: Requests that the Fisher's exact statistics be produced.
-This option is only valid on two-way tables.</p></li>
 <li><p><strong>list</strong>: Two-way interactive tables are a crosstab style
 by default.  If you want a list style two-way table, pass the "list" option.</p></li>
 <li><p><strong>missing</strong>: Normally, missing values are not counted and not
@@ -305,6 +306,16 @@ want the Chi-Square statistic.</p></li>
 <li><p><strong>outcum</strong>: Whether to include the cumulative frequency and percent
 on output frequency tables.  By default, these columns are not included.
 The "outcum" option will include them.</p></li>
+</ul></div>
+    <div id="statistics-options">
+    <h2>Statistics Options</h2>
+    
+
+<p>In addition to the above options, the <code>options</code> parameter accepts
+some statistics options.  The following keywords will generate
+an additional tables of specialized statistics. These statistics
+options are only available on two-way tables:</p><ul><li><p><strong>chisq</strong>: Requests that the Chi-square statistics be produced.</p></li>
+<li><p><strong>fisher</strong>: Requests that the Fisher's exact statistics be produced.</p></li>
 </ul></div>
     <div id="using-factors">
     <h2>Using Factors</h2>

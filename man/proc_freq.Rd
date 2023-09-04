@@ -166,9 +166,6 @@ This option is only valid on two-way tables.
 \item{\strong{crosstab}: Two-way output tables are a list style by default.
 If you want a crosstab style, pass the "crosstab" option.
 }
-\item{\strong{fisher}: Requests that the Fisher's exact statistics be produced.
-This option is only valid on two-way tables.
-}
 \item{\strong{list}: Two-way interactive tables are a crosstab style
 by default.  If you want a list style two-way table, pass the "list" option.
 }
@@ -220,6 +217,20 @@ want the Chi-Square statistic.
 \item{\strong{outcum}: Whether to include the cumulative frequency and percent
 on output frequency tables.  By default, these columns are not included.
 The "outcum" option will include them.
+}
+}
+}
+
+\section{Statistics Options}{
+
+In addition to the above options, the \code{options} parameter accepts
+some statistics options.  The following keywords will generate
+an additional tables of specialized statistics. These statistics
+options are only available on two-way tables:
+\itemize{
+\item{\strong{chisq}: Requests that the Chi-square statistics be produced.
+}
+\item{\strong{fisher}: Requests that the Fisher's exact statistics be produced.
 }
 }
 }

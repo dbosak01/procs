@@ -872,6 +872,7 @@ test_that("means39: check more confidence limit options", {
 
   res
 
+  frt <- v(nonobs, notype, alpha = .05)
 
   expect_equal("data.frame" %in% class(res), TRUE)
   expect_equal(ncol(res), 4)

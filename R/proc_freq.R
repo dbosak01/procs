@@ -88,9 +88,6 @@
 #' \item{\strong{crosstab}: Two-way output tables are a list style by default.
 #' If you want a crosstab style, pass the "crosstab" option.
 #' }
-#' \item{\strong{fisher}: Requests that the Fisher's exact statistics be produced.
-#' This option is only valid on two-way tables.
-#' }
 #' \item{\strong{list}: Two-way interactive tables are a crosstab style
 #' by default.  If you want a list style two-way table, pass the "list" option.
 #' }
@@ -143,7 +140,17 @@
 #' on output frequency tables.  By default, these columns are not included.
 #' The "outcum" option will include them.
 #' }
-
+#' }
+#' @section Statistics Options:
+#' In addition to the above options, the \code{options} parameter accepts
+#' some statistics options.  The following keywords will generate
+#' an additional tables of specialized statistics. These statistics
+#' options are only available on two-way tables:
+#' \itemize{
+#' \item{\strong{chisq}: Requests that the Chi-square statistics be produced.
+#' }
+#' \item{\strong{fisher}: Requests that the Fisher's exact statistics be produced.
+#' }
 #' }
 #' @section Using Factors:
 #' There are some occasions when you may want to define the \code{tables} variable
@@ -397,20 +404,6 @@ proc_freq <- function(data,
                     #  plots = NULL
                       ) {
 
-  kopts <- c("noprint",
-             "list", "nocol", "nocum", "nofreq", "nopercent",
-             "norow", "nosparse", "outcum",
-             "sparse", "crosstab",
-             "notable", "nonobs", "missing", "nlevels",
-             "wide", "long", "stacked")  # vector not used
-
-  outopts <- c("out", "report", "none")
-
-  # "expected", "outexpect", "missprint"
-
-  vstats <- c("chisq", "cl", "fisher") # vector not used
-
-  nopts <- c("alpha", "maxlevels", "out") # vector not used
 
   # Deal with single value unquoted parameter values
   oby <- deparse(substitute(by, env = environment()))
@@ -469,6 +462,26 @@ proc_freq <- function(data,
     if (!all(tolower(output) %in% outs)) {
 
       stop(paste("Invalid output keyword: ", output[!tolower(output) %in% outs], "\n"))
+    }
+
+  }
+
+  if (!is.null(options)) {
+    kopts <- c("noprint",
+               "list", "nocol", "nocum", "nofreq", "nopercent",
+               "norow", "nosparse", "outcum",
+               "sparse", "crosstab",
+               "notable", "nonobs", "missing", "nlevels",
+               "chisq", "fisher", # Statistics options
+               "alpha" # Setting options
+               )
+
+    # Future options
+    # "expected", "outexpect", "missprint", "cl", "maxlevels"
+
+    if (!all(tolower(options) %in% kopts)) {
+
+      stop(paste("Invalid options keyword: ", options[!tolower(options) %in% kopts], "\n"))
     }
 
   }

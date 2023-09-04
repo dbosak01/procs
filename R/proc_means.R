@@ -223,7 +223,7 @@
 #' will be nested in the \code{by}.
 # @param weight An optional weight parameter.
 #' @param options A vector of optional keywords. Valid values are: "alpha =",
-#' "completetypes", "long", "maxdec", "noprint", "notype, "nofreq", "nonobs".
+#' "completetypes", "maxdec =", "noprint", "notype", "nofreq", "nonobs".
 #' The "notype", "nofreq", and "nonobs" keywords will turn
 #' off columns on the output datasets.  The "alpha = " option will set the alpha
 #' value for confidence limit statistics.  The default is 95% (alpha = 0.05).
@@ -390,7 +390,7 @@ proc_means <- function(data,
   if (!is.null(class)) {
     if (!all(class %in% nms)) {
 
-      stop(paste("Invalid variable name: ", class[!class %in% nms], "\n"))
+      stop(paste("Invalid class name: ", class[!class %in% nms], "\n"))
     }
   }
 
@@ -418,6 +418,22 @@ proc_means <- function(data,
     }
 
   }
+
+  if (!is.null(options)) {
+    kopts <- c("alpha", "completetypes", "long", "maxdec",
+               "noprint", "notype", "nofreq", "nonobs")
+
+    # Deal with "alpha =" and "maxdec = " by using name instead of value
+    nopts <- names(options)
+    mopts <- ifelse(nopts == "", options, nopts)
+
+
+    if (!all(tolower(mopts) %in% kopts)) {
+
+      stop(paste("Invalid options keyword: ", mopts[!tolower(mopts) %in% kopts], "\n"))
+    }
+  }
+
 
   # Generate output specs
   if (has_output(output))

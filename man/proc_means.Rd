@@ -65,7 +65,7 @@ When a \code{by} and a \code{class} are both specified, the \code{class}
 will be nested in the \code{by}.}
 
 \item{options}{A vector of optional keywords. Valid values are: "alpha =",
-"completetypes", "long", "maxdec", "noprint", "notype, "nofreq", "nonobs".
+"completetypes", "maxdec =", "noprint", "notype", "nofreq", "nonobs".
 The "notype", "nofreq", and "nonobs" keywords will turn
 off columns on the output datasets.  The "alpha = " option will set the alpha
 value for confidence limit statistics.  The default is 95\% (alpha = 0.05).

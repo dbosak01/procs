@@ -2057,15 +2057,13 @@ test_that("freq68: var and by as factors work.", {
 
 })
 
+test_that("freq69: Param checks work.", {
 
-# test_that("freq67: outexpect keyword works as expected.", {
-#
-#   res <- proc_freq(dat, tables = v(Eyes * Hair),
-#                    options = v(outexpect, list),
-#                    weight = "Count")
-#
-#   sum(res$CNT)
-#
-#   expect_equal("N" %in% names(res), FALSE)
-#
-# })
+
+  expect_error(proc_freq(dat, tables = c("Hairy")))
+  expect_error(proc_freq(dat, tables = c("Hair"), output = "spork"))
+  expect_error(proc_freq(dat, tables = c("Hair"), options = "spork"))
+
+
+})
+

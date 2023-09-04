@@ -498,7 +498,7 @@ test_that("transpose21: transposing two id variables.", {
                    titles = "My first Frequency Table",
                    by = c("sex"),
                    weight = "count",
-                   options = v(out, outcum))
+                   options = v(outcum))
 
   res
 
@@ -521,8 +521,7 @@ test_that("transpose22: transposing inconsistent categories.", {
                    tables = c("internship"),
                    titles = "My first Frequency Table",
                    by = c("sex", "enrollment"),
-                   weight = "count",
-                   options = out)
+                   weight = "count")
 
   res
 

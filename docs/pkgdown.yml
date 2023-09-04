@@ -5,11 +5,12 @@ articles:
   procs-dm: procs-dm.html
   procs-example1: procs-example1.html
   procs-example2: procs-example2.html
+  procs-example3: procs-example3.html
   procs-faq: procs-faq.html
   procs-freq: procs-freq.html
   procs-means: procs-means.html
   procs: procs.html
-last_built: 2023-09-04T16:45Z
+last_built: 2023-09-04T21:11Z
 urls:
   reference: https://procs.r-sassy.org/reference
   article: https://procs.r-sassy.org/articles
