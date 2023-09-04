@@ -30,7 +30,10 @@ return list of tables. See "Example 3" for an illustration on how to name an
 output table.}
 
 \item{output}{Whether or not to return datasets from the function. Valid
-values are "all", "none", and "report".  Default is "all".}
+values are "out", "none", and "report".  Default is "out". This parameter
+also accepts the data shaping options "long", "stacked", and "wide". See
+the \strong{Data Shaping} section for a description of these options. Multiple
+output keywords may be passed on a character vector.}
 
 \item{by}{An optional by group. Parameter accepts a vector of one or more
 variable names. When this parameter is set, data
@@ -46,18 +49,17 @@ counts.}
 Options are passed to the parameter as a vector of quoted strings. You may
 also use the \code{v()} function to pass unquoted strings.
 The following options are available:
-"chisq", "crosstab", "fisher", "list", "long", "missing",
+"chisq", "crosstab", "fisher", "list", "missing",
 "nlevels", "nocol",
 "nocum", "nofreq", "nopercent", "noprint",
-"nonobs", "norow", "nosparse", "notable", "outcum",
-"stacked", and "wide". See
+"nonobs", "norow", "nosparse", "notable", "outcum". See
 the \strong{Options} section for a description of these options.}
 
 \item{titles}{A vector of titles to assign to the interactive report.}
 }
 \value{
 The function will return all requested datasets by default.  This is
-equivalent to the \code{output = "all"} option.  To return the datasets
+equivalent to the \code{output = "out"} option.  To return the datasets
 as created for the interactive report, pass the "report" output option.  If
 no output datasets are desired, pass the "none" output option. If a
 single dataset is requested, the function
@@ -100,7 +102,7 @@ over the column headers in the final report.
 
 The exact datasets used for the interactive output can be returned as a list.
 To return these datasets as a list, pass
-the "report" keyword on the \code{options} parameter. This list may in
+the "report" keyword on the \code{output} parameter. This list may in
 turn be passed to \code{\link{proc_print}} to write the report to a file.
 }
 
@@ -168,9 +170,6 @@ This option is only valid on two-way tables.
 \item{\strong{list}: Two-way interactive tables are a crosstab style
 by default.  If you want a list style two-way table, pass the "list" option.
 }
-\item{\strong{long}: A shaping option that will transpose the output datasets
-so that statistics are in rows and levels are in columns.
-}
 \item{\strong{missing}: Normally, missing values are not counted and not
 shown on frequency tables.  The "missing" option allows you to treat
 missing (NA) values as normal values, so that they are counted and
@@ -220,14 +219,6 @@ want the Chi-Square statistic.
 on output frequency tables.  By default, these columns are not included.
 The "outcum" option will include them.
 }
-\item{\strong{stacked}: A data shaping option that requests output datasets
-be returned in "stacked" form, such that both statistics and levels
-are in rows.
-}
-\item{\strong{wide}: A data shaping option that requests output datasets
-be returned in "wide" form, such that statistics are across the top in
-columns, and levels are in rows.
-}
 }
 }
 
@@ -253,6 +244,41 @@ that the "sparse" option is actually the default.
 If you do not want to
 show the zero-count categories on a variable that is defined as a factor,
 pass the "nosparse" keyword on the \code{options} parameter.
+}
+
+\section{Data Shaping}{
+
+By default, the \code{proc_freq} function returns an output dataset of
+frequency results.  If running interactively, the function also prints
+the frequency results to the viewer.  As described above, the output
+dataset can be somewhat different than the dataset sent to the viewer.
+The \code{output} parameter allows you to choose which datasets to return.
+There are three choices:
+"out", "report", and "none".  The "out" keyword returns the default output
+dataset.  The "report" keyword returns the dataset(s) sent to the viewer. You
+may also pass "none" if you don't want any datasets returned from the function.
+
+In addition, the output dataset produced by the "out" keyword can be shaped
+in different ways. These shaping options allow you to decide whether the
+data should be returned long and skinny, or short and wide. The shaping
+options can reduce the amount of data manipulation necessary to get the
+frequencies into the desired form. The available
+shaping options are as follows:
+\itemize{
+\item{\strong{long}: An option that will transpose the output datasets
+so that statistics are in rows and frequency categories are in columns.
+}
+\item{\strong{stacked}: Requests that output datasets
+be returned in "stacked" form, such that both statistics and frequency
+categories are in rows.
+}
+\item{\strong{wide}: Requests that output datasets
+be returned in "wide" form, such that statistics are across the top in
+columns, and frequency categories are in rows.
+}
+}
+The default shaping option for the \code{proc_freq} function is "wide".
+To pass multiple output keywords, pass them on a vector.
 }
 
 \examples{

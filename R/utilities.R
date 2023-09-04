@@ -448,7 +448,7 @@ has_output <- function(outpt) {
       ret <- FALSE
     }
 
-    if (any(tolower(outpt) %in% c("all"))) {
+    if (any(tolower(outpt) %in% c("out"))) {
       ret <- TRUE
     }
 

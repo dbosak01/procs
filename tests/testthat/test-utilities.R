@@ -258,11 +258,11 @@ test_that("utils9: get_option() returns appropriate data type.", {
 })
 
 #
-# test_that("utils9: out() function works as expected.", {
+# test_that("utils9: out_spec() function works as expected.", {
 #
 #
 #
-#   out <- out(stats = c("mean", "median", "min", "max"), shape = "wide",
+#   out <- out_spec(stats = c("mean", "median", "min", "max"), shape = "wide",
 #                 fork = "sammy", bork = c("one", "two", "three"), table = "A")
 #
 #   out
@@ -282,12 +282,12 @@ test_that("utils9: get_option() returns appropriate data type.", {
 #
 #   expect_equal(has_report(NULL), FALSE)
 #
-#   opts1 <- list(out = out(stats = "n"))
+#   opts1 <- list(out = out_spec(stats = "n"))
 #
 #   expect_equal(has_report(opts1), FALSE)
 #
-#   opts2 <- list(out = out(stats = "n"),
-#                 out2 = out(report = TRUE))
+#   opts2 <- list(out = out_spec(stats = "n"),
+#                 out2 = out_spec(report = TRUE))
 #
 #
 #   expect_equal(has_report(opts2), TRUE)
@@ -355,10 +355,10 @@ test_that("utils12: fill_missing() function works as expected.", {
 })
 
 
-# test_that("utils13: out() NSE works as expected.", {
+# test_that("utils13: out_spec() NSE works as expected.", {
 #
 #
-#   res <- out(table = flork, stats = bork, drop = sam,
+#   res <- out_spec(table = flork, stats = bork, drop = sam,
 #              keep = fred, sammy = TRUE)
 #
 #
@@ -399,7 +399,7 @@ test_that("utils15: has_* functions work as expected.", {
   options("procs.interactive" = NULL)
 
   # Output
-  res <- has_output("all")
+  res <- has_output("out")
 
   expect_equal(res, TRUE)
 
@@ -416,7 +416,7 @@ test_that("utils15: has_* functions work as expected.", {
   expect_equal(res, TRUE)
 
   # Report
-  res <- has_report("all")
+  res <- has_report("out")
 
   expect_equal(res, FALSE)
 
@@ -449,7 +449,7 @@ test_that("utils15: has_* functions work as expected.", {
   options("procs.interactive" = TRUE)
 
   # Output
-  res <- has_output("all")
+  res <- has_output("out")
 
   expect_equal(res, TRUE)
 
@@ -466,7 +466,7 @@ test_that("utils15: has_* functions work as expected.", {
   expect_equal(res, FALSE)
 
   # Report
-  res <- has_report("all")
+  res <- has_report("out")
 
   expect_equal(res, FALSE)
 

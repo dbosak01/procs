@@ -128,7 +128,10 @@ output table.</p></dd>
 
 <dt>output</dt>
 <dd><p>Whether or not to return datasets from the function. Valid
-values are "all", "none", and "report".  Default is "all".</p></dd>
+values are "out", "none", and "report".  Default is "out". This parameter
+also accepts the data shaping options "long", "stacked", and "wide". See
+the <strong>Data Shaping</strong> section for a description of these options. Multiple
+output keywords may be passed on a character vector.</p></dd>
 
 
 <dt>by</dt>
@@ -150,11 +153,10 @@ counts.</p></dd>
 Options are passed to the parameter as a vector of quoted strings. You may
 also use the <code><a href="https://common.r-sassy.org/reference/v.html" class="external-link">v()</a></code> function to pass unquoted strings.
 The following options are available:
-"chisq", "crosstab", "fisher", "list", "long", "missing",
+"chisq", "crosstab", "fisher", "list", "missing",
 "nlevels", "nocol",
 "nocum", "nofreq", "nopercent", "noprint",
-"nonobs", "norow", "nosparse", "notable", "outcum",
-"stacked", and "wide". See
+"nonobs", "norow", "nosparse", "notable", "outcum". See
 the <strong>Options</strong> section for a description of these options.</p></dd>
 
 
@@ -167,7 +169,7 @@ the <strong>Options</strong> section for a description of these options.</p></dd
     
 
 <p>The function will return all requested datasets by default.  This is
-equivalent to the <code>output = "all"</code> option.  To return the datasets
+equivalent to the <code>output = "out"</code> option.  To return the datasets
 as created for the interactive report, pass the "report" output option.  If
 no output datasets are desired, pass the "none" output option. If a
 single dataset is requested, the function
@@ -201,7 +203,7 @@ will be used in the report output. This feature gives you some control
 over the column headers in the final report.</p>
 <p>The exact datasets used for the interactive output can be returned as a list.
 To return these datasets as a list, pass
-the "report" keyword on the <code>options</code> parameter. This list may in
+the "report" keyword on the <code>output</code> parameter. This list may in
 turn be passed to <code><a href="proc_print.html">proc_print</a></code> to write the report to a file.</p>
     </div>
     <div id="data-frame-output">
@@ -264,8 +266,6 @@ If you want a crosstab style, pass the "crosstab" option.</p></li>
 This option is only valid on two-way tables.</p></li>
 <li><p><strong>list</strong>: Two-way interactive tables are a crosstab style
 by default.  If you want a list style two-way table, pass the "list" option.</p></li>
-<li><p><strong>long</strong>: A shaping option that will transpose the output datasets
-so that statistics are in rows and levels are in columns.</p></li>
 <li><p><strong>missing</strong>: Normally, missing values are not counted and not
 shown on frequency tables.  The "missing" option allows you to treat
 missing (NA) values as normal values, so that they are counted and
@@ -303,12 +303,6 @@ want the Chi-Square statistic.</p></li>
 <li><p><strong>outcum</strong>: Whether to include the cumulative frequency and percent
 on output frequency tables.  By default, these columns are not included.
 The "outcum" option will include them.</p></li>
-<li><p><strong>stacked</strong>: A data shaping option that requests output datasets
-be returned in "stacked" form, such that both statistics and levels
-are in rows.</p></li>
-<li><p><strong>wide</strong>: A data shaping option that requests output datasets
-be returned in "wide" form, such that statistics are across the top in
-columns, and levels are in rows.</p></li>
 </ul></div>
     <div id="using-factors">
     <h2>Using Factors</h2>
@@ -331,6 +325,35 @@ that the "sparse" option is actually the default.</p>
 <p>If you do not want to
 show the zero-count categories on a variable that is defined as a factor,
 pass the "nosparse" keyword on the <code>options</code> parameter.</p>
+    </div>
+    <div id="data-shaping">
+    <h2>Data Shaping</h2>
+    
+
+<p>By default, the <code>proc_freq</code> function returns an output dataset of
+frequency results.  If running interactively, the function also prints
+the frequency results to the viewer.  As described above, the output
+dataset can be somewhat different than the dataset sent to the viewer.
+The <code>output</code> parameter allows you to choose which datasets to return.
+There are three choices:
+"out", "report", and "none".  The "out" keyword returns the default output
+dataset.  The "report" keyword returns the dataset(s) sent to the viewer. You
+may also pass "none" if you don't want any datasets returned from the function.</p>
+<p>In addition, the output dataset produced by the "out" keyword can be shaped
+in different ways. These shaping options allow you to decide whether the
+data should be returned long and skinny, or short and wide. The shaping
+options can reduce the amount of data manipulation necessary to get the
+frequencies into the desired form. The available
+shaping options are as follows:</p><ul><li><p><strong>long</strong>: An option that will transpose the output datasets
+so that statistics are in rows and frequency categories are in columns.</p></li>
+<li><p><strong>stacked</strong>: Requests that output datasets
+be returned in "stacked" form, such that both statistics and frequency
+categories are in rows.</p></li>
+<li><p><strong>wide</strong>: Requests that output datasets
+be returned in "wide" form, such that statistics are across the top in
+columns, and frequency categories are in rows.</p></li>
+</ul><p>The default shaping option for the <code>proc_freq</code> function is "wide".
+To pass multiple output keywords, pass them on a vector.</p>
     </div>
     <div id="see-also">
     <h2>See also</h2>

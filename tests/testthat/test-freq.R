@@ -112,7 +112,7 @@ test_that("freq2: Simple proc_freq with out works.", {
 #   res <- proc_freq(dat, tables = c("Eyes"),
 #                    titles = "My first Frequency Table",
 #
-#                    out = out(label = c(VAR = "Variable", CAT = "Category"),
+#                    out = out_spec(label = c(VAR = "Variable", CAT = "Category"),
 #                              format = list(CUMPCT = "%.3f")))
 #
 #   res
@@ -212,7 +212,7 @@ test_that("freq6: Simple proc_freq with output long works.", {
   res <- proc_freq(dat, tables = c("Eyes"),
                    weight = "Count",
                    titles = "My first Frequency Table",
-                   options = long)
+                   output = long)
 
 
   res
@@ -374,11 +374,11 @@ test_that("freq13: Nocum option work as expected.", {
 })
 
 
-test_that("freq14: output = all on table.", {
+test_that("freq14: output = out on table.", {
 
 
   res <- proc_freq(dat, tables = c("Eyes", "Eyes * Hair"),
-                   output = all,
+                   output = out,
                    options = noprint,
                    titles = "Eye and Hair Color of European Children")
 
@@ -584,7 +584,7 @@ test_that("freq22: Crosstab option works.", {
 #
 #   res <- proc_freq(dat, tables = c("Eyes"),
 #                    titles = "My first Frequency Table",
-#                    out = out(drop = "CUMPCT",
+#                    out = out_spec(drop = "CUMPCT",
 #                              keep = c("CAT", "VAR", "N", "CNT", "PCT"),
 #                              rename = c(VAR = "BLOCK")))
 #
@@ -607,7 +607,7 @@ test_that("freq22: Crosstab option works.", {
 #
 #   res <- proc_freq(dat, tables = c("Eyes"),
 #                    titles = "My first Frequency Table",
-#                    out = out(where = expression(CAT == "green")))
+#                    out = out_spec(where = expression(CAT == "green")))
 #
 #   res
 #
@@ -1003,7 +1003,7 @@ test_that("freq37: Crosstab works with factors.", {
 test_that("freq38: get_output_specs works as expected.", {
 
 
-  res1 <- get_output_specs(c("A", "B", "A * B"), list(), "")
+  res1 <- get_output_specs(c("A", "B", "A * B"), list(), "", "")
 
   res1
   expect_equal(length(res1), 3)
@@ -1012,7 +1012,7 @@ test_that("freq38: get_output_specs works as expected.", {
   expect_equal(res1[[3]]$table, "A * B")
 
 
-  res2 <- get_output_specs(c(tab1 = "A", "B", tab3 = "A * B"), list(), "")
+  res2 <- get_output_specs(c(tab1 = "A", "B", tab3 = "A * B"), list(), "", "")
 
   res2
   expect_equal(length(res2), 3)
@@ -1021,8 +1021,8 @@ test_that("freq38: get_output_specs works as expected.", {
   expect_equal(res2[[2]]$table, "B")
   expect_equal(res2[[3]]$table, "A * B")
 
-  ot <- list(out = out(stats = c("n", "pct"), shape = "wide"))
-  res3 <- get_output_specs(c(tab1 = "A", "B", tab3 = "A * B"), ot, "")
+  ot <- list(out = out_spec(stats = c("n", "pct"), shape = "wide"))
+  res3 <- get_output_specs(c(tab1 = "A", "B", tab3 = "A * B"), ot, "", "")
 
   res3
   expect_equal(length(res3), 3)
@@ -1033,12 +1033,12 @@ test_that("freq38: get_output_specs works as expected.", {
 
 
 
-  ot <- list(out1 = out(table = "A", stats = c("n", "pct"), shape = "wide"),
-             out2 = out(table = "B", stats = c("n", "pct"), shape = "wide"),
-             out3 = out(table = "A * B", stats = c("n", "pct"), shape = "wide")
+  ot <- list(out1 = out_spec(table = "A", stats = c("n", "pct"), shape = "wide"),
+             out2 = out_spec(table = "B", stats = c("n", "pct"), shape = "wide"),
+             out3 = out_spec(table = "A * B", stats = c("n", "pct"), shape = "wide")
 
              )
-  res4 <- get_output_specs(NULL, ot, "")
+  res4 <- get_output_specs(NULL, ot, "", "")
 
   res4
   expect_equal(length(res4), 3)
@@ -1048,11 +1048,11 @@ test_that("freq38: get_output_specs works as expected.", {
   expect_equal(res4[[3]]$table, "A * B")
 
 
-  ot <- list(out1 = out(stats = c("n", "pct"), shape = "wide"),
-             out2 = out(table = "A * B", stats = c("chisq"), shape = "wide")
+  ot <- list(out1 = out_spec(stats = c("n", "pct"), shape = "wide"),
+             out2 = out_spec(table = "A * B", stats = c("chisq"), shape = "wide")
 
   )
-  res5 <- get_output_specs(c(tab1 = "A", "B", tab3 = "A * B"), ot, "")
+  res5 <- get_output_specs(c(tab1 = "A", "B", tab3 = "A * B"), ot, "", "")
 
   res5
   expect_equal(length(res5), 4)
@@ -1169,7 +1169,7 @@ test_that("freq43: oneway output statistics work.", {
 
   res <- proc_freq(dat,
                    tables = c("Eyes", "Hair"),
-                   options = long,
+                   output = long,
                    titles = "My first Frequency Table",
                    weight = "Count")
 
@@ -1193,7 +1193,8 @@ test_that("freq45: twoway output statistics work.", {
   res <- proc_freq(dat,
                    tables = c("Eyes", "Region * Eyes", "Region"),
                    titles = "My first Frequency Table",
-                   options = v(long, outcum),
+                   output = long,
+                   options = outcum,
                    weight = "Count")
 
   res
@@ -1218,7 +1219,8 @@ test_that("freq46: output parameter works.", {
                    tables = c("Eyes", "Region * Eyes", "Region"),
                    titles = "My first Frequency Table",
                    weight = "Count",
-                   options = v(outcum, long))
+                   output = long,
+                   options = outcum)
 
 
   res
@@ -1266,7 +1268,7 @@ test_that("freq48: oneway output stacked works.", {
                    titles = "My first Frequency Table",
                    by = "Region",
                    weight = "Count",
-                   options = v(stacked))
+                   output = v(stacked))
 
 
   res
@@ -1284,7 +1286,7 @@ test_that("freq48: oneway output stacked works.", {
 #                    by = "Region",
 #                    view = TRUE,
 #                    weight = "Count",
-#                    report = out(stats = c("n", "cnt", "pct"), shape = "stacked"))
+#                    report = out_spec(stats = c("n", "cnt", "pct"), shape = "stacked"))
 #
 #
 #   res
@@ -1371,7 +1373,7 @@ test_that("freq53: error on unknown parameter.", {
 #                    titles = "My first Frequency Table",
 #                    by = c("sex", "enrollment"),
 #                    weight = "count",
-#                    out = out(rename = list(BY2 = "Enrollment"),
+#                    out = out_spec(rename = list(BY2 = "Enrollment"),
 #                              where = expression(Enrollment == "no")))
 #
 #   res
@@ -1383,7 +1385,7 @@ test_that("freq53: error on unknown parameter.", {
 #                    titles = "My first Frequency Table",
 #                    by = c("sex", "enrollment"),
 #                    weight = "count",
-#                    out = out(rename = list(BY2 = "Enrollment"),
+#                    out = out_spec(rename = list(BY2 = "Enrollment"),
 #                              where = expression(BY2 == "no")))
 #
 #   res
@@ -1411,10 +1413,10 @@ test_that("freq56: get_table_list() works as expected.", {
 
 test_that("freq56: get_output_tables() works as expected.", {
 
-  lst <- list(out1 = out(table = "A"),
-              out2 = out(table = "B"),
-              out3 = out(table = "A * B"),
-              out4 = out(table = "A * C"))
+  lst <- list(out1 = out_spec(table = "A"),
+              out2 = out_spec(table = "B"),
+              out3 = out_spec(table = "A * B"),
+              out4 = out_spec(table = "A * C"))
 
   res <- get_output_tables(lst)
 
@@ -1429,9 +1431,9 @@ test_that("freq56: get_output_tables() works as expected.", {
 
 test_that("freq55: get_nway_zero_fills() works as expected.", {
 
-  lst <- list(out1 = out(table = "x"),
-              out2 = out(table = "y"),
-              out3 = out(table = "x * y"))
+  lst <- list(out1 = out_spec(table = "x"),
+              out2 = out_spec(table = "y"),
+              out3 = out_spec(table = "x * y"))
 
 
   dt <- data.frame(x = c("A", "A", "B", "B"),
@@ -1456,7 +1458,7 @@ test_that("freq55: get_nway_zero_fills() works as expected.", {
   expect_equal(ncol(res), 5)
 
 
-  lst2 <- list(out1 = out(table = "x"))
+  lst2 <- list(out1 = out_spec(table = "x"))
 
   res <- get_nway_zero_fills(dt, lst2, c("y", "z"), weight = "w")
 
@@ -1512,7 +1514,7 @@ test_that("freq52: zero count categories appear on twoway tables.", {
                    titles = "My first Frequency Table",
                    by = c("sex"),
                    weight = "count",
-                   output = all)
+                   output = out)
 
   res
 
@@ -1633,30 +1635,6 @@ test_that("freq56: nlevels works as expected.", {
   expect_equal(length(res), 4)
   expect_equal(ncol(res[[1]]), 2)
   expect_equal(nrow(res[[1]]), 1)
-
-  # res <- proc_freq(dat, tables = v(Eyes, Hair),
-  #                  by = Region,
-  #                  options = v(report, out, nlevels))
-  #
-  #
-  # res
-  #
-  # expect_equal(length(res), 2)
-  # expect_equal(ncol(res$out$`NLevels:Eyes`), 2)
-  # expect_equal(nrow(res$out$`NLevels:Eyes`), 2)
-  #
-  #
-  #
-  # res <- proc_freq(dat, tables = v(Eyes * Hair),
-  #                  by = Region,
-  #                  options = v(report, out, nlevels))
-  #
-  #
-  # res
-  #
-  # expect_equal(length(res), 2)
-  # expect_equal(ncol(res$out$`NLevels:Eyes * Hair`), 3)
-  # expect_equal(nrow(res$out$`NLevels:Eyes * Hair`), 2)
 
 
 })
@@ -1826,7 +1804,7 @@ test_that("freq61: factors and ordering with crosstab output works.", {
 
 
   res1 <- proc_freq(dat, tables = c("Eyes", "Hair", comb = "Eyes * Hair"),
-                   output = all,
+                   output = out,
                    titles = "Eye and Hair Color of European Children")
 
   res1
@@ -1839,7 +1817,7 @@ test_that("freq61: factors and ordering with crosstab output works.", {
 
 
   res2 <- proc_freq(datsp, tables = c("Eyes", "Hair", comb = "Eyes * Hair"),
-                    output = all,
+                    output = out,
                     titles = "Eye and Hair Color of European Children")
 
   res2
@@ -1856,7 +1834,7 @@ test_that("freq62: factors and ordering with list output works.", {
 
 
   res1 <- proc_freq(dat, tables = c("Eyes", "Hair", comb = "Eyes * Hair"),
-                    output = all,
+                    output = out,
                     options = list,
                     titles = "Eye and Hair Color of European Children")
 
@@ -1870,7 +1848,7 @@ test_that("freq62: factors and ordering with list output works.", {
 
 
   res2 <- proc_freq(datsp, tables = c("Eyes", "Hair", comb = "Eyes * Hair"),
-                    output = all,
+                    output = out,
                     options = list,
                     titles = "Eye and Hair Color of European Children")
 
@@ -1899,7 +1877,7 @@ test_that("freq63: totals always end up at bottom.", {
   datsp$Eyes <- sub("blue", "zed", datsp$Eyes, fixed = TRUE)
 
   res1 <- proc_freq(datsp, tables = c("Eyes", "Hair", comb = "Eyes * Hair"),
-                    output = all,
+                    output = out,
                     titles = "Eye and Hair Color of European Children")
 
   res1
@@ -1913,7 +1891,7 @@ test_that("freq63: totals always end up at bottom.", {
 
 
   res2 <- proc_freq(datsp, tables = c("Eyes", "Hair", comb = "Eyes * Hair"),
-                    output = all,
+                    output = out,
                     titles = "Eye and Hair Color of European Children")
 
   res2
@@ -1985,7 +1963,7 @@ test_that("freq67: factor with sparse show zero counts.", {
 
 
   res1 <- proc_freq(datsp, tables = c("Eyes"),
-                    output = all,
+                    output = out,
                     options = nosparse,
                     titles = "Eye and Hair Color of European Children")
 
@@ -1993,7 +1971,7 @@ test_that("freq67: factor with sparse show zero counts.", {
 
 
   res2 <- proc_freq(datsp, tables = c("Eyes"),
-                    output = all,
+                    output = out,
                     options = sparse,
                     titles = "Eye and Hair Color of European Children")
 
@@ -2018,7 +1996,7 @@ test_that("freq68: factors with by work.", {
 
 
   res1 <- proc_freq(datsp, tables = c("Hair"),
-                    output = all,
+                    output = out,
                     by = "Eyes",
                     options = nosparse,
                     titles = "Eye and Hair Color of European Children")
@@ -2027,7 +2005,7 @@ test_that("freq68: factors with by work.", {
 
 
   res2 <- proc_freq(datsp, tables = c("Hair"),
-                    output = all,
+                    output = out,
                     by = "Eyes",
                     options = sparse,
                     titles = "Eye and Hair Color of European Children")
@@ -2052,7 +2030,7 @@ test_that("freq68: var and by as factors work.", {
 
 
   res1 <- proc_freq(datsp, tables = c("Hair"),
-                    output = all,
+                    output = out,
                     by = "Eyes",
                     options = nosparse,
                     titles = "Eye and Hair Color of European Children")
@@ -2061,7 +2039,7 @@ test_that("freq68: var and by as factors work.", {
 
 
   res2 <- proc_freq(datsp, tables = c("Hair"),
-                    output = all,
+                    output = out,
                     by = "Eyes",
                     options = sparse,
                     titles = "Eye and Hair Color of European Children")

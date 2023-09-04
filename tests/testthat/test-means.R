@@ -263,7 +263,7 @@ test_that("means12: proc_means in function works.", {
     myres <- proc_means(datm, var = var1,
                       stats = var2,
                       titles = "My first title for Means",
-                      options = long)
+                      output = long)
 
     return(myres)
   }
@@ -393,7 +393,7 @@ test_that("means15: check missing parameter works.", {
 
 test_that("means16: default vars works.", {
 
-  res <- proc_means(datm, options = long)
+  res <- proc_means(datm, output = long)
 
   res
 
@@ -497,9 +497,9 @@ test_that("means22: gen_output_means works.", {
 
   res <- gen_output_means(datm,
                           var = c("PresentScore", "TasteScore"),
-          output = list(out1 = out(stats = c("n", "mean", "min", "max"),
+          output = list(out1 = out_spec(stats = c("n", "mean", "min", "max"),
                                    shape = "long"),
-                        out2 = out(stats = c("n", "mean", "std"),
+                        out2 = out_spec(stats = c("n", "mean", "std"),
                                    shape = "long")))
 
   res
@@ -523,7 +523,7 @@ test_that("means23: get_class works.", {
 
   res <- get_class_report(datm, var = c("PresentScore", "TasteScore"),
                    class = "Layers",
-                   outp = out(stats = c("n", "mean", "min", "max"),
+                   outp = out_spec(stats = c("n", "mean", "min", "max"),
                                  shape = "wide"))
 
 
@@ -534,7 +534,7 @@ test_that("means23: get_class works.", {
 
   res <- get_class_output(datm, var = c("PresentScore", "TasteScore"),
                    class = "Layers",
-                   outp = out(stats = c("n", "mean", "min", "max"),
+                   outp = out_spec(stats = c("n", "mean", "min", "max"),
                               shape = "wide"))
 
 
@@ -551,9 +551,9 @@ test_that("means24: gen_output_means works.", {
   res <- gen_output_means(datm,
                           var = c("PresentScore", "TasteScore"),
                           class = "Layers",
-                          output = list(out1 = out(stats = c("n", "mean", "min", "max"),
+                          output = list(out1 = out_spec(stats = c("n", "mean", "min", "max"),
                                                    shape = "long"),
-                                        out2 = out(stats = c("n", "mean", "std"),
+                                        out2 = out_spec(stats = c("n", "mean", "std"),
                                                    shape = "long")))
 
   res
@@ -579,7 +579,7 @@ test_that("means25: class parameter works.", {
                     stats = var2,
                     class = Layers,
                     titles = "My first title for Means",
-                    options = long)
+                    output = long)
 
   res
 
@@ -630,7 +630,7 @@ test_that("means27: by parameter works.", {
                     by = "Layers",
                   #  class = "Flavor",
                     titles = "My first title for Means",
-                    options = long)
+                    output = long)
 
   res
 
@@ -650,7 +650,7 @@ test_that("means28: by with class works.", {
                     by = "Layers",
                     class = "Flavor",
                     titles = "My first title for Means",
-                    options = long)
+                    output = long)
 
   res
 
@@ -670,7 +670,7 @@ test_that("means29: 2 class vars works.", {
                     #by = "Layers",
                     class = c("Layers", "Flavor"),
                     titles = "My first title for Means",
-                    options = long)
+                    output = long)
 
   res
 
@@ -693,7 +693,7 @@ test_that("means30: by and 2 class vars works.", {
                     by = "Group",
                     class = c("Flavor", "Layers"),
                     titles = "My first title for Means",
-                    options = long)
+                    output = long)
 
   res
 
@@ -716,7 +716,7 @@ test_that("means31: Outputs work as expected.", {
   expect_equal(is.null(res), TRUE)
 
 
-  res2 <- proc_means(datm, output = all)
+  res2 <- proc_means(datm, output = out)
 
   expect_equal(nrow(res2), 4)
   expect_equal(ncol(res2), 8)
@@ -732,7 +732,7 @@ test_that("means32: get_class works with empty data frame.", {
 
   res <- get_class_report(dftmp, var = c("PresentScore", "TasteScore"),
                    class = "Layers",
-                   outp = out(stats = c("n", "mean", "min", "max"),
+                   outp = out_spec(stats = c("n", "mean", "min", "max"),
                               shape = "wide"))
 
 
@@ -742,7 +742,7 @@ test_that("means32: get_class works with empty data frame.", {
 
   res <- get_class_output(dftmp, var = c("PresentScore", "TasteScore"),
                    class = "Layers",
-                   outp = out(stats = c("n", "mean", "min", "max"),
+                   outp = out_spec(stats = c("n", "mean", "min", "max"),
                               shape = "wide"))
 
 
@@ -766,7 +766,7 @@ test_that("means33: 2 by and 1 class vars works.", {
                     by = c("Group", "Layers"),
                     class = "Flavor",
                     titles = "My first title for Means",
-                    options = long)
+                    output = long)
 
   res
 
@@ -804,7 +804,7 @@ test_that("means35: Stacked output works.", {
 
   res <- proc_means(datm,
                     by = "Layers",
-                    options = stacked)
+                    output = stacked)
 
   res
 
@@ -814,7 +814,7 @@ test_that("means35: Stacked output works.", {
 })
 
 
-test_that("means47: log_means() works as expected.", {
+test_that("means36: log_means() works as expected.", {
 
 
   res <- log_means(mtcars, var = c("mpg", "cyl"),
@@ -830,7 +830,7 @@ test_that("means47: log_means() works as expected.", {
 })
 
 
-test_that("means48: warning on unknown parameter works.", {
+test_that("means37: warning on unknown parameter works.", {
 
   var1 <- c("Age", "PresentScore", "TasteScore")
   var2 <- c("n", "min", "max", "mean", "std")
@@ -845,7 +845,7 @@ test_that("means48: warning on unknown parameter works.", {
 
 
 
-test_that("means49: view can be FALSE without error.", {
+test_that("means38: view can be FALSE without error.", {
 
   var1 <- c("Age", "PresentScore", "TasteScore")
   var2 <- c("n", "min", "max", "mean", "std")
@@ -862,7 +862,7 @@ test_that("means49: view can be FALSE without error.", {
 })
 
 
-test_that("means50: check more confidence limit options", {
+test_that("means39: check more confidence limit options", {
 
   # 2-sided 95%
   res <- proc_means(datm, var = v(PresentScore, TasteScore),
@@ -950,7 +950,7 @@ test_that("means50: check more confidence limit options", {
 })
 
 
-test_that("means50: check maxdec option", {
+test_that("means40: check maxdec option", {
 
   # 2-sided 95%
   res <- proc_means(datm, var = v(PresentScore, TasteScore),
@@ -970,7 +970,7 @@ test_that("means50: check maxdec option", {
 })
 
 
-test_that("means51: t and probt work as expected.", {
+test_that("means41: t and probt work as expected.", {
 
 
   datp <- read.table(header = TRUE, text = '
@@ -1000,7 +1000,7 @@ test_that("means51: t and probt work as expected.", {
 })
 
 
-test_that("means52: default statistics work as expected.", {
+test_that("means42: default statistics work as expected.", {
 
   res <- proc_means(datm, var = v(Age, PresentScore, TasteScore, Layers),
                     titles = c("Test"))
@@ -1010,7 +1010,7 @@ test_that("means52: default statistics work as expected.", {
 })
 
 
-test_that("means53: various statistics work as expected.", {
+test_that("means43: various statistics work as expected.", {
 
   res <- proc_means(datm, var = v(Age, PresentScore, TasteScore, Layers),
                     stats = v(n, mean,  uss, vari, sum, nobs, cv, css),
@@ -1025,7 +1025,7 @@ test_that("means53: various statistics work as expected.", {
   expect_equal(res[1, "CSS"], 4177.2)
 })
 
-test_that("means54: skewness and kurtosis work as expected.", {
+test_that("means44: skewness and kurtosis work as expected.", {
 
 
   res <- proc_means(datm, var = v(Age, PresentScore, TasteScore, Layers),
@@ -1045,7 +1045,7 @@ test_that("means54: skewness and kurtosis work as expected.", {
 })
 
 
-test_that("means52: default variables work as expected.", {
+test_that("means45: default variables work as expected.", {
 
   res <- proc_means(datm,
                     titles = c("Test"))
@@ -1055,7 +1055,7 @@ test_that("means52: default variables work as expected.", {
 
 })
 
-test_that("means53: Multiple class vars match SAS.", {
+test_that("means46: Multiple class vars match SAS.", {
 
   datmr <- read.table(header = TRUE, text = '
     LastName  Age PresentScore TasteScore Flavor Layers Region
@@ -1086,10 +1086,10 @@ test_that("means53: Multiple class vars match SAS.", {
   res <- proc_means(datmr,
                     var = c("Age", "PresentScore", "TasteScore"),
                     stats = c("n", "min", "max", "mean", "std"),
-                    output = c("all", "report"),
+                    output = c("out", "report", "long"),
                     class = c("Region", "Layers"),
                     titles = "My first title for Means",
-                    options = c("long", maxdec = 4))
+                    options = c(maxdec = 4))
 
   res
 
@@ -1105,10 +1105,10 @@ test_that("means53: Multiple class vars match SAS.", {
   res <- proc_means(datmr,
                     var = c("Age", "PresentScore", "TasteScore"),
                     stats = c("n", "min", "max", "mean", "std"),
-                    output = c("all", "report"),
+                    output = c("out", "report", "long"),
                     class = c("Region", "Layers", "Flavor"),
                     titles = "My first title for Means",
-                    options = c("long", maxdec = 4))
+                    options = c( maxdec = 4))
 
   res
 
@@ -1123,7 +1123,7 @@ test_that("means53: Multiple class vars match SAS.", {
 })
 
 
-test_that("means54: check alternate keywords work.", {
+test_that("means47: check alternate keywords work.", {
 
 
 
@@ -1145,7 +1145,7 @@ test_that("means54: check alternate keywords work.", {
 })
 
 
-test_that("means55: nway option works.", {
+test_that("means48: nway option works.", {
 
 
 
@@ -1175,7 +1175,7 @@ test_that("means55: nway option works.", {
 
 })
 
-test_that("means56: factors work as expected.", {
+test_that("means49: factors work as expected.", {
 
   datmr <- read.table(header = TRUE, text = '
     LastName  Age PresentScore TasteScore Flavor Layers Region
@@ -1212,11 +1212,11 @@ test_that("means56: factors work as expected.", {
   res <- proc_means(datmr,
                     var = c("Age", "PresentScore", "TasteScore"),
                     stats = c("n", "min", "max", "mean", "std"),
-                    output = c("all", "report"),
+                    output = c("out", "report", "long"),
                     by = "Region",
                    #  class = c("Layers", "Flavor"),
                     titles = "My first title for Means",
-                    options = c("long", maxdec = 4))
+                    options = c(maxdec = 4))
 
   res
 
@@ -1232,10 +1232,10 @@ test_that("means56: factors work as expected.", {
   res <- proc_means(datmr,
                     var = c("Age", "PresentScore", "TasteScore"),
                     stats = c("n", "min", "max", "mean", "std"),
-                    output = c("all", "report"),
+                    output = c("out", "report", "long"),
                     class = c("Region", "Layers", "Flavor"),
                     titles = "My first title for Means",
-                    options = c("long", maxdec = 4))
+                    options = c(maxdec = 4))
 
   res
 
@@ -1250,11 +1250,11 @@ test_that("means56: factors work as expected.", {
   res <- proc_means(datmr,
                     var = c("Age", "PresentScore", "TasteScore"),
                     stats = c("n", "min", "max", "mean", "std"),
-                    output = c("all", "report"),
+                    output = c("out", "report", "long"),
                     by = "Region",
                     class = c("Layers", "Flavor"),
                     titles = "My first title for Means",
-                    options = c("long", maxdec = 4))
+                    options = c(maxdec = 4))
 
   res
 
@@ -1268,7 +1268,7 @@ test_that("means56: factors work as expected.", {
 })
 
 
-test_that("means68: two by as factors work.", {
+test_that("means50: two by as factors work.", {
 
   datsp <- datm
   datsp$Flavor <- factor(datsp$Flavor, levels = c("Vanilla", "Chocolate", "Spice", "Rum"))
@@ -1276,7 +1276,7 @@ test_that("means68: two by as factors work.", {
 
 
   res1 <- proc_means(datsp, var = c("Age", "PresentScore", "TasteScore"),
-                    output = all,
+                    output = out,
                     by = c("Layers", "Flavor"))
 
   res1
@@ -1286,7 +1286,7 @@ test_that("means68: two by as factors work.", {
   expect_equal(ncol(res1), 10)
 
   res1 <- proc_means(datsp, var = c("Age", "PresentScore", "TasteScore"),
-                     output = all,
+                     output = out,
                      by = c("Layers"),
                      class = "Flavor")
 
@@ -1301,14 +1301,14 @@ test_that("means68: two by as factors work.", {
 })
 
 
-test_that("means69: other statistics with by works.", {
+test_that("means51: other statistics with by works.", {
 
   datsp <- datm
   datsp$Layers[1] <- 3
 
   res1 <- proc_means(datsp, var = c("Age", "PresentScore", "TasteScore"),
                      stats = c("kurtosis", "skew", "cv", "clm"),
-                     output = all,
+                     output = out,
                      by = c("Layers"),
                      options = c(maxdec = 8)
                      )
@@ -1328,7 +1328,7 @@ test_that("means69: other statistics with by works.", {
   # Not enough observations
   expect_error(proc_means(datsp, var = c("Age", "PresentScore", "TasteScore"),
                      stats = c("kurt", "skew", "cv", "clm"),
-                     output = all,
+                     output = out,
                      by = c("Layers"),
                      class = "Flavor"))
 
@@ -1338,7 +1338,7 @@ test_that("means69: other statistics with by works.", {
 
 
 
-test_that("means70: factor sort on class works.", {
+test_that("means52: factor sort on class works.", {
 
   var1 <- c("Age", "PresentScore", "TasteScore")
   var2 <- c("n",  "mean", "std", "min", "max")
@@ -1353,8 +1353,7 @@ test_that("means70: factor sort on class works.", {
                     #by = "Layers",
                     class = c("Layers"),
                     titles = "My first title for Means",
-                    options = long,
-                    output = c("all", "report"))
+                    output = c("out", "report", "long"))
 
   res
 
@@ -1368,7 +1367,7 @@ test_that("means70: factor sort on class works.", {
 
 })
 
-test_that("means71: factor sort on 2 classes works.", {
+test_that("means53: factor sort on 2 classes works.", {
 
   var1 <- c("Age", "PresentScore", "TasteScore")
   var2 <- c("n",  "mean", "std", "min", "max")
@@ -1383,8 +1382,7 @@ test_that("means71: factor sort on 2 classes works.", {
                     #by = "Layers",
                     class = c("Layers", "Flavor"),
                     titles = "My first title for Means",
-                    options = long,
-                    output = c("all", "report"))
+                    output = c("out", "report", "long"))
 
   res
 
@@ -1401,7 +1399,7 @@ test_that("means71: factor sort on 2 classes works.", {
 })
 #
 #
-# test_that("means72: completetypes on one factor works.", {
+# test_that("means54: completetypes on one factor works.", {
 #
 #   var1 <- c("Age", "PresentScore", "TasteScore")
 #   var2 <- c("n",  "mean", "std", "min", "max")
@@ -1418,7 +1416,7 @@ test_that("means71: factor sort on 2 classes works.", {
 #                     class = c("Layers"),
 #                     titles = "My first title for Means",
 #                     options = "completetypes",
-#                     output = c("all", "report"))
+#                     output = c("out", "report"))
 #
 #   res
 #
@@ -1428,7 +1426,7 @@ test_that("means71: factor sort on 2 classes works.", {
 #                     class = c("Layers"),
 #                     titles = "My first title for Means",
 #                     options = "completetypes",
-#                     output = c("all", "report"))
+#                     output = c("out", "report"))
 #
 #   res1
 #

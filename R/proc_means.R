@@ -130,6 +130,38 @@
 #' such that statistics are across the top in columns, and variables are in rows.
 #' }
 #' }
+#' @section Data Shaping:
+#' By default, the \code{proc_means} function returns an output dataset of
+#' summary statistics.  If running interactively, the function also prints
+#' the results to the viewer.  As described above, the output
+#' dataset can be somewhat different than the dataset sent to the viewer.
+#' The \code{output} parameter allows you to choose which datasets to return.
+#' There are three choices:
+#' "out", "report", and "none".  The "out" keyword returns the default output
+#' dataset.  The "report" keyword returns the dataset(s) sent to the viewer. You
+#' may also pass "none" if you don't want any datasets returned from the function.
+#'
+#' In addition, the output dataset produced by the "out" keyword can be shaped
+#' in different ways. These shaping options allow you to decide whether the
+#' data should be returned long and skinny, or short and wide. The shaping
+#' options can reduce the amount of data manipulation necessary to get the
+#' frequencies into the desired form. The available
+#' shaping options are as follows:
+#' \itemize{
+#' \item{\strong{long}: An option that will transpose the output datasets
+#' so that statistics are in rows and variables are in columns.
+#' }
+#' \item{\strong{stacked}: Requests that output datasets
+#' be returned in "stacked" form, such that both statistics and
+#' variables are in rows.
+#' }
+#' \item{\strong{wide}: Requests that output datasets
+#' be returned in "wide" form, such that statistics are across the top in
+#' columns, and variables are in rows.
+#' }
+#' }
+#' The default shaping option for the \code{proc_means} function is "wide".
+#' To pass multiple output keywords, pass them on a vector.
 # @section Data Constraints:
 # Explain limits of data for each stat option.  Number of non-missing
 # values, etc.
@@ -154,11 +186,17 @@
 #' Default statistics are: "n", "mean", "std",
 #' "min", and "max".
 #' @param output Whether or not to return datasets from the function. Valid
-#' values are "all", "none", and "report".  Default is "all", and will
+#' values are "out", "none", and "report".  Default is "out", and will
 #' produce dataset output specifically designed for programmatic use. The "none"
 #' option will return a NULL instead of a dataset or list of datasets.
 #' The "report" keyword returns the datasets from the interactive report, which
-#' may be different from the standard output.
+#' may be different from the standard output. The output parameter also accepts
+#' data shaping keywords.
+#' The "long, "stacked", and "wide" keywords are data
+#' shaping options that control the structure of the output data. See the
+#' \strong{Data Shaping} section for additional details. Note that
+#' multiple output keywords may be passed on
+#' character vector.
 #' @param by An optional by group. If you specify an by group, the input
 #' data will be subset on the by variable(s) prior to performing any
 #' statistics.
@@ -169,9 +207,7 @@
 #' will be nested in the \code{by}.
 # @param weight An optional weight parameter.
 #' @param options A vector of optional keywords. Valid values are: "alpha =",
-#' "completetypes", "long", "maxdec", "noprint", "notype, "nofreq", "nonobs",
-#' "stacked", and "wide".  The "wide", "long", and "stacked" keywords are data
-#' shaping options that control the structure of the output data.
+#' "completetypes", "long", "maxdec", "noprint", "notype, "nofreq", "nonobs".
 #' The "notype", "nofreq", and "nonobs" keywords will turn
 #' off columns on the output datasets.  The "alpha = " option will set the alpha
 #' value for confidence limit statistics.  The default is 95% (alpha = 0.05).
@@ -227,7 +263,8 @@
 #'                    var = v(Petal.Length, Petal.Width),
 #'                    class = Species,
 #'                    stats = v(n, mean, std, median, qrange, clm),
-#'                    options = v(nofreq, long))
+#'                    options = nofreq,
+#'                    output = long)
 #' # View results
 #' res3
 #' #         CLASS TYPE   STAT Petal.Length Petal.Width
@@ -357,9 +394,18 @@ proc_means <- function(data,
     }
   }
 
+  if (!is.null(output)) {
+    outs <- c("out", "report", "none", "wide", "long", "stacked")
+    if (!all(tolower(output) %in% outs)) {
+
+      stop(paste("Invalid output keyword: ", output[!tolower(output) %in% outs], "\n"))
+    }
+
+  }
+
   # Generate output specs
   if (has_output(output))
-    outreq <- get_output_specs_means(list(), stats, options)
+    outreq <- get_output_specs_means(list(), stats, options, output)
   else
     outreq <- NULL
 
@@ -497,7 +543,7 @@ log_means <- function(data,
 # Stats ---------------------------------------------------------------
 
 
-get_output_specs_means <- function(outs, stats, opts) {
+get_output_specs_means <- function(outs, stats, opts, output) {
 
   # outreq <- NULL
 
@@ -521,19 +567,19 @@ get_output_specs_means <- function(outs, stats, opts) {
       #   } else {
       #
       #     warning("proc_means: Unknown parameter '" %p% nm %p% "'")
-      #     outreq[[nm]] <- out(shape = "wide")
+      #     outreq[[nm]] <- out_spec(shape = "wide")
       #   }
       # }
     } else {
 
-      if (option_true(opts, "long")) {
-        outreq[["out"]] <- out(stats = stats, shape = "long",
+      if (option_true(output, "long")) {
+        outreq[["out"]] <- out_spec(stats = stats, shape = "long",
                                type = TRUE, freq = TRUE)
-      } else if (option_true(opts, "stacked")) {
-        outreq[["out"]] <- out(stats = stats, shape = "stacked",
+      } else if (option_true(output, "stacked")) {
+        outreq[["out"]] <- out_spec(stats = stats, shape = "stacked",
                                type = TRUE, freq = TRUE)
       } else {
-        outreq[["out"]] <- out(stats = stats, shape = "wide",
+        outreq[["out"]] <- out_spec(stats = stats, shape = "wide",
                                type = TRUE, freq = TRUE)
       }
 
@@ -1098,7 +1144,7 @@ gen_report_means <- function(data,
 
     # data, var, class, outp, freq = TRUE,
     # type = NULL, byvals = NULL
-    outp <- out(stats = stats, shape = "wide")
+    outp <- out_spec(stats = stats, shape = "wide")
     smtbl <- get_class_report(dt, var, class, outp, freq = FALSE, opts = opts)
 
     nm <- length(res) + 1
