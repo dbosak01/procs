@@ -131,7 +131,9 @@ output table.</p></dd>
 values are "out", "none", and "report".  Default is "out". This parameter
 also accepts the data shaping options "long", "stacked", and "wide". See
 the <strong>Data Shaping</strong> section for a description of these options. Multiple
-output keywords may be passed on a character vector.</p></dd>
+output keywords may be passed on a character vector. For example,
+to produce both a report dataset and a "long" output dataset,
+use the parameter <code>output = c("report", "out", "long")</code>.</p></dd>
 
 
 <dt>by</dt>
@@ -343,18 +345,17 @@ may also pass "none" if you don't want any datasets returned from the function.<
 in different ways. These shaping options allow you to decide whether the
 data should be returned long and skinny, or short and wide. The shaping
 options can reduce the amount of data manipulation necessary to get the
-frequencies into the desired form. The available
-shaping options are as follows:</p><ul><li><p><strong>long</strong>: An option that will transpose the output datasets
+frequencies into the desired form. The
+shaping options are as follows:</p><ul><li><p><strong>long</strong>: Transposes the output datasets
 so that statistics are in rows and frequency categories are in columns.</p></li>
 <li><p><strong>stacked</strong>: Requests that output datasets
 be returned in "stacked" form, such that both statistics and frequency
 categories are in rows.</p></li>
 <li><p><strong>wide</strong>: Requests that output datasets
 be returned in "wide" form, such that statistics are across the top in
-columns, and frequency categories are in rows.</p></li>
-</ul><p>The default shaping option for the <code>proc_freq</code> function is "wide".
-To pass multiple output keywords, pass them on a vector.</p>
-    </div>
+columns, and frequency categories are in rows. This shaping option
+is the default.</p></li>
+</ul></div>
     <div id="see-also">
     <h2>See also</h2>
     <div class="dont-index"><p>For summary statistics, see <code><a href="proc_means.html">proc_means</a></code>.  To pivot

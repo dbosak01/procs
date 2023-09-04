@@ -33,7 +33,9 @@ output table.}
 values are "out", "none", and "report".  Default is "out". This parameter
 also accepts the data shaping options "long", "stacked", and "wide". See
 the \strong{Data Shaping} section for a description of these options. Multiple
-output keywords may be passed on a character vector.}
+output keywords may be passed on a character vector. For example,
+to produce both a report dataset and a "long" output dataset,
+use the parameter \code{output = c("report", "out", "long")}.}
 
 \item{by}{An optional by group. Parameter accepts a vector of one or more
 variable names. When this parameter is set, data
@@ -262,10 +264,10 @@ In addition, the output dataset produced by the "out" keyword can be shaped
 in different ways. These shaping options allow you to decide whether the
 data should be returned long and skinny, or short and wide. The shaping
 options can reduce the amount of data manipulation necessary to get the
-frequencies into the desired form. The available
+frequencies into the desired form. The
 shaping options are as follows:
 \itemize{
-\item{\strong{long}: An option that will transpose the output datasets
+\item{\strong{long}: Transposes the output datasets
 so that statistics are in rows and frequency categories are in columns.
 }
 \item{\strong{stacked}: Requests that output datasets
@@ -274,11 +276,10 @@ categories are in rows.
 }
 \item{\strong{wide}: Requests that output datasets
 be returned in "wide" form, such that statistics are across the top in
-columns, and frequency categories are in rows.
+columns, and frequency categories are in rows. This shaping option
+is the default.
 }
 }
-The default shaping option for the \code{proc_freq} function is "wide".
-To pass multiple output keywords, pass them on a vector.
 }
 
 \examples{

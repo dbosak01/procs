@@ -141,12 +141,14 @@ produce dataset output specifically designed for programmatic use. The "none"
 option will return a NULL instead of a dataset or list of datasets.
 The "report" keyword returns the datasets from the interactive report, which
 may be different from the standard output. The output parameter also accepts
-data shaping keywords.
-The "long, "stacked", and "wide" keywords are data
+data shaping keywords "long, "stacked", and "wide".
+The keywords are
 shaping options that control the structure of the output data. See the
 <strong>Data Shaping</strong> section for additional details. Note that
-multiple output keywords may be passed on
-character vector.</p></dd>
+multiple output keywords may be passed on a
+character vector. For example,
+to produce both a report dataset and a "long" output dataset,
+use the parameter <code>output = c("report", "out", "long")</code>.</p></dd>
 
 
 <dt>by</dt>
@@ -184,7 +186,7 @@ on report output.</p></dd>
 <p>Normally, the requested summary statistics are shown interactively
 in the viewer, and output results are returned as a data frame.
 If the request produces multiple data frames, they will be returned in a list.
-You may then access individual dataset from the list.
+You may then access individual datasets from the list.
 The interactive report can be turned off using the "noprint" option, and
 the output datasets can be turned off using the "none" keyword on the
 <code>output</code> parameter.</p>
@@ -209,6 +211,10 @@ effort. To turn off the interactive report, pass the "noprint" keyword
 to the <code>options</code> parameter.</p>
 <p>The <code>titles</code> parameter allows you to set one or more titles for your
 report.  Pass these titles as a vector of strings.</p>
+<p>The exact datasets used for the interactive report can be returned as a list.
+To return these datasets as a list, pass
+the "report" keyword on the <code>output</code> parameter. This list may in
+turn be passed to <code><a href="proc_print.html">proc_print</a></code> to write the report to a file.</p>
     </div>
     <div id="dataset-output">
     <h2>Dataset Output</h2>
@@ -225,10 +231,6 @@ will always be named "BY", and the class variable will always be named
 "CLASS".  In addition, data values in the
 output datasets are intentionally not rounded or formatted
 to give you the most accurate statistical results.</p>
-<p>The exact datasets used for the interactive report can be returned as a list.
-To return these datasets as a list, pass
-the "report" keyword on the <code>output</code> parameter. This list may in
-turn be passed to <code><a href="proc_print.html">proc_print</a></code> to write the report to a file.</p>
     </div>
     <div id="statistics-keywords">
     <h2>Statistics Keywords</h2>
@@ -278,11 +280,10 @@ value for confidence limit statistics.  Set the alpha as a decimal value
 between 0 and 1.  For example, you can set a 90% confidence limit as
 <code>alpha = 0.1</code>.</p></li>
 <li><p><strong>completetypes</strong>: The "completetypes" option will generate
-all combinations of the available class categories in the data.  Available
-categories will be distinguished by the TYPE variable. If the variable is
-a factor, the available categories will be taken from the factor levels.</p></li>
-<li><p><strong>long</strong>: A shaping option that will transpose the output dataset
-so that statistics are in rows and variables are in columns.</p></li>
+all combinations of the class variable, even if there is no data
+present for a particular level.
+Combinations will be distinguished by the TYPE variable. To use the "completetypes"
+option, define the class variable(s) as a factor.</p></li>
 <li><p><strong>maxdec = </strong>: The "maxdec = " option will set the maximum
 of decimal places displayed on report output. For example, you can set 4 decimal
 places as follows: <code>maxdec = 4</code>.  Default is 7 decimal places.
@@ -296,40 +297,62 @@ option will inhibit printing.</p></li>
 dataset.</p></li>
 <li><p><strong>nway</strong>: Returns only the highest level TYPE combination.  By
 default, the function return all TYPE combinations.</p></li>
-<li><p><strong>stacked</strong>: Requests that output datasets be returned in "stacked"
-form, such that both statistics and variables are in rows.</p></li>
-<li><p><strong>wide</strong>: Requests that output datasets be returned in "wide" form,
-such that statistics are across the top in columns, and variables are in rows.</p></li>
 </ul></div>
+    <div id="type-and-freq-variables">
+    <h2>TYPE and FREQ Variables</h2>
+    
+
+<p>The TYPE and FREQ variables appear on the output dataset by default.</p>
+<p>The FREQ variable contains a count of the number of input rows/observations that were
+included in the statistics for that output row. The FREQ count can be different
+from the N statistic. The FREQ count is a count of the number of rows/observations,
+while the N statistic is a count of non-missing values.  These counts can
+be different if you have missing values in your data.  If you want to remove
+the FREQ column from the output dataset, use the "nofreq" option.</p>
+<p>The TYPE variable identifies combinations of class categories, and produces
+summary statistics for each of those combinations.  For example, the
+output dataset normally produces statistics for TYPE 0, which is all
+class categories, and a TYPE 1 which is each class category.  If there
+are multiple classes, there will be multiple TYPE values for each level
+of class combinations.  If you do no want to show the various
+type combinations, use the "nway" option. If you want to remove the TYPE
+column from the output dataset, use the "notype" option.</p>
+    </div>
+    <div id="using-factors">
+    <h2>Using Factors</h2>
+    
+
+<p>There are some occasions when you may want to define the <code>class</code> variable(s)
+as a factor. One occasion is for sorting/ordering,
+and the other is for obtaining zero-counts on sparse data.</p>
+<p>To order the class categories in the means output, define the
+<code>class</code> variable as a factor in the desired order. The function will
+then retain that order for the class categories in the output dataset
+and report.</p>
+<p>You may also wish to
+define the class variable as a factor if you are dealing with sparse data
+and some of the class categories are not present in the data. To ensure
+these categories are displayed with zero-counts, define the <code>class</code> variable
+as a factor and use the "completetypes" option.</p>
+    </div>
     <div id="data-shaping">
     <h2>Data Shaping</h2>
     
 
-<p>By default, the <code>proc_means</code> function returns an output dataset of
-summary statistics.  If running interactively, the function also prints
-the results to the viewer.  As described above, the output
-dataset can be somewhat different than the dataset sent to the viewer.
-The <code>output</code> parameter allows you to choose which datasets to return.
-There are three choices:
-"out", "report", and "none".  The "out" keyword returns the default output
-dataset.  The "report" keyword returns the dataset(s) sent to the viewer. You
-may also pass "none" if you don't want any datasets returned from the function.</p>
-<p>In addition, the output dataset produced by the "out" keyword can be shaped
+<p>The output dataset produced by the "out" keyword can be shaped
 in different ways. These shaping options allow you to decide whether the
 data should be returned long and skinny, or short and wide. The shaping
 options can reduce the amount of data manipulation necessary to get the
-frequencies into the desired form. The available
-shaping options are as follows:</p><ul><li><p><strong>long</strong>: An option that will transpose the output datasets
+frequencies into the desired form. The
+shaping options are as follows:</p><ul><li><p><strong>long</strong>: Transposes the output datasets
 so that statistics are in rows and variables are in columns.</p></li>
 <li><p><strong>stacked</strong>: Requests that output datasets
 be returned in "stacked" form, such that both statistics and
 variables are in rows.</p></li>
 <li><p><strong>wide</strong>: Requests that output datasets
 be returned in "wide" form, such that statistics are across the top in
-columns, and variables are in rows.</p></li>
-</ul><p>The default shaping option for the <code>proc_means</code> function is "wide".
-To pass multiple output keywords, pass them on a vector.</p>
-    </div>
+columns, and variables are in rows. This shaping option is the default.</p></li>
+</ul></div>
 
     <div id="ref-examples">
     <h2>Examples</h2>

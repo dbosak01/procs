@@ -28,6 +28,11 @@
 #' The \code{titles} parameter allows you to set one or more titles for your
 #' report.  Pass these titles as a vector of strings.
 #'
+#' The exact datasets used for the interactive report can be returned as a list.
+#' To return these datasets as a list, pass
+#' the "report" keyword on the \code{output} parameter. This list may in
+#' turn be passed to \code{\link{proc_print}} to write the report to a file.
+#'
 #' @section Dataset Output:
 #' Dataset results are also returned from the function by default.
 #' If the results are a single dataset, a single
@@ -41,11 +46,6 @@
 #' "CLASS".  In addition, data values in the
 #' output datasets are intentionally not rounded or formatted
 #' to give you the most accurate statistical results.
-#'
-#' The exact datasets used for the interactive report can be returned as a list.
-#' To return these datasets as a list, pass
-#' the "report" keyword on the \code{output} parameter. This list may in
-#' turn be passed to \code{\link{proc_print}} to write the report to a file.
 #'
 #' @section Statistics Keywords:
 #' The following statistics keywords can be passed on the \code{stats}
@@ -98,12 +98,10 @@
 #' \code{alpha = 0.1}.
 #' }
 #' \item{\strong{completetypes}: The "completetypes" option will generate
-#' all combinations of the available class categories in the data.  Available
-#' categories will be distinguished by the TYPE variable. If the variable is
-#' a factor, the available categories will be taken from the factor levels.
-#' }
-#' \item{\strong{long}: A shaping option that will transpose the output dataset
-#' so that statistics are in rows and variables are in columns.
+#' all combinations of the class variable, even if there is no data
+#' present for a particular level.
+#' Combinations will be distinguished by the TYPE variable. To use the "completetypes"
+#' option, define the class variable(s) as a factor.
 #' }
 #' \item{\strong{maxdec = }: The "maxdec = " option will set the maximum
 #' of decimal places displayed on report output. For example, you can set 4 decimal
@@ -123,32 +121,50 @@
 #' \item{\strong{nway}: Returns only the highest level TYPE combination.  By
 #' default, the function return all TYPE combinations.
 #' }
-#' \item{\strong{stacked}: Requests that output datasets be returned in "stacked"
-#' form, such that both statistics and variables are in rows.
 #' }
-#' \item{\strong{wide}: Requests that output datasets be returned in "wide" form,
-#' such that statistics are across the top in columns, and variables are in rows.
-#' }
-#' }
-#' @section Data Shaping:
-#' By default, the \code{proc_means} function returns an output dataset of
-#' summary statistics.  If running interactively, the function also prints
-#' the results to the viewer.  As described above, the output
-#' dataset can be somewhat different than the dataset sent to the viewer.
-#' The \code{output} parameter allows you to choose which datasets to return.
-#' There are three choices:
-#' "out", "report", and "none".  The "out" keyword returns the default output
-#' dataset.  The "report" keyword returns the dataset(s) sent to the viewer. You
-#' may also pass "none" if you don't want any datasets returned from the function.
+#' @section TYPE and FREQ Variables:
+#' The TYPE and FREQ variables appear on the output dataset by default.
 #'
-#' In addition, the output dataset produced by the "out" keyword can be shaped
+#' The FREQ variable contains a count of the number of input rows/observations that were
+#' included in the statistics for that output row. The FREQ count can be different
+#' from the N statistic. The FREQ count is a count of the number of rows/observations,
+#' while the N statistic is a count of non-missing values.  These counts can
+#' be different if you have missing values in your data.  If you want to remove
+#' the FREQ column from the output dataset, use the "nofreq" option.
+#'
+#' The TYPE variable identifies combinations of class categories, and produces
+#' summary statistics for each of those combinations.  For example, the
+#' output dataset normally produces statistics for TYPE 0, which is all
+#' class categories, and a TYPE 1 which is each class category.  If there
+#' are multiple classes, there will be multiple TYPE values for each level
+#' of class combinations.  If you do no want to show the various
+#' type combinations, use the "nway" option. If you want to remove the TYPE
+#' column from the output dataset, use the "notype" option.
+#'
+#' @section Using Factors:
+#' There are some occasions when you may want to define the \code{class} variable(s)
+#' as a factor. One occasion is for sorting/ordering,
+#' and the other is for obtaining zero-counts on sparse data.
+#'
+#' To order the class categories in the means output, define the
+#' \code{class} variable as a factor in the desired order. The function will
+#' then retain that order for the class categories in the output dataset
+#' and report.
+#'
+#' You may also wish to
+#' define the class variable as a factor if you are dealing with sparse data
+#' and some of the class categories are not present in the data. To ensure
+#' these categories are displayed with zero-counts, define the \code{class} variable
+#' as a factor and use the "completetypes" option.
+#' @section Data Shaping:
+#' The output dataset produced by the "out" keyword can be shaped
 #' in different ways. These shaping options allow you to decide whether the
 #' data should be returned long and skinny, or short and wide. The shaping
 #' options can reduce the amount of data manipulation necessary to get the
-#' frequencies into the desired form. The available
+#' frequencies into the desired form. The
 #' shaping options are as follows:
 #' \itemize{
-#' \item{\strong{long}: An option that will transpose the output datasets
+#' \item{\strong{long}: Transposes the output datasets
 #' so that statistics are in rows and variables are in columns.
 #' }
 #' \item{\strong{stacked}: Requests that output datasets
@@ -157,11 +173,9 @@
 #' }
 #' \item{\strong{wide}: Requests that output datasets
 #' be returned in "wide" form, such that statistics are across the top in
-#' columns, and variables are in rows.
+#' columns, and variables are in rows. This shaping option is the default.
 #' }
 #' }
-#' The default shaping option for the \code{proc_means} function is "wide".
-#' To pass multiple output keywords, pass them on a vector.
 # @section Data Constraints:
 # Explain limits of data for each stat option.  Number of non-missing
 # values, etc.
@@ -191,12 +205,14 @@
 #' option will return a NULL instead of a dataset or list of datasets.
 #' The "report" keyword returns the datasets from the interactive report, which
 #' may be different from the standard output. The output parameter also accepts
-#' data shaping keywords.
-#' The "long, "stacked", and "wide" keywords are data
+#' data shaping keywords "long, "stacked", and "wide".
+#' The keywords are
 #' shaping options that control the structure of the output data. See the
 #' \strong{Data Shaping} section for additional details. Note that
-#' multiple output keywords may be passed on
-#' character vector.
+#' multiple output keywords may be passed on a
+#' character vector. For example,
+#' to produce both a report dataset and a "long" output dataset,
+#' use the parameter \code{output = c("report", "out", "long")}.
 #' @param by An optional by group. If you specify an by group, the input
 #' data will be subset on the by variable(s) prior to performing any
 #' statistics.
@@ -217,7 +233,7 @@
 #' @return Normally, the requested summary statistics are shown interactively
 #' in the viewer, and output results are returned as a data frame.
 #' If the request produces multiple data frames, they will be returned in a list.
-#' You may then access individual dataset from the list.
+#' You may then access individual datasets from the list.
 #' The interactive report can be turned off using the "noprint" option, and
 #' the output datasets can be turned off using the "none" keyword on the
 #' \code{output} parameter.
@@ -648,7 +664,7 @@ get_output <- function(data, var, stats, missing = FALSE,
 
   if (!is.null(by)) {
 
-    # Create a new vector of class names and values
+    # Create a new vector of by names and values
     bv <- by
 
     if (length(bv) == 1)
@@ -1235,7 +1251,12 @@ get_class_report <- function(data, var, class, outp, freq = TRUE,
   clslist <- list(data)
   cnms <- NULL
   if (!is.null(class)) {
-    clslist <- split(data, data[ , class], sep = "|", drop = TRUE)
+
+    if (has_option(opts, "completetypes"))
+      clslist <- split(data, data[ , class], sep = "|", drop = FALSE)
+    else
+      clslist <- split(data, data[ , class], sep = "|", drop = TRUE)
+
     cnms <- names(clslist)
     if (length(clslist) == 0) {
 
@@ -1325,10 +1346,20 @@ gen_output_means <- function(data,
 
       # Create vector of NA class values
       cls <- NULL
+      ctypes <- list() # Not used but not ready to get rid of it yet
       if (!is.null(class)) {
         cls <- rep(NA, length(class))
         names(cls) <- class
 
+        if (has_option(opts, "completetypes")) {
+          for (cnm in class) {
+            if (is.factor(data[[cnm]])) {
+              ctypes[[cnm]] <- levels(data[[cnm]])
+            } else {
+              ctypes[[cnm]] <- unique(data[[cnm]])
+            }
+          }
+        }
       }
 
       bdat <- list(data)
@@ -1490,7 +1521,11 @@ get_class_output <- function(data, var, class, outp, freq = TRUE,
 
         tmpcls <- cbm[[j]]
 
-        clslist <- split(data, data[ , tmpcls], sep = "|", drop = TRUE)
+        if (has_option(opts, "completetypes"))
+          clslist <- split(data, data[ , tmpcls], sep = "|", drop = FALSE)
+        else
+          clslist <- split(data, data[ , tmpcls], sep = "|", drop = TRUE)
+
         cnms <- names(clslist)
         if (length(clslist) == 0) {
 

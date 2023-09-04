@@ -256,7 +256,7 @@ data is organized.  The options are best illustrated by an example:
 ```{r eval=FALSE, echo=TRUE} 
 # Shape wide
 res1 <- proc_freq(dat, tables = y, 
-                  options = wide)
+                  output = wide)
 
 # Wide results
 res1
@@ -267,7 +267,7 @@ res1
 
 # Shape long
 res2 <- proc_freq(dat, tables = y, 
-                  options = long)
+                  output = long)
 
 # Long results
 res2
@@ -278,7 +278,7 @@ res2
 
 # Shape stacked
 res3 <- proc_freq(dat, tables = y, 
-                  options = stacked)
+                  output = stacked)
 
 # Stacked results
 res3

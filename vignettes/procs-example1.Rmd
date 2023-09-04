@@ -112,7 +112,8 @@ put(adsl)
 
 put("Get ARM population counts")
 proc_freq(adsl, tables = ARM, 
-          options = v(long, nopercent, nonobs)) -> arm_pop
+          output = long,
+          options = v(nopercent, nonobs)) -> arm_pop
 
 # Age Summary Block -------------------------------------------------------
 
@@ -172,7 +173,7 @@ sep("Create frequency counts for SEX")
 put("Get sex frequency counts")
 proc_freq(adsl, tables = SEX,
           by = ARM,
-          options = v(nonobs)) -> sex_freq 
+          options = nonobs) -> sex_freq 
 
 
 put("Combine counts and percents.")
@@ -230,7 +231,7 @@ sep("Create frequency counts for RACE")
 put("Get race frequency counts")
 proc_freq(adsl, tables = RACE,
           by = ARM,
-          options = v(nonobs)) -> race_freq 
+          options = nonobs) -> race_freq 
 
 
 put("Combine counts and percents.")
@@ -287,7 +288,7 @@ put("Get age group frequency counts")
 proc_freq(adsl,
           table = AGECAT,
           by = ARM,
-          options = v(nonobs)) -> ageg_freq
+          options = nonobs) -> ageg_freq
 
 put("Combine counts and percents and assign age group factor for sorting")
 datastep(ageg_freq,

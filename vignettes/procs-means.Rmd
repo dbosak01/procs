@@ -334,7 +334,7 @@ shaping options:
 ```{r eval=FALSE, echo=TRUE} 
 # Shape wide
 res1 <- proc_means(dat, stats = v(median, sum, q1, q3),
-                   options = wide)
+                   output = wide)
 
 # Wide results
 res1
@@ -344,7 +344,7 @@ res1
 
 # Shape long
 res2 <- proc_means(dat, stats = v(median, sum, q1, q3),
-                   options = long)
+                   output = long)
 
 # Long results
 res2
@@ -356,7 +356,7 @@ res2
 
 # Shape stacked
 res3 <- proc_means(dat, stats = v(median, sum, q1, q3),
-                   options = stacked)
+                   output = stacked)
 
 # Stacked results
 res3

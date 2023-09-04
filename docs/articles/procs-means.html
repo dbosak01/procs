@@ -545,7 +545,7 @@ shaping options:</p>
 <div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Shape wide</span></span>
 <span><span class="va">res1</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/proc_means.html">proc_means</a></span><span class="op">(</span><span class="va">dat</span>, stats <span class="op">=</span> <span class="fu"><a href="https://common.r-sassy.org/reference/v.html" class="external-link">v</a></span><span class="op">(</span><span class="va">median</span>, <span class="va">sum</span>, <span class="va">q1</span>, <span class="va">q3</span><span class="op">)</span>,</span>
-<span>                   options <span class="op">=</span> <span class="va">wide</span><span class="op">)</span></span>
+<span>                   output <span class="op">=</span> <span class="va">wide</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Wide results</span></span>
 <span><span class="va">res1</span></span>
@@ -555,7 +555,7 @@ shaping options:</p>
 <span></span>
 <span><span class="co"># Shape long</span></span>
 <span><span class="va">res2</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/proc_means.html">proc_means</a></span><span class="op">(</span><span class="va">dat</span>, stats <span class="op">=</span> <span class="fu"><a href="https://common.r-sassy.org/reference/v.html" class="external-link">v</a></span><span class="op">(</span><span class="va">median</span>, <span class="va">sum</span>, <span class="va">q1</span>, <span class="va">q3</span><span class="op">)</span>,</span>
-<span>                   options <span class="op">=</span> <span class="va">long</span><span class="op">)</span></span>
+<span>                   output <span class="op">=</span> <span class="va">long</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Long results</span></span>
 <span><span class="va">res2</span></span>
@@ -567,7 +567,7 @@ shaping options:</p>
 <span></span>
 <span><span class="co"># Shape stacked</span></span>
 <span><span class="va">res3</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/proc_means.html">proc_means</a></span><span class="op">(</span><span class="va">dat</span>, stats <span class="op">=</span> <span class="fu"><a href="https://common.r-sassy.org/reference/v.html" class="external-link">v</a></span><span class="op">(</span><span class="va">median</span>, <span class="va">sum</span>, <span class="va">q1</span>, <span class="va">q3</span><span class="op">)</span>,</span>
-<span>                   options <span class="op">=</span> <span class="va">stacked</span><span class="op">)</span></span>
+<span>                   output <span class="op">=</span> <span class="va">stacked</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Stacked results</span></span>
 <span><span class="va">res3</span></span>
