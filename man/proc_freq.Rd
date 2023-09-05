@@ -93,7 +93,7 @@ By default, \code{proc_freq} results will
 be immediately sent to the viewer as an HTML report.  This functionality
 makes it easy to get a quick analysis of your data with very little
 effort. To turn off the interactive report, pass the "noprint" keyword
-to the \code{options} parameter.
+to the \code{options} parameter or set \code{options("procs.print" = FALSE)}.
 
 The \code{titles} parameter allows you to set one or more titles for your
 report.  Pass these titles as a vector of strings.
@@ -135,7 +135,7 @@ Normally the \code{proc_freq} function counts each row in the
 input data equally. In some cases, however, each row in the data
 can represent multiple observations, and rows should not be treated
 equally.  In these cases, use the \code{weight} parameter.  The parameter
-accepts a quoted variable/column name to use as the weighted value.  If the
+accepts a variable/column name to use as the weighted value.  If the
 \code{weight} parameter is used, the function will sum the weighted values
 instead of counting rows.
 }
@@ -155,14 +155,11 @@ by additional columns.
 
 The \code{options} parameter accepts a vector of options.  Normally, these
 options must be quoted.  But you may pass them unquoted using the \code{v()}
-function.  For example, you can request report datasets and the Chi-Square
-statistic like this: \code{options = v(nlevels, chisq)}.
+function.  For example, you can request the number of category levels
+and the Chi-Square statistic like this: \code{options = v(nlevels, chisq)}.
 
 Below are all the available options and a description of each:
 \itemize{
-\item{\strong{chisq}: Requests that the Chi-square statistics be produced.
-This option is only valid on two-way tables.
-}
 \item{\strong{crosstab}: Two-way output tables are a list style by default.
 If you want a crosstab style, pass the "crosstab" option.
 }

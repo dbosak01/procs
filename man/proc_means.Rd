@@ -102,8 +102,8 @@ options to determine whether and what results are returned.
 
 By default, \code{proc_freq} results will
 be immediately sent to the viewer as an HTML report.  This functionality
-makes it easy to get a quick analysis of your data with very little
-effort. To turn off the interactive report, pass the "noprint" keyword
+makes it easy to get a quick analysis of your data. To turn off the
+interactive report, pass the "noprint" keyword
 to the \code{options} parameter.
 
 The \code{titles} parameter allows you to set one or more titles for your
