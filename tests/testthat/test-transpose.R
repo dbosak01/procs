@@ -635,5 +635,16 @@ test_that("transpose26: prefix, and suffix works with no ID.", {
 
 })
 
+test_that("transpose27: noname options works as expected.", {
 
+  res <- proc_transpose(score, var = c("Test1", "Test2", "Final"), options = noname)
+
+
+  res
+
+  expect_equal(nrow(res), 3)
+  expect_equal(ncol(res), 7)
+  expect_equal("NAME" %in% names(res), FALSE)
+
+})
 

@@ -72,6 +72,9 @@
 #' @param where An expression to filter the rows after the transform
 #' is complete.  Use the \code{\link{expression}} function to define
 #' the where clause.
+#' @param options Optional keywords that affect the transpose. Default is NULL.
+#' Available option is "noname" which drops the name column from the
+#' output dataset.
 #' @param log Whether or not to log the procedure.  Default is TRUE.
 #' This parameter is used internally.
 #' @return The transposed dataset. If a data frame
@@ -159,6 +162,7 @@ proc_transpose <- function(data,
                            delimiter = ".",
                            suffix = NULL,
                            where = NULL,
+                           options = NULL,
                            log = TRUE
                            ) {
 
@@ -212,6 +216,10 @@ proc_transpose <- function(data,
   delimiter <- tryCatch({if (typeof(delimiter) %in% c("character", "NULL")) delimiter else odelimiter},
                      error = function(cond) {odelimiter})
 
+  ooptions <- deparse(substitute(options, env = environment()))
+  options <- tryCatch({if (typeof(options) %in% c("character", "NULL")) options else ooptions},
+                        error = function(cond) {ooptions})
+
   # Parameter checks
   nms <- names(data)
   if (!is.null(by)) {
@@ -246,6 +254,15 @@ proc_transpose <- function(data,
     if (!all(copy %in% nms)) {
 
       stop(paste("Invalid copy name: ", copy[!copy %in% nms], "\n"))
+    }
+  }
+
+
+  if (!is.null(options)) {
+    opts <- c("noname")
+    if (!all(options %in% opts)) {
+
+      stop(paste("Invalid option name: ", options[!options %in% opts], "\n"))
     }
   }
 
@@ -469,10 +486,17 @@ proc_transpose <- function(data,
 
    }
 
-   # Assign name label
-   if (!is.null(namelabel)) {
+   if ("noname" %in% options) {
 
-     attr(res[[name]], "label") <-  namelabel
+     res[[name]] <- NULL
+
+   } else {
+
+     # Assign name label
+     if (!is.null(namelabel)) {
+
+       attr(res[[name]], "label") <-  namelabel
+     }
    }
 
    # Assign ID labels

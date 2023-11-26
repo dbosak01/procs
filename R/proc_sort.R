@@ -33,6 +33,12 @@
 #' are 'dupkey' and 'nodupkey'. The 'nodupkey' option removes duplicate
 #' rows from the sorted dataset.  The 'dupkey' option removes unique
 #' rows from the sorted dataset.
+#' @param as.character If TRUE, will cast any factors in the 'by' parameter
+#' to character. Default is FALSE.  This parameter is included because it is
+#' common to use factors for sorting in R, but you may not want to keep the
+#' variable as a factor.  This parameter therefore allows you to use
+#' the factor for the sort, but then convert back to a character
+#' once the sort is complete.
 #' @return The sorted dataset.  If a data frame was input, a
 #' data frame will be output.  If a tibble was input, a tibble will
 #' be output.
@@ -99,7 +105,7 @@
 #' @import tibble
 #' @export
 proc_sort <- function(data,  by = NULL, keep = NULL, order = "ascending",
-                      options = NULL) {
+                      options = NULL, as.character = FALSE) {
 
 
   # Deal with single value unquoted parameter values
@@ -163,13 +169,21 @@ proc_sort <- function(data,  by = NULL, keep = NULL, order = "ascending",
   # Order and keep
   ret <- ret[ , keep, drop = FALSE]
 
+  # Cast factors to character if requested
+  if (as.character == TRUE) {
+    for (nm in by) {
+      if (is.factor(ret[[nm]])) {
+        ret[[nm]] <- as.character(ret[[nm]])
+      }
+    }
+  }
 
+  # Convert to tibble if input was a tibble
   if ("tbl_df" %in% class(data)) {
 
     ret <- as_tibble(ret)
   }
 
-  # unique(prt[, c("sex", "internship")])
 
   log_sort(data,
            by = by,

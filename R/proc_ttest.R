@@ -1,0 +1,1392 @@
+
+# TTest Procedure ---------------------------------------------------------
+
+
+
+#' @title Calculates T-Test Statistics
+#' @encoding UTF-8
+#' @description The \code{proc_ttest} function generates T-Test statistics
+#' for selected variables on the input dataset.  The variables are identified
+#' on the \code{var} parameter.  The statistics to perform are identified
+#' on the \code{stats} parameter.  Results are displayed in
+#' the viewer interactively and returned from the function.
+#' @details
+#' The \code{proc_means} function is for analysis of continuous variables.
+#' Data is passed in on the \code{data}
+#' parameter.  The desired statistics are specified using keywords
+#' on the \code{stats} parameter.  The function can segregate data into
+#' groups using the \code{by} and \code{class} parameters. There are also
+#' options to determine whether and what results are returned.
+#'
+#' @section Interactive Output:
+#' By default, \code{proc_freq} results will
+#' be immediately sent to the viewer as an HTML report.  This functionality
+#' makes it easy to get a quick analysis of your data. To turn off the
+#' interactive report, pass the "noprint" keyword
+#' to the \code{options} parameter.
+#'
+#' The \code{titles} parameter allows you to set one or more titles for your
+#' report.  Pass these titles as a vector of strings.
+#'
+#' The exact datasets used for the interactive report can be returned as a list.
+#' To return these datasets as a list, pass
+#' the "report" keyword on the \code{output} parameter. This list may in
+#' turn be passed to \code{\link{proc_print}} to write the report to a file.
+#'
+#' @section Dataset Output:
+#' Dataset results are also returned from the function by default.
+#' If the results are a single dataset, a single
+#' data frame will be returned.  If there are multiple results, a list of data
+#' frames will be returned.
+#'
+#' The output datasets generated are optimized for data manipulation.
+#' The column names have been standardized, and additional variables may
+#' be present to help with data manipulation.  For example, the by variable
+#' will always be named "BY", and the class variable will always be named
+#' "CLASS".  In addition, data values in the
+#' output datasets are intentionally not rounded or formatted
+#' to give you the most accurate statistical results.
+#'
+#' @section Statistics Keywords:
+#' The following statistics keywords can be passed on the \code{stats}
+#' parameter.  Normally, each statistic
+#' will be contained in a separate column and the column name will be
+#' the same as the statistic keyword. You may pass statistic keywords as a
+#' quoted vector of strings, or an unquoted vector using the \code{v()} function.
+#' \itemize{
+#'   \item{\strong{css}: Corrected Sum of Squares.}
+#'   \item{\strong{clm, lclm, uclm}: Upper and lower confidence limits.}
+#'   \item{\strong{cv}: Coefficient of Variation.}
+#'   \item{\strong{kurt/kurtosis}: The Kurtosis is a description of the
+#'   distribution tails. It requires at least 4 complete observations.}
+#'   \item{\strong{mean}: The arithmetic mean.}
+#'   \item{\strong{median}: The median.}
+#'   \item{\strong{mode}: The mode of the target variable.}
+#'   \item{\strong{min, max}: The minimum and maximum values of the target
+#'   variable.}
+#'   \item{\strong{n}: The number of non-missing observations.}
+#'   \item{\strong{nmiss}: The number of missing observations.}
+#'   \item{\strong{nobs}: The number of observations, whether
+#'   missing or non-missing.}
+#'   \item{\strong{p1 - p99}: Percentile ranges from p1 to p99, in increments
+#'   of 5.}
+#'   \item{\strong{qrange, q1, q3}: Quantile ranges for the first and third quantiles.}
+#'   \item{\strong{range}: Difference between the minimum and maximum values.}
+#'   \item{\strong{skew/skewness}: A measure of distribution skewness. It
+#'   requires at least 3 complete observations.}
+#'   \item{\strong{std/stddev}: Standard deviation.}
+#'   \item{\strong{stderr}: Standard error.}
+#'   \item{\strong{sum}: The sum of variable values.}
+#'   \item{\strong{uss}: Uncorrected sum of squares.}
+#'   \item{\strong{vari}: The variance.}
+#' }
+#' The function supports the following keywords to perform hypothesis testing:
+#' \itemize{
+#'   \item{\strong{t}: Student's t statistic.}
+#'   \item{\strong{prt/probt}: A two-tailed p-value for the Student's t statistic.}
+#'   \item{\strong{df}: Degrees of freedom for the Student's t statistic.}
+#' }
+#'
+#' @section Options:
+#' The \code{proc_means} function recognizes the following options.  Options may
+#' be passed as a quoted vector of strings, or an unquoted vector using the
+#' \code{v()} function.
+#' \itemize{
+#' \item{\strong{alpha = }: The "alpha = " option will set the alpha
+#' value for confidence limit statistics.  Set the alpha as a decimal value
+#' between 0 and 1.  For example, you can set a 90% confidence limit as
+#' \code{alpha = 0.1}.
+#' }
+#' \item{\strong{completetypes}: The "completetypes" option will generate
+#' all combinations of the class variable, even if there is no data
+#' present for a particular level.
+#' Combinations will be distinguished by the TYPE variable. To use the "completetypes"
+#' option, define the class variable(s) as a factor.
+#' }
+#' \item{\strong{maxdec = }: The "maxdec = " option will set the maximum
+#' of decimal places displayed on report output. For example, you can set 4 decimal
+#' places as follows: \code{maxdec = 4}.  Default is 7 decimal places.
+#' This option will not round any values on the output dataset.
+#' }
+#' \item{\strong{nofreq, nonobs}: Turns off the FREQ column
+#' on the output datasets.
+#' }
+#' \item{\strong{noprint}: Whether to print the interactive report to the
+#' viewer.  By default, the report is printed to the viewer. The "noprint"
+#' option will inhibit printing.
+#' }
+#' \item{\strong{notype}: Turns off the TYPE column on the output
+#' dataset.
+#' }
+#' \item{\strong{nway}: Returns only the highest level TYPE combination.  By
+#' default, the function return all TYPE combinations.
+#' }
+#' }
+#' @section TYPE and FREQ Variables:
+#' The TYPE and FREQ variables appear on the output dataset by default.
+#'
+#' The FREQ variable contains a count of the number of input rows/observations that were
+#' included in the statistics for that output row. The FREQ count can be different
+#' from the N statistic. The FREQ count is a count of the number of rows/observations,
+#' while the N statistic is a count of non-missing values.  These counts can
+#' be different if you have missing values in your data.  If you want to remove
+#' the FREQ column from the output dataset, use the "nofreq" option.
+#'
+#' The TYPE variable identifies combinations of class categories, and produces
+#' summary statistics for each of those combinations.  For example, the
+#' output dataset normally produces statistics for TYPE 0, which is all
+#' class categories, and a TYPE 1 which is each class category.  If there
+#' are multiple classes, there will be multiple TYPE values for each level
+#' of class combinations.  If you do no want to show the various
+#' type combinations, use the "nway" option. If you want to remove the TYPE
+#' column from the output dataset, use the "notype" option.
+#'
+#' @section Using Factors:
+#' There are some occasions when you may want to define the \code{class} variable(s)
+#' as a factor. One occasion is for sorting/ordering,
+#' and the other is for obtaining zero-counts on sparse data.
+#'
+#' To order the class categories in the means output, define the
+#' \code{class} variable as a factor in the desired order. The function will
+#' then retain that order for the class categories in the output dataset
+#' and report.
+#'
+#' You may also wish to
+#' define the class variable as a factor if you are dealing with sparse data
+#' and some of the class categories are not present in the data. To ensure
+#' these categories are displayed with zero-counts, define the \code{class} variable
+#' as a factor and use the "completetypes" option.
+#' @section Data Shaping:
+#' The output dataset produced by the "out" keyword can be shaped
+#' in different ways. These shaping options allow you to decide whether the
+#' data should be returned long and skinny, or short and wide. The shaping
+#' options can reduce the amount of data manipulation necessary to get the
+#' frequencies into the desired form. The
+#' shaping options are as follows:
+#' \itemize{
+#' \item{\strong{long}: Transposes the output datasets
+#' so that statistics are in rows and variables are in columns.
+#' }
+#' \item{\strong{stacked}: Requests that output datasets
+#' be returned in "stacked" form, such that both statistics and
+#' variables are in rows.
+#' }
+#' \item{\strong{wide}: Requests that output datasets
+#' be returned in "wide" form, such that statistics are across the top in
+#' columns, and variables are in rows. This shaping option is the default.
+#' }
+#' }
+# @section Data Constraints:
+# Explain limits of data for each stat option.  Number of non-missing
+# values, etc.
+#'
+#' @param data The input data frame for which to calculate summary statistics.
+#' This parameter is required.
+#' @param var The variable(s) to calculate summary statistics for. If no
+#' variables are specified,
+#' summary statistics will be generated for all numeric variables on the
+#' input data frame.
+#' @param paired A pair of variables to perform a T-Test on.  Variables should
+#' be separated by a star (*).  Entire string should be quoted.
+#' @param output Whether or not to return datasets from the function. Valid
+#' values are "out", "none", and "report".  Default is "out", and will
+#' produce dataset output specifically designed for programmatic use. The "none"
+#' option will return a NULL instead of a dataset or list of datasets.
+#' The "report" keyword returns the datasets from the interactive report, which
+#' may be different from the standard output. The output parameter also accepts
+#' data shaping keywords "long, "stacked", and "wide".
+#' The keywords are
+#' shaping options that control the structure of the output data. See the
+#' \strong{Data Shaping} section for additional details. Note that
+#' multiple output keywords may be passed on a
+#' character vector. For example,
+#' to produce both a report dataset and a "long" output dataset,
+#' use the parameter \code{output = c("report", "out", "long")}.
+#' @param by An optional by group. If you specify an by group, the input
+#' data will be subset on the by variable(s) prior to performing any
+#' statistics.
+#' @param class The \code{class} parameter is similar to the \code{by}
+#' parameter, but the output is different.  By groups will create completely
+#' separate tables, while class groups will be continued in the same table.
+#' When a \code{by} and a \code{class} are both specified, the \code{class}
+#' will be nested in the \code{by}.
+# @param weight An optional weight parameter.
+#' @param options A vector of optional keywords. Valid values are: "alpha =",
+#' "completetypes", "maxdec =", "noprint", "notype", "nofreq", "nonobs", "nway".
+#' The "notype", "nofreq", and "nonobs" keywords will turn
+#' off columns on the output datasets.  The "alpha = " option will set the alpha
+#' value for confidence limit statistics.  The default is 95% (alpha = 0.05).
+#' The "maxdec = " option sets the maximum number of decimal places displayed
+#' on report output. The "nway" option returns only the highest type values.
+#' @param titles A vector of one or more titles to use for the report output.
+#' @return Normally, the requested summary statistics are shown interactively
+#' in the viewer, and output results are returned as a data frame.
+#' If the request produces multiple data frames, they will be returned in a list.
+#' You may then access individual datasets from the list.
+#' The interactive report can be turned off using the "noprint" option, and
+#' the output datasets can be turned off using the "none" keyword on the
+#' \code{output} parameter.
+#' @import fmtr
+#' @import tibble
+#' @export
+#' @examples
+#' # Turn off printing for CRAN checks
+#' options("procs.print" = FALSE)
+#'
+#' # Default statistics on iris
+#' res1 <- proc_means(iris)
+#'
+#' # View results
+#' res1
+#' #   TYPE FREQ          VAR   N     MEAN       STD MIN MAX
+#' # 1    0  150 Sepal.Length 150 5.843333 0.8280661 4.3 7.9
+#' # 2    0  150  Sepal.Width 150 3.057333 0.4358663 2.0 4.4
+#' # 3    0  150 Petal.Length 150 3.758000 1.7652982 1.0 6.9
+#' # 4    0  150  Petal.Width 150 1.199333 0.7622377 0.1 2.5
+#'
+#' # Defaults statistics with by
+#' res2 <- proc_means(iris,
+#'                    by = Species)
+#' # View results
+#' res2
+#' #            BY TYPE FREQ          VAR  N  MEAN       STD MIN MAX
+#' # 1      setosa    0   50 Sepal.Length 50 5.006 0.3524897 4.3 5.8
+#' # 2      setosa    0   50  Sepal.Width 50 3.428 0.3790644 2.3 4.4
+#' # 3      setosa    0   50 Petal.Length 50 1.462 0.1736640 1.0 1.9
+#' # 4      setosa    0   50  Petal.Width 50 0.246 0.1053856 0.1 0.6
+#' # 5  versicolor    0   50 Sepal.Length 50 5.936 0.5161711 4.9 7.0
+#' # 6  versicolor    0   50  Sepal.Width 50 2.770 0.3137983 2.0 3.4
+#' # 7  versicolor    0   50 Petal.Length 50 4.260 0.4699110 3.0 5.1
+#' # 8  versicolor    0   50  Petal.Width 50 1.326 0.1977527 1.0 1.8
+#' # 9   virginica    0   50 Sepal.Length 50 6.588 0.6358796 4.9 7.9
+#' # 10  virginica    0   50  Sepal.Width 50 2.974 0.3224966 2.2 3.8
+#' # 11  virginica    0   50 Petal.Length 50 5.552 0.5518947 4.5 6.9
+#' # 12  virginica    0   50  Petal.Width 50 2.026 0.2746501 1.4 2.5
+#'
+#' # Specified variables, statistics, and options
+#' res3 <- proc_means(iris,
+#'                    var = v(Petal.Length, Petal.Width),
+#'                    class = Species,
+#'                    stats = v(n, mean, std, median, qrange, clm),
+#'                    options = nofreq,
+#'                    output = long)
+#' # View results
+#' res3
+#' #         CLASS TYPE   STAT Petal.Length Petal.Width
+#' # 1        <NA>    0      N  150.0000000 150.0000000
+#' # 2        <NA>    0   MEAN    3.7580000   1.1993333
+#' # 3        <NA>    0    STD    1.7652982   0.7622377
+#' # 4        <NA>    0 MEDIAN    4.3500000   1.3000000
+#' # 5        <NA>    0 QRANGE    3.5000000   1.5000000
+#' # 6        <NA>    0   LCLM    3.4731854   1.0763533
+#' # 7        <NA>    0   UCLM    4.0428146   1.3223134
+#' # 8      setosa    1      N   50.0000000  50.0000000
+#' # 9      setosa    1   MEAN    1.4620000   0.2460000
+#' # 10     setosa    1    STD    0.1736640   0.1053856
+#' # 11     setosa    1 MEDIAN    1.5000000   0.2000000
+#' # 12     setosa    1 QRANGE    0.2000000   0.1000000
+#' # 13     setosa    1   LCLM    1.4126452   0.2160497
+#' # 14     setosa    1   UCLM    1.5113548   0.2759503
+#' # 15 versicolor    1      N   50.0000000  50.0000000
+#' # 16 versicolor    1   MEAN    4.2600000   1.3260000
+#' # 17 versicolor    1    STD    0.4699110   0.1977527
+#' # 18 versicolor    1 MEDIAN    4.3500000   1.3000000
+#' # 19 versicolor    1 QRANGE    0.6000000   0.3000000
+#' # 20 versicolor    1   LCLM    4.1264528   1.2697993
+#' # 21 versicolor    1   UCLM    4.3935472   1.3822007
+#' # 22  virginica    1      N   50.0000000  50.0000000
+#' # 23  virginica    1   MEAN    5.5520000   2.0260000
+#' # 24  virginica    1    STD    0.5518947   0.2746501
+#' # 25  virginica    1 MEDIAN    5.5500000   2.0000000
+#' # 26  virginica    1 QRANGE    0.8000000   0.5000000
+#' # 27  virginica    1   LCLM    5.3951533   1.9479453
+#' # 28  virginica    1   UCLM    5.7088467   2.1040547
+#'
+proc_ttest <- function(data,
+                       var = NULL,
+                       paired = NULL,
+                       output = NULL,
+                       by = NULL,
+                       class = NULL,
+                       # freq = NULL, ?
+                       # weight = NULL, ?
+                       # bootstrap = NULL, ?
+                       # crossover = NULL, ?
+                       options = NULL,
+                       titles = NULL
+) {
+
+  # SAS seems to always ignore these
+  # Not sure why R has an option to keep them
+  missing <- FALSE
+
+
+  # Deal with single value unquoted parameter values
+  oby <- deparse(substitute(by, env = environment()))
+  by <- tryCatch({if (typeof(by) %in% c("character", "NULL")) by else oby},
+                 error = function(cond) {oby})
+
+  # Deal with single value unquoted parameter values
+  oclass <- deparse(substitute(class, env = environment()))
+  class <- tryCatch({if (typeof(class) %in% c("character", "NULL")) class else oclass},
+                    error = function(cond) {oclass})
+
+  ovar <- deparse(substitute(var, env = environment()))
+  var <- tryCatch({if (typeof(var) %in% c("character", "NULL")) var else ovar},
+                  error = function(cond) {ovar})
+
+  oopt <- deparse(substitute(options, env = environment()))
+  options <- tryCatch({if (typeof(options) %in% c("integer", "double", "character", "NULL")) options else oopt},
+                      error = function(cond) {oopt})
+
+  oout <- deparse(substitute(output, env = environment()))
+  output <- tryCatch({if (typeof(output) %in% c("character", "NULL")) output else oout},
+                     error = function(cond) {oout})
+
+  opaired <- deparse(substitute(paired, env = environment()))
+  paired <- tryCatch({if (typeof(paired) %in% c("character", "NULL")) paired else opaired},
+                     error = function(cond) {opaired})
+
+  # Parameter checks
+  nms <- names(data)
+
+  if (!is.null(by)) {
+    if (!all(by %in% nms)) {
+
+      stop(paste("Invalid by name: ", by[!by %in% nms], "\n"))
+    }
+  }
+
+  if (!is.null(class)) {
+    if (!all(class %in% nms)) {
+
+      stop(paste("Invalid class name: ", class[!class %in% nms], "\n"))
+    }
+  }
+
+
+  if (!is.null(output)) {
+    outs <- c("out", "report", "none", "wide", "long", "stacked")
+    if (!all(tolower(output) %in% outs)) {
+
+      stop(paste("Invalid output keyword: ", output[!tolower(output) %in% outs], "\n"))
+    }
+
+  }
+
+  # https://documentation.sas.com/doc/en/pgmsascdc/9.4_3.4/statug/statug_ttest_overview.htm
+  # https://documentation.sas.com/doc/en/pgmsascdc/9.4_3.4/statug/statug_ttest_syntax01.htm
+  aopts <- c("alpha=", "dist", "H0=", "sides", "test", "tost", "crossover=") # analysis options
+  dopts <- c("ci", "cochran", "plots") # display options
+  oopts <- c("byvar", "nobyvar")  # Output ordering
+
+  # Comment out for now.
+  # if (!is.null(options)) {
+  #   kopts <- c("alpha", "completetypes", "maxdec",
+  #              "noprint", "notype", "nofreq", "nonobs")
+  #
+  #   # Deal with "alpha =" and "maxdec = " by using name instead of value
+  #   nopts <- names(options)
+  #   mopts <- ifelse(nopts == "", options, nopts)
+  #
+  #
+  #   if (!all(tolower(mopts) %in% kopts)) {
+  #
+  #     stop(paste("Invalid options keyword: ", mopts[!tolower(mopts) %in% kopts], "\n"))
+  #   }
+  # }
+
+
+  rptflg <- FALSE
+  rptnm <- ""
+  rptres <- NULL
+
+  # Kill output request for report
+  # Otherwise, this will mess up gen_output_ttest
+  if (has_report(output)) {
+    rptflg <- TRUE
+    rptnm <- "report"
+  }
+
+  if (has_view(options))
+    view <- TRUE
+  else
+    view <- FALSE
+
+  res <- NULL
+
+
+  # Get report if requested
+  if (view == TRUE | rptflg) {
+    rptres <- gen_report_ttest(data, by = by, var = var, class = class,
+                               paired = paired, view = view,
+                               titles = titles, #weight = weight,
+                               opts = options, output = output)
+  }
+
+  # Get output datasets if requested
+  if (has_output(output)) {
+    res <- gen_output_ttest(data,
+                            by = by,
+                            class = class,
+                            var = var,
+                            paired = paired,
+                            output = output,
+                            opts = options
+    )
+  }
+
+  # Add report to result if requested
+  if (rptflg & !is.null(rptres)) {
+
+    if (is.null(res))
+      res <- rptres
+    else {
+      res <- list(out = res, report = rptres)
+    }
+
+
+  }
+
+  # Log the means function
+  log_ttest(data,
+            by = by,
+            class = class,
+            var = var,
+            paired = paired,
+            output = output,
+            # weight = weight,
+            view = view,
+            titles = titles,
+            options = options,
+            outcnt = ifelse("data.frame" %in% class(res),
+                            1, length(res)))
+
+  # If only one dataset returned, remove list
+  if (length(res) == 1)
+    res <- res[[1]]
+
+  if (log_output()) {
+    log_logr(res)
+    return(res)
+  }
+
+  return(res)
+}
+
+
+log_ttest <- function(data,
+                      by = NULL,
+                      class = NULL,
+                      var = NULL,
+                      paired = NULL,
+                      output = NULL,
+                      #weight = NULL,
+                      view = TRUE,
+                      titles = NULL,
+                      options = NULL,
+                      outcnt = NULL) {
+
+  ret <- c()
+
+  indt <- paste0(rep(" ", 12), collapse = "")
+
+  ret <- paste0("proc_ttest: input data set ", nrow(data),
+                " rows and ", ncol(data), " columns")
+
+  if (!is.null(by))
+    ret[length(ret) + 1] <- paste0(indt, "by: ", paste(by, collapse = " "))
+
+  if (!is.null(class))
+    ret[length(ret) + 1] <- paste0(indt, "class: ",
+                                   paste(class, collapse = " "))
+
+  if (!is.null(var))
+    ret[length(ret) + 1] <- paste0(indt, "var: ",
+                                   paste(var, collapse = " "))
+
+  if (!is.null(paired))
+    ret[length(ret) + 1] <- paste0(indt, "paired: ",
+                                   paste(paired, collapse = " "))
+
+  if (!is.null(output))
+    ret[length(ret) + 1] <- paste0(indt, "output: ", paste(output, collapse = " "))
+
+  # if (!is.null(weight))
+  #   ret[length(ret) + 1] <- paste0(indt, "weight: ", paste(weight, collapse = " "))
+
+  if (!is.null(view))
+    ret[length(ret) + 1]<- paste0(indt, "view: ", paste(view, collapse = " "))
+
+  if (!is.null(titles))
+    ret[length(ret) + 1] <- paste0(indt, "titles: ", paste(titles, collapse = "\n"))
+
+
+  if (!is.null(outcnt))
+    ret[length(ret) + 1] <- paste0(indt, "output: ", outcnt, " datasets")
+
+
+  log_logr(ret)
+
+}
+
+
+# Drivers -----------------------------------------------------------------
+
+
+get_output_specs_ttest <- function(data, var, paired, class, opts, output) {
+
+  dat <- data
+  spcs <- list()
+
+
+  if (is.null(paired) & is.null(var) & is.null(class)) {
+
+    stop("Procedure requires 'var', 'paired', or 'class' parameters to be specified")
+
+
+  } else if (!is.null(paired) & !is.null(var)) {
+
+      stop("Specify either the 'var' or 'paired' parameter, but not both.")
+
+  } else if (!is.null(class)) {
+
+    v1 <-
+    # splt <- trimws(strsplit(paired, "*", fixed = TRUE)[[1]])
+    # v1 <- splt[1]
+    # v2 <- splt[2]
+    #
+    # dat[["..diff"]] <- dat[[v1]] - dat[[v2]]
+
+    stats <- c("n", "mean", "std", "stderr", "min", "max")
+
+    spcs[["Statistics"]] <- out_spec(stats = stats, shape = "wide",
+                                     type = FALSE, freq = FALSE,
+                                     var = class)
+
+    spcs[["ConfLimits"]] <- out_spec(stats = c("mean", "clm", "std"), shape = "wide",
+                                     types = FALSE, freq = FALSE, var = class)
+
+    # spcs[["TTests"]] <- out_spec(stats = c("df", "t", "probt"),
+    #                              shape = "wide",
+    #                              type = FALSE, freq = FALSE,
+    #                              var = "..diff")
+
+
+  } else if (is.null(paired) & !is.null(var) & is.null(class)) {
+
+
+    h0 <- get_option(opts, "h0", 0)
+
+    if (!var %in% names(dat))
+      stop("Variable '" %p% var %p% "' not found in data.")
+
+    dat[["..var"]] <- dat[[var]] - h0
+
+    stats <- c("n", "mean", "std", "stderr", "min", "max")
+
+    spcs[["Statistics"]] <- out_spec(stats = stats, shape = "wide",
+                                         type = FALSE, freq = FALSE,
+                                         var = var, format = "%.4f")
+
+    spcs[["ConfLimits"]] <- out_spec(stats = c("mean", "clm", "std"), shape = "wide",
+                                     types = FALSE, freq = FALSE, var = var)
+
+    spcs[["TTests"]] <- out_spec(stats = c("df", "t", "probt"),
+                                 shape = "wide",
+                                 type = FALSE, freq = FALSE,
+                                 var = "..var")
+
+
+
+
+  } else if (!is.null(paired)) {
+
+    splt <- trimws(strsplit(paired, "*", fixed = TRUE)[[1]])
+    v1 <- splt[1]
+    v2 <- splt[2]
+
+    dat[["..diff"]] <- dat[[v1]] - dat[[v2]]
+
+    stats <- c("n", "mean", "std", "stderr", "min", "max")
+
+    spcs[["Statistics"]] <- out_spec(stats = stats, shape = "wide",
+                                     type = FALSE, freq = FALSE,
+                                     var = "..diff")
+
+    spcs[["ConfLimits"]] <- out_spec(stats = c("mean", "clm", "std"), shape = "wide",
+                                     types = FALSE, freq = FALSE, var = "..diff")
+
+    spcs[["TTests"]] <- out_spec(stats = c("df", "t", "probt"),
+                                 shape = "wide",
+                                 type = FALSE, freq = FALSE,
+                                 var = "..diff")
+
+
+  } else {
+
+
+
+  }
+
+
+
+  # outreq <- NULL
+
+  # Set default statistics for output parameters
+  # if (!is.null(outs)) {
+  #   outreq <- outs  # need to check this
+  #
+  # } else {
+  # outreq <- outs
+  # if (length(outreq) >= 1) {
+    # for (nm in names(outreq)) {
+    #   if ("out_req" %in% class(outreq[[nm]])) {
+    #     if (is.null(outreq[[nm]]$stats)) {
+    #
+    #       outreq[[nm]]$stats <- stats
+    #     }
+    #     if (is.null(outreq[[nm]]$shape)) {
+    #
+    #       outreq[[nm]]$shape <- "wide"
+    #     }
+    #   } else {
+    #
+    #     warning("proc_means: Unknown parameter '" %p% nm %p% "'")
+    #     outreq[[nm]] <- out_spec(shape = "wide")
+    #   }
+    # }
+  # } else {
+  #
+  #   if (option_true(output, "long")) {
+  #     outreq[["out"]] <- out_spec(stats = stats, shape = "long",
+  #                                 type = TRUE, freq = TRUE)
+  #   } else if (option_true(output, "stacked")) {
+  #     outreq[["out"]] <- out_spec(stats = stats, shape = "stacked",
+  #                                 type = TRUE, freq = TRUE)
+  #   } else {
+  #     outreq[["out"]] <- out_spec(stats = stats, shape = "wide",
+  #                                 type = TRUE, freq = TRUE)
+  #   }
+  #
+  # }
+
+
+
+  ret <- list(data = dat, outreq = spcs)
+
+  return(ret)
+
+}
+
+
+ttest_fc <- fcat(N = "%d", MEAN = "%.4f", STD = "%.4f", STDERR = "%.4f",
+                 MIN = "%.4f", MAX = "%.4f", UCLM = "%.4f", LCLM = "%.4f",
+                 DF = "%d", "T" = "%.2f", PROBT = "%.4f", log = FALSE)
+
+#' @import common
+gen_report_ttest <- function(data,
+                             by = NULL,
+                             class = NULL,
+                             var = NULL,
+                             paired = NULL,
+                             weight = NULL,
+                             opts = NULL,
+                             output = NULL,
+                             view = TRUE,
+                             titles = NULL) {
+
+  spcs <- get_output_specs_ttest(data, var, paired, class, opts, output)
+
+  data <- spcs$data
+  outreq <- spcs$outreq
+  nms <- names(outreq)
+
+  # Declare return list
+  res <- list()
+  byres <- list()
+
+  # Assign CL Percentage on Labels
+  alph <- (1 - get_alpha(opts)) * 100
+  mlbls[["UCLM"]] <- sprintf(mlbls[["UCLM"]], alph)
+  mlbls[["LCLM"]] <- sprintf(mlbls[["LCLM"]], alph)
+
+  #browser()
+
+  if (length(outreq) > 0) {
+
+    bylbls <- c()
+    if (!is.null(by)) {
+
+      lst <- unclass(data)[by]
+      for (nm in names(lst))
+        lst[[nm]] <- as.factor(lst[[nm]])
+      dtlst <- split(data, lst, sep = "|", drop = TRUE)
+
+      snms <- strsplit(names(dtlst), "|", fixed = TRUE)
+
+      for (k in seq_len(length(snms))) {
+        for (l in seq_len(length(by))) {
+          lv <- ""
+          if (!is.null(bylbls[k])) {
+            if (!is.na(bylbls[k])) {
+              lv <- bylbls[k]
+            }
+          }
+
+          if (l == length(by))
+            cma <- ""
+          else
+            cma <- ", "
+
+          bylbls[k] <- paste0(lv, by[l], "=", snms[[k]][l], cma)
+        }
+      }
+
+    } else {
+
+      dtlst <- list(data)
+    }
+
+    # Loop through by groups
+    for (j in seq_len(length(dtlst))) {
+
+      # Get table for this by group
+      dt <- dtlst[[j]]
+      bynm <- "main"
+
+      for (i in seq_len(length(outreq))) {
+
+        outp <- outreq[[i]]
+
+        # data, var, class, outp, freq = TRUE,
+        # type = NULL, byvals = NULL
+        #outp <- out_spec(stats = stats, shape = "wide")
+        smtbl <- get_class_report(dt, outp$var, class, outp, freq = FALSE, opts = opts)
+
+        nm <- nms[i]
+
+
+        # Add spanning headers if there are by groups
+        if (!is.null(by) & !is.null(smtbl)) {
+
+          # Add spanning headers
+          # spn <- span(1, ncol(smtbl), label = bylbls[j], level = 1)
+          # attr(smtbl, "spans") <- list(spn)
+
+          bynm <-  bylbls[j]
+        }
+
+        # Add default formats
+        #fmt <- "%.4f"
+        formats(smtbl) <- ttest_fc
+        # for (cnm in names(smtbl)) {
+        #
+        #   if (typeof(smtbl[[cnm]]) %in% c("double")) {
+        #
+        #     attr(smtbl[[cnm]], "format") <- fmt
+        #   }
+        #
+        # }
+
+
+        # Assign labels
+        if (is.null(class))
+          labels(smtbl) <- mlbls
+        else {
+
+          cv <- class
+          if (length(class) == 1)
+            cnms <- "CLASS"
+          else
+            cnms <- paste0("CLASS", seq(1, length(class)))
+
+          names(cv) <- cnms
+
+          labels(smtbl) <- append(as.list(cv), mlbls)
+
+        }
+
+        # Kill var variable for reports
+        if ("VAR" %in% names(smtbl)) {
+
+           smtbl[["VAR"]] <- NULL
+
+        }
+
+        # Convert to tibble if incoming data is a tibble
+        if ("tbl_df" %in% class(data)) {
+          res[[nm]] <- as_tibble(smtbl)
+        } else {
+          res[[nm]] <- smtbl
+        }
+
+      }
+
+      byres[[bynm]] <- res
+    }
+
+    # Add summary plot  - Commented for now because I can't get it to match SAS.
+   # res[["SummaryPanel"]] <- gen_summarypanel(dt, var, confidence = alph)
+
+  }
+
+  # Assign return object
+  if (length(byres) == 1)
+    ret <- byres[[1]]
+  else
+    ret <- byres
+
+  # Determine if printing
+  gv <- options("procs.print")[[1]]
+  if (is.null(gv))
+    gv <- TRUE
+
+  # Create viewer report if requested
+  if (gv) {
+    if (view == TRUE && interactive()) {
+
+
+      vrfl <- tempfile()
+
+      ttls <- c(titles, paste0("Variable: ", var))
+
+      out <- output_report(ret, dir_name = dirname(vrfl),
+                           file_name = basename(vrfl), out_type = "HTML",
+                           titles = ttls, margins = .5, viewer = TRUE,
+                           pages = length(byres))
+
+      show_viewer(out)
+    }
+  }
+
+  return(ret)
+
+}
+
+
+#' @import common
+gen_report_ttest_back <- function(data,
+                             by = NULL,
+                             class = NULL,
+                             var = NULL,
+                             paired = NULL,
+                             weight = NULL,
+                             opts = NULL,
+                             output = NULL,
+                             view = TRUE,
+                             titles = NULL) {
+
+  spcs <- get_output_specs_ttest(data, var, paired, class, opts, output)
+
+  data <- spcs$data
+  outreq <- spcs$outreq
+
+
+  # Declare return list
+  res <- list()
+
+  # Assign CL Percentage on Labels
+  alph <- (1 - get_alpha(opts)) * 100
+  mlbls[["UCLM"]] <- sprintf(mlbls[["UCLM"]], alph)
+  mlbls[["LCLM"]] <- sprintf(mlbls[["LCLM"]], alph)
+
+  #browser()
+
+  if (length(outreq) > 0) {
+
+    nms <- names(outreq)
+    for (i in seq_len(length(outreq))) {
+
+      outp <- outreq[[i]]
+
+      bylbls <- c()
+      if (!is.null(by)) {
+
+        lst <- unclass(data)[by]
+        for (nm in names(lst))
+          lst[[nm]] <- as.factor(lst[[nm]])
+        dtlst <- split(data, lst, sep = "|", drop = TRUE)
+
+        snms <- strsplit(names(dtlst), "|", fixed = TRUE)
+
+        for (k in seq_len(length(snms))) {
+          for (l in seq_len(length(by))) {
+            lv <- ""
+            if (!is.null(bylbls[k])) {
+              if (!is.na(bylbls[k])) {
+                lv <- bylbls[k]
+              }
+            }
+
+            if (l == length(by))
+              cma <- ""
+            else
+              cma <- ", "
+
+            bylbls[k] <- paste0(lv, by[l], "=", snms[[k]][l], cma)
+          }
+        }
+
+      } else {
+
+        dtlst <- list(data)
+      }
+
+      # Loop through by groups
+      for (j in seq_len(length(dtlst))) {
+
+        # Get table for this by group
+        dt <- dtlst[[j]]
+
+        # data, var, class, outp, freq = TRUE,
+        # type = NULL, byvals = NULL
+        #outp <- out_spec(stats = stats, shape = "wide")
+        smtbl <- get_class_report(dt, outp$var, class, outp, freq = FALSE, opts = opts)
+
+        nm <- length(res) + 1
+
+        # Add spanning headers if there are by groups
+        if (!is.null(by) & !is.null(smtbl)) {
+
+          # Add spanning headers
+          spn <- span(1, ncol(smtbl), label = bylbls[j], level = 1)
+          attr(smtbl, "spans") <- list(spn)
+
+          nm <-  bylbls[j]
+        }
+
+        # Add default formats
+        #fmt <- "%.4f"
+        formats(smtbl) <- ttest_fc
+        # for (cnm in names(smtbl)) {
+        #
+        #   if (typeof(smtbl[[cnm]]) %in% c("double")) {
+        #
+        #     attr(smtbl[[cnm]], "format") <- fmt
+        #   }
+        #
+        # }
+
+
+        # Assign labels
+        if (is.null(class))
+          labels(smtbl) <- mlbls
+        else {
+
+          cv <- class
+          if (length(class) == 1)
+            cnms <- "CLASS"
+          else
+            cnms <- paste0("CLASS", seq(1, length(class)))
+
+          names(cv) <- cnms
+
+          labels(smtbl) <- append(as.list(cv), mlbls)
+
+        }
+
+        # Kill var variable for reports
+        if ("VAR" %in% names(smtbl)) {
+
+          smtbl[["VAR"]] <- NULL
+
+        }
+
+        # Convert to tibble if incoming data is a tibble
+        if ("tbl_df" %in% class(data)) {
+          res[[nm]] <- as_tibble(smtbl)
+        } else {
+          res[[nm]] <- smtbl
+        }
+
+
+
+
+
+      }
+
+    }
+
+    # Add summary plot  - Commented for now because I can't get it to match SAS.
+    # res[["SummaryPanel"]] <- gen_summarypanel(dt, var, confidence = alph)
+
+  }
+
+  gv <- options("procs.print")[[1]]
+  if (is.null(gv))
+    gv <- TRUE
+
+  # Create viewer report if requested
+  if (gv) {
+    if (view == TRUE && interactive()) {
+
+
+      vrfl <- tempfile()
+
+      ttls <- c(titles, paste0("Variable: ", var))
+
+      out <- output_report(res, dir_name = dirname(vrfl),
+                           file_name = basename(vrfl), out_type = "HTML",
+                           titles = ttls, margins = .5, viewer = TRUE)
+
+      show_viewer(out)
+    }
+  }
+
+  if (length(res) == 1)
+    res <- res[[1]]
+
+  return(res)
+
+}
+
+
+
+#' @import fmtr
+#' @import common
+gen_output_ttest_forward <- function(data,
+                             by = NULL,
+                             class = NULL,
+                             var = NULL,
+                             paired = NULL,
+                             weight = NULL,
+                             output = NULL,
+                             opts = NULL) {
+
+  spcs <- get_output_specs_ttest(data, var, paired, class, opts, output)
+
+  data <- spcs$data
+  outreq <- spcs$outreq
+  nms <- names(outreq)
+
+
+  res <- list()
+  byres <- list()
+  if (length(outreq) > 0) {
+    # Create vector of NA class values
+    cls <- NULL
+    ctypes <- list() # Not used but not ready to get rid of it yet
+    if (!is.null(class)) {
+      cls <- rep(NA, length(class))
+      names(cls) <- class
+
+      if (has_option(opts, "completetypes")) {
+        for (cnm in class) {
+          if (is.factor(data[[cnm]])) {
+            ctypes[[cnm]] <- levels(data[[cnm]])
+          } else {
+            ctypes[[cnm]] <- unique(data[[cnm]])
+          }
+        }
+      }
+    }
+
+    bdat <- list(data)
+    if (!is.null(by)) {
+
+      bdat <- split(data, data[ , by, drop = FALSE], sep = "|", drop = TRUE)
+
+    }
+    bynms <- names(bdat)
+
+    # Make up by variable names for output ds
+    byn <- NULL
+    bylbls <- NULL
+    if (!is.null(by)) {
+      if (length(by) == 1)
+        byn <- "BY"
+      else
+        byn <- paste0("BY", seq(1, length(by)))
+
+      bylbls <- by
+      names(bylbls) <- byn
+    }
+
+    tmpres <- NULL
+
+    for (j in seq_len(length(bdat))) {
+
+      dat <- bdat[[j]]
+
+      # Deal with by variable values
+      bynm <- NULL
+      if (!is.null(bynms)) {
+        bynm <- strsplit(bynms[j], "|", fixed = TRUE)[[1]]
+        names(bynm) <- byn
+      }
+
+
+      for (i in seq_len(length(outreq))) {
+
+        outp <- outreq[[i]]
+
+        if (is.null(class)) {
+
+          # Always add type 0
+          tmpby <- get_output(dat, var = outp$var,
+                              by = bynm,
+                              class = cls,
+                              stats = outp$stats,
+                              shape = outp$shape,
+                              freq = outp$parameters$freq,
+                              type = outp$parameters$type,
+                              opts = opts)
+
+          tmpby <- restore_datatypes(tmpby, dat, class)
+
+          if (is.null(tmpres))
+            tmpres <- tmpby
+          else
+            tmpres <- rbind(tmpres, tmpby)
+
+        }
+
+
+        if (!is.null(class)) {
+
+          if (!is.null(tp))
+            tp <- 1
+
+
+          tmpcls <- get_class_output(dat, var = outp$var,
+                                     class = class, outp = outp,
+                                     freq = outp$parameters$freq,
+                                     type = outp$parameters$type,
+                                     byvals = bynm, opts = opts,
+                                     stats = outp$stats)
+
+          if (is.null(tmpres))
+            tmpres <- tmpcls
+          else
+            tmpres <- rbind(tmpres, tmpcls)
+
+        }
+
+        # System Labels
+        if (!is.null(tmpres))
+          labels(tmpres) <- append(mlbls, bylbls)
+
+        # Class labels
+        clbls <- NULL
+        if (!is.null(class)) {
+          if (length(class) == 1)
+            cnms <- "CLASS"
+          else {
+            cnms <- paste0("CLASS", seq(1, length(class)))
+          }
+          clbls <- as.list(class)
+          names(clbls) <- cnms
+
+          labels(tmpres) <- clbls
+        }
+
+        # User labels
+        if (!is.null(outp$label))
+          labels(tmpres) <- outp$label
+
+        # Formats
+        if (!is.null(outp$format))
+          formats(tmpres) <- outp$format
+
+        # Reset rownames
+        rownames(tmpres) <- NULL
+
+        # Kill type variable for output datasets
+        if ("TYPE" %in% names(tmpres)) {
+
+          tmpres[["TYPE"]] <- NULL
+        }
+
+        byres[[nms[i]]]  <- tmpres
+      }
+
+      res[[bynms[j]]]  <- byres
+    }
+  }
+
+  if (length(res) == 1)
+    res <- res[[1]]
+
+
+  return(res)
+
+}
+
+
+
+
+#' @import fmtr
+#' @import common
+gen_output_ttest <- function(data,
+                             by = NULL,
+                             class = NULL,
+                             var = NULL,
+                             paired = NULL,
+                             weight = NULL,
+                             output = NULL,
+                             opts = NULL) {
+
+
+
+  spcs <- get_output_specs_ttest(data, var, paired, class, opts, output)
+
+  data <- spcs$data
+  outreq <- spcs$outreq
+
+
+
+  res <- list()
+  if (length(outreq) > 0) {
+
+    nms <- names(outreq)
+    for (i in seq_len(length(outreq))) {
+
+      outp <- outreq[[i]]
+
+      # Create vector of NA class values
+      cls <- NULL
+      ctypes <- list() # Not used but not ready to get rid of it yet
+      if (!is.null(class)) {
+        cls <- rep(NA, length(class))
+        names(cls) <- class
+
+        if (has_option(opts, "completetypes")) {
+          for (cnm in class) {
+            if (is.factor(data[[cnm]])) {
+              ctypes[[cnm]] <- levels(data[[cnm]])
+            } else {
+              ctypes[[cnm]] <- unique(data[[cnm]])
+            }
+          }
+        }
+      }
+
+      bdat <- list(data)
+      if (!is.null(by)) {
+
+        bdat <- split(data, data[ , by, drop = FALSE], sep = "|", drop = TRUE)
+
+      }
+      bynms <- names(bdat)
+
+      # Make up by variable names for output ds
+      byn <- NULL
+      bylbls <- NULL
+      if (!is.null(by)) {
+        if (length(by) == 1)
+          byn <- "BY"
+        else
+          byn <- paste0("BY", seq(1, length(by)))
+
+        bylbls <- by
+        names(bylbls) <- byn
+      }
+
+      tmpres <- NULL
+
+      for (j in seq_len(length(bdat))) {
+
+        dat <- bdat[[j]]
+
+        # Deal with by variable values
+        bynm <- NULL
+        if (!is.null(bynms)) {
+          bynm <- strsplit(bynms[j], "|", fixed = TRUE)[[1]]
+          names(bynm) <- byn
+        }
+
+
+        if (is.null(class)) {
+
+          # Always add type 0
+          tmpby <- get_output(dat, var = outp$var,
+                              by = bynm,
+                              class = cls,
+                              stats = outp$stats,
+                              shape = outp$shape,
+                              freq = outp$parameters$freq,
+                              type = outp$parameters$type,
+                              opts = opts)
+
+          tmpby <- restore_datatypes(tmpby, dat, class)
+
+          if (is.null(tmpres))
+            tmpres <- tmpby
+          else
+            tmpres <- rbind(tmpres, tmpby)
+
+        }
+
+
+        if (!is.null(class)) {
+
+          if (!is.null(tp))
+            tp <- 1
+
+
+          tmpcls <- get_class_output(dat, var = outp$var,
+                                     class = class, outp = outp,
+                                     freq = outp$parameters$freq,
+                                     type = outp$parameters$type,
+                                     byvals = bynm, opts = opts,
+                                     stats = outp$stats)
+
+          if (is.null(tmpres))
+            tmpres <- tmpcls
+          else
+            tmpres <- rbind(tmpres, tmpcls)
+
+        }
+      }
+
+
+      # System Labels
+      if (!is.null(tmpres))
+        labels(tmpres) <- append(mlbls, bylbls)
+
+      # Class labels
+      clbls <- NULL
+      if (!is.null(class)) {
+        if (length(class) == 1)
+          cnms <- "CLASS"
+        else {
+          cnms <- paste0("CLASS", seq(1, length(class)))
+        }
+        clbls <- as.list(class)
+        names(clbls) <- cnms
+
+        labels(tmpres) <- clbls
+      }
+
+      # User labels
+      if (!is.null(outp$label))
+        labels(tmpres) <- outp$label
+
+      # Formats
+      if (!is.null(outp$format))
+        formats(tmpres) <- outp$format
+
+      # Reset rownames
+      rownames(tmpres) <- NULL
+
+      # Kill type variable for output datasets
+      if ("TYPE" %in% names(tmpres)) {
+
+        tmpres[["TYPE"]] <- NULL
+      }
+
+      res[[nms[i]]]  <- tmpres
+
+    }
+  }
+
+  if (length(res) == 1)
+    res <- res[[1]]
+
+
+  return(res)
+
+}
+
+

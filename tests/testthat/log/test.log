@@ -1,0 +1,42 @@
+=========================================================================
+Log Path: c:/packages/procs/tests/testthat/log/test.log
+Program Path: C:/packages/procs/tests/testthat/test-ttest.R
+Working Directory: C:/packages/procs
+User Name: dbosa
+R Version: 4.3.1 (2023-06-16 ucrt)
+Machine: SOCRATES x86-64
+Operating System: Windows 10 x64 build 22621
+Base Packages: stats graphics grDevices utils datasets methods base Other
+Packages: tidylog_1.0.2 procs_1.0.4 testthat_3.1.10 common_1.1.0 logr_1.3.5
+Log Start Time: 2023-11-24 19:52:16.424096
+=========================================================================
+
+proc_ttest: input data set 19 rows and 5 columns
+            var: Height
+            view: TRUE
+            titles: My first Frequency Table
+            output: 3 datasets
+
+NOTE: Log Print Time:  2023-11-24 19:52:17.530357
+NOTE: Elapsed Time: 1.10520386695862 secs
+
+$Statistics
+     VAR  N     MEAN      STD   STDERR  MIN MAX
+1 Height 19 62.33684 5.127075 1.176232 51.3  72
+
+$ConfLimits
+     VAR     MEAN     LCLM     UCLM      STD
+1 Height 62.33684 59.86567 64.80801 5.127075
+
+$TTests
+    VAR DF         T      PROBT
+1 ..var 18 -2.264144 0.03615222
+
+
+NOTE: Log Print Time:  2023-11-24 19:52:17.556402
+NOTE: Elapsed Time: 0.0260450839996338 secs
+
+=========================================================================
+Log End Time: 2023-11-24 19:52:18.294578
+Log Elapsed Time: 0 00:00:01
+=========================================================================

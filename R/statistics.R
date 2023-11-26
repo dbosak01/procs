@@ -169,7 +169,37 @@ get_clm <- function(x, narm = TRUE, alpha = 0.05, onesided = FALSE) {
   return(res)
 }
 
+#' @noRd
+get_clmstd <- function(x, narm = TRUE, alpha = 0.05, onesided = FALSE) {
 
+  if (!is.numeric(alpha))
+    alpha <- as.numeric(alpha)
+
+  if (onesided) {
+    alp <- 1 - alpha
+  } else {
+    alp <- 1 - (alpha / 2)
+  }
+
+  #Sample size
+  n <- sum(!is.na(x), na.rm = narm)
+
+  # Sample mean weight
+  xbar <- mean(x, na.rm = narm)
+
+  # Sample standard deviation
+  std <- sd(x, na.rm = narm)
+
+  # Margin of error
+  margin <- qt(alp,df=n-1)*std/sqrt(n)
+
+  # Lower and upper confidence interval boundaries
+  res <- c(ucl = xbar + margin,
+           lcl = xbar - margin,
+           alpha = alpha)
+
+  return(res)
+}
 
 
 #' @noRd

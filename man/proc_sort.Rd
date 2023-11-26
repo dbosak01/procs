@@ -4,7 +4,14 @@
 \alias{proc_sort}
 \title{Sorts a dataset}
 \usage{
-proc_sort(data, by = NULL, keep = NULL, order = "ascending", options = NULL)
+proc_sort(
+  data,
+  by = NULL,
+  keep = NULL,
+  order = "ascending",
+  options = NULL,
+  as.character = FALSE
+)
 }
 \arguments{
 \item{data}{The input data to sort.}
@@ -24,6 +31,13 @@ parameter.  Default is 'ascending' for all by variables.}
 are 'dupkey' and 'nodupkey'. The 'nodupkey' option removes duplicate
 rows from the sorted dataset.  The 'dupkey' option removes unique
 rows from the sorted dataset.}
+
+\item{as.character}{If TRUE, will cast any factors in the 'by' parameter
+to character. Default is FALSE.  This parameter is included because it is
+common to use factors for sorting in R, but you may not want to keep the
+variable as a factor.  This parameter therefore allows you to use
+the factor for the sort, but then convert back to a character
+once the sort is complete.}
 }
 \value{
 The sorted dataset.  If a data frame was input, a

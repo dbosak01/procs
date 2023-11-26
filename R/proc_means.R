@@ -119,7 +119,7 @@
 #' dataset.
 #' }
 #' \item{\strong{nway}: Returns only the highest level TYPE combination.  By
-#' default, the function return all TYPE combinations.
+#' default, the function returns all TYPE combinations.
 #' }
 #' }
 #' @section TYPE and FREQ Variables:

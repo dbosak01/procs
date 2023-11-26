@@ -1,3 +1,12 @@
+# procs 1.0.4
+
+* Added "as.character" parameter to `proc_sort()` to cast any factors in the
+by variables to character.  This parameter is the counter-point to
+the "as.factor" parameter on the `value()` function in the **fmtr** package.
+* Added an "options" parameter to `proc_transpose()`.  For now accepts only
+one option "noname" which will drop the NAME variable from the output dataset.
+* Added `proc_ttest()` function.
+
 # procs 1.0.3
 
 * Fixed 'class' parameter on 'proc_freq()'.

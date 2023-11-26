@@ -18,6 +18,7 @@ proc_transpose(
   delimiter = ".",
   suffix = NULL,
   where = NULL,
+  options = NULL,
   log = TRUE
 )
 }
@@ -57,6 +58,10 @@ column names.}
 \item{where}{An expression to filter the rows after the transform
 is complete.  Use the \code{\link{expression}} function to define
 the where clause.}
+
+\item{options}{Optional keywords that affect the transpose. Default is NULL.
+Available option is "noname" which drops the name column from the
+output dataset.}
 
 \item{log}{Whether or not to log the procedure.  Default is TRUE.
 This parameter is used internally.}

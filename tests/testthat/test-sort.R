@@ -227,3 +227,41 @@ test_that("sort13: Another dupkey test works.", {
   expect_equal(res$Name, c("Bane", "Bane", "David", "David"))
 
 })
+
+test_that("sort14: proc_sort works with factors.", {
+
+  prttmp <- prt
+
+  prttmp$sex <- factor(prttmp$sex, c("girls", "boys"))
+
+
+  res <- proc_sort(prttmp, by = c("sex", "count"))
+
+  res
+
+  expect_equal(as.character(res[8, 1]), "boys")
+  expect_equal(as.character(res[4, 1]), "girls")
+
+
+})
+
+
+test_that("sort15: as.character parameter works as expected.", {
+
+  prttmp <- prt
+
+  prttmp$sex <- factor(prttmp$sex, c("girls", "boys"))
+
+
+  res <- proc_sort(prttmp, by = c("sex", "count"), as.character = TRUE)
+
+  res
+
+  expect_equal(res[8, 1], "boys")
+  expect_equal(res[4, 1], "girls")
+
+
+})
+
+
+

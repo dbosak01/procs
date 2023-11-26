@@ -10,7 +10,9 @@
 output_report <- function(lst,
                           dir_name, file_name, out_type = 'HTML',
                           style = NULL,
-                          titles = NULL, margins = 1, viewer = FALSE) {
+                          titles = NULL, margins = 1,
+                          viewer = FALSE,
+                          pages = 1) {
 
 
   if (is.null(dir_name)) {
@@ -60,73 +62,112 @@ output_report <- function(lst,
 
   }
 
-
-  for (i in seq_len(length(lst))) {
-    dt <- lst[[i]]
+  for (j in seq_len(pages)) {
 
 
-    if (viewer == TRUE) {
-
-      if ("CAT" %in% names(dt)) {
-        lbl <-  attr(dt$CAT, "label")
-        if (is.null(lbl))
-          lbl <- "CAT"
-        nms <- names(dt)
-        names(dt) <- gsub("CAT", "stub", nms, fixed = TRUE)
-      }
-
-      if ("stub" %in% names(dt)) {
-       lbl <- attr(dt$stub, "label")
-       if (is.null(lbl))
-         lbl <- ""
-
-      }
-
-      # Create table
-      tbl <- create_table(dt, borders = c("all"))
-
-      # Dedupe stub column if it exists
-      if ("stub" %in% names(dt)) {
-
-        wth <- rpt$char_width * nchar(lbl)
-        tbl <- define(tbl, "stub", dedupe = TRUE, label =lbl, width = wth,
-                      standard_eval = "true")
-
-      }
+    if (pages == 1) {
+      pg <- lst
 
     } else {
-
-      # Create table
-      tbl <- create_table(dt, borders = c("outside"))
+      pg <- lst[[j]]
     }
 
-    #
+    for (i in seq_len(length(pg))) {
 
-    # Add titles
-    if (!is.null(titles) & i == 1) {
-      tbl <- titles(tbl, titles)
-    }
+      brk <- FALSE
+      if (pages > 1 & i == length(pg))
+        brk <- TRUE
 
-    #browser()
-    # Add spanning headers if requested
-    # spns <- attr(dt, "spans")
-    # if (!is.null(spns)) {
-    #
-    #   for (i in seq_len(length(spns))) {
-    #     spn <- spns[[i]]
-    #     tbl <- spanning_header(tbl, label = spn$label, from = as.character(spn$start),
-    #                            to = as.character(spn$end), level = spn$level,
-    #                            standard_eval = TRUE)
-    #
-    #   }
-    #
-    # }
+      # Assign page data
+      dt <- pg[[i]]
 
-    # Append table to report
-    rpt <- add_content(rpt, tbl, align = 'center', page_break = FALSE)
+      if ("data.frame" %in% class(dt)) {
+        if (viewer == TRUE) {
+
+          if ("CAT" %in% names(dt)) {
+            lbl <-  attr(dt$CAT, "label")
+            if (is.null(lbl))
+              lbl <- "CAT"
+            nms <- names(dt)
+            names(dt) <- gsub("CAT", "stub", nms, fixed = TRUE)
+          }
+
+          if ("stub" %in% names(dt)) {
+           lbl <- attr(dt$stub, "label")
+           if (is.null(lbl))
+             lbl <- ""
+
+          }
+
+          # Create table
+          tbl <- create_table(dt, borders = c("all"))
+
+          # Dedupe stub column if it exists
+          if ("stub" %in% names(dt)) {
+
+            wth <- rpt$char_width * nchar(lbl)
+            tbl <- define(tbl, "stub", dedupe = TRUE, label =lbl, width = wth,
+                          standard_eval = "true")
+
+          }
+
+        } else {
+
+          # Create table
+          tbl <- create_table(dt, borders = c("outside"))
+        }
+
+        #
+
+        # Add titles
+        if (!is.null(titles) & i == 1) {
+          tbl <- titles(tbl, titles)
+        }
+
+        #browser()
+        # Add spanning headers if requested
+        # spns <- attr(dt, "spans")
+        # if (!is.null(spns)) {
+        #
+        #   for (i in seq_len(length(spns))) {
+        #     spn <- spns[[i]]
+        #     tbl <- spanning_header(tbl, label = spn$label, from = as.character(spn$start),
+        #                            to = as.character(spn$end), level = spn$level,
+        #                            standard_eval = TRUE)
+        #
+        #   }
+        #
+        # }
+
+        # Append table to report
+        rpt <- add_content(rpt, tbl, align = 'center', page_break = brk)
 
 
-  }
+
+      } else if ("ggplot" %in% class(dt)) {
+
+        if (viewer == TRUE) {
+
+          # Create plot content
+          fig <- create_plot(dt, height = 3, width = 3.5)
+
+        } else {
+
+          # Create plot content
+          fig <- create_plot(dt, height = 4, width = 5)
+
+
+        }
+
+        # Add plot content
+        rpt <- add_content(rpt, fig, align = 'center', page_break = brk)
+
+
+      }
+    } # Tables
+
+
+  } # Pages
 
 
   ret <- c()

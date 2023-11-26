@@ -640,8 +640,14 @@ freq_oneway <- function(data, tb, weight, options, out = FALSE, stats = NULL) {
     } else {
       cnts <- aggregate(data[[weight]], list(var), FUN = sum)
 
-      categories <- cnts$Group.1
-      frequencies <- cnts$x
+      if (nrow(cnts) == 0) {
+        categories <- ""
+        frequencies <- 0
+
+      } else {
+        categories <- cnts$Group.1
+        frequencies <- cnts$x
+      }
     }
 
 
@@ -1561,11 +1567,15 @@ get_nway_zero_fills <- function(data, outs, by = NULL, weight = NULL, options = 
       # Expand combinations
       ex <- expand.grid(v1, stringsAsFactors = FALSE)
 
-      # Zero fill combinations
-      ex[["__cnt"]] <- 0
+      if (nrow(ex) > 0) {
 
-      # Merge combinations onto original data
-      ret <- merge(ret, ex, sort = FALSE, all = TRUE)
+        # Zero fill combinations
+        ex[["__cnt"]] <- 0
+
+        # Merge combinations onto original data
+        ret <- merge(ret, ex, sort = FALSE, all = TRUE)
+
+      }
     }
 
   }
