@@ -121,7 +121,14 @@ output_report <- function(lst,
 
         # Add titles
         if (!is.null(titles) & i == 1) {
-          tbl <- titles(tbl, titles)
+
+          tt <- titles
+
+          if (pages > 1) {
+            tt <- c(tt, names(lst)[j])
+          }
+
+          tbl <- titles(tbl, tt)
         }
 
         #browser()

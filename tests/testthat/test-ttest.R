@@ -28,17 +28,17 @@ Thomas   M  11   57.5   85.0
 William   M  15   66.5  112.0')
 
 paird <- read.table(header = TRUE, text = '
-subject_id before_measure after_measure
-1 12 15
-2 14 16
-3 10 11
-4 15 18
-5 18 20
-6 20 22
-7 11 12
-8 13 14
-9 16 17
-10 9 13')
+subject_id before_measure after_measure region
+1 12 15  A
+2 14 16  A
+3 10 11  A
+4 15 18  A
+5 18 20  A
+6 20 22  B
+7 11 12  B
+8 13 14  B
+9 16 17  B
+10 9 13  B')
 
 options("logr.output" = FALSE)
 options("procs.print" = FALSE)
@@ -78,7 +78,7 @@ test_that("ttest2: Simple proc_ttest one variable works.", {
 
   res
 
-   expect_equal(is.null(res), FALSE)
+  expect_equal(is.null(res), FALSE)
   expect_equal(length(res), 3)
 
   expect_equal(as.numeric(res$Statistics$MEAN), 62.336842)
@@ -372,8 +372,7 @@ test_that("ttest11: Simple proc_ttest with report and by works with print", {
 
   res <- proc_ttest(cls,
                     var = c("Height"), output = "report", by = "Sex",
-                    options = c("h0" = 65, "alpha" = 0.05),
-                    titles = "My first Frequency Table")
+                    options = c("h0" = 65, "alpha" = 0.05))
 
   res
 
@@ -391,3 +390,46 @@ test_that("ttest11: Simple proc_ttest with report and by works with print", {
 
 })
 
+test_that("ttest12: proc_ttest with paired and by variables works.", {
+
+  # data PairedData;
+  # input subject_id before_measure after_measure region $9;
+  # datalines;
+  # 1 12 15 A
+  # 2 14 16 A
+  # 3 10 11 A
+  # 4 15 18 A
+  # 5 18 20 A
+  # 6 20 22 B
+  # 7 11 12 B
+  # 8 13 14 B
+  # 9 16 17 B
+  # 10 9 13 B
+  # ;
+  # run;
+  #
+  # proc ttest data=PairedData;
+  # paired before_measure * after_measure;
+  # run;
+
+  res <- proc_ttest(paird,
+                    paired = c("before_measure * after_measure"),
+                    by = region)
+
+  res
+
+  expect_equal(is.null(res), FALSE)
+  expect_equal(length(res), 3)
+
+  expect_equal(as.numeric(res$Statistics$N[2]), 5)
+  expect_equal(as.numeric(res$Statistics$MEAN[2]), -1.8)
+  expect_equal(as.numeric(res$Statistics$STD[2]), 1.303840481)
+  expect_equal(as.numeric(res$Statistics$STDERR[2]),  0.583095189)
+  expect_equal(as.numeric(res$Statistics$MIN[2]), -4)
+  expect_equal(as.numeric(res$Statistics$MAX[2]), -1)
+  expect_equal(as.numeric(res$ConfLimits$UCLM[2]), -0.181068215)
+  expect_equal(as.numeric(res$ConfLimits$LCLM[2]), -3.41893178)
+  expect_equal(as.numeric(res$TTests$DF[2]), 4)
+  expect_equal(as.numeric(res$TTests$T[2]), -3.08697453)
+  expect_equal(as.numeric(res$TTests$PROBT[2]), 0.03668198940)
+})

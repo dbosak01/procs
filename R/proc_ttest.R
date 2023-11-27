@@ -7,19 +7,20 @@
 #' @encoding UTF-8
 #' @description The \code{proc_ttest} function generates T-Test statistics
 #' for selected variables on the input dataset.  The variables are identified
-#' on the \code{var} parameter.  The statistics to perform are identified
-#' on the \code{stats} parameter.  Results are displayed in
+#' on the \code{var} parameter, the \code{paired} parameter, or the \code{class}
+#' parameter.  The function will calculate a standard set of T-Test statistics.
+#' Results are displayed in
 #' the viewer interactively and returned from the function.
 #' @details
-#' The \code{proc_means} function is for analysis of continuous variables.
+#' The \code{proc_ttest} function is for performing hypothesis testing between
+#' two variables, or between a variable and a known baseline.
 #' Data is passed in on the \code{data}
-#' parameter.  The desired statistics are specified using keywords
-#' on the \code{stats} parameter.  The function can segregate data into
-#' groups using the \code{by} and \code{class} parameters. There are also
+#' parameter. The function can segregate data into
+#' groups using the \code{by} parameter. There are also
 #' options to determine whether and what results are returned.
 #'
 #' @section Interactive Output:
-#' By default, \code{proc_freq} results will
+#' By default, \code{proc_ttest} results will
 #' be immediately sent to the viewer as an HTML report.  This functionality
 #' makes it easy to get a quick analysis of your data. To turn off the
 #' interactive report, pass the "noprint" keyword
@@ -35,57 +36,17 @@
 #'
 #' @section Dataset Output:
 #' Dataset results are also returned from the function by default.
-#' If the results are a single dataset, a single
-#' data frame will be returned.  If there are multiple results, a list of data
-#' frames will be returned.
+#' \code{proc_ttest} typically returns multiple datasets in a list. Each
+#' dataset in the list will be named according to the category of statistical
+#' results.  There are three standard categories of results: "Statistics",
+#' "ConfLimits", and "TTests".
 #'
 #' The output datasets generated are optimized for data manipulation.
 #' The column names have been standardized, and additional variables may
 #' be present to help with data manipulation.  For example, the by variable
-#' will always be named "BY", and the class variable will always be named
-#' "CLASS".  In addition, data values in the
+#' will always be named "BY".  In addition, data values in the
 #' output datasets are intentionally not rounded or formatted
 #' to give you the most accurate statistical results.
-#'
-#' @section Statistics Keywords:
-#' The following statistics keywords can be passed on the \code{stats}
-#' parameter.  Normally, each statistic
-#' will be contained in a separate column and the column name will be
-#' the same as the statistic keyword. You may pass statistic keywords as a
-#' quoted vector of strings, or an unquoted vector using the \code{v()} function.
-#' \itemize{
-#'   \item{\strong{css}: Corrected Sum of Squares.}
-#'   \item{\strong{clm, lclm, uclm}: Upper and lower confidence limits.}
-#'   \item{\strong{cv}: Coefficient of Variation.}
-#'   \item{\strong{kurt/kurtosis}: The Kurtosis is a description of the
-#'   distribution tails. It requires at least 4 complete observations.}
-#'   \item{\strong{mean}: The arithmetic mean.}
-#'   \item{\strong{median}: The median.}
-#'   \item{\strong{mode}: The mode of the target variable.}
-#'   \item{\strong{min, max}: The minimum and maximum values of the target
-#'   variable.}
-#'   \item{\strong{n}: The number of non-missing observations.}
-#'   \item{\strong{nmiss}: The number of missing observations.}
-#'   \item{\strong{nobs}: The number of observations, whether
-#'   missing or non-missing.}
-#'   \item{\strong{p1 - p99}: Percentile ranges from p1 to p99, in increments
-#'   of 5.}
-#'   \item{\strong{qrange, q1, q3}: Quantile ranges for the first and third quantiles.}
-#'   \item{\strong{range}: Difference between the minimum and maximum values.}
-#'   \item{\strong{skew/skewness}: A measure of distribution skewness. It
-#'   requires at least 3 complete observations.}
-#'   \item{\strong{std/stddev}: Standard deviation.}
-#'   \item{\strong{stderr}: Standard error.}
-#'   \item{\strong{sum}: The sum of variable values.}
-#'   \item{\strong{uss}: Uncorrected sum of squares.}
-#'   \item{\strong{vari}: The variance.}
-#' }
-#' The function supports the following keywords to perform hypothesis testing:
-#' \itemize{
-#'   \item{\strong{t}: Student's t statistic.}
-#'   \item{\strong{prt/probt}: A two-tailed p-value for the Student's t statistic.}
-#'   \item{\strong{df}: Degrees of freedom for the Student's t statistic.}
-#' }
 #'
 #' @section Options:
 #' The \code{proc_means} function recognizes the following options.  Options may
@@ -97,11 +58,8 @@
 #' between 0 and 1.  For example, you can set a 90% confidence limit as
 #' \code{alpha = 0.1}.
 #' }
-#' \item{\strong{completetypes}: The "completetypes" option will generate
-#' all combinations of the class variable, even if there is no data
-#' present for a particular level.
-#' Combinations will be distinguished by the TYPE variable. To use the "completetypes"
-#' option, define the class variable(s) as a factor.
+#' \item{\strong{h0}: The "h0 =" option is used to set the baseline mean value
+#' for testing a single variable.  Pass the option as a name/value pair.
 #' }
 #' \item{\strong{maxdec = }: The "maxdec = " option will set the maximum
 #' of decimal places displayed on report output. For example, you can set 4 decimal
@@ -115,47 +73,7 @@
 #' viewer.  By default, the report is printed to the viewer. The "noprint"
 #' option will inhibit printing.
 #' }
-#' \item{\strong{notype}: Turns off the TYPE column on the output
-#' dataset.
 #' }
-#' \item{\strong{nway}: Returns only the highest level TYPE combination.  By
-#' default, the function return all TYPE combinations.
-#' }
-#' }
-#' @section TYPE and FREQ Variables:
-#' The TYPE and FREQ variables appear on the output dataset by default.
-#'
-#' The FREQ variable contains a count of the number of input rows/observations that were
-#' included in the statistics for that output row. The FREQ count can be different
-#' from the N statistic. The FREQ count is a count of the number of rows/observations,
-#' while the N statistic is a count of non-missing values.  These counts can
-#' be different if you have missing values in your data.  If you want to remove
-#' the FREQ column from the output dataset, use the "nofreq" option.
-#'
-#' The TYPE variable identifies combinations of class categories, and produces
-#' summary statistics for each of those combinations.  For example, the
-#' output dataset normally produces statistics for TYPE 0, which is all
-#' class categories, and a TYPE 1 which is each class category.  If there
-#' are multiple classes, there will be multiple TYPE values for each level
-#' of class combinations.  If you do no want to show the various
-#' type combinations, use the "nway" option. If you want to remove the TYPE
-#' column from the output dataset, use the "notype" option.
-#'
-#' @section Using Factors:
-#' There are some occasions when you may want to define the \code{class} variable(s)
-#' as a factor. One occasion is for sorting/ordering,
-#' and the other is for obtaining zero-counts on sparse data.
-#'
-#' To order the class categories in the means output, define the
-#' \code{class} variable as a factor in the desired order. The function will
-#' then retain that order for the class categories in the output dataset
-#' and report.
-#'
-#' You may also wish to
-#' define the class variable as a factor if you are dealing with sparse data
-#' and some of the class categories are not present in the data. To ensure
-#' these categories are displayed with zero-counts, define the \code{class} variable
-#' as a factor and use the "completetypes" option.
 #' @section Data Shaping:
 #' The output dataset produced by the "out" keyword can be shaped
 #' in different ways. These shaping options allow you to decide whether the
@@ -205,19 +123,20 @@
 #' @param by An optional by group. If you specify an by group, the input
 #' data will be subset on the by variable(s) prior to performing any
 #' statistics.
-#' @param class The \code{class} parameter is similar to the \code{by}
-#' parameter, but the output is different.  By groups will create completely
-#' separate tables, while class groups will be continued in the same table.
-#' When a \code{by} and a \code{class} are both specified, the \code{class}
-#' will be nested in the \code{by}.
+#' @param class The \code{class} parameter is used to perform a T-Test
+#' between two different values of the same variable.  For example, if you
+#' want to test for a significant difference between a control group and a test
+#' group, where the control and test groups are in rows identified by a
+#' variable "Group".  To perform a T-Test using the \code{class} parameter,
+#' there can only be two different values on the class variable.
 # @param weight An optional weight parameter.
 #' @param options A vector of optional keywords. Valid values are: "alpha =",
-#' "completetypes", "maxdec =", "noprint", "notype", "nofreq", "nonobs", "nway".
+#' "completetypes", "maxdec =", "noprint", "notype", "nofreq", "nonobs".
 #' The "notype", "nofreq", and "nonobs" keywords will turn
 #' off columns on the output datasets.  The "alpha = " option will set the alpha
 #' value for confidence limit statistics.  The default is 95% (alpha = 0.05).
 #' The "maxdec = " option sets the maximum number of decimal places displayed
-#' on report output. The "nway" option returns only the highest type values.
+#' on report output.
 #' @param titles A vector of one or more titles to use for the report output.
 #' @return Normally, the requested summary statistics are shown interactively
 #' in the viewer, and output results are returned as a data frame.
@@ -233,74 +152,83 @@
 #' # Turn off printing for CRAN checks
 #' options("procs.print" = FALSE)
 #'
-#' # Default statistics on iris
-#' res1 <- proc_means(iris)
+#' # Prepare sample data
+#' dat1 <- subset(sleep, group == 1, c("ID", "extra"))
+#' dat2 <- subset(sleep, group == 2, c("ID", "extra"))
+#' dat <- data.frame(ID = dat1$ID, group1 = dat1$extra, group2 = dat2$extra)
+#'
+#' # View sample data
+#' #    ID group1 group2
+#' # 1   1    0.7    1.9
+#' # 2   2   -1.6    0.8
+#' # 3   3   -0.2    1.1
+#' # 4   4   -1.2    0.1
+#' # 5   5   -0.1   -0.1
+#' # 6   6    3.4    4.4
+#' # 7   7    3.7    5.5
+#' # 8   8    0.8    1.6
+#' # 9   9    0.0    4.6
+#' # 10 10    2.0    3.4
+#'
+#' # Example 1:  T-Test using h0 option
+#' res1 <- proc_ttest(dat, var = "group1", options = c("h0" = 0))
 #'
 #' # View results
 #' res1
-#' #   TYPE FREQ          VAR   N     MEAN       STD MIN MAX
-#' # 1    0  150 Sepal.Length 150 5.843333 0.8280661 4.3 7.9
-#' # 2    0  150  Sepal.Width 150 3.057333 0.4358663 2.0 4.4
-#' # 3    0  150 Petal.Length 150 3.758000 1.7652982 1.0 6.9
-#' # 4    0  150  Petal.Width 150 1.199333 0.7622377 0.1 2.5
+#' # $Statistics
+#' #      VAR  N MEAN     STD    STDERR  MIN MAX
+#' # 1 group1 10 0.75 1.78901 0.5657345 -1.6 3.7
+#' #
+#' # $ConfLimits
+#' #      VAR MEAN       LCLM    UCLM     STD
+#' # 1 group1 0.75 -0.5297804 2.02978 1.78901
+#' #
+#' # $TTests
+#' #      VAR DF       T     PROBT
+#' # 1 group1  9 1.32571 0.2175978
 #'
-#' # Defaults statistics with by
-#' res2 <- proc_means(iris,
-#'                    by = Species)
+#' # Example 2: T-Test using paired parameter
+#' res2 <- proc_ttest(dat, paired = "group2 * group1")
+#'
 #' # View results
 #' res2
-#' #            BY TYPE FREQ          VAR  N  MEAN       STD MIN MAX
-#' # 1      setosa    0   50 Sepal.Length 50 5.006 0.3524897 4.3 5.8
-#' # 2      setosa    0   50  Sepal.Width 50 3.428 0.3790644 2.3 4.4
-#' # 3      setosa    0   50 Petal.Length 50 1.462 0.1736640 1.0 1.9
-#' # 4      setosa    0   50  Petal.Width 50 0.246 0.1053856 0.1 0.6
-#' # 5  versicolor    0   50 Sepal.Length 50 5.936 0.5161711 4.9 7.0
-#' # 6  versicolor    0   50  Sepal.Width 50 2.770 0.3137983 2.0 3.4
-#' # 7  versicolor    0   50 Petal.Length 50 4.260 0.4699110 3.0 5.1
-#' # 8  versicolor    0   50  Petal.Width 50 1.326 0.1977527 1.0 1.8
-#' # 9   virginica    0   50 Sepal.Length 50 6.588 0.6358796 4.9 7.9
-#' # 10  virginica    0   50  Sepal.Width 50 2.974 0.3224966 2.2 3.8
-#' # 11  virginica    0   50 Petal.Length 50 5.552 0.5518947 4.5 6.9
-#' # 12  virginica    0   50  Petal.Width 50 2.026 0.2746501 1.4 2.5
+#' # $Statistics
+#' #      VAR  N MEAN      STD    STDERR MIN MAX
+#' # 1 ..diff 10 1.58 1.229995 0.3889587   0 4.6
+#' #
+#' # $ConfLimits
+#' #      VAR MEAN      LCLM     UCLM      STD
+#' # 1 ..diff 1.58 0.7001142 2.459886 1.229995
+#' #
+#' # $TTests
+#' #      VAR DF        T      PROBT
+#' # 1 ..diff  9 4.062128 0.00283289
 #'
-#' # Specified variables, statistics, and options
-#' res3 <- proc_means(iris,
-#'                    var = v(Petal.Length, Petal.Width),
-#'                    class = Species,
-#'                    stats = v(n, mean, std, median, qrange, clm),
-#'                    options = nofreq,
-#'                    output = long)
+#' # Example 3: T-Test using class parameter
+#' # res3 <- proc_ttest(sleep, var = "extra", class = "group")
+#'
 #' # View results
-#' res3
-#' #         CLASS TYPE   STAT Petal.Length Petal.Width
-#' # 1        <NA>    0      N  150.0000000 150.0000000
-#' # 2        <NA>    0   MEAN    3.7580000   1.1993333
-#' # 3        <NA>    0    STD    1.7652982   0.7622377
-#' # 4        <NA>    0 MEDIAN    4.3500000   1.3000000
-#' # 5        <NA>    0 QRANGE    3.5000000   1.5000000
-#' # 6        <NA>    0   LCLM    3.4731854   1.0763533
-#' # 7        <NA>    0   UCLM    4.0428146   1.3223134
-#' # 8      setosa    1      N   50.0000000  50.0000000
-#' # 9      setosa    1   MEAN    1.4620000   0.2460000
-#' # 10     setosa    1    STD    0.1736640   0.1053856
-#' # 11     setosa    1 MEDIAN    1.5000000   0.2000000
-#' # 12     setosa    1 QRANGE    0.2000000   0.1000000
-#' # 13     setosa    1   LCLM    1.4126452   0.2160497
-#' # 14     setosa    1   UCLM    1.5113548   0.2759503
-#' # 15 versicolor    1      N   50.0000000  50.0000000
-#' # 16 versicolor    1   MEAN    4.2600000   1.3260000
-#' # 17 versicolor    1    STD    0.4699110   0.1977527
-#' # 18 versicolor    1 MEDIAN    4.3500000   1.3000000
-#' # 19 versicolor    1 QRANGE    0.6000000   0.3000000
-#' # 20 versicolor    1   LCLM    4.1264528   1.2697993
-#' # 21 versicolor    1   UCLM    4.3935472   1.3822007
-#' # 22  virginica    1      N   50.0000000  50.0000000
-#' # 23  virginica    1   MEAN    5.5520000   2.0260000
-#' # 24  virginica    1    STD    0.5518947   0.2746501
-#' # 25  virginica    1 MEDIAN    5.5500000   2.0000000
-#' # 26  virginica    1 QRANGE    0.8000000   0.5000000
-#' # 27  virginica    1   LCLM    5.3951533   1.9479453
-#' # 28  virginica    1   UCLM    5.7088467   2.1040547
+#' # res3
+#'
+#' # Example 4: T-Test using h0 option and by variable
+#' res4 <- proc_ttest(sleep, var = "extra", by = "group", options = c("h0" = 0))
+#'
+#' # View results
+#' res4
+#' # $Statistics
+#' #   BY   VAR  N MEAN      STD    STDERR  MIN MAX
+#' # 1  1 extra 10 0.75 1.789010 0.5657345 -1.6 3.7
+#' # 2  2 extra 10 2.33 2.002249 0.6331666 -0.1 5.5
+#' #
+#' # $ConfLimits
+#' #   BY   VAR MEAN       LCLM     UCLM      STD
+#' # 1  1 extra 0.75 -0.5297804 2.029780 1.789010
+#' # 2  2 extra 2.33  0.8976775 3.762322 2.002249
+#' #
+#' # $TTests
+#' #   BY   VAR DF        T       PROBT
+#' # 1  1 extra  9 1.325710 0.217597780
+#' # 2  2 extra  9 3.679916 0.005076133
 #'
 proc_ttest <- function(data,
                        var = NULL,
@@ -849,7 +777,13 @@ gen_report_ttest <- function(data,
 
       vrfl <- tempfile()
 
-      ttls <- c(titles, paste0("Variable: ", var))
+      if (is.null(titles))
+        titles <- "The TTEST Function"
+
+      if (!is.null(var))
+        ttls <- c(titles, paste0("Variable: ", var))
+      else if (!is.null(paired))
+        ttls <- c(titles, paste0("Variable: ", sub("*", "-", paired, fixed = TRUE)))
 
       out <- output_report(ret, dir_name = dirname(vrfl),
                            file_name = basename(vrfl), out_type = "HTML",
@@ -1045,179 +979,6 @@ gen_report_ttest_back <- function(data,
 
 #' @import fmtr
 #' @import common
-gen_output_ttest_forward <- function(data,
-                             by = NULL,
-                             class = NULL,
-                             var = NULL,
-                             paired = NULL,
-                             weight = NULL,
-                             output = NULL,
-                             opts = NULL) {
-
-  spcs <- get_output_specs_ttest(data, var, paired, class, opts, output)
-
-  data <- spcs$data
-  outreq <- spcs$outreq
-  nms <- names(outreq)
-
-
-  res <- list()
-  byres <- list()
-  if (length(outreq) > 0) {
-    # Create vector of NA class values
-    cls <- NULL
-    ctypes <- list() # Not used but not ready to get rid of it yet
-    if (!is.null(class)) {
-      cls <- rep(NA, length(class))
-      names(cls) <- class
-
-      if (has_option(opts, "completetypes")) {
-        for (cnm in class) {
-          if (is.factor(data[[cnm]])) {
-            ctypes[[cnm]] <- levels(data[[cnm]])
-          } else {
-            ctypes[[cnm]] <- unique(data[[cnm]])
-          }
-        }
-      }
-    }
-
-    bdat <- list(data)
-    if (!is.null(by)) {
-
-      bdat <- split(data, data[ , by, drop = FALSE], sep = "|", drop = TRUE)
-
-    }
-    bynms <- names(bdat)
-
-    # Make up by variable names for output ds
-    byn <- NULL
-    bylbls <- NULL
-    if (!is.null(by)) {
-      if (length(by) == 1)
-        byn <- "BY"
-      else
-        byn <- paste0("BY", seq(1, length(by)))
-
-      bylbls <- by
-      names(bylbls) <- byn
-    }
-
-    tmpres <- NULL
-
-    for (j in seq_len(length(bdat))) {
-
-      dat <- bdat[[j]]
-
-      # Deal with by variable values
-      bynm <- NULL
-      if (!is.null(bynms)) {
-        bynm <- strsplit(bynms[j], "|", fixed = TRUE)[[1]]
-        names(bynm) <- byn
-      }
-
-
-      for (i in seq_len(length(outreq))) {
-
-        outp <- outreq[[i]]
-
-        if (is.null(class)) {
-
-          # Always add type 0
-          tmpby <- get_output(dat, var = outp$var,
-                              by = bynm,
-                              class = cls,
-                              stats = outp$stats,
-                              shape = outp$shape,
-                              freq = outp$parameters$freq,
-                              type = outp$parameters$type,
-                              opts = opts)
-
-          tmpby <- restore_datatypes(tmpby, dat, class)
-
-          if (is.null(tmpres))
-            tmpres <- tmpby
-          else
-            tmpres <- rbind(tmpres, tmpby)
-
-        }
-
-
-        if (!is.null(class)) {
-
-          if (!is.null(tp))
-            tp <- 1
-
-
-          tmpcls <- get_class_output(dat, var = outp$var,
-                                     class = class, outp = outp,
-                                     freq = outp$parameters$freq,
-                                     type = outp$parameters$type,
-                                     byvals = bynm, opts = opts,
-                                     stats = outp$stats)
-
-          if (is.null(tmpres))
-            tmpres <- tmpcls
-          else
-            tmpres <- rbind(tmpres, tmpcls)
-
-        }
-
-        # System Labels
-        if (!is.null(tmpres))
-          labels(tmpres) <- append(mlbls, bylbls)
-
-        # Class labels
-        clbls <- NULL
-        if (!is.null(class)) {
-          if (length(class) == 1)
-            cnms <- "CLASS"
-          else {
-            cnms <- paste0("CLASS", seq(1, length(class)))
-          }
-          clbls <- as.list(class)
-          names(clbls) <- cnms
-
-          labels(tmpres) <- clbls
-        }
-
-        # User labels
-        if (!is.null(outp$label))
-          labels(tmpres) <- outp$label
-
-        # Formats
-        if (!is.null(outp$format))
-          formats(tmpres) <- outp$format
-
-        # Reset rownames
-        rownames(tmpres) <- NULL
-
-        # Kill type variable for output datasets
-        if ("TYPE" %in% names(tmpres)) {
-
-          tmpres[["TYPE"]] <- NULL
-        }
-
-        byres[[nms[i]]]  <- tmpres
-      }
-
-      res[[bynms[j]]]  <- byres
-    }
-  }
-
-  if (length(res) == 1)
-    res <- res[[1]]
-
-
-  return(res)
-
-}
-
-
-
-
-#' @import fmtr
-#' @import common
 gen_output_ttest <- function(data,
                              by = NULL,
                              class = NULL,
@@ -1376,6 +1137,13 @@ gen_output_ttest <- function(data,
         tmpres[["TYPE"]] <- NULL
       }
 
+      # Replace VAR value
+      if (!is.null(var)) {
+        if ("VAR" %in% names(tmpres)) {
+          tmpres[["VAR"]] <- var
+        }
+      }
+
       res[[nms[i]]]  <- tmpres
 
     }
@@ -1389,4 +1157,10 @@ gen_output_ttest <- function(data,
 
 }
 
+#' @import sasLM
+#' @import common
+get_class_ttest <- function(data, var, class) {
 
+
+  return(NULL)
+}
