@@ -92,26 +92,24 @@ test_that("ttest2: Simple proc_ttest one variable works.", {
 
 })
 
-#
-# test_that("ttest3: Simple proc_ttest with class works.", {
-#
-#   # proc ttest data=sashelp.class alpha=0.05;
-#   # class sex /* Grouping Variable */;
-#   # var height;
-#   # run;
-#
-#
-#
-#   res <- proc_ttest(cls,
-#                     class = "Sex",
-#                     options = c("alpha" = 0.05),
-#                     titles = "My first TTest Table")
-#
-#   res
-#
-#   expect_equal(is.null(res), FALSE)
-#
-# })
+
+test_that("ttest3: Simple proc_ttest with class works.", {
+
+  # proc ttest data=sashelp.class alpha=0.05;
+  # class sex /* Grouping Variable */;
+  # var height;
+  # run;
+
+  res <- proc_ttest(cls,
+                    var = "Height",
+                    class = "Sex")
+
+  res
+
+  expect_equal(is.null(res), FALSE)
+  expect_equal(length(res), 4)
+
+})
 
 
 test_that("ttest4: Simple proc_ttest with paired variables works.", {
@@ -432,4 +430,52 @@ test_that("ttest12: proc_ttest with paired and by variables works.", {
   expect_equal(as.numeric(res$TTests$DF[2]), 4)
   expect_equal(as.numeric(res$TTests$T[2]), -3.08697453)
   expect_equal(as.numeric(res$TTests$PROBT[2]), 0.03668198940)
+})
+
+
+test_that("ttest13: get_class_ttest with paired and by variables works.", {
+
+
+  res <- get_class_ttest(cls, "Height", "Sex")
+
+  res
+
+  expect_equal(length(res), 4)
+  expect_equal(names(res), c("Statistics", "ConfLimits", "TTests", "Equality"))
+
+
+  res <- get_class_ttest(cls, "Height", "Sex", report = FALSE)
+
+  res
+
+  expect_equal(length(res), 4)
+  expect_equal("VAR" %in% names(res$Statistics), TRUE)
+
+
+})
+
+
+
+test_that("ttest3: Simple proc_ttest with class and by works.", {
+
+  # proc ttest data=sashelp.class alpha=0.05;
+  # class sex /* Grouping Variable */;
+  # var height;
+  # run;
+
+  tmpdat <- cls
+  tmpdat$cat <- c("A", "A", "A", "A", "A", "A", "A", "A", "A",
+                  "B", "B", "B", "B", "B", "B", "B", "B", "B", "B")
+
+  res <- proc_ttest(tmpdat,
+                    by = "cat",
+                    var = "Height",
+                    class = "Sex")
+
+  res
+
+  expect_equal(length(res), 2)
+  expect_equal(nrow(res$Statistics), 4)
+  expect_equal(nrow(res$ConfLimits), 4)
+
 })

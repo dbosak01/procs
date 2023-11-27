@@ -725,3 +725,100 @@ get_class_names <- function(class) {
 
 
 
+
+# Perform the set operation.  Works on main
+# dataset plus one or more datasets.
+perform_set <- function(dta, stdta) {
+
+  # Save off class
+  dtacls <- class(dta)
+
+  # Work with pure data frames.
+  # Tibbles will mess with names.
+  dta <- as.data.frame(dta)
+
+  # Put in list
+  if ("data.frame" %in% class(stdta))
+    dtalst <- list(stdta)
+  else
+    dtalst <- stdta
+
+  # Collect Names
+  fnms <- names(dta)
+
+  # Assign counter to ensure stacking
+  dta[["..ds"]] <- 0
+
+  ret <- dta
+
+  # Stack datasets
+  for (i in seq_len(length(dtalst))){
+
+    tmp <- as.data.frame(dtalst[[i]])
+    nnms <- names(tmp)
+    fnms <- c(fnms, nnms[!nnms %in% fnms])
+    tmp[["..ds"]] <- i
+    ret <- merge(ret, tmp, all = TRUE, sort = FALSE)
+
+  }
+
+  # Clean up counter
+  ret[["..ds"]] <- NULL
+  dta[["..ds"]] <- NULL
+
+  # Rename so first dataset drives naming
+  # Can easily break if name has been changed.
+  ret <- tryCatch({ret[ , fnms]}, error = function(cond){ret})
+
+  # Restore attributes
+  ret <- copy_attributes_sp(dta, ret)
+  ret <- copy_df_attributes(dta, ret)
+
+  # Restore original class
+  class(ret) <- dtacls
+
+  return(ret)
+
+}
+
+copy_attributes_sp <- function(df1, df2) {
+
+  ret <- df2
+
+  for (nm in names(df2)) {
+
+    col <- df1[[nm]]
+    if (!is.null(col)) {
+      for (at in names(attributes(col))) {
+
+        if (!at %in% c("levels")) {
+
+          attr(ret[[nm]], at) <- attr(col, at)
+        }
+
+      }
+    }
+
+  }
+
+  return(ret)
+}
+
+
+# Copies attributes on data frame from one df to another
+# Skips rownames and names, which can cause trouble.
+copy_df_attributes <- function(src, trgt) {
+
+  atts <- attributes(src)
+
+  ret <- trgt
+
+  for (anm in names(atts)) {
+
+    if (!anm %in% c("names", "row.names")) {
+      attr(ret, anm) <- atts[[anm]]
+    }
+  }
+
+  return(ret)
+}

@@ -461,6 +461,8 @@ log_ttest <- function(data,
 
 # Drivers -----------------------------------------------------------------
 
+tlbls <- c(METHOD = "Method", VARIANCES = "Variances", NDF = "Num DF", DDF = "Den DF",
+           FVAL = "F Value", PROBF = "Pr > F", mlbls)
 
 get_output_specs_ttest <- function(data, var, paired, class, opts, output) {
 
@@ -479,26 +481,21 @@ get_output_specs_ttest <- function(data, var, paired, class, opts, output) {
 
   } else if (!is.null(class)) {
 
-    v1 <-
-    # splt <- trimws(strsplit(paired, "*", fixed = TRUE)[[1]])
-    # v1 <- splt[1]
-    # v2 <- splt[2]
-    #
-    # dat[["..diff"]] <- dat[[v1]] - dat[[v2]]
 
     stats <- c("n", "mean", "std", "stderr", "min", "max")
 
-    spcs[["Statistics"]] <- out_spec(stats = stats, shape = "wide",
-                                     type = FALSE, freq = FALSE,
-                                     var = class)
+    spcs[["Statistics"]] <- out_spec(var = var, stats = stats, shape = "wide",
+                                     type = FALSE, freq = FALSE)
 
-    spcs[["ConfLimits"]] <- out_spec(stats = c("mean", "clm", "std"), shape = "wide",
-                                     types = FALSE, freq = FALSE, var = class)
+    spcs[["ConfLimits"]] <- out_spec(var = var, stats = c("mean", "clm", "std"), shape = "wide",
+                                     types = FALSE, freq = FALSE)
 
-    # spcs[["TTests"]] <- out_spec(stats = c("df", "t", "probt"),
-    #                              shape = "wide",
-    #                              type = FALSE, freq = FALSE,
-    #                              var = "..diff")
+    spcs[["TTests"]] <- out_spec(stats = c("df", "t", "probt"),
+                                 shape = "wide",
+                                 type = FALSE, freq = FALSE,
+                                 var = var)
+
+    spcs[["Equality"]] <- out_spec(stats = "dummy", var = var, types = FALSE, freq = FALSE)
 
 
   } else if (is.null(paired) & !is.null(var) & is.null(class)) {
@@ -610,7 +607,8 @@ get_output_specs_ttest <- function(data, var, paired, class, opts, output) {
 
 ttest_fc <- fcat(N = "%d", MEAN = "%.4f", STD = "%.4f", STDERR = "%.4f",
                  MIN = "%.4f", MAX = "%.4f", UCLM = "%.4f", LCLM = "%.4f",
-                 DF = "%d", "T" = "%.2f", PROBT = "%.4f", log = FALSE)
+                 DF = "%f", "T" = "%.2f", PROBT = "%.4f", NDF = "%f", DDF = "%f",
+                 FVAL = "%.2f", PROBF = "%.4f", log = FALSE)
 
 #' @import common
 gen_report_ttest <- function(data,
@@ -683,16 +681,39 @@ gen_report_ttest <- function(data,
       dt <- dtlst[[j]]
       bynm <- "main"
 
+      # Get class-level t-tests
+      if (!is.null(class)) {
+
+          ctbl <- get_class_ttest(dt, var, class, TRUE, opts)
+      }
+
       for (i in seq_len(length(outreq))) {
 
         outp <- outreq[[i]]
-
-        # data, var, class, outp, freq = TRUE,
-        # type = NULL, byvals = NULL
-        #outp <- out_spec(stats = stats, shape = "wide")
-        smtbl <- get_class_report(dt, outp$var, class, outp, freq = FALSE, opts = opts)
-
         nm <- nms[i]
+
+        if (is.null(class) ||
+            (!is.null(class) && nm %in% c("Statistics", "ConfLimits"))) {
+
+          # data, var, class, outp, freq = TRUE,
+          # type = NULL, byvals = NULL
+          #outp <- out_spec(stats = stats, shape = "wide")
+          smtbl <- get_class_report(dt, outp$var, class, outp, freq = FALSE, opts = opts)
+
+
+
+          # Add in class-level tests if needed
+          if (!is.null(class)) {
+
+             smtbl <- add_class_ttest(smtbl, ctbl[[nm]])
+          }
+
+        } else if (!is.null(class)) {
+
+          # Add extra tests for class comparison
+          smtbl <- ctbl[[nm]]
+
+        }
 
 
         # Add spanning headers if there are by groups
@@ -720,7 +741,7 @@ gen_report_ttest <- function(data,
 
         # Assign labels
         if (is.null(class))
-          labels(smtbl) <- mlbls
+          labels(smtbl) <- tlbls
         else {
 
           cv <- class
@@ -731,7 +752,7 @@ gen_report_ttest <- function(data,
 
           names(cv) <- cnms
 
-          labels(smtbl) <- append(as.list(cv), mlbls)
+          labels(smtbl) <- append(as.list(cv), tlbls)
 
         }
 
@@ -1082,9 +1103,6 @@ gen_output_ttest <- function(data,
 
         if (!is.null(class)) {
 
-          if (!is.null(tp))
-            tp <- 1
-
 
           tmpcls <- get_class_output(dat, var = outp$var,
                                      class = class, outp = outp,
@@ -1104,7 +1122,7 @@ gen_output_ttest <- function(data,
 
       # System Labels
       if (!is.null(tmpres))
-        labels(tmpres) <- append(mlbls, bylbls)
+        labels(tmpres) <- append(tlbls, bylbls)
 
       # Class labels
       clbls <- NULL
@@ -1159,8 +1177,91 @@ gen_output_ttest <- function(data,
 
 #' @import sasLM
 #' @import common
-get_class_ttest <- function(data, var, class) {
+get_class_ttest <- function(data, var, class, report = TRUE, opts = NULL,
+                            byvar = NULL, byval = NULL) {
+
+  ret <- list()
+
+  if (is.factor(data[[class]]) == FALSE)
+    data$sfact <- factor(data[[class]])
+  else
+    data$sfact <- data[[class]]
+
+  lst <- split(data, f = data$sfact, drop=FALSE)
+
+  nms <- names(lst)
+
+  v1 <- lst[[1]][[var]]
+  v2 <- lst[[2]][[var]]
+
+  alph <- get_alpha(opts)
+
+  ttret <- TTEST(v1, v2, alph)
+
+  st <- as.data.frame(ttret$`Statistics by group`,
+                      stringsAsFactors = FALSE)
+  tt <- as.data.frame(unclass(ttret$`Two groups t-test for the difference of means`),
+                      stringsAsFactors = FALSE)
+  ft <- as.data.frame(unclass(ttret$`F-test for the ratio of variances`),
+                      stringsAsFactors = FALSE)
+
+  vcls <- c("Diff (1-2)")
+  empt <- c(NA, NA)
+  mth <- c("Pooled", "Satterthwaite")
+  vari <- c("Equal", "Unequal")
+
+  ret[["Statistics"]] <- data.frame(CLASS = vcls, METHOD = mth, N = empt,
+                                    MEAN = tt$PE,
+                                    STD = empt, STDERR = tt$SE, MIN = empt,
+                                    MAX = empt,
+                                    stringsAsFactors = FALSE)
+
+  ret[["ConfLimits"]] <- data.frame(CLASS = vcls, METHOD = mth, MEAN = tt$PE,
+                                    LCLM = tt$LCL ,
+                                    UCLM = tt$UCL, STD = empt,
+                                    stringsAsFactors = FALSE)
 
 
-  return(NULL)
+  ret[["TTests"]] <- data.frame(METHOD = mth, VARIANCES = vari, DF = tt$Df,
+                                "T" = tt$`t value`, PROBT = tt$`Pr(>|t|)`,
+                                stringsAsFactors = FALSE)
+
+  ret[["Equality"]] <- data.frame(METHOD = "Folded F", NDF = ft$`Num Df`,
+                                  DDF = ft$`Denom Df`, FVAL = ft$`F value`,
+                                  PROBF = ft$`Pr(>F)`,
+                                  stringsAsFactors = FALSE)
+
+
+  if (report == FALSE) {
+
+    ret[["Statistics"]] <- data.frame(VAR = var, ret[["Statistics"]],
+                                      stringsAsFactors = FALSE)
+
+    ret[["ConfLimits"]] <- data.frame(VAR = var, ret[["ConfLimits"]],
+                                      stringsAsFactors = FALSE)
+
+    ret[["TTests"]] <- data.frame(VAR = var, ret[["TTests"]],
+                                      stringsAsFactors = FALSE)
+
+    ret[["Equality"]] <- data.frame(VAR = var, ret[["Equality"]],
+                                      stringsAsFactors = FALSE)
+  }
+
+  return(ret)
 }
+
+# Function to set two tables with unequal columns
+add_class_ttest <- function(rtbl, ctbl) {
+
+
+  ret <- perform_set(rtbl, ctbl)
+
+  nms <- names(ret)
+  onms <- nms[!nms %in% c("CLASS", "METHOD")]
+
+  ret <- ret[ , c("CLASS", "METHOD", onms)]
+
+  return(ret)
+}
+
+# ttret <- TTEST(cls[cls$Sex == 'F', "Height"], cls[cls$Sex == 'M', "Height"], .95)
