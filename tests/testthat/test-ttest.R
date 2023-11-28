@@ -456,7 +456,7 @@ test_that("ttest13: get_class_ttest with paired and by variables works.", {
 
 
 
-test_that("ttest3: Simple proc_ttest with class and by works.", {
+test_that("ttest14: Simple proc_ttest with class and by works.", {
 
   # proc ttest data=sashelp.class alpha=0.05;
   # class sex /* Grouping Variable */;
@@ -474,8 +474,9 @@ test_that("ttest3: Simple proc_ttest with class and by works.", {
 
   res
 
-  expect_equal(length(res), 2)
-  expect_equal(nrow(res$Statistics), 4)
-  expect_equal(nrow(res$ConfLimits), 4)
-
+  expect_equal(length(res), 4)
+  expect_equal(nrow(res$Statistics), 8)
+  expect_equal(nrow(res$ConfLimits), 8)
+  expect_equal(nrow(res$TTests), 4)
+  expect_equal(nrow(res$Equality), 2)
 })

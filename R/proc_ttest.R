@@ -7,8 +7,8 @@
 #' @encoding UTF-8
 #' @description The \code{proc_ttest} function generates T-Test statistics
 #' for selected variables on the input dataset.  The variables are identified
-#' on the \code{var} parameter, the \code{paired} parameter, or the \code{class}
-#' parameter.  The function will calculate a standard set of T-Test statistics.
+#' on the \code{var} parameter or the \code{paired} parameter.
+#' The function will calculate a standard set of T-Test statistics.
 #' Results are displayed in
 #' the viewer interactively and returned from the function.
 #' @details
@@ -100,12 +100,13 @@
 #'
 #' @param data The input data frame for which to calculate summary statistics.
 #' This parameter is required.
-#' @param var The variable(s) to calculate summary statistics for. If no
-#' variables are specified,
-#' summary statistics will be generated for all numeric variables on the
-#' input data frame.
+#' @param var The variable to by used for hypothesis testing.  If the \code{class}
+#' variable is specified, the function will compare the two groups identified
+#' in the class variable.  If the \code{class} variable is not specified,
+#' enter the baseline hypothesis value on the "h0" option.
 #' @param paired A pair of variables to perform a T-Test on.  Variables should
-#' be separated by a star (*).  Entire string should be quoted.
+#' be separated by a star (*).  The entire string should be quoted, for example,
+#' \code{paired = "var1 * var2"}.
 #' @param output Whether or not to return datasets from the function. Valid
 #' values are "out", "none", and "report".  Default is "out", and will
 #' produce dataset output specifically designed for programmatic use. The "none"
@@ -459,10 +460,15 @@ log_ttest <- function(data,
 }
 
 
-# Drivers -----------------------------------------------------------------
+# Utilities -----------------------------------------------------------------
 
 tlbls <- c(METHOD = "Method", VARIANCES = "Variances", NDF = "Num DF", DDF = "Den DF",
            FVAL = "F Value", PROBF = "Pr > F", mlbls)
+
+ttest_fc <- fcat(N = "%d", MEAN = "%.4f", STD = "%.4f", STDERR = "%.4f",
+                 MIN = "%.4f", MAX = "%.4f", UCLM = "%.4f", LCLM = "%.4f",
+                 DF = "%.3f", "T" = "%.2f", PROBT = "%.4f", NDF = "%.3f", DDF = "%.3f",
+                 FVAL = "%.2f", PROBF = "%.4f", log = FALSE)
 
 get_output_specs_ttest <- function(data, var, paired, class, opts, output) {
 
@@ -605,10 +611,139 @@ get_output_specs_ttest <- function(data, var, paired, class, opts, output) {
 }
 
 
-ttest_fc <- fcat(N = "%d", MEAN = "%.4f", STD = "%.4f", STDERR = "%.4f",
-                 MIN = "%.4f", MAX = "%.4f", UCLM = "%.4f", LCLM = "%.4f",
-                 DF = "%f", "T" = "%.2f", PROBT = "%.4f", NDF = "%f", DDF = "%f",
-                 FVAL = "%.2f", PROBF = "%.4f", log = FALSE)
+#' @import sasLM
+#' @import common
+get_class_ttest <- function(data, var, class, report = TRUE, opts = NULL,
+                            byvar = NULL, byval = NULL) {
+
+  ret <- list()
+
+  if (is.factor(data[[class]]) == FALSE)
+    data$sfact <- factor(data[[class]])
+  else
+    data$sfact <- data[[class]]
+
+  lst <- split(data, f = data$sfact, drop=FALSE)
+
+  nms <- names(lst)
+
+  v1 <- lst[[1]][[var]]
+  v2 <- lst[[2]][[var]]
+
+  alph <- 1 - get_alpha(opts)
+
+  ttret <- TTEST(v1, v2, alph)
+
+  st <- as.data.frame(ttret$`Statistics by group`,
+                      stringsAsFactors = FALSE)
+  tt <- as.data.frame(unclass(ttret$`Two groups t-test for the difference of means`),
+                      stringsAsFactors = FALSE)
+  ft <- as.data.frame(unclass(ttret$`F-test for the ratio of variances`),
+                      stringsAsFactors = FALSE)
+
+  vcls <- c("Diff (1-2)")
+  empt <- c(NA, NA)
+  mth <- c("Pooled", "Satterthwaite")
+  vari <- c("Equal", "Unequal")
+
+  ret[["Statistics"]] <- data.frame(CLASS = vcls, METHOD = mth, N = empt,
+                                    MEAN = tt$PE,
+                                    STD = empt, STDERR = tt$SE, MIN = empt,
+                                    MAX = empt,
+                                    stringsAsFactors = FALSE)
+
+  ret[["ConfLimits"]] <- data.frame(CLASS = vcls, METHOD = mth, MEAN = tt$PE,
+                                    LCLM = tt$LCL ,
+                                    UCLM = tt$UCL, STD = empt,
+                                    stringsAsFactors = FALSE)
+
+
+  ret[["TTests"]] <- data.frame(METHOD = mth, VARIANCES = vari, DF = tt$Df,
+                                "T" = tt$`t value`, PROBT = tt$`Pr(>|t|)`,
+                                stringsAsFactors = FALSE)
+
+  ret[["Equality"]] <- data.frame(METHOD = "Folded F", NDF = ft$`Num Df`,
+                                  DDF = ft$`Denom Df`, FVAL = ft$`F value`,
+                                  PROBF = ft$`Pr(>F)`,
+                                  stringsAsFactors = FALSE)
+
+
+  if (report == FALSE) {
+
+    if (is.null(byvar)) {
+      ret[["Statistics"]] <- data.frame(VAR = var, ret[["Statistics"]],
+                                        stringsAsFactors = FALSE)
+
+      ret[["ConfLimits"]] <- data.frame(VAR = var, ret[["ConfLimits"]],
+                                        stringsAsFactors = FALSE)
+
+      ret[["TTests"]] <- data.frame(VAR = var, ret[["TTests"]],
+                                        stringsAsFactors = FALSE)
+
+      ret[["Equality"]] <- data.frame(VAR = var, ret[["Equality"]],
+                                        stringsAsFactors = FALSE)
+
+    } else {
+
+      vlst <- list(VAR = var)
+
+      for (nm in names(byval))
+        vlst[[nm]] <- byval[nm]
+
+      vdat <- as.data.frame(vlst, stringsAsFactors = FALSE, row.names = NULL)
+
+      ret[["Statistics"]] <- data.frame(vdat, ret[["Statistics"]],
+                                        stringsAsFactors = FALSE)
+
+      ret[["ConfLimits"]] <- data.frame(vdat, ret[["ConfLimits"]],
+                                        stringsAsFactors = FALSE)
+
+      ret[["TTests"]] <- data.frame(vdat, ret[["TTests"]],
+                                    stringsAsFactors = FALSE)
+
+      ret[["Equality"]] <- data.frame(vdat, ret[["Equality"]],
+                                      stringsAsFactors = FALSE)
+
+
+    }
+
+
+  }
+
+  return(ret)
+}
+
+# Function to set two tables with unequal columns
+add_class_ttest <- function(rtbl, ctbl) {
+
+
+  ret <- perform_set(rtbl, ctbl)
+
+  nms <- names(ret)
+
+  # Output datasets
+  if ("VAR" %in% nms) {
+
+    bynms <- find.names(ret, "BY*")
+
+    onms <- nms[!nms %in% c("VAR", bynms, "CLASS", "METHOD")]
+
+    ret <- ret[ , c("VAR", bynms, "CLASS", "METHOD", onms)]
+
+  } else { # Report datasets
+    onms <- nms[!nms %in% c("CLASS", "METHOD")]
+
+    ret <- ret[ , c("CLASS", "METHOD", onms)]
+
+  }
+
+  return(ret)
+}
+
+# ttret <- TTEST(cls[cls$Sex == 'F', "Height"], cls[cls$Sex == 'M', "Height"], .95)
+
+
+# Drivers -----------------------------------------------------------------
 
 #' @import common
 gen_report_ttest <- function(data,
@@ -622,6 +757,7 @@ gen_report_ttest <- function(data,
                              view = TRUE,
                              titles = NULL) {
 
+
   spcs <- get_output_specs_ttest(data, var, paired, class, opts, output)
 
   data <- spcs$data
@@ -634,8 +770,8 @@ gen_report_ttest <- function(data,
 
   # Assign CL Percentage on Labels
   alph <- (1 - get_alpha(opts)) * 100
-  mlbls[["UCLM"]] <- sprintf(mlbls[["UCLM"]], alph)
-  mlbls[["LCLM"]] <- sprintf(mlbls[["LCLM"]], alph)
+  tlbls[["UCLM"]] <- sprintf(tlbls[["UCLM"]], alph)
+  tlbls[["LCLM"]] <- sprintf(tlbls[["LCLM"]], alph)
 
   #browser()
 
@@ -684,7 +820,7 @@ gen_report_ttest <- function(data,
       # Get class-level t-tests
       if (!is.null(class)) {
 
-          ctbl <- get_class_ttest(dt, var, class, TRUE, opts)
+        ctbl <- get_class_ttest(dt, var, class, TRUE, opts)
       }
 
       for (i in seq_len(length(outreq))) {
@@ -705,7 +841,7 @@ gen_report_ttest <- function(data,
           # Add in class-level tests if needed
           if (!is.null(class)) {
 
-             smtbl <- add_class_ttest(smtbl, ctbl[[nm]])
+            smtbl <- add_class_ttest(smtbl, ctbl[[nm]])
           }
 
         } else if (!is.null(class)) {
@@ -727,7 +863,7 @@ gen_report_ttest <- function(data,
         }
 
         # Add default formats
-        #fmt <- "%.4f"
+        # fmt <- "%.4f"
         formats(smtbl) <- ttest_fc
         # for (cnm in names(smtbl)) {
         #
@@ -759,7 +895,7 @@ gen_report_ttest <- function(data,
         # Kill var variable for reports
         if ("VAR" %in% names(smtbl)) {
 
-           smtbl[["VAR"]] <- NULL
+          smtbl[["VAR"]] <- NULL
 
         }
 
@@ -776,7 +912,7 @@ gen_report_ttest <- function(data,
     }
 
     # Add summary plot  - Commented for now because I can't get it to match SAS.
-   # res[["SummaryPanel"]] <- gen_summarypanel(dt, var, confidence = alph)
+    # res[["SummaryPanel"]] <- gen_summarypanel(dt, var, confidence = alph)
 
   }
 
@@ -820,183 +956,6 @@ gen_report_ttest <- function(data,
 }
 
 
-#' @import common
-gen_report_ttest_back <- function(data,
-                             by = NULL,
-                             class = NULL,
-                             var = NULL,
-                             paired = NULL,
-                             weight = NULL,
-                             opts = NULL,
-                             output = NULL,
-                             view = TRUE,
-                             titles = NULL) {
-
-  spcs <- get_output_specs_ttest(data, var, paired, class, opts, output)
-
-  data <- spcs$data
-  outreq <- spcs$outreq
-
-
-  # Declare return list
-  res <- list()
-
-  # Assign CL Percentage on Labels
-  alph <- (1 - get_alpha(opts)) * 100
-  mlbls[["UCLM"]] <- sprintf(mlbls[["UCLM"]], alph)
-  mlbls[["LCLM"]] <- sprintf(mlbls[["LCLM"]], alph)
-
-  #browser()
-
-  if (length(outreq) > 0) {
-
-    nms <- names(outreq)
-    for (i in seq_len(length(outreq))) {
-
-      outp <- outreq[[i]]
-
-      bylbls <- c()
-      if (!is.null(by)) {
-
-        lst <- unclass(data)[by]
-        for (nm in names(lst))
-          lst[[nm]] <- as.factor(lst[[nm]])
-        dtlst <- split(data, lst, sep = "|", drop = TRUE)
-
-        snms <- strsplit(names(dtlst), "|", fixed = TRUE)
-
-        for (k in seq_len(length(snms))) {
-          for (l in seq_len(length(by))) {
-            lv <- ""
-            if (!is.null(bylbls[k])) {
-              if (!is.na(bylbls[k])) {
-                lv <- bylbls[k]
-              }
-            }
-
-            if (l == length(by))
-              cma <- ""
-            else
-              cma <- ", "
-
-            bylbls[k] <- paste0(lv, by[l], "=", snms[[k]][l], cma)
-          }
-        }
-
-      } else {
-
-        dtlst <- list(data)
-      }
-
-      # Loop through by groups
-      for (j in seq_len(length(dtlst))) {
-
-        # Get table for this by group
-        dt <- dtlst[[j]]
-
-        # data, var, class, outp, freq = TRUE,
-        # type = NULL, byvals = NULL
-        #outp <- out_spec(stats = stats, shape = "wide")
-        smtbl <- get_class_report(dt, outp$var, class, outp, freq = FALSE, opts = opts)
-
-        nm <- length(res) + 1
-
-        # Add spanning headers if there are by groups
-        if (!is.null(by) & !is.null(smtbl)) {
-
-          # Add spanning headers
-          spn <- span(1, ncol(smtbl), label = bylbls[j], level = 1)
-          attr(smtbl, "spans") <- list(spn)
-
-          nm <-  bylbls[j]
-        }
-
-        # Add default formats
-        #fmt <- "%.4f"
-        formats(smtbl) <- ttest_fc
-        # for (cnm in names(smtbl)) {
-        #
-        #   if (typeof(smtbl[[cnm]]) %in% c("double")) {
-        #
-        #     attr(smtbl[[cnm]], "format") <- fmt
-        #   }
-        #
-        # }
-
-
-        # Assign labels
-        if (is.null(class))
-          labels(smtbl) <- mlbls
-        else {
-
-          cv <- class
-          if (length(class) == 1)
-            cnms <- "CLASS"
-          else
-            cnms <- paste0("CLASS", seq(1, length(class)))
-
-          names(cv) <- cnms
-
-          labels(smtbl) <- append(as.list(cv), mlbls)
-
-        }
-
-        # Kill var variable for reports
-        if ("VAR" %in% names(smtbl)) {
-
-          smtbl[["VAR"]] <- NULL
-
-        }
-
-        # Convert to tibble if incoming data is a tibble
-        if ("tbl_df" %in% class(data)) {
-          res[[nm]] <- as_tibble(smtbl)
-        } else {
-          res[[nm]] <- smtbl
-        }
-
-
-
-
-
-      }
-
-    }
-
-    # Add summary plot  - Commented for now because I can't get it to match SAS.
-    # res[["SummaryPanel"]] <- gen_summarypanel(dt, var, confidence = alph)
-
-  }
-
-  gv <- options("procs.print")[[1]]
-  if (is.null(gv))
-    gv <- TRUE
-
-  # Create viewer report if requested
-  if (gv) {
-    if (view == TRUE && interactive()) {
-
-
-      vrfl <- tempfile()
-
-      ttls <- c(titles, paste0("Variable: ", var))
-
-      out <- output_report(res, dir_name = dirname(vrfl),
-                           file_name = basename(vrfl), out_type = "HTML",
-                           titles = ttls, margins = .5, viewer = TRUE)
-
-      show_viewer(out)
-    }
-  }
-
-  if (length(res) == 1)
-    res <- res[[1]]
-
-  return(res)
-
-}
-
-
 
 #' @import fmtr
 #' @import common
@@ -1019,12 +978,15 @@ gen_output_ttest <- function(data,
 
 
   res <- list()
+  ctbl <- NULL
+
   if (length(outreq) > 0) {
 
     nms <- names(outreq)
     for (i in seq_len(length(outreq))) {
 
       outp <- outreq[[i]]
+      nm <- nms[i]
 
       # Create vector of NA class values
       cls <- NULL
@@ -1111,6 +1073,21 @@ gen_output_ttest <- function(data,
                                      byvals = bynm, opts = opts,
                                      stats = outp$stats)
 
+          # Get class-level t-tests
+          ctbl <- get_class_ttest(dat, var, class, FALSE, opts,
+                                  byvar = by, byval = bynm)
+
+
+          if (nm %in% c("Statistics", "ConfLimits")) {
+
+            tmpcls <- add_class_ttest(tmpcls, ctbl[[nm]])
+
+          } else {
+
+            tmpcls <- ctbl[[nm]]
+          }
+
+
           if (is.null(tmpres))
             tmpres <- tmpcls
           else
@@ -1174,94 +1151,3 @@ gen_output_ttest <- function(data,
   return(res)
 
 }
-
-#' @import sasLM
-#' @import common
-get_class_ttest <- function(data, var, class, report = TRUE, opts = NULL,
-                            byvar = NULL, byval = NULL) {
-
-  ret <- list()
-
-  if (is.factor(data[[class]]) == FALSE)
-    data$sfact <- factor(data[[class]])
-  else
-    data$sfact <- data[[class]]
-
-  lst <- split(data, f = data$sfact, drop=FALSE)
-
-  nms <- names(lst)
-
-  v1 <- lst[[1]][[var]]
-  v2 <- lst[[2]][[var]]
-
-  alph <- get_alpha(opts)
-
-  ttret <- TTEST(v1, v2, alph)
-
-  st <- as.data.frame(ttret$`Statistics by group`,
-                      stringsAsFactors = FALSE)
-  tt <- as.data.frame(unclass(ttret$`Two groups t-test for the difference of means`),
-                      stringsAsFactors = FALSE)
-  ft <- as.data.frame(unclass(ttret$`F-test for the ratio of variances`),
-                      stringsAsFactors = FALSE)
-
-  vcls <- c("Diff (1-2)")
-  empt <- c(NA, NA)
-  mth <- c("Pooled", "Satterthwaite")
-  vari <- c("Equal", "Unequal")
-
-  ret[["Statistics"]] <- data.frame(CLASS = vcls, METHOD = mth, N = empt,
-                                    MEAN = tt$PE,
-                                    STD = empt, STDERR = tt$SE, MIN = empt,
-                                    MAX = empt,
-                                    stringsAsFactors = FALSE)
-
-  ret[["ConfLimits"]] <- data.frame(CLASS = vcls, METHOD = mth, MEAN = tt$PE,
-                                    LCLM = tt$LCL ,
-                                    UCLM = tt$UCL, STD = empt,
-                                    stringsAsFactors = FALSE)
-
-
-  ret[["TTests"]] <- data.frame(METHOD = mth, VARIANCES = vari, DF = tt$Df,
-                                "T" = tt$`t value`, PROBT = tt$`Pr(>|t|)`,
-                                stringsAsFactors = FALSE)
-
-  ret[["Equality"]] <- data.frame(METHOD = "Folded F", NDF = ft$`Num Df`,
-                                  DDF = ft$`Denom Df`, FVAL = ft$`F value`,
-                                  PROBF = ft$`Pr(>F)`,
-                                  stringsAsFactors = FALSE)
-
-
-  if (report == FALSE) {
-
-    ret[["Statistics"]] <- data.frame(VAR = var, ret[["Statistics"]],
-                                      stringsAsFactors = FALSE)
-
-    ret[["ConfLimits"]] <- data.frame(VAR = var, ret[["ConfLimits"]],
-                                      stringsAsFactors = FALSE)
-
-    ret[["TTests"]] <- data.frame(VAR = var, ret[["TTests"]],
-                                      stringsAsFactors = FALSE)
-
-    ret[["Equality"]] <- data.frame(VAR = var, ret[["Equality"]],
-                                      stringsAsFactors = FALSE)
-  }
-
-  return(ret)
-}
-
-# Function to set two tables with unequal columns
-add_class_ttest <- function(rtbl, ctbl) {
-
-
-  ret <- perform_set(rtbl, ctbl)
-
-  nms <- names(ret)
-  onms <- nms[!nms %in% c("CLASS", "METHOD")]
-
-  ret <- ret[ , c("CLASS", "METHOD", onms)]
-
-  return(ret)
-}
-
-# ttret <- TTEST(cls[cls$Sex == 'F', "Height"], cls[cls$Sex == 'M', "Height"], .95)

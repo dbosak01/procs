@@ -20,13 +20,14 @@ proc_ttest(
 \item{data}{The input data frame for which to calculate summary statistics.
 This parameter is required.}
 
-\item{var}{The variable(s) to calculate summary statistics for. If no
-variables are specified,
-summary statistics will be generated for all numeric variables on the
-input data frame.}
+\item{var}{The variable to by used for hypothesis testing.  If the \code{class}
+variable is specified, the function will compare the two groups identified
+in the class variable.  If the \code{class} variable is not specified,
+enter the baseline hypothesis value on the "h0" option.}
 
 \item{paired}{A pair of variables to perform a T-Test on.  Variables should
-be separated by a star (*).  Entire string should be quoted.}
+be separated by a star (*).  The entire string should be quoted, for example,
+\code{paired = "var1 * var2"}.}
 
 \item{output}{Whether or not to return datasets from the function. Valid
 values are "out", "none", and "report".  Default is "out", and will
@@ -76,8 +77,8 @@ the output datasets can be turned off using the "none" keyword on the
 \description{
 The \code{proc_ttest} function generates T-Test statistics
 for selected variables on the input dataset.  The variables are identified
-on the \code{var} parameter, the \code{paired} parameter, or the \code{class}
-parameter.  The function will calculate a standard set of T-Test statistics.
+on the \code{var} parameter or the \code{paired} parameter.
+The function will calculate a standard set of T-Test statistics.
 Results are displayed in
 the viewer interactively and returned from the function.
 }
