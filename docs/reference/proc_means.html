@@ -21,7 +21,7 @@ the viewer interactively and returned from the function."><meta property="og:ima
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">procs</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.0.3</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.0.4</span>
       </span>
     </div>
 
@@ -40,6 +40,9 @@ the viewer interactively and returned from the function."><meta property="og:ima
     </li>
     <li>
       <a href="../articles/procs-means.html">The Means Function</a>
+    </li>
+    <li>
+      <a href="../articles/procs-ttest.html">The TTest Function</a>
     </li>
     <li>
       <a href="../articles/procs-dm.html">Data Manipulation Functions</a>
@@ -170,12 +173,12 @@ will be nested in the <code>by</code>.</p></dd>
 
 <dt>options</dt>
 <dd><p>A vector of optional keywords. Valid values are: "alpha =",
-"completetypes", "maxdec =", "noprint", "notype", "nofreq", "nonobs".
+"completetypes", "maxdec =", "noprint", "notype", "nofreq", "nonobs", "nway".
 The "notype", "nofreq", and "nonobs" keywords will turn
 off columns on the output datasets.  The "alpha = " option will set the alpha
 value for confidence limit statistics.  The default is 95% (alpha = 0.05).
 The "maxdec = " option sets the maximum number of decimal places displayed
-on report output.</p></dd>
+on report output. The "nway" option returns only the highest type values.</p></dd>
 
 
 <dt>titles</dt>
@@ -299,7 +302,7 @@ option will inhibit printing.</p></li>
 <li><p><strong>notype</strong>: Turns off the TYPE column on the output
 dataset.</p></li>
 <li><p><strong>nway</strong>: Returns only the highest level TYPE combination.  By
-default, the function return all TYPE combinations.</p></li>
+default, the function returns all TYPE combinations.</p></li>
 </ul></div>
     <div id="type-and-freq-variables">
     <h2>TYPE and FREQ Variables</h2>

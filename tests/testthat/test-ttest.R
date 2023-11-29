@@ -480,3 +480,61 @@ test_that("ttest14: Simple proc_ttest with class and by works.", {
   expect_equal(nrow(res$TTests), 4)
   expect_equal(nrow(res$Equality), 2)
 })
+
+
+test_that("test15: One sample test with sides parameter.", {
+
+
+  # data time;
+  # input time @@;
+  # datalines;
+  # 43  90  84  87  116   95  86   99   93  92
+  # 121  71  66  98   79  102  60  112  105  98
+  # ;
+  #
+  # proc ttest h0=80 plots(showh0) sides=u alpha=0.1;
+  # var time;
+  # run;
+
+  v1 <- c(43,  90,  84,  87,  116,   95,  86,   99,   93,  92,
+          121,  71,  66,  98,   79,  102,  60,  112,  105,  98)
+
+  dat <- data.frame(time = v1, stringsAsFactors = FALSE)
+
+  res <- proc_ttest(dat, var = time, options = c("h0"=80, alpha = .1))
+
+
+})
+
+
+test_that("ttest2: proc_ttest output options work.", {
+
+  # proc ttest data=sashelp.class
+  # h0=65 /* Null hypothesis mean of 65 */
+  #   alpha=0.05;  /* Significance level of 0.05 */
+  #   var height; /* Specify the variable to test */
+  #   run;
+
+
+  res <- proc_ttest(cls,
+                    var = c("Height"),
+                    options = c("h0" = 65, "alpha" = 0.05),
+                    output = report)
+
+  res
+
+  expect_equal("VAR" %in% names(res$Statistics), FALSE)
+  expect_equal(length(res), 3)
+  expect_equal(nrow(res$Statistics), 1)
+
+  res <- proc_ttest(cls,
+                    var = c("Height"),
+                    options = c("h0" = 65, "alpha" = 0.05),
+                    output = long)
+
+
+  # expect_equal(nrow(res$Statistics), 6)  # Need to fix
+
+
+})
+

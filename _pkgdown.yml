@@ -6,6 +6,7 @@ articles:
   contents:
   - procs-freq
   - procs-means
+  - procs-ttest
   - procs-dm
   - procs-example1
   - procs-example2
@@ -18,6 +19,7 @@ reference:
   contents:
   - proc_freq
   - proc_means
+  - proc_ttest
 
 - title: Data Manipulation
   desc: Functions to manipulate data.

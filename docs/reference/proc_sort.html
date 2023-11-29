@@ -23,7 +23,7 @@ The parameters will accept either quoted or unquoted values."><meta property="og
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">procs</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.0.3</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.0.4</span>
       </span>
     </div>
 
@@ -42,6 +42,9 @@ The parameters will accept either quoted or unquoted values."><meta property="og
     </li>
     <li>
       <a href="../articles/procs-means.html">The Means Function</a>
+    </li>
+    <li>
+      <a href="../articles/procs-ttest.html">The TTest Function</a>
     </li>
     <li>
       <a href="../articles/procs-dm.html">Data Manipulation Functions</a>
@@ -99,7 +102,14 @@ The parameters will accept either quoted or unquoted values.</p>
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">proc_sort</span><span class="op">(</span><span class="va">data</span>, by <span class="op">=</span> <span class="cn">NULL</span>, keep <span class="op">=</span> <span class="cn">NULL</span>, order <span class="op">=</span> <span class="st">"ascending"</span>, options <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">proc_sort</span><span class="op">(</span></span>
+<span>  <span class="va">data</span>,</span>
+<span>  by <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  keep <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  order <span class="op">=</span> <span class="st">"ascending"</span>,</span>
+<span>  options <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  as.character <span class="op">=</span> <span class="cn">FALSE</span></span>
+<span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
@@ -130,6 +140,15 @@ parameter.  Default is 'ascending' for all by variables.</p></dd>
 are 'dupkey' and 'nodupkey'. The 'nodupkey' option removes duplicate
 rows from the sorted dataset.  The 'dupkey' option removes unique
 rows from the sorted dataset.</p></dd>
+
+
+<dt>as.character</dt>
+<dd><p>If TRUE, will cast any factors in the 'by' parameter
+to character. Default is FALSE.  This parameter is included because it is
+common to use factors for sorting in R, but you may not want to keep the
+variable as a factor.  This parameter therefore allows you to use
+the factor for the sort, but then convert back to a character
+once the sort is complete.</p></dd>
 
 </dl></div>
     <div id="value">

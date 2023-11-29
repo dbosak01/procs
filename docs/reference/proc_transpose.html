@@ -22,7 +22,7 @@ accept quoted or unquoted values."><meta property="og:image" content="https://pr
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">procs</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.0.3</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.0.4</span>
       </span>
     </div>
 
@@ -41,6 +41,9 @@ accept quoted or unquoted values."><meta property="og:image" content="https://pr
     </li>
     <li>
       <a href="../articles/procs-means.html">The Means Function</a>
+    </li>
+    <li>
+      <a href="../articles/procs-ttest.html">The TTest Function</a>
     </li>
     <li>
       <a href="../articles/procs-dm.html">Data Manipulation Functions</a>
@@ -110,6 +113,7 @@ accept quoted or unquoted values.</p>
 <span>  delimiter <span class="op">=</span> <span class="st">"."</span>,</span>
 <span>  suffix <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  where <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  options <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  log <span class="op">=</span> <span class="cn">TRUE</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
@@ -174,6 +178,12 @@ column names.</p></dd>
 <dd><p>An expression to filter the rows after the transform
 is complete.  Use the <code><a href="https://rdrr.io/r/base/expression.html" class="external-link">expression</a></code> function to define
 the where clause.</p></dd>
+
+
+<dt>options</dt>
+<dd><p>Optional keywords that affect the transpose. Default is NULL.
+Available option is "noname" which drops the name column from the
+output dataset.</p></dd>
 
 
 <dt>log</dt>
