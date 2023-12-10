@@ -236,6 +236,17 @@ res2
 
 # View results
 # res3
+# $Statistics
+# VAR  N MEAN      STD    STDERR MIN MAX
+# 1 ..diff 10   -2 1.054093 0.3333333  -4  -1
+#
+# $ConfLimits
+# VAR MEAN      LCLM      UCLM      STD
+# 1 ..diff   -2 -2.754052 -1.245948 1.054093
+#
+# $TTests
+# VAR DF  T        PROBT
+# 1 ..diff  9 -6 0.0002024993
 
 # Example 4: T-Test using h0 option and by variable
 res4 <- proc_ttest(sleep, var = "extra", by = "group", options = c("h0" = 0))

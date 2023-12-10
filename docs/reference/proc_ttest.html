@@ -334,6 +334,17 @@ columns, and variables are in rows. This shaping option is the default.</p></li>
 <span></span>
 <span><span class="co"># View results</span></span>
 <span><span class="co"># res3</span></span>
+<span><span class="co"># $Statistics</span></span>
+<span><span class="co"># VAR  N MEAN      STD    STDERR MIN MAX</span></span>
+<span><span class="co"># 1 ..diff 10   -2 1.054093 0.3333333  -4  -1</span></span>
+<span><span class="co">#</span></span>
+<span><span class="co"># $ConfLimits</span></span>
+<span><span class="co"># VAR MEAN      LCLM      UCLM      STD</span></span>
+<span><span class="co"># 1 ..diff   -2 -2.754052 -1.245948 1.054093</span></span>
+<span><span class="co">#</span></span>
+<span><span class="co"># $TTests</span></span>
+<span><span class="co"># VAR DF  T        PROBT</span></span>
+<span><span class="co"># 1 ..diff  9 -6 0.0002024993</span></span>
 <span></span>
 <span><span class="co"># Example 4: T-Test using h0 option and by variable</span></span>
 <span><span class="va">res4</span> <span class="op">&lt;-</span> <span class="fu">proc_ttest</span><span class="op">(</span><span class="va">sleep</span>, var <span class="op">=</span> <span class="st">"extra"</span>, by <span class="op">=</span> <span class="st">"group"</span>, options <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"h0"</span> <span class="op">=</span> <span class="fl">0</span><span class="op">)</span><span class="op">)</span></span>

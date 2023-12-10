@@ -27,6 +27,7 @@ The package includes the following functions:
 
 * `proc_freq()`: A function to simulate the FREQ procedure.
 * `proc_means()`: A function to simulate the MEANS or SUMMARY procedure.
+* `proc_ttest()`: A function to perform T-Tests and calculate confidence limits. 
 * `proc_transpose()`: A function to pivot data similar in syntax to the 
 TRANSPOSE procedure.
 * `proc_sort()`: A function to sort and dedupe datasets.
@@ -179,6 +180,53 @@ columns according to the statistic or parameter they represent.  This convention
 is somewhat different from SAS®, but makes it easier to manipulate
 the output data.
 
+
+
+### Hypothesis Testing
+
+Similar to PROC TTEST in SAS®, the `proc_ttest()` function performs 
+hypothesis testing and calculates confidence limits.  The function can operate
+on a single variable, two independent samples, or paired observations.  
+
+The paired observation test can be used in cases when you have data on the 
+same value at different time points, or before and after a procedure. This example
+attemps to determine whether there is a significant change in systolic blood
+pressure before and after a stimulus.  It uses the following data:
+```{r eval=FALSE, echo=TRUE} 
+# Create sample data
+pressure <- read.table(header = TRUE, text = '
+  SBPbefore SBPafter
+  120 128
+  124 131
+  130 131
+  118 127
+  140 132
+  128 125
+  140 141
+  135 137
+  126 118
+  130 132
+  126 129
+  127 135
+  ')
+
+```
+
+Now let's determine if there is a significant change before and after the stimulus measures:
+```{r eval=FALSE, echo=TRUE} 
+# Perform T-Test
+res <- proc_ttest(pressure, paired = "SBPbefore * SBPafter")
+
+# View results
+res
+
+```
+If printing is enabled, the following is sent to the viewer:
+
+<img src="../man/images/ttest.png"/>
+
+The above test shows although there was a change before and after the stimulus, 
+that change was not statistically significant.
 
 ### Other Functions
 

@@ -117,19 +117,20 @@ output_report <- function(lst,
           tbl <- create_table(dt, borders = c("outside"))
         }
 
-        #
-
         # Add titles
-        if (!is.null(titles) & i == 1) {
+        tt <- NULL
+        if (i == 1) {
 
-          tt <- titles
+          if (!is.null(titles))
+            tt <- titles
 
-          if (pages > 1) {
-            tt <- c(tt, names(lst)[j])
-          }
-
-          tbl <- titles(tbl, tt)
         }
+
+        if (!is.null(attr(dt, "ttls")))
+          tt <- c(tt, attr(dt, "ttls"))
+
+        if (!is.null(tt))
+          tbl <- titles(tbl, tt)
 
         #browser()
         # Add spanning headers if requested

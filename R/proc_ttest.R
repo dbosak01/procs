@@ -210,6 +210,17 @@
 #'
 #' # View results
 #' # res3
+#' # $Statistics
+#' # VAR  N MEAN      STD    STDERR MIN MAX
+#' # 1 ..diff 10   -2 1.054093 0.3333333  -4  -1
+#' #
+#' # $ConfLimits
+#' # VAR MEAN      LCLM      UCLM      STD
+#' # 1 ..diff   -2 -2.754052 -1.245948 1.054093
+#' #
+#' # $TTests
+#' # VAR DF  T        PROBT
+#' # 1 ..diff  9 -6 0.0002024993
 #'
 #' # Example 4: T-Test using h0 option and by variable
 #' res4 <- proc_ttest(sleep, var = "extra", by = "group", options = c("h0" = 0))
@@ -470,11 +481,17 @@ ttest_fc <- fcat(N = "%d", MEAN = "%.4f", STD = "%.4f", STDERR = "%.4f",
                  DF = "%.3f", "T" = "%.2f", PROBT = "%.4f", NDF = "%.3f", DDF = "%.3f",
                  FVAL = "%.2f", PROBF = "%.4f", log = FALSE)
 
-get_output_specs_ttest <- function(data, var, paired, class, opts, output) {
+get_output_specs_ttest <- function(data, var, paired, class, opts, output,
+                                   report = FALSE) {
 
   dat <- data
   spcs <- list()
 
+
+  for (vr in var) {
+    if (!vr %in% names(dat))
+      stop("Variable '" %p% vr %p% "' not found in data.")
+  }
 
   if (is.null(paired) & is.null(var) & is.null(class)) {
 
@@ -490,16 +507,17 @@ get_output_specs_ttest <- function(data, var, paired, class, opts, output) {
 
     stats <- c("n", "mean", "std", "stderr", "min", "max")
 
+
     spcs[["Statistics"]] <- out_spec(var = var, stats = stats, shape = "wide",
-                                     type = FALSE, freq = FALSE)
+                                     type = FALSE, freq = FALSE, report = report)
 
     spcs[["ConfLimits"]] <- out_spec(var = var, stats = c("mean", "clm", "std"), shape = "wide",
-                                     types = FALSE, freq = FALSE)
+                                     types = FALSE, freq = FALSE, report = report)
 
     spcs[["TTests"]] <- out_spec(stats = c("df", "t", "probt"),
                                  shape = "wide",
                                  type = FALSE, freq = FALSE,
-                                 var = var)
+                                 var = var, report = report)
 
     spcs[["Equality"]] <- out_spec(stats = "dummy", var = var, types = FALSE, freq = FALSE)
 
@@ -509,24 +527,67 @@ get_output_specs_ttest <- function(data, var, paired, class, opts, output) {
 
     h0 <- get_option(opts, "h0", 0)
 
-    if (!var %in% names(dat))
-      stop("Variable '" %p% var %p% "' not found in data.")
+    shp <- "wide"
+    if (report == FALSE) {
+      if ("long" %in% output)
+        shp <- "long"
+      else if ("stacked" %in% output)
+        shp <- "stacked"
+    }
 
-    dat[["..var"]] <- dat[[var]] - h0
+    if (report == FALSE) {
 
-    stats <- c("n", "mean", "std", "stderr", "min", "max")
+      for (vr in var) {
+        dat[[paste0("..", vr)]] <- dat[[vr]] - h0
+      }
 
-    spcs[["Statistics"]] <- out_spec(stats = stats, shape = "wide",
-                                         type = FALSE, freq = FALSE,
-                                         var = var, format = "%.4f")
+      vrs <- paste0("..", var)
 
-    spcs[["ConfLimits"]] <- out_spec(stats = c("mean", "clm", "std"), shape = "wide",
-                                     types = FALSE, freq = FALSE, var = var)
+      stats <- c("n", "mean", "std", "stderr", "min", "max")
 
-    spcs[["TTests"]] <- out_spec(stats = c("df", "t", "probt"),
-                                 shape = "wide",
-                                 type = FALSE, freq = FALSE,
-                                 var = "..var")
+      spcs[["Statistics"]] <- out_spec(stats = stats, shape = shp,
+                                                   type = FALSE, freq = FALSE,
+                                                   var = var, format = "%.4f",
+                                       report = report)
+
+      spcs[["ConfLimits"]] <- out_spec(stats = c("mean", "clm", "std"), shape = shp,
+                                                   types = FALSE, freq = FALSE,
+                                       var = var, report = report)
+
+      spcs[["TTests"]] <- out_spec(stats = c("df", "t", "probt"),
+                                               shape =  shp,
+                                               type = FALSE, freq = FALSE,
+                                               var = vrs, report = report,
+                                   varlbl = var)
+
+
+    } else {
+
+      for (vr in var) {
+
+        vn <- ""
+        if (length(var) > 1)
+          vn <- paste0(vr, ":")
+
+        dat[[paste0("..", vr)]] <- dat[[vr]] - h0
+
+        stats <- c("n", "mean", "std", "stderr", "min", "max")
+
+        spcs[[paste0(vn, "Statistics")]] <- out_spec(stats = stats, shape = shp,
+                                             type = FALSE, freq = FALSE,
+                                             var = vr, format = "%.4f", report = report)
+
+        spcs[[paste0(vn, "ConfLimits")]] <- out_spec(stats = c("mean", "clm", "std"), shape = shp,
+                                         types = FALSE, freq = FALSE, var = vr, report = report)
+
+        spcs[[paste0(vn, "TTests")]] <- out_spec(stats = c("df", "t", "probt"),
+                                     shape =  shp,
+                                     type = FALSE, freq = FALSE,
+                                     var = paste0("..", vr), report = report, varlbl = vr)
+
+      }
+
+    }
 
 
 
@@ -539,19 +600,23 @@ get_output_specs_ttest <- function(data, var, paired, class, opts, output) {
 
     dat[["..diff"]] <- dat[[v1]] - dat[[v2]]
 
+    vr <- paste0(v1, "-", v2)
+
     stats <- c("n", "mean", "std", "stderr", "min", "max")
 
     spcs[["Statistics"]] <- out_spec(stats = stats, shape = "wide",
                                      type = FALSE, freq = FALSE,
-                                     var = "..diff")
+                                     var = "..diff", report = report, varlbl = vr)
 
     spcs[["ConfLimits"]] <- out_spec(stats = c("mean", "clm", "std"), shape = "wide",
-                                     types = FALSE, freq = FALSE, var = "..diff")
+                                     types = FALSE, freq = FALSE, var = "..diff",
+                                     varlbl = vr, report = report)
 
     spcs[["TTests"]] <- out_spec(stats = c("df", "t", "probt"),
                                  shape = "wide",
                                  type = FALSE, freq = FALSE,
-                                 var = "..diff")
+                                 var = "..diff", varlbl = vr,
+                                 report = report)
 
 
   } else {
@@ -758,7 +823,8 @@ gen_report_ttest <- function(data,
                              titles = NULL) {
 
 
-  spcs <- get_output_specs_ttest(data, var, paired, class, opts, output)
+  spcs <- get_output_specs_ttest(data, var, paired, class,
+                                 opts, output, report = TRUE)
 
   data <- spcs$data
   outreq <- spcs$outreq
@@ -851,6 +917,14 @@ gen_report_ttest <- function(data,
 
         }
 
+        if (length(grep("Statistics", nm, fixed = TRUE)) > 0) {
+
+          if (!is.null(outp$varlbl))
+            attr(smtbl, "ttls") <- paste0("Variable: ", outp$varlbl)
+          else
+            attr(smtbl, "ttls") <- paste0("Variable: ", outp$var)
+        }
+
 
         # Add spanning headers if there are by groups
         if (!is.null(by) & !is.null(smtbl)) {
@@ -860,6 +934,13 @@ gen_report_ttest <- function(data,
           # attr(smtbl, "spans") <- list(spn)
 
           bynm <-  bylbls[j]
+
+          if (length(grep("Statistics", nm, fixed = TRUE)) > 0) {
+
+            attr(smtbl, "ttls") <- c(attr(smtbl, "ttls"), bynm)
+
+          }
+
         }
 
         # Add default formats
@@ -897,6 +978,10 @@ gen_report_ttest <- function(data,
 
           smtbl[["VAR"]] <- NULL
 
+        } else {
+
+          if (!is.null(outp$varlbl))
+            smtbl[["VAR"]] <- outp$varlbl
         }
 
         # Convert to tibble if incoming data is a tibble
@@ -931,20 +1016,41 @@ gen_report_ttest <- function(data,
   if (gv) {
     if (view == TRUE && interactive()) {
 
-
       vrfl <- tempfile()
 
       if (is.null(titles))
         titles <- "The TTEST Function"
 
-      if (!is.null(var))
-        ttls <- c(titles, paste0("Variable: ", var))
-      else if (!is.null(paired))
-        ttls <- c(titles, paste0("Variable: ", sub("*", "-", paired, fixed = TRUE)))
+
+     # attr(ret, "ttls") <- c(titles, attr(ret, "ttls"))
+
+      # for (bc in seq_len(length(byres))) {
+      #
+      #   ttls <- c()
+      #   for (tc in seq_len(length(var))) {
+      #     if (!is.null(var))
+      #       ttls[length(ttls) + 1] <- paste0("Variable: ", var[tc])
+      #     else if (!is.null(paired))
+      #       ttls[length(ttls) + 1] <- paste0("Variable: ", sub("*", "-", paired, fixed = TRUE))
+      #
+      #
+      #   }
+      #
+      #   if (length(byres) > 1) {
+      #     ttls[length(ttls) + 1] <- names(byres)[bc]
+      #
+      #     attr(ret[[bc]], "ttls") <- ttls
+      #
+      #   } else {
+      #
+      #     attr(ret, "ttls") <- ttls
+      #   }
+      #
+      # }
 
       out <- output_report(ret, dir_name = dirname(vrfl),
                            file_name = basename(vrfl), out_type = "HTML",
-                           titles = ttls, margins = .5, viewer = TRUE,
+                           titles = titles, margins = .5, viewer = TRUE,
                            pages = length(byres))
 
       show_viewer(out)
@@ -970,7 +1076,8 @@ gen_output_ttest <- function(data,
 
 
 
-  spcs <- get_output_specs_ttest(data, var, paired, class, opts, output)
+  spcs <- get_output_specs_ttest(data, var, paired, class,
+                                 opts, output, report = FALSE)
 
   data <- spcs$data
   outreq <- spcs$outreq
@@ -1133,9 +1240,12 @@ gen_output_ttest <- function(data,
       }
 
       # Replace VAR value
-      if (!is.null(var)) {
+      if (!is.null(var) | !is.null(paired)) {
         if ("VAR" %in% names(tmpres)) {
-          tmpres[["VAR"]] <- var
+          if (!is.null(outp$varlbl))
+            tmpres[["VAR"]] <- outp$varlbl
+          else
+            tmpres[["VAR"]] <- outp$var
         }
       }
 

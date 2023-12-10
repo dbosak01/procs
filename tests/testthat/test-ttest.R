@@ -6,26 +6,26 @@ data_dir <- "."
 
 
 cls <- read.table(header = TRUE, text = '
-Name Sex Age Height Weight
-Alfred   M  14   69.0  112.5
-Alice   F  13   56.5   84.0
-Barbara   F  13   65.3   98.0
-Carol   F  14   62.8  102.5
-Henry   M  14   63.5  102.5
-James   M  12   57.3   83.0
-Jane   F  12   59.8   84.5
-Janet   F  15   62.5  112.5
-Jeffrey   M  13   62.5   84.0
-John   M  12   59.0   99.5
-Joyce   F  11   51.3   50.5
-Judy   F  14   64.3   90.0
-Louise   F  12   56.3   77.0
-Mary   F  15   66.5  112.0
-Philip   M  16   72.0  150.0
-Robert   M  12   64.8  128.0
-Ronald   M  15   67.0  133.0
-Thomas   M  11   57.5   85.0
-William   M  15   66.5  112.0')
+Name Sex Age Height Weight    region
+Alfred   M  14   69.0  112.5   A
+Alice   F  13   56.5   84.0    A
+Barbara   F  13   65.3   98.0  A
+Carol   F  14   62.8  102.5    A
+Henry   M  14   63.5  102.5    A
+James   M  12   57.3   83.0    A
+Jane   F  12   59.8   84.5     A
+Janet   F  15   62.5  112.5    A
+Jeffrey   M  13   62.5   84.0  A
+John   M  12   59.0   99.5     B
+Joyce   F  11   51.3   50.5    B
+Judy   F  14   64.3   90.0     B
+Louise   F  12   56.3   77.0   B
+Mary   F  15   66.5  112.0     B
+Philip   M  16   72.0  150.0   B
+Robert   M  12   64.8  128.0   B
+Ronald   M  15   67.0  133.0   B
+Thomas   M  11   57.5   85.0   B
+William   M  15   66.5  112.0  B')
 
 paird <- read.table(header = TRUE, text = '
 subject_id before_measure after_measure region
@@ -57,7 +57,7 @@ test_that("ttest1: Get Output Specs works as expected.", {
 
 
   expect_equal(is.null(res), FALSE)
-  expect_equal("..var" %in% names(res$data), TRUE)
+  expect_equal("..mpg" %in% names(res$data), TRUE)
   expect_equal(length(res$outreq) > 0, TRUE)
 
 })
@@ -242,7 +242,7 @@ test_that("ttest7: Simple proc_ttest with by and noprint works.", {
 
 
   res <- proc_ttest(cls,
-                    var = c("Height"), by = "Sex",
+                    var = c("Height"), by = c("Sex"),
                     options = c("h0" = 65, "alpha" = 0.05, "noprint"),
                     titles = "My first Frequency Table")
 
@@ -482,32 +482,34 @@ test_that("ttest14: Simple proc_ttest with class and by works.", {
 })
 
 
-test_that("test15: One sample test with sides parameter.", {
+# test_that("test15: One sample test with sides parameter.", {
+#
+#
+#   # data time;
+#   # input time @@;
+#   # datalines;
+#   # 43  90  84  87  116   95  86   99   93  92
+#   # 121  71  66  98   79  102  60  112  105  98
+#   # ;
+#   #
+#   # proc ttest h0=80 plots(showh0) sides=u alpha=0.1;
+#   # var time;
+#   # run;
+#
+#   v1 <- c(43,  90,  84,  87,  116,   95,  86,   99,   93,  92,
+#           121,  71,  66,  98,   79,  102,  60,  112,  105,  98)
+#
+#   dat <- data.frame(time = v1, stringsAsFactors = FALSE)
+#
+#   res <- proc_ttest(dat, var = time, options = c("h0"=80, alpha = .1))
+#
+#   expect_equal(res$Statistics
+#
+#
+# })
 
 
-  # data time;
-  # input time @@;
-  # datalines;
-  # 43  90  84  87  116   95  86   99   93  92
-  # 121  71  66  98   79  102  60  112  105  98
-  # ;
-  #
-  # proc ttest h0=80 plots(showh0) sides=u alpha=0.1;
-  # var time;
-  # run;
-
-  v1 <- c(43,  90,  84,  87,  116,   95,  86,   99,   93,  92,
-          121,  71,  66,  98,   79,  102,  60,  112,  105,  98)
-
-  dat <- data.frame(time = v1, stringsAsFactors = FALSE)
-
-  res <- proc_ttest(dat, var = time, options = c("h0"=80, alpha = .1))
-
-
-})
-
-
-test_that("ttest2: proc_ttest output options work.", {
+test_that("ttest16: proc_ttest output options work.", {
 
   # proc ttest data=sashelp.class
   # h0=65 /* Null hypothesis mean of 65 */
@@ -532,9 +534,203 @@ test_that("ttest2: proc_ttest output options work.", {
                     options = c("h0" = 65, "alpha" = 0.05),
                     output = long)
 
+  res
 
-  # expect_equal(nrow(res$Statistics), 6)  # Need to fix
+  expect_equal(nrow(res$Statistics), 6)
+  expect_equal(ncol(res$Statistics), 2)
+
+
+  res <- proc_ttest(cls,
+                    var = c("Height"),
+                    by = Sex,
+                    options = c("h0" = 65, "alpha" = 0.05),
+                    output = long)
+
+  res
+
+  expect_equal(nrow(res$Statistics), 12)
+  expect_equal(ncol(res$Statistics), 3)
+
+
+  res <- proc_ttest(cls,
+                    var = c("Height"),
+                    by = Sex,
+                    options = c("h0" = 65, "alpha" = 0.05),
+                    output = c("out", "report"))
+
+  res
+
+  expect_equal(names(res), c("out", "report"))
+  expect_equal(nrow(res$out$Statistics), 2)
+  expect_equal(nrow(res$report$`Sex=F`$Statistics), 1)
+
+
 
 
 })
 
+
+test_that("ttest17: Multiple variables work with shaping options", {
+
+  res <- proc_ttest(cls,
+                    var = c("Height", "Weight"),
+                    #by = Sex,
+                    options = c("h0" = 65, "alpha" = 0.05),
+                    output = out) #v(out, report, wide))
+
+  res
+
+  expect_equal(nrow(res$Statistics), 2)
+  expect_equal(ncol(res$Statistics), 7)
+  expect_equal(res$Statistics$VAR[1], "Height")
+  expect_equal(res$Statistics$VAR[2], "Weight")
+
+
+
+  res <- proc_ttest(cls,
+                    var = c("Height", "Weight"),
+                    by = Sex,
+                    options = c("h0" = 65, "alpha" = 0.05),
+                    output = out) #v(out, report, wide))
+
+  res
+
+  expect_equal(nrow(res$Statistics), 4)
+  expect_equal(ncol(res$Statistics), 8)
+  expect_equal(res$Statistics$VAR[1], "Height")
+  expect_equal(res$Statistics$VAR[2], "Weight")
+
+
+
+  res <- proc_ttest(cls,
+                    var = c("Height", "Weight"),
+                    by = Sex,
+                    options = c("h0" = 65, "alpha" = 0.05),
+                    output = c("out", "stacked"))
+
+  res
+
+  expect_equal(nrow(res$Statistics), 24)
+
+
+  res <- proc_ttest(cls,
+                    var = c("Height", "Weight"),
+                    by = Sex,
+                    options = c("h0" = 65, "alpha" = 0.05),
+                    output = c("out", "long"))
+
+  res
+
+  expect_equal(nrow(res$Statistics), 12)
+
+})
+
+
+
+test_that("ttest18: Two by variables one var works.", {
+
+  # proc ttest data=sashelp.class
+  # h0=65 /* Null hypothesis mean of 65 */
+  #   alpha=0.05;  /* Significance level of 0.05 */
+  #   var height; /* Specify the variable to test */
+  #   by sex;
+  #   run;
+
+
+  res <- proc_ttest(cls,
+                    var = c("Height"), by = c("region", "Sex"),
+                    options = c("h0" = 65, "alpha" = 0.05),
+                    titles = "My first Frequency Table")
+
+  res
+
+  expect_equal(is.null(res), FALSE)
+  expect_equal(length(res), 3)
+  expect_equal(nrow(res$Statistics), 4)
+  expect_equal(all(c("BY1", "BY2") %in% names(res$Statistics)), TRUE)
+
+
+  # Test report
+  res <- proc_ttest(cls,
+                    var = c("Height"), by = c("region", "Sex"), output = "report",
+                    options = c("h0" = 65, "alpha" = 0.05),
+                    titles = "My first Frequency Table")
+
+  res
+
+  expect_equal(is.null(res), FALSE)
+  # expect_equal(length(res), 3)
+  # expect_equal(nrow(res$Statistics), 4)
+  # expect_equal(all(c("BY1", "BY2") %in% names(res$Statistics)), TRUE)
+
+
+})
+
+
+test_that("ttest19: One by variable two vars works.", {
+
+  # proc ttest data=sashelp.class
+  # h0=65 /* Null hypothesis mean of 65 */
+  #   alpha=0.05;  /* Significance level of 0.05 */
+  #   var height; /* Specify the variable to test */
+  #   by sex;
+  #   run;
+
+
+  res <- proc_ttest(cls,
+                    var = c("Height", "Weight"), by = c("Sex"),
+                    options = c("h0" = 65, "alpha" = 0.05))
+
+  res
+
+  expect_equal(is.null(res), FALSE)
+  expect_equal(length(res), 3)
+  expect_equal(nrow(res$Statistics), 4)
+  expect_equal(all(c("BY") %in% names(res$Statistics)), TRUE)
+
+
+  res <- proc_ttest(cls,
+                    var = c("Height", "Weight"), by = c("Sex"), output = report,
+                    options = c("h0" = 65, "alpha" = 0.05))
+
+  res
+
+  expect_equal(is.null(res), FALSE)
+  expect_equal(length(res), 2)
+  expect_equal(nrow(res[[1]][[1]]), 1)
+
+})
+
+test_that("ttest20: Two by variables two vars works.", {
+
+  # proc ttest data=sashelp.class
+  # h0=65 /* Null hypothesis mean of 65 */
+  #   alpha=0.05;  /* Significance level of 0.05 */
+  #   var height; /* Specify the variable to test */
+  #   by sex;
+  #   run;
+
+
+  res <- proc_ttest(cls,
+                    var = c("Height", "Weight"), by = c("region", "Sex"),
+                    options = c("h0" = 65, "alpha" = 0.05),
+                    titles = "My first Frequency Table")
+
+
+  res
+
+  expect_equal(length(res), 3)
+  expect_equal(nrow(res$Statistics), 8)
+
+  res <- proc_ttest(cls,
+                    var = c("Height", "Weight"), by = c("region", "Sex"),
+                    options = c("h0" = 65, "alpha" = 0.05), output = report,
+                    titles = "My first Frequency Table")
+
+
+  res
+
+  expect_equal(length(res), 4)
+  expect_equal(nrow(res[[1]][[1]]), 1)
+
+})

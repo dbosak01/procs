@@ -82,7 +82,7 @@ get_breaks <- function(var1) {
 }
 
 
-#' @import ggplot2
+# @import ggplot2
 gen_qqplot <- function(var1, var2 = NULL) {
 
   # lblX <- names(var1)

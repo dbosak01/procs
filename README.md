@@ -13,8 +13,8 @@
 <img src='man/images/procs_new.png' align="left" height="138px" style="margin-right:10px;height:138px"/>
 
 The purpose of the **procs** package is to recreate commonly used SAS® 
-procedures in R.  The first version of the package will attempt to simulate
-PROC FREQ and PROC MEANS. 
+procedures in R.  This version of the package will attempt to simulate
+PROC FREQ, PROC MEANS, and PROC TTEST. 
 Subsequent versions of the package will add more statistical procedures.  
 
 The package will also include a conceptual reproduction of PROC TRANSPOSE,
