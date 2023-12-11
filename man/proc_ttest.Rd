@@ -20,14 +20,18 @@ proc_ttest(
 \item{data}{The input data frame for which to calculate summary statistics.
 This parameter is required.}
 
-\item{var}{The variable to by used for hypothesis testing.  If the \code{class}
+\item{var}{The variable or variables to be used for hypothesis testing.
+If the \code{class}
 variable is specified, the function will compare the two groups identified
 in the class variable.  If the \code{class} variable is not specified,
-enter the baseline hypothesis value on the "h0" option.}
+enter the baseline hypothesis value on the "h0" option.  Default "h0" value
+is zero (0).  To test multiple variables, pass as a vector:
+\code{var = c("var1", "var2")}.}
 
-\item{paired}{A pair of variables to perform a T-Test on.  Variables should
+\item{paired}{A vector of paired variables to perform a T-Test on.  Variables should
 be separated by a star (*).  The entire string should be quoted, for example,
-\code{paired = "var1 * var2"}.}
+\code{paired = "var1 * var2"}.  To test multiple pairs, place in a vector
+as so: \code{paired = c("var1 * var2", "var3 * var4")}.}
 
 \item{output}{Whether or not to return datasets from the function. Valid
 values are "out", "none", and "report".  Default is "out", and will

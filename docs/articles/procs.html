@@ -320,7 +320,18 @@ the stimulus measures:</p>
 <span><span class="va">res</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/proc_ttest.html">proc_ttest</a></span><span class="op">(</span><span class="va">pressure</span>, paired <span class="op">=</span> <span class="st">"SBPbefore * SBPafter"</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># View results</span></span>
-<span><span class="va">res</span></span></code></pre></div>
+<span><span class="va">res</span></span>
+<span><span class="co"># $Statistics</span></span>
+<span><span class="co">#                  VAR  N      MEAN      STD   STDERR MIN MAX</span></span>
+<span><span class="co"># 1 SBPbefore-SBPafter 12 -1.833333 5.828353 1.682501  -9   8</span></span>
+<span><span class="co"># </span></span>
+<span><span class="co"># $ConfLimits</span></span>
+<span><span class="co">#                  VAR      MEAN      LCLM     UCLM      STD</span></span>
+<span><span class="co"># 1 SBPbefore-SBPafter -1.833333 -5.536492 1.869825 5.828353</span></span>
+<span><span class="co"># </span></span>
+<span><span class="co"># $TTests</span></span>
+<span><span class="co">#                  VAR DF         T     PROBT</span></span>
+<span><span class="co"># 1 SBPbefore-SBPafter 11 -1.089648 0.2991635</span></span></code></pre></div>
 <p>If printing is enabled, the following is sent to the viewer:</p>
 <p><img src="../man/images/ttest.png"></p>
 <p>The above test shows although there was a change before and after the

@@ -823,3 +823,19 @@ copy_df_attributes <- function(src, trgt) {
 
   return(ret)
 }
+
+
+get_ttest_type <- function(txt) {
+
+  ret <- txt
+  if (length(grep(":", txt, fixed = TRUE)) > 0) {
+
+    pos <- unlist(gregexpr(':', txt, fixed = TRUE))[1]
+    ret <- substring(txt, pos + 1)
+
+  }
+
+
+  return(ret)
+
+}

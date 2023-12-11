@@ -734,3 +734,90 @@ test_that("ttest20: Two by variables two vars works.", {
   expect_equal(nrow(res[[1]][[1]]), 1)
 
 })
+
+
+test_that("ttest21: proc_ttest with two paired variables works.", {
+
+  # data PairedData;
+  # input subject_id before_measure after_measure region $9;
+  # datalines;
+  # 1 12 15 A
+  # 2 14 16 A
+  # 3 10 11 A
+  # 4 15 18 A
+  # 5 18 20 A
+  # 6 20 22 B
+  # 7 11 12 B
+  # 8 13 14 B
+  # 9 16 17 B
+  # 10 9 13 B
+  # ;
+  # run;
+  #
+  # proc ttest data=PairedData;
+  # paired before_measure * after_measure after_measure * before_measure;
+  # run;
+
+  res <- proc_ttest(paird,
+                    paired = c("before_measure * after_measure",
+                               "after_measure * before_measure"),
+                    options = c(alpha = .1)
+                    )
+
+  res
+
+  expect_equal(is.null(res), FALSE)
+  expect_equal(length(res), 3)
+  expect_equal(nrow(res$Statistics), 2)
+
+
+  res <- proc_ttest(paird,
+                    paired = c("before_measure * after_measure",
+                               "after_measure * before_measure"),
+                    by = region,
+                    options = c(alpha = .1)
+  )
+
+
+  res
+
+  expect_equal(is.null(res), FALSE)
+  expect_equal(length(res), 3)
+  expect_equal(nrow(res$Statistics), 4)
+
+})
+
+
+test_that("ttest22: proc_ttest with two vars and class works.", {
+
+  # proc ttest data=sashelp.class alpha=0.05;
+  # class sex /* Grouping Variable */;
+  # var height;
+  # run;
+
+  res <- proc_ttest(cls,
+                    var = c("Height", "Weight"),
+                    class = "Sex",
+                   # options = "noprint",
+                    output = "report")
+
+  res
+
+  expect_equal(is.null(res), FALSE)
+  expect_equal(length(res), 8)
+  expect_equal(nrow(res$`Height:Statistics`), 4)
+
+
+  res <- proc_ttest(cls,
+                    var = c("Height", "Weight"),
+                    class = "Sex",
+                    output = "out")
+
+  res
+
+  expect_equal(is.null(res), FALSE)
+  expect_equal(length(res), 4)
+  expect_equal(nrow(res$Statistics), 8)
+
+})
+

@@ -100,13 +100,17 @@
 #'
 #' @param data The input data frame for which to calculate summary statistics.
 #' This parameter is required.
-#' @param var The variable to by used for hypothesis testing.  If the \code{class}
+#' @param var The variable or variables to be used for hypothesis testing.
+#' If the \code{class}
 #' variable is specified, the function will compare the two groups identified
 #' in the class variable.  If the \code{class} variable is not specified,
-#' enter the baseline hypothesis value on the "h0" option.
-#' @param paired A pair of variables to perform a T-Test on.  Variables should
+#' enter the baseline hypothesis value on the "h0" option.  Default "h0" value
+#' is zero (0).  To test multiple variables, pass as a vector:
+#' \code{var = c("var1", "var2")}.
+#' @param paired A vector of paired variables to perform a T-Test on.  Variables should
 #' be separated by a star (*).  The entire string should be quoted, for example,
-#' \code{paired = "var1 * var2"}.
+#' \code{paired = "var1 * var2"}.  To test multiple pairs, place in a vector
+#' as so: \code{paired = c("var1 * var2", "var3 * var4")}.
 #' @param output Whether or not to return datasets from the function. Valid
 #' values are "out", "none", and "report".  Default is "out", and will
 #' produce dataset output specifically designed for programmatic use. The "none"
@@ -505,21 +509,51 @@ get_output_specs_ttest <- function(data, var, paired, class, opts, output,
   } else if (!is.null(class)) {
 
 
-    stats <- c("n", "mean", "std", "stderr", "min", "max")
+    if (report == TRUE) {
+
+      stats <- c("n", "mean", "std", "stderr", "min", "max")
+
+      for (vr in var) {
+
+        vlbl <- ""
+        if (length(var) > 1)
+          vlbl <- paste0(vr, ":")
+
+        spcs[[paste0(vlbl, "Statistics")]] <- out_spec(var = vr, stats = stats, shape = "wide",
+                                         type = FALSE, freq = FALSE, report = report)
+
+        spcs[[paste0(vlbl, "ConfLimits")]] <- out_spec(var = vr, stats = c("mean", "clm", "std"), shape = "wide",
+                                         types = FALSE, freq = FALSE, report = report)
+
+        spcs[[paste0(vlbl, "TTests")]] <- out_spec(stats = c("df", "t", "probt"),
+                                     shape = "wide",
+                                     type = FALSE, freq = FALSE,
+                                     var = vr, report = report)
+
+        spcs[[paste0(vlbl, "Equality")]] <- out_spec(stats = "dummy", var = vr, types = FALSE, freq = FALSE)
+
+      }
+
+    } else {
+
+      stats <- c("n", "mean", "std", "stderr", "min", "max")
 
 
-    spcs[["Statistics"]] <- out_spec(var = var, stats = stats, shape = "wide",
-                                     type = FALSE, freq = FALSE, report = report)
+      spcs[["Statistics"]] <- out_spec(var = var, stats = stats, shape = "wide",
+                                       type = FALSE, freq = FALSE, report = report)
 
-    spcs[["ConfLimits"]] <- out_spec(var = var, stats = c("mean", "clm", "std"), shape = "wide",
-                                     types = FALSE, freq = FALSE, report = report)
+      spcs[["ConfLimits"]] <- out_spec(var = var, stats = c("mean", "clm", "std"), shape = "wide",
+                                       types = FALSE, freq = FALSE, report = report)
 
-    spcs[["TTests"]] <- out_spec(stats = c("df", "t", "probt"),
-                                 shape = "wide",
-                                 type = FALSE, freq = FALSE,
-                                 var = var, report = report)
+      spcs[["TTests"]] <- out_spec(stats = c("df", "t", "probt"),
+                                   shape = "wide",
+                                   type = FALSE, freq = FALSE,
+                                   var = var, report = report)
 
-    spcs[["Equality"]] <- out_spec(stats = "dummy", var = var, types = FALSE, freq = FALSE)
+      spcs[["Equality"]] <- out_spec(stats = "dummy", var = var, types = FALSE, freq = FALSE)
+
+
+    }
 
 
   } else if (is.null(paired) & !is.null(var) & is.null(class)) {
@@ -594,29 +628,89 @@ get_output_specs_ttest <- function(data, var, paired, class, opts, output,
 
   } else if (!is.null(paired)) {
 
-    splt <- trimws(strsplit(paired, "*", fixed = TRUE)[[1]])
-    v1 <- splt[1]
-    v2 <- splt[2]
+    if (report == TRUE) {
+      for (i in seq_len(length(paired))) {
 
-    dat[["..diff"]] <- dat[[v1]] - dat[[v2]]
+        pr <- paired[i]
 
-    vr <- paste0(v1, "-", v2)
+        splt <- trimws(strsplit(pr, "*", fixed = TRUE)[[1]])
+        v1 <- splt[1]
+        v2 <- splt[2]
 
-    stats <- c("n", "mean", "std", "stderr", "min", "max")
+        vnm <- paste0("..diff", i)
 
-    spcs[["Statistics"]] <- out_spec(stats = stats, shape = "wide",
+        if (report == TRUE)
+          lnm <- paste0("diff", i, ":")
+        else
+          lnm <- ""
+
+        dat[[vnm]] <- dat[[v1]] - dat[[v2]]
+
+        vr <- paste0(v1, "-", v2)
+
+        stats <- c("n", "mean", "std", "stderr", "min", "max")
+
+        spcs[[paste0(lnm, "Statistics")]] <- out_spec(stats = stats, shape = "wide",
+                                         type = FALSE, freq = FALSE,
+                                         var = vnm, report = report, varlbl = vr)
+
+        spcs[[paste0(lnm, "ConfLimits")]] <- out_spec(stats = c("mean", "clm", "std"), shape = "wide",
+                                         types = FALSE, freq = FALSE, var = vnm,
+                                         varlbl = vr, report = report)
+
+        spcs[[paste0(lnm, "TTests")]] <- out_spec(stats = c("df", "t", "probt"),
+                                     shape = "wide",
                                      type = FALSE, freq = FALSE,
-                                     var = "..diff", report = report, varlbl = vr)
+                                     var = vnm, varlbl = vr,
+                                     report = report)
 
-    spcs[["ConfLimits"]] <- out_spec(stats = c("mean", "clm", "std"), shape = "wide",
-                                     types = FALSE, freq = FALSE, var = "..diff",
-                                     varlbl = vr, report = report)
+      }
 
-    spcs[["TTests"]] <- out_spec(stats = c("df", "t", "probt"),
-                                 shape = "wide",
-                                 type = FALSE, freq = FALSE,
-                                 var = "..diff", varlbl = vr,
-                                 report = report)
+    } else {
+
+
+      vrs <- c()
+      vlbls <- c()
+      for (i in seq_len(length(paired))) {
+
+        pr <- paired[i]
+
+        splt <- trimws(strsplit(pr, "*", fixed = TRUE)[[1]])
+        v1 <- splt[1]
+        v2 <- splt[2]
+
+        vnm <- paste0("..diff", i)
+
+        dat[[vnm]] <- dat[[v1]] - dat[[v2]]
+
+        vrs[i] <- vnm
+        vlbls[i] <- paste0(v1, "-", v2)
+
+      }
+
+        stats <- c("n", "mean", "std", "stderr", "min", "max")
+
+        spcs[["Statistics"]] <- out_spec(stats = stats, shape = "wide",
+                                                      type = FALSE, freq = FALSE,
+                                                      var = vrs,
+                                                      varlbl = vlbls,
+                                                      report = report)
+
+        spcs[["ConfLimits"]] <- out_spec(stats = c("mean", "clm", "std"), shape = "wide",
+                                                      types = FALSE, freq = FALSE, var = vrs,
+                                                      varlbl = vlbls,
+                                                      report = report)
+
+        spcs[["TTests"]] <- out_spec(stats = c("df", "t", "probt"),
+                                                  shape = "wide",
+                                                  type = FALSE, freq = FALSE,
+                                                  var = vrs,
+                                                  varlbl = vlbls,
+                                                  report = report)
+
+
+
+    }
 
 
   } else {
@@ -883,19 +977,21 @@ gen_report_ttest <- function(data,
       dt <- dtlst[[j]]
       bynm <- "main"
 
-      # Get class-level t-tests
-      if (!is.null(class)) {
-
-        ctbl <- get_class_ttest(dt, var, class, TRUE, opts)
-      }
-
       for (i in seq_len(length(outreq))) {
 
         outp <- outreq[[i]]
         nm <- nms[i]
+        tnm <- get_ttest_type(nm)
+
+
+        # Get class-level t-tests
+        if (!is.null(class)) {
+
+          ctbl <- get_class_ttest(dt, outp$var, class, TRUE, opts)
+        }
 
         if (is.null(class) ||
-            (!is.null(class) && nm %in% c("Statistics", "ConfLimits"))) {
+           (!is.null(class) && tnm %in% c("Statistics", "ConfLimits"))) {   # Fix this
 
           # data, var, class, outp, freq = TRUE,
           # type = NULL, byvals = NULL
@@ -907,22 +1003,28 @@ gen_report_ttest <- function(data,
           # Add in class-level tests if needed
           if (!is.null(class)) {
 
-            smtbl <- add_class_ttest(smtbl, ctbl[[nm]])
+            smtbl <- add_class_ttest(smtbl, ctbl[[tnm]])
           }
 
         } else if (!is.null(class)) {
 
           # Add extra tests for class comparison
-          smtbl <- ctbl[[nm]]
+          smtbl <- ctbl[[tnm]]
 
         }
 
-        if (length(grep("Statistics", nm, fixed = TRUE)) > 0) {
+        if (tnm == "Statistics") {
 
-          if (!is.null(outp$varlbl))
-            attr(smtbl, "ttls") <- paste0("Variable: ", outp$varlbl)
-          else
+          if (!is.null(outp$varlbl)) {
+            if (!is.null(paired)) {
+              attr(smtbl, "ttls") <- paste0("Difference: ", outp$varlbl)
+            } else {
+              attr(smtbl, "ttls") <- paste0("Variable: ", outp$varlbl)
+            }
+
+          } else {
             attr(smtbl, "ttls") <- paste0("Variable: ", outp$var)
+          }
         }
 
 
@@ -935,7 +1037,7 @@ gen_report_ttest <- function(data,
 
           bynm <-  bylbls[j]
 
-          if (length(grep("Statistics", nm, fixed = TRUE)) > 0) {
+          if (tnm == "Statistics") {
 
             attr(smtbl, "ttls") <- c(attr(smtbl, "ttls"), bynm)
 
@@ -1172,33 +1274,36 @@ gen_output_ttest <- function(data,
 
         if (!is.null(class)) {
 
+          for (vr in outp$var) {
 
-          tmpcls <- get_class_output(dat, var = outp$var,
-                                     class = class, outp = outp,
-                                     freq = outp$parameters$freq,
-                                     type = outp$parameters$type,
-                                     byvals = bynm, opts = opts,
-                                     stats = outp$stats)
+            tmpcls <- get_class_output(dat, var = vr,
+                                       class = class, outp = outp,
+                                       freq = outp$parameters$freq,
+                                       type = outp$parameters$type,
+                                       byvals = bynm, opts = opts,
+                                       stats = outp$stats)
 
-          # Get class-level t-tests
-          ctbl <- get_class_ttest(dat, var, class, FALSE, opts,
-                                  byvar = by, byval = bynm)
+            # Get class-level t-tests
+            ctbl <- get_class_ttest(dat, vr, class, FALSE, opts,
+                                    byvar = by, byval = bynm)
 
 
-          if (nm %in% c("Statistics", "ConfLimits")) {
+            if (nm %in% c("Statistics", "ConfLimits")) {
 
-            tmpcls <- add_class_ttest(tmpcls, ctbl[[nm]])
+              tmpcls <- add_class_ttest(tmpcls, ctbl[[nm]])
 
-          } else {
+            } else {
 
-            tmpcls <- ctbl[[nm]]
+              tmpcls <- ctbl[[nm]]
+            }
+
+
+            if (is.null(tmpres))
+              tmpres <- tmpcls
+            else
+              tmpres <- rbind(tmpres, tmpcls)
+
           }
-
-
-          if (is.null(tmpres))
-            tmpres <- tmpcls
-          else
-            tmpres <- rbind(tmpres, tmpcls)
 
         }
       }
@@ -1240,7 +1345,7 @@ gen_output_ttest <- function(data,
       }
 
       # Replace VAR value
-      if (!is.null(var) | !is.null(paired)) {
+      if ((!is.null(var) && is.null(class)) | !is.null(paired)) {
         if ("VAR" %in% names(tmpres)) {
           if (!is.null(outp$varlbl))
             tmpres[["VAR"]] <- outp$varlbl

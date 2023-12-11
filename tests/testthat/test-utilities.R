@@ -595,6 +595,24 @@ test_that("utils17: get_maxdec() option works as expected.", {
 })
 
 
+test_that("utils18: get_ttest_type() works as expected.", {
+
+
+  res <- get_ttest_type("Myvar:Statistics")
+
+  res
+
+  expect_equal(res, "Statistics")
+
+
+
+  res <- get_ttest_type("Statistics")
+
+  res
+
+  expect_equal(res, "Statistics")
+
+})
 
 
 #

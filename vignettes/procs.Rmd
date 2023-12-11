@@ -219,6 +219,17 @@ res <- proc_ttest(pressure, paired = "SBPbefore * SBPafter")
 
 # View results
 res
+# $Statistics
+#                  VAR  N      MEAN      STD   STDERR MIN MAX
+# 1 SBPbefore-SBPafter 12 -1.833333 5.828353 1.682501  -9   8
+# 
+# $ConfLimits
+#                  VAR      MEAN      LCLM     UCLM      STD
+# 1 SBPbefore-SBPafter -1.833333 -5.536492 1.869825 5.828353
+# 
+# $TTests
+#                  VAR DF         T     PROBT
+# 1 SBPbefore-SBPafter 11 -1.089648 0.2991635
 
 ```
 If printing is enabled, the following is sent to the viewer:
