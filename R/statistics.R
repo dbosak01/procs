@@ -169,6 +169,7 @@ get_clm <- function(x, narm = TRUE, alpha = 0.05, onesided = FALSE) {
   return(res)
 }
 
+
 #' @noRd
 get_clmstd <- function(x, narm = TRUE, alpha = 0.05, onesided = FALSE) {
 
@@ -176,26 +177,31 @@ get_clmstd <- function(x, narm = TRUE, alpha = 0.05, onesided = FALSE) {
     alpha <- as.numeric(alpha)
 
   if (onesided) {
-    alp <- 1 - alpha
+    alp <- alpha
   } else {
-    alp <- 1 - (alpha / 2)
+    alp <- alpha / 2
   }
 
-  #Sample size
-  n <- sum(!is.na(x), na.rm = narm)
+  # Remove NA
+  if (narm)
+    x <- na.omit(x)
 
-  # Sample mean weight
-  xbar <- mean(x, na.rm = narm)
+  # Calculate variance
+  x.var <- var(x)
 
-  # Sample standard deviation
-  std <- sd(x, na.rm = narm)
+  # Degrees of freedom
+  df <- length(x) - 1L
 
-  # Margin of error
-  margin <- qt(alp,df=n-1)*std/sqrt(n)
+  # Calculate chisq for upper and lower cl
+  crit.low <- qchisq(alp, df = df, lower.tail = FALSE)
+  crit.upp <- qchisq(alp, df = df, lower.tail = TRUE)
+
+  # Take square root
+  ci <- sqrt(c(low = df*x.var / crit.low, upp = df*x.var / crit.upp))
 
   # Lower and upper confidence interval boundaries
-  res <- c(ucl = xbar + margin,
-           lcl = xbar - margin,
+  res <- c(ucl = ci[["upp"]],
+           lcl = ci[["low"]],
            alpha = alpha)
 
   return(res)

@@ -312,6 +312,31 @@ test_that("stat14: get_kurtosis() works as expected.", {
 })
 
 
+
+# A test for confidence limits of standard deviation
+test_that("stat15: get_clmstd() works as expected.", {
+
+  ht <- c(69.0, 56.5, 65.3, 62.8, 63.5, 57.3, 59.8, 62.5, 62.5, 59.0,
+          51.3, 64.3, 56.3, 66.5, 72.0, 64.8, 67.0, 57.5, 66.5)
+
+  # Target
+  # STD     95% LCM   95% UCM
+  # 5.1271	3.8741	7.5820
+
+  res <- get_clmstd(ht)
+
+
+  res
+
+  expect_equal(res[["lcl"]], 3.8740828)
+  expect_equal(res[["ucl"]], 7.5820447)
+
+})
+
+
+
+
+
 # Matches SAS?
 # test_that("stat10: cmh works no weight uncorrected", {
 #

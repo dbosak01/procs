@@ -879,6 +879,19 @@ get_summaries <- function(data, var, stats, missing = FALSE,
           }
         }
 
+        if (st == "clmstd") {
+
+          alph <- get_alpha(opts)
+
+          tmp <- get_clmstd(var, narm, alph)
+
+          rw[["LCLMSTD"]] <- tmp[["lcl"]]
+
+          rw[["UCLMSTD"]] <- tmp[["ucl"]]
+
+
+        }
+
         if (st == "t") {
 
           alph <- get_alpha(opts)
@@ -1111,7 +1124,9 @@ mlbls <- list(MEAN = "Mean", STD = "Std Dev", MEDIAN = "Median", MIN = "Minimum"
               P40 = "40th Pctl", P50 = "50th Pctl", P60 = "60th Pctl",
               P70 = "70th Pctl", P75 = "75th Pctl", P80 = "80th Pctl",
               P90 = "90th Pctl", P95 = "95th Pctl", P99 = "99th Pctl",
-              Q1 = "Lower Quartile", Q3 = "Upper Quartile"
+              Q1 = "Lower Quartile", Q3 = "Upper Quartile",
+              UCLMSTD = "Upper %s%% CL for Std Dev",
+              LCLMSTD = "Lower %s%% CL for Std Dev"
               )
 
 #' @import common
@@ -1132,6 +1147,8 @@ gen_report_means <- function(data,
   alph <- (1 - get_alpha(opts)) * 100
   mlbls[["UCLM"]] <- sprintf(mlbls[["UCLM"]], alph)
   mlbls[["LCLM"]] <- sprintf(mlbls[["LCLM"]], alph)
+  mlbls[["UCLMSTD"]] <- sprintf(mlbls[["UCLMSTD"]], alph)
+  mlbls[["LCLMSTD"]] <- sprintf(mlbls[["LCLMSTD"]], alph)
 
   #browser()
 

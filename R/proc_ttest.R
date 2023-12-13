@@ -483,7 +483,8 @@ tlbls <- c(METHOD = "Method", VARIANCES = "Variances", NDF = "Num DF", DDF = "De
 ttest_fc <- fcat(N = "%d", MEAN = "%.4f", STD = "%.4f", STDERR = "%.4f",
                  MIN = "%.4f", MAX = "%.4f", UCLM = "%.4f", LCLM = "%.4f",
                  DF = "%.3f", "T" = "%.2f", PROBT = "%.4f", NDF = "%.3f", DDF = "%.3f",
-                 FVAL = "%.2f", PROBF = "%.4f", log = FALSE)
+                 FVAL = "%.2f", PROBF = "%.4f", UCLMSTD = "%.4f", LCLMSTD = "%.4f",
+                 log = FALSE)
 
 get_output_specs_ttest <- function(data, var, paired, class, opts, output,
                                    report = FALSE) {
@@ -522,7 +523,7 @@ get_output_specs_ttest <- function(data, var, paired, class, opts, output,
         spcs[[paste0(vlbl, "Statistics")]] <- out_spec(var = vr, stats = stats, shape = "wide",
                                          type = FALSE, freq = FALSE, report = report)
 
-        spcs[[paste0(vlbl, "ConfLimits")]] <- out_spec(var = vr, stats = c("mean", "clm", "std"), shape = "wide",
+        spcs[[paste0(vlbl, "ConfLimits")]] <- out_spec(var = vr, stats = c("mean", "clm", "std", "clmstd"), shape = "wide",
                                          types = FALSE, freq = FALSE, report = report)
 
         spcs[[paste0(vlbl, "TTests")]] <- out_spec(stats = c("df", "t", "probt"),
@@ -536,21 +537,30 @@ get_output_specs_ttest <- function(data, var, paired, class, opts, output,
 
     } else {
 
+      shp <- "wide"
+      if (!is.null(output)) {
+        if ("long" %in% output)
+          shp <- "long"
+        else if ("stacked" %in% output)
+          shp <- "stacked"
+
+      }
+
       stats <- c("n", "mean", "std", "stderr", "min", "max")
 
 
-      spcs[["Statistics"]] <- out_spec(var = var, stats = stats, shape = "wide",
+      spcs[["Statistics"]] <- out_spec(var = var, stats = stats, shape = shp,
                                        type = FALSE, freq = FALSE, report = report)
 
-      spcs[["ConfLimits"]] <- out_spec(var = var, stats = c("mean", "clm", "std"), shape = "wide",
+      spcs[["ConfLimits"]] <- out_spec(var = var, stats = c("mean", "clm", "std", "clmstd"), shape = shp,
                                        types = FALSE, freq = FALSE, report = report)
 
       spcs[["TTests"]] <- out_spec(stats = c("df", "t", "probt"),
-                                   shape = "wide",
+                                   shape = shp,
                                    type = FALSE, freq = FALSE,
                                    var = var, report = report)
 
-      spcs[["Equality"]] <- out_spec(stats = "dummy", var = var, types = FALSE, freq = FALSE)
+      spcs[["Equality"]] <- out_spec(stats = "dummy", var = var, types = FALSE, freq = FALSE, shape = shp)
 
 
     }
@@ -584,7 +594,7 @@ get_output_specs_ttest <- function(data, var, paired, class, opts, output,
                                                    var = var, format = "%.4f",
                                        report = report)
 
-      spcs[["ConfLimits"]] <- out_spec(stats = c("mean", "clm", "std"), shape = shp,
+      spcs[["ConfLimits"]] <- out_spec(stats = c("mean", "clm", "std", "clmstd"), shape = shp,
                                                    types = FALSE, freq = FALSE,
                                        var = var, report = report)
 
@@ -611,7 +621,7 @@ get_output_specs_ttest <- function(data, var, paired, class, opts, output,
                                              type = FALSE, freq = FALSE,
                                              var = vr, format = "%.4f", report = report)
 
-        spcs[[paste0(vn, "ConfLimits")]] <- out_spec(stats = c("mean", "clm", "std"), shape = shp,
+        spcs[[paste0(vn, "ConfLimits")]] <- out_spec(stats = c("mean", "clm", "std", "clmstd"), shape = shp,
                                          types = FALSE, freq = FALSE, var = vr, report = report)
 
         spcs[[paste0(vn, "TTests")]] <- out_spec(stats = c("df", "t", "probt"),
@@ -773,7 +783,7 @@ get_output_specs_ttest <- function(data, var, paired, class, opts, output,
 #' @import sasLM
 #' @import common
 get_class_ttest <- function(data, var, class, report = TRUE, opts = NULL,
-                            byvar = NULL, byval = NULL) {
+                            byvar = NULL, byval = NULL, shape = NULL) {
 
   ret <- list()
 
@@ -866,7 +876,15 @@ get_class_ttest <- function(data, var, class, report = TRUE, opts = NULL,
 
     }
 
+    if (!is.null(shape)) {
+      ret[["Statistics"]] <- shape_ttest_data(ret[["Statistics"]], shape = shape)
 
+      ret[["ConfLimits"]] <- shape_ttest_data(ret[["ConfLimits"]], shape = shape)
+
+      ret[["TTests"]] <- shape_ttest_data(ret[["TTests"]], shape = shape)
+
+      ret[["Equality"]] <- shape_ttest_data(ret[["Equality"]], shape = shape)
+    }
   }
 
   return(ret)
@@ -899,8 +917,55 @@ add_class_ttest <- function(rtbl, ctbl) {
   return(ret)
 }
 
-# ttret <- TTEST(cls[cls$Sex == 'F', "Height"], cls[cls$Sex == 'M', "Height"], .95)
+# Specifically for shaping results of get_class_ttest()
+shape_ttest_data <- function(ds, shape, copy = NULL) {
 
+  # Assumed to be wide
+  ret <- ds
+
+  if (!is.null(shape)) {
+    if (all(shape == "long")) {
+
+      bv <- c("CLASS", "METHOD")
+      if (!"CLASS" %in% names(ds))
+        bv <- "METHOD"
+
+      bnms <- find.names(ds, "BY*")
+      if (!is.null(bnms))
+        bv <- c(bnms, bv)
+
+      ret <- proc_transpose(ds, by = bv,
+                            name = "STAT", id = "VAR", copy = copy,
+                            log = FALSE)
+
+      # ret <- proc_transpose(ret, id = "VAR", name = "STAT",
+      #                       copy = copy, log = FALSE)
+
+
+    } else if (all(shape == "stacked")) {
+
+
+      bv <- c("VAR", "CLASS", "METHOD")
+      if (!"CLASS" %in% names(ds))
+        bv <- c("VAR", "METHOD")
+
+      ret <- proc_transpose(ds, by = bv, name = "STAT",
+                     copy = copy, log = FALSE)
+
+      # ret <- proc_transpose(ret, name = "STAT", by = "VAR",
+      #                       copy = copy, log = FALSE)
+
+      rnms <- names(ret)
+      rnms[rnms %in% "COL1"] <- "VALUES"
+
+      names(ret) <- rnms
+
+    }
+  }
+
+  return(ret)
+
+}
 
 # Drivers -----------------------------------------------------------------
 
@@ -932,6 +997,8 @@ gen_report_ttest <- function(data,
   alph <- (1 - get_alpha(opts)) * 100
   tlbls[["UCLM"]] <- sprintf(tlbls[["UCLM"]], alph)
   tlbls[["LCLM"]] <- sprintf(tlbls[["LCLM"]], alph)
+  tlbls[["UCLMSTD"]] <- sprintf(tlbls[["UCLMSTD"]], alph)
+  tlbls[["LCLMSTD"]] <- sprintf(tlbls[["LCLMSTD"]], alph)
 
   #browser()
 
@@ -1237,6 +1304,7 @@ gen_output_ttest <- function(data,
       }
 
       tmpres <- NULL
+      byres <- NULL
 
       for (j in seq_len(length(bdat))) {
 
@@ -1276,19 +1344,21 @@ gen_output_ttest <- function(data,
 
           for (vr in outp$var) {
 
-            tmpcls <- get_class_output(dat, var = vr,
-                                       class = class, outp = outp,
-                                       freq = outp$parameters$freq,
-                                       type = outp$parameters$type,
-                                       byvals = bynm, opts = opts,
-                                       stats = outp$stats)
-
             # Get class-level t-tests
             ctbl <- get_class_ttest(dat, vr, class, FALSE, opts,
-                                    byvar = by, byval = bynm)
+                                    byvar = by, byval = bynm,
+                                    shape = outp$shape)
 
 
             if (nm %in% c("Statistics", "ConfLimits")) {
+
+              # Get standard statistics
+              tmpcls <- get_class_output(dat, var = vr,
+                                         class = class, outp = outp,
+                                         freq = outp$parameters$freq,
+                                         type = outp$parameters$type,
+                                         byvals = bynm, opts = opts,
+                                         stats = outp$stats)
 
               tmpcls <- add_class_ttest(tmpcls, ctbl[[nm]])
 
@@ -1300,12 +1370,21 @@ gen_output_ttest <- function(data,
 
             if (is.null(tmpres))
               tmpres <- tmpcls
-            else
-              tmpres <- rbind(tmpres, tmpcls)
+            else {
+
+              if (outp$shape == "long")
+                tmpres[[vr]] <- tmpcls[[vr]]
+              else
+                tmpres <- rbind(tmpres, tmpcls)
+
+            }
 
           }
 
         }
+
+        # Need to capture by datasets. Getting overwritten each time around if there
+        # are multiple variables.
       }
 
 

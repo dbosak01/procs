@@ -819,5 +819,101 @@ test_that("ttest22: proc_ttest with two vars and class works.", {
   expect_equal(length(res), 4)
   expect_equal(nrow(res$Statistics), 8)
 
+  res <- proc_ttest(cls,
+                    var = c("Height", "Weight"),
+                    class = "Sex",
+                    output = "long")
+
+  res
+
+  expect_equal(is.null(res), FALSE)
+  expect_equal(length(res), 4)
+  expect_equal(nrow(res$Statistics), 16)
+
+
+  res <- proc_ttest(cls,
+                    var = c("Height", "Weight"),
+                    class = "Sex",
+                    output = "stacked")
+
+  res
+
+  expect_equal(is.null(res), FALSE)
+  expect_equal(length(res), 4)
+  expect_equal(nrow(res$Statistics), 32)
+  expect_equal(nrow(res$Equality), 8)
+
+
+
+  res <- proc_ttest(cls,
+                    var = c("Height", "Weight"),
+                    class = "Sex",
+                    by = "region",
+                    output = "out")
+
+  res
+
+  expect_equal(length(res), 4)
+  expect_equal(nrow(res$Statistics), 16)
+
+
+  # res <- proc_ttest(cls,
+  #                   var = c("Height", "Weight"),  # not working
+  #                   class = "Sex",
+  #                   by = "region",
+  #                   output = "long")
+  #
+  # res
+  #
+  # expect_equal(length(res), 4)
+  # expect_equal(nrow(res$Statistics), 16)
+  #
+  #
+  # res <- proc_ttest(cls,
+  #                   var = c("Height", "Weight"), # not working
+  #                   class = "Sex",
+  #                   output = "stacked")
+  #
+  # res
+  #
+  # expect_equal(is.null(res), FALSE)
+  # expect_equal(length(res), 4)
+  # expect_equal(nrow(res$Statistics), 32)
+  # expect_equal(nrow(res$Equality), 8)
+
+
+
+
 })
+
+
+test_that("ttest23: shape_ttest_data works as expected.", {
+
+
+  r1 <- proc_ttest(cls,
+                   var = c("Height", "Weight"),
+                   class = "Sex",
+                   output = "wide")
+
+
+  dat1 <- r1$Statistics[c(3, 4), ]
+
+
+  res1 <- shape_ttest_data(dat1, "long")
+
+  res1
+
+  expect_equal(nrow(res1), 12)
+
+
+  dat2 <- r1$Statistics[c(3, 4, 7, 8), ]
+
+  res2 <- shape_ttest_data(dat2, "stacked")
+
+  res2
+
+  expect_equal(nrow(res2), 24)
+
+})
+
 
