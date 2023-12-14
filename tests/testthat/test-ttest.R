@@ -857,29 +857,30 @@ test_that("ttest22: proc_ttest with two vars and class works.", {
   expect_equal(nrow(res$Statistics), 16)
 
 
-  # res <- proc_ttest(cls,
-  #                   var = c("Height", "Weight"),  # not working
-  #                   class = "Sex",
-  #                   by = "region",
-  #                   output = "long")
-  #
-  # res
-  #
-  # expect_equal(length(res), 4)
-  # expect_equal(nrow(res$Statistics), 16)
-  #
-  #
-  # res <- proc_ttest(cls,
-  #                   var = c("Height", "Weight"), # not working
-  #                   class = "Sex",
-  #                   output = "stacked")
-  #
-  # res
-  #
-  # expect_equal(is.null(res), FALSE)
-  # expect_equal(length(res), 4)
-  # expect_equal(nrow(res$Statistics), 32)
-  # expect_equal(nrow(res$Equality), 8)
+  res <- proc_ttest(cls,
+                    var = c("Height", "Weight"),
+                    class = "Sex",
+                    by = "region",
+                    output = "long")
+
+  res
+
+  expect_equal(length(res), 4)
+  expect_equal(nrow(res$Statistics), 32)
+
+
+  res <- proc_ttest(cls,
+                    var = c("Height", "Weight"),
+                    class = "Sex",
+                    by = "region",
+                    output = "stacked")
+
+  res
+
+  expect_equal(is.null(res), FALSE)
+  expect_equal(length(res), 4)
+  expect_equal(nrow(res$Statistics), 64)
+  expect_equal(nrow(res$Equality), 16)
 
 
 

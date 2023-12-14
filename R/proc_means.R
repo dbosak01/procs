@@ -1614,7 +1614,8 @@ get_class_output <- function(data, var, class, outp, freq = TRUE,
 
     if ("STAT" %in% names(res)) {
         # Sort stats by supplied order
-        res[["STAT"]] <- factor(res[["STAT"]], levels = toupper(stats))
+        # res[["STAT"]] <- factor(res[["STAT"]], levels = toupper(stats))  # stats not complete list
+        res[["STAT"]] <- factor(res[["STAT"]], levels = unique(res[["STAT"]]))
 
         # Deal with NA values in sort
         ccnms <- as.character(clsnms)

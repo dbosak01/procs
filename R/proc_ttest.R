@@ -949,6 +949,10 @@ shape_ttest_data <- function(ds, shape, copy = NULL) {
       if (!"CLASS" %in% names(ds))
         bv <- c("VAR", "METHOD")
 
+      bnms <- find.names(ds, "BY*")
+      if (!is.null(bnms))
+        bv <- c(bnms, bv)
+
       ret <- proc_transpose(ds, by = bv, name = "STAT",
                      copy = copy, log = FALSE)
 
@@ -1303,11 +1307,12 @@ gen_output_ttest <- function(data,
         names(bylbls) <- byn
       }
 
-      tmpres <- NULL
+
       byres <- NULL
 
       for (j in seq_len(length(bdat))) {
 
+        tmpres <- NULL
         dat <- bdat[[j]]
 
         # Deal with by variable values
@@ -1383,9 +1388,15 @@ gen_output_ttest <- function(data,
 
         }
 
-        # Need to capture by datasets. Getting overwritten each time around if there
-        # are multiple variables.
+        if (is.null(byres))
+          byres <- tmpres
+        else {
+          byres <- rbind(byres, tmpres)
+        }
       }
+
+      tmpres <- byres
+      byres <- NULL
 
 
       # System Labels
