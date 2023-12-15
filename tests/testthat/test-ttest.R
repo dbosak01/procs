@@ -811,12 +811,11 @@ test_that("ttest21: proc_ttest with two paired variables works.", {
 
   res <- proc_ttest(paird,
                     paired = c("before_measure * after_measure",
-                               "after_measure * before_measure"), # Need to fix VAR names
+                               "after_measure * before_measure"),
                     by = region,
                     options = c(alpha = .1),
                     output = long
   )
-
 
   res
 

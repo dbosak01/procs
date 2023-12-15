@@ -839,3 +839,60 @@ get_ttest_type <- function(txt) {
   return(ret)
 
 }
+
+
+# Function to split the paired parameter string and create
+# separate variables for VAR1, VAR2, and DIFF
+add_paired_vars <- function(dt, vlbl, shape) {
+
+  if (is.null(vlbl)) {
+
+    ret <- dt
+
+  } else {
+
+    if (shape %in% c("wide", "stacked")) {
+      nms <- names(dt)
+      slbl <- strsplit(vlbl, "-", fixed = TRUE)
+      pos <- match("VAR", nms)
+      ret <- dt
+
+      ret[["LBL"]] <- as.integer(sub("..diff", "", ret[["VAR"]], fixed = TRUE))
+      ret[["DIFF"]] <- ret[["VAR"]]
+      for (i in seq_len(nrow(ret))) {
+        lbl <- ret[["LBL"]][i]
+        ret[["VAR1"]][i] <- trimws(slbl[[lbl]][1])
+        ret[["VAR2"]][i] <- trimws(slbl[[lbl]][2])
+      }
+      ret[["VAR"]] <- NULL
+      ret[["LBL"]] <- NULL
+
+      # Rearrange df
+      prenms <- c()
+      if (pos > 1)
+        prenms <- nms[seq(1, pos - 1)]
+
+      postnms <- nms[seq(pos + 1, length(nms))]
+
+      nmv <- c(prenms, "VAR1", "VAR2", "DIFF", postnms)
+      ret <- ret[ , nmv]
+
+    } else if (shape == "long") {
+
+      nms <- names(dt)
+      rnms <- sub("..diff", "DIFF", nms, fixed = TRUE)
+      ret <- dt
+      names(ret) <- rnms
+
+
+    } else {
+
+      ret <- dt
+    }
+
+  }
+
+
+  return(ret)
+
+}

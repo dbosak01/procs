@@ -47,7 +47,7 @@
 #' be present to help with data manipulation.  For example, the by variable
 #' will always be named "BY".  In addition, data values in the
 #' output datasets are intentionally not rounded or formatted
-#' to give you the most accurate statistical results.
+#' to give you the most accurate numeric results.
 #'
 #' @section Options:
 #' The \code{proc_ttest} function recognizes the following options.  Options may
@@ -60,7 +60,8 @@
 #' \code{alpha = 0.1}.
 #' }
 #' \item{\strong{h0}: The "h0 =" option is used to set the baseline mean value
-#' for testing a single variable.  Pass the option as a name/value pair.
+#' for testing a single variable.  Pass the option as a name/value pair,
+#' such as \code{h0 = 95}.
 #' }
 #' \item{\strong{noprint}: Whether to print the interactive report to the
 #' viewer.  By default, the report is printed to the viewer. The "noprint"
@@ -68,11 +69,11 @@
 #' }
 #' }
 #' @section Data Shaping:
-#' The output dataset produced by the "out" keyword can be shaped
+#' The output datasets produced by the function can be shaped
 #' in different ways. These shaping options allow you to decide whether the
 #' data should be returned long and skinny, or short and wide. The shaping
 #' options can reduce the amount of data manipulation necessary to get the
-#' frequencies into the desired form. The
+#' data into the desired form. The
 #' shaping options are as follows:
 #' \itemize{
 #' \item{\strong{long}: Transposes the output datasets
@@ -87,6 +88,8 @@
 #' columns, and variables are in rows. This shaping option is the default.
 #' }
 #' }
+#' These shaping options are passed on the \code{output} parameter.  For example,
+#' to return the data in "long" form, use \code{output = "long"}.
 # @section Data Constraints:
 # Explain limits of data for each stat option.  Number of non-missing
 # values, etc.
@@ -139,10 +142,10 @@
 #' The "h0 = " option sets the baseline hypothosis value for single-variable
 #' hypothesis testing.  The "noprint" option turns off the interactive report.
 #' @param titles A vector of one or more titles to use for the report output.
-#' @return Normally, the requested summary statistics are shown interactively
-#' in the viewer, and output results are returned as a data frame.
-#' If the request produces multiple data frames, they will be returned in a list.
-#' You may then access individual datasets from the list.
+#' @return Normally, the requested T-Test statistics are shown interactively
+#' in the viewer, and output results are returned as a list of data frames.
+#' You may then access individual datasets from the list using dollar sign ($)
+#' syntax.
 #' The interactive report can be turned off using the "noprint" option, and
 #' the output datasets can be turned off using the "none" keyword on the
 #' \code{output} parameter.
@@ -206,21 +209,32 @@
 #' # 1 ..diff  9 4.062128 0.00283289
 #'
 #' # Example 3: T-Test using class parameter
-#' # res3 <- proc_ttest(sleep, var = "extra", class = "group")
+#' res3 <- proc_ttest(sleep, var = "extra", class = "group")
 #'
 #' # View results
-#' # res3
+#' res3
 #' # $Statistics
-#' # VAR  N MEAN      STD    STDERR MIN MAX
-#' # 1 ..diff 10   -2 1.054093 0.3333333  -4  -1
+#' #     VAR      CLASS        METHOD  N  MEAN      STD    STDERR  MIN MAX
+#' # 1 extra          1          <NA> 10  0.75 1.789010 0.5657345 -1.6 3.7
+#' # 2 extra          2          <NA> 10  2.33 2.002249 0.6331666 -0.1 5.5
+#' # 3 extra Diff (1-2)        Pooled NA -1.58       NA 0.8490910   NA  NA
+#' # 4 extra Diff (1-2) Satterthwaite NA -1.58       NA 0.8490910   NA  NA
 #' #
 #' # $ConfLimits
-#' # VAR MEAN      LCLM      UCLM      STD
-#' # 1 ..diff   -2 -2.754052 -1.245948 1.054093
+#' #     VAR      CLASS        METHOD  MEAN       LCLM      UCLM      STD  LCLMSTD  UCLMSTD
+#' # 1 extra          1          <NA>  0.75 -0.5297804 2.0297804 1.789010 1.230544 3.266034
+#' # 2 extra          2          <NA>  2.33  0.8976775 3.7623225 2.002249 1.377217 3.655326
+#' # 3 extra Diff (1-2)        Pooled -1.58 -3.3638740 0.2038740       NA       NA       NA
+#' # 4 extra Diff (1-2) Satterthwaite -1.58 -3.3654832 0.2054832       NA       NA       NA
 #' #
 #' # $TTests
-#' # VAR DF  T        PROBT
-#' # 1 ..diff  9 -6 0.0002024993
+#' #     VAR        METHOD VARIANCES       DF         T      PROBT
+#' # 1 extra        Pooled     Equal 18.00000 -1.860813 0.07918671
+#' # 2 extra Satterthwaite   Unequal 17.77647 -1.860813 0.07939414
+#' #
+#' # $Equality
+#' #     VAR   METHOD NDF DDF      FVAL     PROBF
+#' # 1 extra Folded F   9   9 0.7983426 0.7427199
 #'
 #' # Example 4: T-Test using h0 option and by variable
 #' res4 <- proc_ttest(sleep, var = "extra", by = "group", options = c("h0" = 0))
@@ -242,6 +256,34 @@
 #' # 1  1 extra  9 1.325710 0.217597780
 #' # 2  2 extra  9 3.679916 0.005076133
 #'
+#' # Example 5: Single variable T-Test using "long" shaping option
+#' res5 <- proc_ttest(sleep, var = "extra", output = "long")
+#' # View results
+#' res5
+#' # $Statistics
+#' #     STAT      extra
+#' # 1      N 20.0000000
+#' # 2   MEAN  1.5400000
+#' # 3    STD  2.0179197
+#' # 4 STDERR  0.4512206
+#' # 5    MIN -1.6000000
+#' # 6    MAX  5.5000000
+#' #
+#' # $ConfLimits
+#' #      STAT     extra
+#' # 1    MEAN 1.5400000
+#' # 2    LCLM 0.5955845
+#' # 3    UCLM 2.4844155
+#' # 4     STD 2.0179197
+#' # 5 LCLMSTD 1.5346086
+#' # 6 UCLMSTD 2.9473163
+#' #
+#' # $TTests
+#' #    STAT     ..extra
+#' # 1    DF 19.00000000
+#' # 2     T  3.41296500
+#' # 3 PROBT  0.00291762
+#'
 proc_ttest <- function(data,
                        var = NULL,
                        paired = NULL,
@@ -250,8 +292,6 @@ proc_ttest <- function(data,
                        class = NULL,
                        # freq = NULL, ?
                        # weight = NULL, ?
-                       # bootstrap = NULL, ?
-                       # crossover = NULL, ?
                        options = NULL,
                        titles = NULL
 ) {
@@ -320,7 +360,7 @@ proc_ttest <- function(data,
   dopts <- c("ci", "cochran", "plots") # display options
   oopts <- c("byvar", "nobyvar")  # Output ordering
 
-  # Comment out for now.
+  # Parameter checks for options
   if (!is.null(options)) {
 
     kopts <- c("alpha", "h0", "noprint")
@@ -340,6 +380,7 @@ proc_ttest <- function(data,
     }
   }
 
+  # Parameter check for paired parameter
   if (!is.null(paired)) {
 
     splt <- strsplit(paired, "*", fixed = TRUE)
@@ -351,7 +392,7 @@ proc_ttest <- function(data,
 
         if (!vr %in% nms) {
 
-          stop(paste0("Invalid variable name: ", vr, "\n"))
+          stop(paste0("Invalid paired variable name: ", vr, "\n"))
 
         }
       }
@@ -1319,7 +1360,9 @@ gen_output_ttest <- function(data,
                               type = outp$parameters$type,
                               opts = opts)
 
-          tmpby <- restore_datatypes(tmpby, dat, class)
+          if (!is.null(paired)) {
+            tmpby <- add_paired_vars(tmpby, outp$varlbl, outp$shape)
+          }
 
           if (is.null(tmpres))
             tmpres <- tmpby
@@ -1419,7 +1462,14 @@ gen_output_ttest <- function(data,
       }
 
       # Replace VAR value
-      if ((!is.null(var) && is.null(class)) | !is.null(paired)) {
+      if (!is.null(paired)) {
+        if ("DIFF" %in% names(tmpres)) {
+          if (!is.null(outp$varlbl))
+            tmpres[["DIFF"]] <- outp$varlbl
+          else
+            tmpres[["DIFF"]] <- outp$var
+        }
+      } else if ((!is.null(var) && is.null(class))) {
         if ("VAR" %in% names(tmpres)) {
           if (!is.null(outp$varlbl))
             tmpres[["VAR"]] <- outp$varlbl

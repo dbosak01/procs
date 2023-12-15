@@ -615,6 +615,39 @@ test_that("utils18: get_ttest_type() works as expected.", {
 })
 
 
+test_that("utils19: add_paired_vars works as expected.", {
+
+
+  dat <- data.frame(VAR = "..diff1", A = 1, B = 2)
+
+  res <- add_paired_vars(dat, "var1 - var2", "wide")
+
+  res
+
+  expect_equal(names(res), c("VAR1", "VAR2", "DIFF", "A", "B"))
+
+
+  dat2 <- data.frame(BY = "MYBY", VAR = "..diff1", A = 1, B = 2)
+
+  res2 <- add_paired_vars(dat2, "var1 - var2", "wide")
+
+  res2
+
+  expect_equal(names(res2), c("BY", "VAR1", "VAR2", "DIFF", "A", "B"))
+
+
+
+  dat3 <- data.frame(BY = "MYBY", VAR = c("..diff1", "..diff2"), A = 1, B = 2)
+
+  res3 <- add_paired_vars(dat3, c("var1 - var2", "var3 - var4"), "wide")
+
+  res3
+
+  expect_equal(names(res3), c("BY", "VAR1", "VAR2", "DIFF", "A", "B"))
+
+})
+
+
 #
 # test_that("utils12: stackds() function works as expected.", {
 #

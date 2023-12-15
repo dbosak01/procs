@@ -189,10 +189,10 @@ hypothesis testing.  The "noprint" option turns off the interactive report.</p><
     <h2>Value</h2>
     
 
-<p>Normally, the requested summary statistics are shown interactively
-in the viewer, and output results are returned as a data frame.
-If the request produces multiple data frames, they will be returned in a list.
-You may then access individual datasets from the list.
+<p>Normally, the requested T-Test statistics are shown interactively
+in the viewer, and output results are returned as a list of data frames.
+You may then access individual datasets from the list using dollar sign ($)
+syntax.
 The interactive report can be turned off using the "noprint" option, and
 the output datasets can be turned off using the "none" keyword on the
 <code>output</code> parameter.</p>
@@ -237,7 +237,7 @@ The column names have been standardized, and additional variables may
 be present to help with data manipulation.  For example, the by variable
 will always be named "BY".  In addition, data values in the
 output datasets are intentionally not rounded or formatted
-to give you the most accurate statistical results.</p>
+to give you the most accurate numeric results.</p>
     </div>
     <div id="options">
     <h2>Options</h2>
@@ -250,7 +250,8 @@ value for confidence limit statistics.  Set the alpha as a decimal value
 between 0 and 1.  For example, you can set a 90% confidence limit as
 <code>alpha = 0.1</code>.</p></li>
 <li><p><strong>h0</strong>: The "h0 =" option is used to set the baseline mean value
-for testing a single variable.  Pass the option as a name/value pair.</p></li>
+for testing a single variable.  Pass the option as a name/value pair,
+such as <code>h0 = 95</code>.</p></li>
 <li><p><strong>noprint</strong>: Whether to print the interactive report to the
 viewer.  By default, the report is printed to the viewer. The "noprint"
 option will inhibit printing.</p></li>
@@ -259,11 +260,11 @@ option will inhibit printing.</p></li>
     <h2>Data Shaping</h2>
     
 
-<p>The output dataset produced by the "out" keyword can be shaped
+<p>The output datasets produced by the function can be shaped
 in different ways. These shaping options allow you to decide whether the
 data should be returned long and skinny, or short and wide. The shaping
 options can reduce the amount of data manipulation necessary to get the
-frequencies into the desired form. The
+data into the desired form. The
 shaping options are as follows:</p><ul><li><p><strong>long</strong>: Transposes the output datasets
 so that statistics are in rows and variables are in columns.</p></li>
 <li><p><strong>stacked</strong>: Requests that output datasets
@@ -272,7 +273,9 @@ variables are in rows.</p></li>
 <li><p><strong>wide</strong>: Requests that output datasets
 be returned in "wide" form, such that statistics are across the top in
 columns, and variables are in rows. This shaping option is the default.</p></li>
-</ul></div>
+</ul><p>These shaping options are passed on the <code>output</code> parameter.  For example,
+to return the data in "long" form, use <code>output = "long"</code>.</p>
+    </div>
 
     <div id="ref-examples">
     <h2>Examples</h2>
@@ -332,21 +335,32 @@ columns, and variables are in rows. This shaping option is the default.</p></li>
 <span><span class="co"># 1 ..diff  9 4.062128 0.00283289</span></span>
 <span></span>
 <span><span class="co"># Example 3: T-Test using class parameter</span></span>
-<span><span class="co"># res3 &lt;- proc_ttest(sleep, var = "extra", class = "group")</span></span>
+<span><span class="va">res3</span> <span class="op">&lt;-</span> <span class="fu">proc_ttest</span><span class="op">(</span><span class="va">sleep</span>, var <span class="op">=</span> <span class="st">"extra"</span>, class <span class="op">=</span> <span class="st">"group"</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># View results</span></span>
-<span><span class="co"># res3</span></span>
+<span><span class="va">res3</span></span>
 <span><span class="co"># $Statistics</span></span>
-<span><span class="co"># VAR  N MEAN      STD    STDERR MIN MAX</span></span>
-<span><span class="co"># 1 ..diff 10   -2 1.054093 0.3333333  -4  -1</span></span>
+<span><span class="co">#     VAR      CLASS        METHOD  N  MEAN      STD    STDERR  MIN MAX</span></span>
+<span><span class="co"># 1 extra          1          &lt;NA&gt; 10  0.75 1.789010 0.5657345 -1.6 3.7</span></span>
+<span><span class="co"># 2 extra          2          &lt;NA&gt; 10  2.33 2.002249 0.6331666 -0.1 5.5</span></span>
+<span><span class="co"># 3 extra Diff (1-2)        Pooled NA -1.58       NA 0.8490910   NA  NA</span></span>
+<span><span class="co"># 4 extra Diff (1-2) Satterthwaite NA -1.58       NA 0.8490910   NA  NA</span></span>
 <span><span class="co">#</span></span>
 <span><span class="co"># $ConfLimits</span></span>
-<span><span class="co"># VAR MEAN      LCLM      UCLM      STD</span></span>
-<span><span class="co"># 1 ..diff   -2 -2.754052 -1.245948 1.054093</span></span>
+<span><span class="co">#     VAR      CLASS        METHOD  MEAN       LCLM      UCLM      STD  LCLMSTD  UCLMSTD</span></span>
+<span><span class="co"># 1 extra          1          &lt;NA&gt;  0.75 -0.5297804 2.0297804 1.789010 1.230544 3.266034</span></span>
+<span><span class="co"># 2 extra          2          &lt;NA&gt;  2.33  0.8976775 3.7623225 2.002249 1.377217 3.655326</span></span>
+<span><span class="co"># 3 extra Diff (1-2)        Pooled -1.58 -3.3638740 0.2038740       NA       NA       NA</span></span>
+<span><span class="co"># 4 extra Diff (1-2) Satterthwaite -1.58 -3.3654832 0.2054832       NA       NA       NA</span></span>
 <span><span class="co">#</span></span>
 <span><span class="co"># $TTests</span></span>
-<span><span class="co"># VAR DF  T        PROBT</span></span>
-<span><span class="co"># 1 ..diff  9 -6 0.0002024993</span></span>
+<span><span class="co">#     VAR        METHOD VARIANCES       DF         T      PROBT</span></span>
+<span><span class="co"># 1 extra        Pooled     Equal 18.00000 -1.860813 0.07918671</span></span>
+<span><span class="co"># 2 extra Satterthwaite   Unequal 17.77647 -1.860813 0.07939414</span></span>
+<span><span class="co">#</span></span>
+<span><span class="co"># $Equality</span></span>
+<span><span class="co">#     VAR   METHOD NDF DDF      FVAL     PROBF</span></span>
+<span><span class="co"># 1 extra Folded F   9   9 0.7983426 0.7427199</span></span>
 <span></span>
 <span><span class="co"># Example 4: T-Test using h0 option and by variable</span></span>
 <span><span class="va">res4</span> <span class="op">&lt;-</span> <span class="fu">proc_ttest</span><span class="op">(</span><span class="va">sleep</span>, var <span class="op">=</span> <span class="st">"extra"</span>, by <span class="op">=</span> <span class="st">"group"</span>, options <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"h0"</span> <span class="op">=</span> <span class="fl">0</span><span class="op">)</span><span class="op">)</span></span>
@@ -367,6 +381,34 @@ columns, and variables are in rows. This shaping option is the default.</p></li>
 <span><span class="co">#   BY   VAR DF        T       PROBT</span></span>
 <span><span class="co"># 1  1 extra  9 1.325710 0.217597780</span></span>
 <span><span class="co"># 2  2 extra  9 3.679916 0.005076133</span></span>
+<span></span>
+<span><span class="co"># Example 5: Single variable T-Test using "long" shaping option</span></span>
+<span><span class="va">res5</span> <span class="op">&lt;-</span> <span class="fu">proc_ttest</span><span class="op">(</span><span class="va">sleep</span>, var <span class="op">=</span> <span class="st">"extra"</span>, output <span class="op">=</span> <span class="st">"long"</span><span class="op">)</span></span>
+<span><span class="co"># View results</span></span>
+<span><span class="va">res5</span></span>
+<span><span class="co"># $Statistics</span></span>
+<span><span class="co">#     STAT      extra</span></span>
+<span><span class="co"># 1      N 20.0000000</span></span>
+<span><span class="co"># 2   MEAN  1.5400000</span></span>
+<span><span class="co"># 3    STD  2.0179197</span></span>
+<span><span class="co"># 4 STDERR  0.4512206</span></span>
+<span><span class="co"># 5    MIN -1.6000000</span></span>
+<span><span class="co"># 6    MAX  5.5000000</span></span>
+<span><span class="co">#</span></span>
+<span><span class="co"># $ConfLimits</span></span>
+<span><span class="co">#      STAT     extra</span></span>
+<span><span class="co"># 1    MEAN 1.5400000</span></span>
+<span><span class="co"># 2    LCLM 0.5955845</span></span>
+<span><span class="co"># 3    UCLM 2.4844155</span></span>
+<span><span class="co"># 4     STD 2.0179197</span></span>
+<span><span class="co"># 5 LCLMSTD 1.5346086</span></span>
+<span><span class="co"># 6 UCLMSTD 2.9473163</span></span>
+<span><span class="co">#</span></span>
+<span><span class="co"># $TTests</span></span>
+<span><span class="co">#    STAT     ..extra</span></span>
+<span><span class="co"># 1    DF 19.00000000</span></span>
+<span><span class="co"># 2     T  3.41296500</span></span>
+<span><span class="co"># 3 PROBT  0.00291762</span></span>
 <span></span></code></pre></div>
     </div>
   </div>
