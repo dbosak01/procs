@@ -39,7 +39,8 @@
 #' \code{proc_ttest} typically returns multiple datasets in a list. Each
 #' dataset in the list will be named according to the category of statistical
 #' results.  There are three standard categories of results: "Statistics",
-#' "ConfLimits", and "TTests".
+#' "ConfLimits", and "TTests". For the class style analysis, the function
+#' also returns a dataset called "Equality" that shows the Folded F analysis.
 #'
 #' The output datasets generated are optimized for data manipulation.
 #' The column names have been standardized, and additional variables may
@@ -49,7 +50,7 @@
 #' to give you the most accurate statistical results.
 #'
 #' @section Options:
-#' The \code{proc_means} function recognizes the following options.  Options may
+#' The \code{proc_ttest} function recognizes the following options.  Options may
 #' be passed as a quoted vector of strings, or an unquoted vector using the
 #' \code{v()} function.
 #' \itemize{
@@ -60,14 +61,6 @@
 #' }
 #' \item{\strong{h0}: The "h0 =" option is used to set the baseline mean value
 #' for testing a single variable.  Pass the option as a name/value pair.
-#' }
-#' \item{\strong{maxdec = }: The "maxdec = " option will set the maximum
-#' of decimal places displayed on report output. For example, you can set 4 decimal
-#' places as follows: \code{maxdec = 4}.  Default is 7 decimal places.
-#' This option will not round any values on the output dataset.
-#' }
-#' \item{\strong{nofreq, nonobs}: Turns off the FREQ column
-#' on the output datasets.
 #' }
 #' \item{\strong{noprint}: Whether to print the interactive report to the
 #' viewer.  By default, the report is printed to the viewer. The "noprint"
@@ -101,16 +94,20 @@
 #' @param data The input data frame for which to calculate summary statistics.
 #' This parameter is required.
 #' @param var The variable or variables to be used for hypothesis testing.
+#' Pass the variable names in a quoted vector,
+#' or an unquoted vector using the
+#' \code{v()} function. If there is only one variable, it may be passed
+#' unquoted.
 #' If the \code{class}
 #' variable is specified, the function will compare the two groups identified
 #' in the class variable.  If the \code{class} variable is not specified,
 #' enter the baseline hypothesis value on the "h0" option.  Default "h0" value
-#' is zero (0).  To test multiple variables, pass as a vector:
-#' \code{var = c("var1", "var2")}.
+#' is zero (0).
 #' @param paired A vector of paired variables to perform a T-Test on.  Variables should
 #' be separated by a star (*).  The entire string should be quoted, for example,
-#' \code{paired = "var1 * var2"}.  To test multiple pairs, place in a vector
-#' as so: \code{paired = c("var1 * var2", "var3 * var4")}.
+#' \code{paired = "var1 * var2"}.  To test multiple pairs, place each pair in a vector
+#' : \code{paired = c("var1 * var2", "var3 * var4")}.  The parameter does not
+#' accept parenthesis, hyphens, or any other shortcut syntax.
 #' @param output Whether or not to return datasets from the function. Valid
 #' values are "out", "none", and "report".  Default is "out", and will
 #' produce dataset output specifically designed for programmatic use. The "none"
@@ -118,7 +115,7 @@
 #' The "report" keyword returns the datasets from the interactive report, which
 #' may be different from the standard output. The output parameter also accepts
 #' data shaping keywords "long, "stacked", and "wide".
-#' The keywords are
+#' These keywords are
 #' shaping options that control the structure of the output data. See the
 #' \strong{Data Shaping} section for additional details. Note that
 #' multiple output keywords may be passed on a
@@ -129,19 +126,18 @@
 #' data will be subset on the by variable(s) prior to performing any
 #' statistics.
 #' @param class The \code{class} parameter is used to perform a T-Test
-#' between two different values of the same variable.  For example, if you
+#' between two different groups of the same variable.  For example, if you
 #' want to test for a significant difference between a control group and a test
 #' group, where the control and test groups are in rows identified by a
-#' variable "Group".  To perform a T-Test using the \code{class} parameter,
-#' there can only be two different values on the class variable.
+#' variable "Group".  Note that
+#' there can only be two different values on the class variable.  Also the
+#' parameter is restricted to only one class variable.
 # @param weight An optional weight parameter.
 #' @param options A vector of optional keywords. Valid values are: "alpha =",
-#' "completetypes", "maxdec =", "noprint", "notype", "nofreq", "nonobs".
-#' The "notype", "nofreq", and "nonobs" keywords will turn
-#' off columns on the output datasets.  The "alpha = " option will set the alpha
+#' "h0 =", and "noprint". The "alpha = " option will set the alpha
 #' value for confidence limit statistics.  The default is 95% (alpha = 0.05).
-#' The "maxdec = " option sets the maximum number of decimal places displayed
-#' on report output.
+#' The "h0 = " option sets the baseline hypothosis value for single-variable
+#' hypothesis testing.  The "noprint" option turns off the interactive report.
 #' @param titles A vector of one or more titles to use for the report output.
 #' @return Normally, the requested summary statistics are shown interactively
 #' in the viewer, and output results are returned as a data frame.
@@ -325,20 +321,42 @@ proc_ttest <- function(data,
   oopts <- c("byvar", "nobyvar")  # Output ordering
 
   # Comment out for now.
-  # if (!is.null(options)) {
-  #   kopts <- c("alpha", "completetypes", "maxdec",
-  #              "noprint", "notype", "nofreq", "nonobs")
-  #
-  #   # Deal with "alpha =" and "maxdec = " by using name instead of value
-  #   nopts <- names(options)
-  #   mopts <- ifelse(nopts == "", options, nopts)
-  #
-  #
-  #   if (!all(tolower(mopts) %in% kopts)) {
-  #
-  #     stop(paste("Invalid options keyword: ", mopts[!tolower(mopts) %in% kopts], "\n"))
-  #   }
-  # }
+  if (!is.null(options)) {
+
+    kopts <- c("alpha", "h0", "noprint")
+
+    # Deal with "alpha =" and "maxdec = " by using name instead of value
+    nopts <- names(options)
+
+    if (is.null(nopts) & length(options) > 0)
+      nopts <- options
+
+    mopts <- ifelse(nopts == "", options, nopts)
+
+
+    if (!all(tolower(mopts) %in% kopts)) {
+
+      stop(paste0("Invalid options keyword: ", mopts[!tolower(mopts) %in% kopts], "\n"))
+    }
+  }
+
+  if (!is.null(paired)) {
+
+    splt <- strsplit(paired, "*", fixed = TRUE)
+
+    for (i in seq_len(length(splt))) {
+
+      for (j in seq_len(length(splt[[i]]))) {
+        vr <- trimws(splt[[i]][j])
+
+        if (!vr %in% nms) {
+
+          stop(paste0("Invalid variable name: ", vr, "\n"))
+
+        }
+      }
+    }
+  }
 
 
   rptflg <- FALSE
@@ -664,7 +682,7 @@ get_output_specs_ttest <- function(data, var, paired, class, opts, output,
                                          type = FALSE, freq = FALSE,
                                          var = vnm, report = report, varlbl = vr)
 
-        spcs[[paste0(lnm, "ConfLimits")]] <- out_spec(stats = c("mean", "clm", "std"), shape = "wide",
+        spcs[[paste0(lnm, "ConfLimits")]] <- out_spec(stats = c("mean", "clm", "std", "clmstd"), shape = "wide",
                                          types = FALSE, freq = FALSE, var = vnm,
                                          varlbl = vr, report = report)
 
@@ -677,6 +695,14 @@ get_output_specs_ttest <- function(data, var, paired, class, opts, output,
       }
 
     } else {
+
+      shp <- "wide"
+      if (report == FALSE) {
+        if ("long" %in% output)
+          shp <- "long"
+        else if ("stacked" %in% output)
+          shp <- "stacked"
+      }
 
 
       vrs <- c()
@@ -700,19 +726,19 @@ get_output_specs_ttest <- function(data, var, paired, class, opts, output,
 
         stats <- c("n", "mean", "std", "stderr", "min", "max")
 
-        spcs[["Statistics"]] <- out_spec(stats = stats, shape = "wide",
+        spcs[["Statistics"]] <- out_spec(stats = stats, shape = shp,
                                                       type = FALSE, freq = FALSE,
                                                       var = vrs,
                                                       varlbl = vlbls,
                                                       report = report)
 
-        spcs[["ConfLimits"]] <- out_spec(stats = c("mean", "clm", "std"), shape = "wide",
+        spcs[["ConfLimits"]] <- out_spec(stats = c("mean", "clm", "std", "clmstd"), shape = shp,
                                                       types = FALSE, freq = FALSE, var = vrs,
                                                       varlbl = vlbls,
                                                       report = report)
 
         spcs[["TTests"]] <- out_spec(stats = c("df", "t", "probt"),
-                                                  shape = "wide",
+                                                  shape = shp,
                                                   type = FALSE, freq = FALSE,
                                                   var = vrs,
                                                   varlbl = vlbls,
@@ -728,48 +754,6 @@ get_output_specs_ttest <- function(data, var, paired, class, opts, output,
 
 
   }
-
-
-
-  # outreq <- NULL
-
-  # Set default statistics for output parameters
-  # if (!is.null(outs)) {
-  #   outreq <- outs  # need to check this
-  #
-  # } else {
-  # outreq <- outs
-  # if (length(outreq) >= 1) {
-    # for (nm in names(outreq)) {
-    #   if ("out_req" %in% class(outreq[[nm]])) {
-    #     if (is.null(outreq[[nm]]$stats)) {
-    #
-    #       outreq[[nm]]$stats <- stats
-    #     }
-    #     if (is.null(outreq[[nm]]$shape)) {
-    #
-    #       outreq[[nm]]$shape <- "wide"
-    #     }
-    #   } else {
-    #
-    #     warning("proc_means: Unknown parameter '" %p% nm %p% "'")
-    #     outreq[[nm]] <- out_spec(shape = "wide")
-    #   }
-    # }
-  # } else {
-  #
-  #   if (option_true(output, "long")) {
-  #     outreq[["out"]] <- out_spec(stats = stats, shape = "long",
-  #                                 type = TRUE, freq = TRUE)
-  #   } else if (option_true(output, "stacked")) {
-  #     outreq[["out"]] <- out_spec(stats = stats, shape = "stacked",
-  #                                 type = TRUE, freq = TRUE)
-  #   } else {
-  #     outreq[["out"]] <- out_spec(stats = stats, shape = "wide",
-  #                                 type = TRUE, freq = TRUE)
-  #   }
-  #
-  # }
 
 
 

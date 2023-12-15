@@ -21,17 +21,21 @@ proc_ttest(
 This parameter is required.}
 
 \item{var}{The variable or variables to be used for hypothesis testing.
+Pass the variable names in a quoted vector,
+or an unquoted vector using the
+\code{v()} function. If there is only one variable, it may be passed
+unquoted.
 If the \code{class}
 variable is specified, the function will compare the two groups identified
 in the class variable.  If the \code{class} variable is not specified,
 enter the baseline hypothesis value on the "h0" option.  Default "h0" value
-is zero (0).  To test multiple variables, pass as a vector:
-\code{var = c("var1", "var2")}.}
+is zero (0).}
 
 \item{paired}{A vector of paired variables to perform a T-Test on.  Variables should
 be separated by a star (*).  The entire string should be quoted, for example,
-\code{paired = "var1 * var2"}.  To test multiple pairs, place in a vector
-as so: \code{paired = c("var1 * var2", "var3 * var4")}.}
+\code{paired = "var1 * var2"}.  To test multiple pairs, place each pair in a vector
+: \code{paired = c("var1 * var2", "var3 * var4")}.  The parameter does not
+accept parenthesis, hyphens, or any other shortcut syntax.}
 
 \item{output}{Whether or not to return datasets from the function. Valid
 values are "out", "none", and "report".  Default is "out", and will
@@ -40,7 +44,7 @@ option will return a NULL instead of a dataset or list of datasets.
 The "report" keyword returns the datasets from the interactive report, which
 may be different from the standard output. The output parameter also accepts
 data shaping keywords "long, "stacked", and "wide".
-The keywords are
+These keywords are
 shaping options that control the structure of the output data. See the
 \strong{Data Shaping} section for additional details. Note that
 multiple output keywords may be passed on a
@@ -53,19 +57,18 @@ data will be subset on the by variable(s) prior to performing any
 statistics.}
 
 \item{class}{The \code{class} parameter is used to perform a T-Test
-between two different values of the same variable.  For example, if you
+between two different groups of the same variable.  For example, if you
 want to test for a significant difference between a control group and a test
 group, where the control and test groups are in rows identified by a
-variable "Group".  To perform a T-Test using the \code{class} parameter,
-there can only be two different values on the class variable.}
+variable "Group".  Note that
+there can only be two different values on the class variable.  Also the
+parameter is restricted to only one class variable.}
 
 \item{options}{A vector of optional keywords. Valid values are: "alpha =",
-"completetypes", "maxdec =", "noprint", "notype", "nofreq", "nonobs".
-The "notype", "nofreq", and "nonobs" keywords will turn
-off columns on the output datasets.  The "alpha = " option will set the alpha
+"h0 =", and "noprint". The "alpha = " option will set the alpha
 value for confidence limit statistics.  The default is 95\% (alpha = 0.05).
-The "maxdec = " option sets the maximum number of decimal places displayed
-on report output.}
+The "h0 = " option sets the baseline hypothosis value for single-variable
+hypothesis testing.  The "noprint" option turns off the interactive report.}
 
 \item{titles}{A vector of one or more titles to use for the report output.}
 }
@@ -117,7 +120,8 @@ Dataset results are also returned from the function by default.
 \code{proc_ttest} typically returns multiple datasets in a list. Each
 dataset in the list will be named according to the category of statistical
 results.  There are three standard categories of results: "Statistics",
-"ConfLimits", and "TTests".
+"ConfLimits", and "TTests". For the class style analysis, the function
+also returns a dataset called "Equality" that shows the Folded F analysis.
 
 The output datasets generated are optimized for data manipulation.
 The column names have been standardized, and additional variables may
@@ -129,7 +133,7 @@ to give you the most accurate statistical results.
 
 \section{Options}{
 
-The \code{proc_means} function recognizes the following options.  Options may
+The \code{proc_ttest} function recognizes the following options.  Options may
 be passed as a quoted vector of strings, or an unquoted vector using the
 \code{v()} function.
 \itemize{
@@ -140,14 +144,6 @@ between 0 and 1.  For example, you can set a 90\% confidence limit as
 }
 \item{\strong{h0}: The "h0 =" option is used to set the baseline mean value
 for testing a single variable.  Pass the option as a name/value pair.
-}
-\item{\strong{maxdec = }: The "maxdec = " option will set the maximum
-of decimal places displayed on report output. For example, you can set 4 decimal
-places as follows: \code{maxdec = 4}.  Default is 7 decimal places.
-This option will not round any values on the output dataset.
-}
-\item{\strong{nofreq, nonobs}: Turns off the FREQ column
-on the output datasets.
 }
 \item{\strong{noprint}: Whether to print the interactive report to the
 viewer.  By default, the report is printed to the viewer. The "noprint"

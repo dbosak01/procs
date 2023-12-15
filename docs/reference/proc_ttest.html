@@ -121,19 +121,23 @@ This parameter is required.</p></dd>
 
 <dt>var</dt>
 <dd><p>The variable or variables to be used for hypothesis testing.
+Pass the variable names in a quoted vector,
+or an unquoted vector using the
+<code><a href="https://common.r-sassy.org/reference/v.html" class="external-link">v()</a></code> function. If there is only one variable, it may be passed
+unquoted.
 If the <code>class</code>
 variable is specified, the function will compare the two groups identified
 in the class variable.  If the <code>class</code> variable is not specified,
 enter the baseline hypothesis value on the "h0" option.  Default "h0" value
-is zero (0).  To test multiple variables, pass as a vector:
-<code>var = c("var1", "var2")</code>.</p></dd>
+is zero (0).</p></dd>
 
 
 <dt>paired</dt>
 <dd><p>A vector of paired variables to perform a T-Test on.  Variables should
 be separated by a star (*).  The entire string should be quoted, for example,
-<code>paired = "var1 * var2"</code>.  To test multiple pairs, place in a vector
-as so: <code>paired = c("var1 * var2", "var3 * var4")</code>.</p></dd>
+<code>paired = "var1 * var2"</code>.  To test multiple pairs, place each pair in a vector
+: <code>paired = c("var1 * var2", "var3 * var4")</code>.  The parameter does not
+accept parenthesis, hyphens, or any other shortcut syntax.</p></dd>
 
 
 <dt>output</dt>
@@ -144,7 +148,7 @@ option will return a NULL instead of a dataset or list of datasets.
 The "report" keyword returns the datasets from the interactive report, which
 may be different from the standard output. The output parameter also accepts
 data shaping keywords "long, "stacked", and "wide".
-The keywords are
+These keywords are
 shaping options that control the structure of the output data. See the
 <strong>Data Shaping</strong> section for additional details. Note that
 multiple output keywords may be passed on a
@@ -161,21 +165,20 @@ statistics.</p></dd>
 
 <dt>class</dt>
 <dd><p>The <code>class</code> parameter is used to perform a T-Test
-between two different values of the same variable.  For example, if you
+between two different groups of the same variable.  For example, if you
 want to test for a significant difference between a control group and a test
 group, where the control and test groups are in rows identified by a
-variable "Group".  To perform a T-Test using the <code>class</code> parameter,
-there can only be two different values on the class variable.</p></dd>
+variable "Group".  Note that
+there can only be two different values on the class variable.  Also the
+parameter is restricted to only one class variable.</p></dd>
 
 
 <dt>options</dt>
 <dd><p>A vector of optional keywords. Valid values are: "alpha =",
-"completetypes", "maxdec =", "noprint", "notype", "nofreq", "nonobs".
-The "notype", "nofreq", and "nonobs" keywords will turn
-off columns on the output datasets.  The "alpha = " option will set the alpha
+"h0 =", and "noprint". The "alpha = " option will set the alpha
 value for confidence limit statistics.  The default is 95% (alpha = 0.05).
-The "maxdec = " option sets the maximum number of decimal places displayed
-on report output.</p></dd>
+The "h0 = " option sets the baseline hypothosis value for single-variable
+hypothesis testing.  The "noprint" option turns off the interactive report.</p></dd>
 
 
 <dt>titles</dt>
@@ -227,7 +230,8 @@ turn be passed to <code><a href="proc_print.html">proc_print</a></code> to write
 <code>proc_ttest</code> typically returns multiple datasets in a list. Each
 dataset in the list will be named according to the category of statistical
 results.  There are three standard categories of results: "Statistics",
-"ConfLimits", and "TTests".</p>
+"ConfLimits", and "TTests". For the class style analysis, the function
+also returns a dataset called "Equality" that shows the Folded F analysis.</p>
 <p>The output datasets generated are optimized for data manipulation.
 The column names have been standardized, and additional variables may
 be present to help with data manipulation.  For example, the by variable
@@ -239,7 +243,7 @@ to give you the most accurate statistical results.</p>
     <h2>Options</h2>
     
 
-<p>The <code>proc_means</code> function recognizes the following options.  Options may
+<p>The <code>proc_ttest</code> function recognizes the following options.  Options may
 be passed as a quoted vector of strings, or an unquoted vector using the
 <code><a href="https://common.r-sassy.org/reference/v.html" class="external-link">v()</a></code> function.</p><ul><li><p><strong>alpha = </strong>: The "alpha = " option will set the alpha
 value for confidence limit statistics.  Set the alpha as a decimal value
@@ -247,12 +251,6 @@ between 0 and 1.  For example, you can set a 90% confidence limit as
 <code>alpha = 0.1</code>.</p></li>
 <li><p><strong>h0</strong>: The "h0 =" option is used to set the baseline mean value
 for testing a single variable.  Pass the option as a name/value pair.</p></li>
-<li><p><strong>maxdec = </strong>: The "maxdec = " option will set the maximum
-of decimal places displayed on report output. For example, you can set 4 decimal
-places as follows: <code>maxdec = 4</code>.  Default is 7 decimal places.
-This option will not round any values on the output dataset.</p></li>
-<li><p><strong>nofreq, nonobs</strong>: Turns off the FREQ column
-on the output datasets.</p></li>
 <li><p><strong>noprint</strong>: Whether to print the interactive report to the
 viewer.  By default, the report is printed to the viewer. The "noprint"
 option will inhibit printing.</p></li>

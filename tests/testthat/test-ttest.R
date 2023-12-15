@@ -733,6 +733,29 @@ test_that("ttest20: Two by variables two vars works.", {
   expect_equal(length(res), 4)
   expect_equal(nrow(res[[1]][[1]]), 1)
 
+  res <- proc_ttest(cls,
+                    var = c("Height", "Weight"), by = c("region", "Sex"),
+                    options = c("h0" = 65, "alpha" = 0.05), output = long,
+                    titles = "My first Frequency Table")
+
+
+  res
+
+  expect_equal(length(res), 3)
+  expect_equal(nrow(res$Statistics), 24)
+
+
+  res <- proc_ttest(cls,
+                    var = c("Height", "Weight"), by = c("region", "Sex"),
+                    options = c("h0" = 65, "alpha" = 0.05), output = stacked,
+                    titles = "My first Frequency Table")
+
+
+  res
+
+  expect_equal(length(res), 3)
+  expect_equal(nrow(res$Statistics), 48)
+
 })
 
 
@@ -784,6 +807,41 @@ test_that("ttest21: proc_ttest with two paired variables works.", {
   expect_equal(is.null(res), FALSE)
   expect_equal(length(res), 3)
   expect_equal(nrow(res$Statistics), 4)
+
+
+  res <- proc_ttest(paird,
+                    paired = c("before_measure * after_measure",
+                               "after_measure * before_measure"), # Need to fix VAR names
+                    by = region,
+                    options = c(alpha = .1),
+                    output = long
+  )
+
+
+  res
+
+  expect_equal(is.null(res), FALSE)
+  expect_equal(length(res), 3)
+  expect_equal(nrow(res$Statistics), 12)
+
+
+  res <- proc_ttest(paird,
+                    paired = c("before_measure * after_measure",
+                               "after_measure * before_measure"),
+                    by = region,
+                    options = c(alpha = .1),
+                    output = stacked
+  )
+
+
+  res
+
+  expect_equal(is.null(res), FALSE)
+  expect_equal(length(res), 3)
+  expect_equal(nrow(res$Statistics), 24)
+
+
+
 
 })
 
@@ -883,8 +941,6 @@ test_that("ttest22: proc_ttest with two vars and class works.", {
   expect_equal(nrow(res$Equality), 16)
 
 
-
-
 })
 
 
@@ -917,4 +973,15 @@ test_that("ttest23: shape_ttest_data works as expected.", {
 
 })
 
+test_that("ttest24: test parameter checks.", {
 
+
+  expect_error(proc_ttest(cls, var = "fork"))
+  expect_error(proc_ttest(cls, var = "Height", options = "bork"))
+  expect_error(proc_ttest(cls, var = "Height", options = c("bork"= 2)))
+  expect_error(proc_ttest(cls, var = "Height", options = c("bork"= 2, "spork")))
+  expect_error(proc_ttest(cls, paired = "bork * spork"))
+  expect_error(proc_ttest(cls, paired = "bork * Height"))
+  expect_error(proc_ttest(cls, paired = c("Weight * Height", "spork * Weight")))
+
+})
