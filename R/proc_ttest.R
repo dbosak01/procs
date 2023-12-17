@@ -6,18 +6,44 @@
 #' @title Calculates T-Test Statistics
 #' @encoding UTF-8
 #' @description The \code{proc_ttest} function generates T-Test statistics
-#' for selected variables on the input dataset.  The variables are identified
-#' on the \code{var} parameter or the \code{paired} parameter.
-#' The function will calculate a standard set of T-Test statistics.
+#' for selected variables on the input dataset.
+#' The variables are identified on the \code{var} parameter or the \code{paired}
+#' parameter. The function will calculate a standard set of T-Test statistics.
 #' Results are displayed in
 #' the viewer interactively and returned from the function.
 #' @details
-#' The \code{proc_ttest} function is for performing hypothesis testing between
-#' two variables, or between a variable and a known baseline.
+#' The \code{proc_ttest} function is for performing hypothesis testing.
 #' Data is passed in on the \code{data}
 #' parameter. The function can segregate data into
 #' groups using the \code{by} parameter. There are also
 #' options to determine whether and what results are returned.
+#'
+#' The \code{proc_ttest} function allows for three types of analysis:
+#' \itemize{
+#' \item{\strong{One Sample}: The one sample test allows you to perform
+#' significance testing of a single variable against a known baseline
+#' value or null hypothesis.  To perform this test, pass the variable name
+#' on the \code{var} parameter and the baseline on the \code{h0=} option.
+#' }
+#' \item{\strong{Paired Comparison}: The paired comparison is for tests of
+#' two variables with a natural pairing and the same number of observations
+#' for both measures.
+#' For instance, if you are checking for a change in blood pressure for
+#' the same group of patients at different time points. To perform a paired
+#' comparison, use the \code{paired} parameter with the two variables
+#' separated by a star (*).
+#' }
+#' \item{\strong{Two Independant Samples}: The analysis of two independent
+#' samples is used when there is no natural pairing, and there may be a different
+#' number of observations in each group. This method is used, for example,
+#' if you are comparing the effectiveness of a treatment between two different
+#' groups of patients. The function assumes that there is
+#' a single variable that contains the analysis values for both groups, and
+#' another variable to identify the groups.  To perform this analysis,
+#' pass the target variable name on the \code{var} parameter, and the
+#' grouping variable on the \code{class} parameter.
+#' }
+#' }
 #'
 #' @section Interactive Output:
 #' By default, \code{proc_ttest} results will
@@ -134,7 +160,7 @@
 #' group, where the control and test groups are in rows identified by a
 #' variable "Group".  Note that
 #' there can only be two different values on the class variable.  Also the
-#' parameter is restricted to only one class variable.
+#' analysis is restricted to only one class variable.
 # @param weight An optional weight parameter.
 #' @param options A vector of optional keywords. Valid values are: "alpha =",
 #' "h0 =", and "noprint". The "alpha = " option will set the alpha
@@ -338,6 +364,11 @@ proc_ttest <- function(data,
   }
 
   if (!is.null(class)) {
+    if (length(class) > 1) {
+
+      stop(paste("Class parameter cannot contain more than one variable.\n"))
+
+    }
     if (!all(class %in% nms)) {
 
       stop(paste("Invalid class name: ", class[!class %in% nms], "\n"))
@@ -1292,6 +1323,7 @@ gen_output_ttest <- function(data,
 
       outp <- outreq[[i]]
       nm <- nms[i]
+      tnm <- get_ttest_type(nm)
 
       # Create vector of NA class values
       cls <- NULL
@@ -1363,6 +1395,10 @@ gen_output_ttest <- function(data,
           if (!is.null(paired)) {
             tmpby <- add_paired_vars(tmpby, outp$varlbl, outp$shape)
           }
+
+          # Get rid of temporary var names
+          tmpby <- fix_var_names(tmpby, outp$var, outp$varlbl, outp$shape, tnm)
+
 
           if (is.null(tmpres))
             tmpres <- tmpby
@@ -1470,11 +1506,13 @@ gen_output_ttest <- function(data,
             tmpres[["DIFF"]] <- outp$var
         }
       } else if ((!is.null(var) && is.null(class))) {
-        if ("VAR" %in% names(tmpres)) {
-          if (!is.null(outp$varlbl))
-            tmpres[["VAR"]] <- outp$varlbl
-          else
-            tmpres[["VAR"]] <- outp$var
+        if (outp$shape != "stacked") {
+          if ("VAR" %in% names(tmpres)) {
+            if (!is.null(outp$varlbl))
+              tmpres[["VAR"]] <- outp$varlbl
+            else
+              tmpres[["VAR"]] <- outp$var
+          }
         }
       }
 

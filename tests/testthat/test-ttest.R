@@ -982,5 +982,132 @@ test_that("ttest24: test parameter checks.", {
   expect_error(proc_ttest(cls, paired = "bork * spork"))
   expect_error(proc_ttest(cls, paired = "bork * Height"))
   expect_error(proc_ttest(cls, paired = c("Weight * Height", "spork * Weight")))
+  expect_error(proc_ttest(cls, var = "Height", class = c("Sex", "region")))
+
+})
+
+test_that("ttest25: Internal consistency checks with class.", {
+
+  # proc ttest data=sashelp.class alpha=0.05;
+  # class sex /* Grouping Variable */;
+  # var height;
+  # run;
+
+  res1 <- proc_ttest(cls,
+                    var = c("Height", "Weight"),
+                    class = "Sex",
+                    # options = "noprint",
+                    output = c("out", "report"))
+
+  res1
+
+  expect_equal(res1$out$TTests$PROBT[1], res1$report$`Height:TTests`$PROBT[1])
+  expect_equal(res1$out$TTests$PROBT[3], res1$report$`Weight:TTests`$PROBT[1])
+
+  res2 <- proc_ttest(cls,
+                     var = c("Height", "Weight"),
+                     class = "Sex",
+                     # options = "noprint",
+                     output = c("out", "long"))
+
+  res2
+
+  expect_equal(res1$out$TTests$PROBT[1], res2$TTests$Height[3])
+  expect_equal(res1$out$TTests$PROBT[3], res2$TTests$Weight[3])
+
+
+  res3 <- proc_ttest(cls,
+                     var = c("Height", "Weight"),
+                     class = "Sex",
+                     # options = "noprint",
+                     output = c("out", "stacked"))
+
+  res3
+
+  expect_equal(res1$out$TTests$PROBT[1], res3$TTests$VALUES[3])
+  expect_equal(res1$out$TTests$PROBT[3], res3$TTests$VALUES[9])
+
+})
+
+test_that("ttest25: Internal consistency checks with single variable.", {
+
+  # proc ttest data=sashelp.class alpha=0.05;
+  # class sex /* Grouping Variable */;
+  # var height;
+  # run;
+
+  res1 <- proc_ttest(cls,
+                     var = c("Height", "Weight"),
+                     # options = "noprint",
+                     output = c("out", "report"),
+                     options = c(h0 = 65))
+
+  res1
+
+  expect_equal(res1$out$TTests$PROBT[1], res1$report$`Height:TTests`$PROBT[1])
+  expect_equal(res1$out$TTests$PROBT[2], res1$report$`Weight:TTests`$PROBT[1])
+
+  res2 <- proc_ttest(cls,
+                     var = c("Height", "Weight"),
+                     # options = "noprint",
+                     output = c("out", "long"),
+                     options = c(h0 = 65))
+
+  res2
+
+  expect_equal(res1$out$TTests$PROBT[1], res2$TTests$Height[3])
+  expect_equal(res1$out$TTests$PROBT[2], res2$TTests$Weight[3])
+
+
+  res3 <- proc_ttest(cls,
+                     var = c("Height", "Weight"),  # VAR bad on all
+                     # options = "noprint",
+                     output = c("out", "stacked"),
+                     options = c(h0 = 65))
+
+  res3
+
+  expect_equal(res1$out$TTests$PROBT[1], res3$TTests$VALUES[3])
+  expect_equal(res1$out$TTests$PROBT[3], res3$TTests$VALUES[9])
+
+})
+
+test_that("ttest26: Internal consistency checks with paired", {
+
+  # proc ttest data=sashelp.class alpha=0.05;
+  # class sex /* Grouping Variable */;
+  # var height;
+  # run;
+
+  res1 <- proc_ttest(paird,
+                    paired = c("before_measure * after_measure"),
+                    titles = "My first TTest Table",
+                    output = c("out", "report"))
+
+
+  res1
+
+  expect_equal(res1$out$TTests$PROBT[1], res1$report$`diff1:TTests`$PROBT[1])
+
+
+  res2 <- proc_ttest(paird,
+                     paired = c("before_measure * after_measure"),
+                     titles = "My first TTest Table",
+                     output = c("out", "long"))
+
+  res2
+
+  expect_equal(res1$out$TTests$PROBT[1], res2$TTests$DIFF1[3])
+
+
+  res3 <- proc_ttest(paird,
+                     paired = c("before_measure * after_measure"),
+                     titles = "My first TTest Table",
+                     output = c("out", "stacked"))
+
+  res3
+
+  expect_equal(res1$out$TTests$PROBT[1], res3$TTests$VALUES[3])
+  expect_equal(res1$out$TTests$PROBT[3], res3$TTests$VALUES[9])
 
 })

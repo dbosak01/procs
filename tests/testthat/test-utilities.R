@@ -648,57 +648,29 @@ test_that("utils19: add_paired_vars works as expected.", {
 })
 
 
-#
-# test_that("utils12: stackds() function works as expected.", {
-#
-#
-#   stats <- proc_means(datm, stats = v(n, mean, median),
-#                       by = Layers)
-#
-#   stats
-#
-#
-#   res2 <- proc_transpose(res1, by = v(VAR, Layers),
-#                          name = STAT)
-#
-#   res2
-#
-#   # expect_equal(nrow(res2), 9)
-#   # expect_equal(ncol(res2), 6)
-#   # expect_equal("Group" %in% names(res2), TRUE)
-#
-#
-#
-#
-# })
+test_that("utils20: fix_var_names works as expected.", {
 
 
-# test_that("utils14: parse_tables() works as expected.", {
-#
-#   nms <- v(A, B, C, D)
-#
-#
-#   v1 <- c("A--C)")
-#   v1
-#
-#   res <- parse_tables(nms, v1)
-#
-#
-#   v2 <- c("A * (B C)")
-#   nms
-#   v2
-#
-#   res <- parse_tables(nms, v2)
-#
-#   res
-#
-#   expect_equal(res, c("A * B", "A * C"))
-#
-#   v2 <- c("(A B) * (C D)")
-#   res2 <- parse_tables(nms, v2)
-#
-#   expect_equal(res, c("A * C", "B * C", "A * C", "B * D"))
-#
-#
-#
-# })
+  dat <- data.frame(fork = "A", "..var1" = 1, "..var2" = 2, stringsAsFactors = FALSE)
+
+  vr <- c("..var1", "..var2")
+  vrlbl <- c("VAR1", "VAR2")
+
+
+  res1 <- fix_var_names(dat, vr, vrlbl, "long", "TTests")
+
+  res1
+
+  expect_equal(all(c("VAR1", "VAR2") %in% names(res1)), TRUE)
+
+
+  dat2 <- data.frame(VAR = c("..var1", "..var2"), A = c(1, 2),
+                     stringsAsFactors = FALSE)
+
+  res2 <- fix_var_names(dat2, vr, vrlbl, "stacked", "TTests")
+
+  res2
+
+  expect_equal(res2$VAR, c("VAR1", "VAR2"))
+
+})

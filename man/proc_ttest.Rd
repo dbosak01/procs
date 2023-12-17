@@ -62,7 +62,7 @@ want to test for a significant difference between a control group and a test
 group, where the control and test groups are in rows identified by a
 variable "Group".  Note that
 there can only be two different values on the class variable.  Also the
-parameter is restricted to only one class variable.}
+analysis is restricted to only one class variable.}
 
 \item{options}{A vector of optional keywords. Valid values are: "alpha =",
 "h0 =", and "noprint". The "alpha = " option will set the alpha
@@ -83,19 +83,45 @@ the output datasets can be turned off using the "none" keyword on the
 }
 \description{
 The \code{proc_ttest} function generates T-Test statistics
-for selected variables on the input dataset.  The variables are identified
-on the \code{var} parameter or the \code{paired} parameter.
-The function will calculate a standard set of T-Test statistics.
+for selected variables on the input dataset.
+The variables are identified on the \code{var} parameter or the \code{paired}
+parameter. The function will calculate a standard set of T-Test statistics.
 Results are displayed in
 the viewer interactively and returned from the function.
 }
 \details{
-The \code{proc_ttest} function is for performing hypothesis testing between
-two variables, or between a variable and a known baseline.
+The \code{proc_ttest} function is for performing hypothesis testing.
 Data is passed in on the \code{data}
 parameter. The function can segregate data into
 groups using the \code{by} parameter. There are also
 options to determine whether and what results are returned.
+
+The \code{proc_ttest} function allows for three types of analysis:
+\itemize{
+\item{\strong{One Sample}: The one sample test allows you to perform
+significance testing of a single variable against a known baseline
+value or null hypothesis.  To perform this test, pass the variable name
+on the \code{var} parameter and the baseline on the \code{h0=} option.
+}
+\item{\strong{Paired Comparison}: The paired comparison is for tests of
+two variables with a natural pairing and the same number of observations
+for both measures.
+For instance, if you are checking for a change in blood pressure for
+the same group of patients at different time points. To perform a paired
+comparison, use the \code{paired} parameter with the two variables
+separated by a star (*).
+}
+\item{\strong{Two Independant Samples}: The analysis of two independent
+samples is used when there is no natural pairing, and there may be a different
+number of observations in each group. This method is used, for example,
+if you are comparing the effectiveness of a treatment between two different
+groups of patients. The function assumes that there is
+a single variable that contains the analysis values for both groups, and
+another variable to identify the groups.  To perform this analysis,
+pass the target variable name on the \code{var} parameter, and the
+grouping variable on the \code{class} parameter.
+}
+}
 }
 \section{Interactive Output}{
 

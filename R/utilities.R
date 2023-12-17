@@ -896,3 +896,40 @@ add_paired_vars <- function(dt, vlbl, shape) {
   return(ret)
 
 }
+
+# A function to replace temporary variable names with real ones
+fix_var_names <- function(dat, varnms, varlbls, shp, dnam) {
+
+  ret <- dat
+  if (!is.null(varnms) & !is.null(varlbls)) {
+
+    lkp <- varlbls
+    names(lkp) <- varnms
+
+    if (shp == "long" & dnam == "TTests") {
+
+      nms <- names(dat)
+      nnms <- c()
+
+      for (i in seq_len(length(nms))) {
+
+        if (nms[i] %in% names(lkp)) {
+          nnms[i] <- lkp[nms[i]]
+        } else {
+          nnms[i] <- nms[i]
+        }
+      }
+
+      names(ret) <- nnms
+
+    } else if (shp == "stacked" & dnam == "TTests") {
+
+      nms <- names(dat)
+      if ("VAR" %in% nms) {
+        ret[["VAR"]] <- lkp[ret[["VAR"]]]
+      }
+    }
+  }
+
+  return(ret)
+}
