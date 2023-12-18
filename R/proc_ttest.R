@@ -855,16 +855,37 @@ get_class_ttest <- function(data, var, class, report = TRUE, opts = NULL,
   v1 <- lst[[1]][[var]]
   v2 <- lst[[2]][[var]]
 
+  # # SAS appears to be putting the shorter vector as the experiment
+  # if (length(v2) < length(v1)) {
+  #   v1 <- lst[[2]][[var]]
+  #   v2 <- lst[[1]][[var]]
+  #
+  # }
+
   alph <- 1 - get_alpha(opts)
 
-  ttret <- TTEST(v1, v2, alph)
+  ttret1 <- TTEST(v1, v2, alph)
+  ttret2 <- TTEST(v2, v1, alph)
 
-  st <- as.data.frame(ttret$`Statistics by group`,
+  ft1 <- as.data.frame(unclass(ttret1$`F-test for the ratio of variances`),
                       stringsAsFactors = FALSE)
-  tt <- as.data.frame(unclass(ttret$`Two groups t-test for the difference of means`),
+  ft2 <- as.data.frame(unclass(ttret2$`F-test for the ratio of variances`),
+                       stringsAsFactors = FALSE)
+
+  # SAS appears to be taking the one with the greatest F Value
+  if (ft1$`F value` > ft2$`F value`) {
+    ft <- ft1
+  } else {
+
+    ft <- ft2
+  }
+
+  st <- as.data.frame(ttret1$`Statistics by group`,
                       stringsAsFactors = FALSE)
-  ft <- as.data.frame(unclass(ttret$`F-test for the ratio of variances`),
+  tt <- as.data.frame(unclass(ttret1$`Two groups t-test for the difference of means`),
                       stringsAsFactors = FALSE)
+  # ft <- as.data.frame(unclass(ttret$`F-test for the ratio of variances`),
+  #                     stringsAsFactors = FALSE)
 
   vcls <- c("Diff (1-2)")
   empt <- c(NA, NA)

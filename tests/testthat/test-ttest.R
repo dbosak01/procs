@@ -463,14 +463,12 @@ test_that("ttest14: Simple proc_ttest with class and by works.", {
   # var height;
   # run;
 
-  tmpdat <- cls
-  tmpdat$cat <- c("A", "A", "A", "A", "A", "A", "A", "A", "A",
-                  "B", "B", "B", "B", "B", "B", "B", "B", "B", "B")
 
-  res <- proc_ttest(tmpdat,
-                    by = "cat",
+  res <- proc_ttest(cls,
+                    by = "region",
                     var = "Height",
-                    class = "Sex")
+                    class = "Sex",
+                    options = c(alpha = 0.1))
 
   res
 
@@ -1109,5 +1107,58 @@ test_that("ttest26: Internal consistency checks with paired", {
 
   expect_equal(res1$out$TTests$PROBT[1], res3$TTests$VALUES[3])
   expect_equal(res1$out$TTests$PROBT[3], res3$TTests$VALUES[9])
+
+})
+
+test_that("ttest27: Check F Values for different var and class combinations.", {
+
+  # SAS appears to pick the different variables for test or control
+  # depending on what is going on in the data.  Best guess is that it is
+  # picking the combination with highest F Value.  This is to run a few
+  # comparisons against SAS and just make sure everything is coming out OK.
+
+  # proc ttest data=sashelp.class alpha=0.05;
+  # class sex /* Grouping Variable */;
+  # var height;
+  # run;
+
+
+  res1 <- proc_ttest(cls,
+                    by = "region",
+                    var = "Height",
+                    class = "Sex",
+                    options = c(alpha = 0.1))
+
+  res1
+
+  expect_equal(as.numeric(res1$Equality$NDF), c(3, 3))
+  expect_equal(as.numeric(res1$Equality$DDF), c(4, 5))
+  expect_equal(as.numeric(res1$Equality$FVAL), c(2.04584557, 1.70834286))
+
+
+
+  res2 <- proc_ttest(cls,
+                     by = "region",
+                     var = "Weight",
+                     class = "Sex",
+                     options = c(alpha = 0.1))
+
+  res2
+
+  expect_equal(as.numeric(res2$Equality$NDF), c(3, 3))
+  expect_equal(as.numeric(res2$Equality$DDF), c(4, 5))
+  expect_equal(as.numeric(res2$Equality$FVAL), c(1.4055752, 1.1721952))
+
+  res3 <- proc_ttest(cls,
+                     by = "region",
+                     var = "Age",
+                     class = "Sex",
+                     options = c(alpha = 0.1))
+
+  res3
+
+  expect_equal(as.numeric(res3$Equality$NDF), c(4, 5))
+  expect_equal(as.numeric(res3$Equality$DDF), c(3, 3))
+  expect_equal(as.numeric(res3$Equality$FVAL), c(1.41818182, 1.290000))
 
 })
