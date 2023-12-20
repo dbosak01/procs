@@ -1615,10 +1615,9 @@ test_that("freq55: get_nlevels works as expected.", {
 
 test_that("freq56: nlevels works as expected.", {
 
-  res <- proc_freq(dat, tables = Eyes,
-                   output = report,
-                   options = nlevels)
-
+  res <- proc_freq(dat, tables = "Eyes",
+                   output = "report",
+                   options = "nlevels")
 
   res
 
@@ -1627,9 +1626,9 @@ test_that("freq56: nlevels works as expected.", {
   expect_equal(nrow(res[[1]]), 1)
 
 
-  res <- proc_freq(dat, tables = v(Eyes, Hair),
-                   output = report,
-                   options = nlevels)
+  res <- proc_freq(dat, tables = c("Eyes", "Hair"),
+                   output = "report",
+                   options = "nlevels")
 
 
   res

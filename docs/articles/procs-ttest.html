@@ -178,20 +178,20 @@ option. Like this:</p>
 <span><span class="co"># 1 Height 19 62.33684 5.127075 1.176232 51.3  72</span></span>
 <span><span class="co"># </span></span>
 <span><span class="co"># $ConfLimits</span></span>
-<span><span class="co">#      VAR     MEAN     LCLM     UCLM      STD</span></span>
-<span><span class="co"># 1 Height 62.33684 59.86567 64.80801 5.127075</span></span>
+<span><span class="co">#      VAR     MEAN     LCLM     UCLM      STD  LCLMSTD  UCLMSTD</span></span>
+<span><span class="co"># 1 Height 62.33684 59.86567 64.80801 5.127075 3.874083 7.582045</span></span>
 <span><span class="co"># </span></span>
 <span><span class="co"># $TTests</span></span>
 <span><span class="co">#      VAR DF         T      PROBT</span></span>
 <span><span class="co"># 1 Height 18 -2.264144 0.03615222</span></span></code></pre></div>
 <p>Observe that the results of the function is a list of three data
 frames: “Statistics”, “ConfLimits”, and “TTests”. If working in RStudio
-and printing is enabled, these same three result sets will also sent to
+and printing is enabled, these same three result sets will be sent to
 the viewer:</p>
 <p><img src="../man/images/ttest1.png"></p>
-<p>The calculated p-value of 0.0362 suggests that the null hypothesis
-can be rejected, and that there is a significant difference between 65
-and the mean of “Height”.</p>
+<p>The interactive report allows you to quickly get a snapshot of
+statistical values for your data, and can help you determine the next
+course of action.</p>
 </div>
 <div class="section level2">
 <h2 id="two-sample-t-test">Two Sample T-Test<a class="anchor" aria-label="anchor" href="#two-sample-t-test"></a>
@@ -217,11 +217,11 @@ height:</p>
 <span><span class="co"># 4 Height Diff (1-2) Satterthwaite NA -3.321111       NA 2.288340   NA   NA</span></span>
 <span><span class="co"># </span></span>
 <span><span class="co"># $ConfLimits</span></span>
-<span><span class="co">#      VAR      CLASS        METHOD      MEAN      LCLM      UCLM      STD</span></span>
-<span><span class="co"># 1 Height          F          &lt;NA&gt; 60.588889 56.731461 64.446317 5.018328</span></span>
-<span><span class="co"># 2 Height          M          &lt;NA&gt; 63.910000 60.377613 67.442387 4.937937</span></span>
-<span><span class="co"># 3 Height Diff (1-2)        Pooled -3.321111 -8.144744  1.502522       NA</span></span>
-<span><span class="co"># 4 Height Diff (1-2) Satterthwaite -3.321111 -8.155098  1.512875       NA</span></span>
+<span><span class="co">#      VAR      CLASS        METHOD      MEAN      LCLM      UCLM      STD  LCLMSTD  UCLMSTD</span></span>
+<span><span class="co"># 1 Height          F          &lt;NA&gt; 60.588889 56.731461 64.446317 5.018328 3.389665 9.613966</span></span>
+<span><span class="co"># 2 Height          M          &lt;NA&gt; 63.910000 60.377613 67.442387 4.937937 3.396487 9.014748</span></span>
+<span><span class="co"># 3 Height Diff (1-2)        Pooled -3.321111 -8.144744  1.502522       NA       NA       NA</span></span>
+<span><span class="co"># 4 Height Diff (1-2) Satterthwaite -3.321111 -8.155098  1.512875       NA       NA       NA</span></span>
 <span><span class="co"># </span></span>
 <span><span class="co"># $TTests</span></span>
 <span><span class="co">#      VAR        METHOD VARIANCES       DF         T     PROBT</span></span>
@@ -233,8 +233,12 @@ height:</p>
 <span><span class="co"># 1 Height Folded F   8   9 1.032825 0.9526904</span></span></code></pre></div>
 <p>The interactive output looks like this:</p>
 <p><img src="../man/images/ttest2.png"></p>
-<p>The T-Test reveals that there is no significant difference in the
-mean height between males and females in the sample data provided.</p>
+<p>Notice that the output of the two independent variable T-Test is
+different than the single variable T-Test. The two variable T-Test
+provides separate descriptive statistics for the “Pooled” or
+“Satterthwaite” methods, and an additional “Equality” dataset that
+contains the F-Value. This additional information can help you interpret
+the T-Test results correctly.</p>
 </div>
 <div class="section level2">
 <h2 id="paired-t-test">Paired T-Test<a class="anchor" aria-label="anchor" href="#paired-t-test"></a>
@@ -243,38 +247,77 @@ mean height between males and females in the sample data provided.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Create sample data</span></span>
 <span><span class="va">paird</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/utils/read.table.html" class="external-link">read.table</a></span><span class="op">(</span>header <span class="op">=</span> <span class="cn">TRUE</span>, text <span class="op">=</span> <span class="st">'</span></span>
-<span><span class="st">subject_id before_measure after_measure region</span></span>
-<span><span class="st">1 12 15  A</span></span>
-<span><span class="st">2 14 16  A</span></span>
-<span><span class="st">3 10 11  A</span></span>
-<span><span class="st">4 15 18  A</span></span>
-<span><span class="st">5 18 20  A</span></span>
-<span><span class="st">6 20 22  B</span></span>
-<span><span class="st">7 11 12  B</span></span>
-<span><span class="st">8 13 14  B</span></span>
-<span><span class="st">9 16 17  B</span></span>
-<span><span class="st">10 9 13  B'</span><span class="op">)</span></span></code></pre></div>
+<span><span class="st">id before after</span></span>
+<span><span class="st">1 12 15 </span></span>
+<span><span class="st">2 14 16 </span></span>
+<span><span class="st">3 10 11 </span></span>
+<span><span class="st">4 15 18 </span></span>
+<span><span class="st">5 18 20 </span></span>
+<span><span class="st">6 20 22 </span></span>
+<span><span class="st">7 11 12 </span></span>
+<span><span class="st">8 13 14 </span></span>
+<span><span class="st">9 16 17 </span></span>
+<span><span class="st">10 9 13'</span><span class="op">)</span></span></code></pre></div>
 <p>To perform a paired T-Test, we use the <code>paired</code> parameter
 on the <code><a href="../reference/proc_ttest.html">proc_ttest()</a></code> function, like so:</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Perform paired analysis</span></span>
-<span><span class="va">res3</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/proc_ttest.html">proc_ttest</a></span><span class="op">(</span><span class="va">paird</span>, paired <span class="op">=</span> <span class="st">"before_measure * after_measure"</span><span class="op">)</span></span>
+<span><span class="va">res3</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/proc_ttest.html">proc_ttest</a></span><span class="op">(</span><span class="va">paird</span>, paired <span class="op">=</span> <span class="st">"before * after"</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># View results</span></span>
 <span><span class="va">res3</span></span>
 <span><span class="co"># $Statistics</span></span>
-<span><span class="co">#      VAR  N MEAN      STD    STDERR MIN MAX</span></span>
-<span><span class="co"># 1 ..diff 10   -2 1.054093 0.3333333  -4  -1</span></span>
+<span><span class="co">#     VAR1  VAR2         DIFF  N MEAN      STD    STDERR MIN MAX</span></span>
+<span><span class="co"># 1 before after before-after 10   -2 1.054093 0.3333333  -4  -1</span></span>
 <span><span class="co"># </span></span>
 <span><span class="co"># $ConfLimits</span></span>
-<span><span class="co">#      VAR MEAN      LCLM      UCLM      STD</span></span>
-<span><span class="co"># 1 ..diff   -2 -2.754052 -1.245948 1.054093</span></span>
+<span><span class="co">#     VAR1  VAR2         DIFF MEAN      LCLM      UCLM      STD  LCLMSTD  UCLMSTD</span></span>
+<span><span class="co"># 1 before after before-after   -2 -2.754052 -1.245948 1.054093 0.725042 1.924362</span></span>
 <span><span class="co"># </span></span>
 <span><span class="co"># $TTests</span></span>
-<span><span class="co">#      VAR DF  T        PROBT</span></span>
-<span><span class="co"># 1 ..diff  9 -6 0.0002024993</span></span></code></pre></div>
+<span><span class="co">#     VAR1  VAR2         DIFF DF  T        PROBT</span></span>
+<span><span class="co"># 1 before after before-after  9 -6 0.0002024993</span></span></code></pre></div>
 <p>Here is the interactive report:</p>
 <p><img src="../man/images/ttest3.png"></p>
+<p>The paired analysis is used when you have some sort of natural
+relationship between the variables. Note that the <strong>procs</strong>
+T-Test function does not support shortcut syntax like parenthesis or
+hyphens like the SAS® PROC TTEST procedure. If you want to perform the
+paired analysis on multiple variables, pass them in a vector of
+strings.</p>
+</div>
+<div class="section level2">
+<h2 id="by-groups">By Groups<a class="anchor" aria-label="anchor" href="#by-groups"></a>
+</h2>
+<p>The <code><a href="../reference/proc_ttest.html">proc_ttest()</a></code> function provides a grouping parameter:
+<code>by</code>. The <code>by</code> parameter identifies a variable or
+variables for subsetting the input data. Here is the single sample
+analysis shown above, but using the <code>by</code> parameter to perform
+separate tests for Males and Females:</p>
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># By grouping</span></span>
+<span><span class="va">res5</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/proc_ttest.html">proc_ttest</a></span><span class="op">(</span><span class="va">cls</span>, var <span class="op">=</span> <span class="st">"Height"</span>,</span>
+<span>                   by <span class="op">=</span> <span class="st">"Sex"</span>, options <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>h0 <span class="op">=</span> <span class="fl">65</span><span class="op">)</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># View Results</span></span>
+<span><span class="va">res5</span></span>
+<span><span class="co"># $Statistics</span></span>
+<span><span class="co">#   BY    VAR  N     MEAN      STD   STDERR  MIN  MAX</span></span>
+<span><span class="co"># 1  F Height  9 60.58889 5.018328 1.672776 51.3 66.5</span></span>
+<span><span class="co"># 2  M Height 10 63.91000 4.937937 1.561513 57.3 72.0</span></span>
+<span><span class="co"># </span></span>
+<span><span class="co"># $ConfLimits</span></span>
+<span><span class="co">#   BY    VAR     MEAN     LCLM     UCLM      STD  LCLMSTD  UCLMSTD</span></span>
+<span><span class="co"># 1  F Height 60.58889 56.73146 64.44632 5.018328 3.389665 9.613966</span></span>
+<span><span class="co"># 2  M Height 63.91000 60.37761 67.44239 4.937937 3.396487 9.014748</span></span>
+<span><span class="co"># </span></span>
+<span><span class="co"># $TTests</span></span>
+<span><span class="co">#   BY    VAR DF         T      PROBT</span></span>
+<span><span class="co"># 1  F Height  8 -2.637001 0.02985198</span></span>
+<span><span class="co"># 2  M Height  9 -0.698041 0.50278618</span></span></code></pre></div>
+<p>For the interactive report, the by groups will be separated onto
+their own page:</p>
+<p><img src="../man/images/ttest4.png"></p>
 </div>
 <div class="section level2">
 <h2 id="output-datasets">Output Datasets<a class="anchor" aria-label="anchor" href="#output-datasets"></a>
@@ -287,81 +330,144 @@ datasets meant for further manipulation and analysis. The “report”
 keyword requests the exact datasets used in the interactive report. The
 “none” keyword indicates that you don’t want any datasets returned. In
 this case, the function will return a NULL.</p>
-<p>Here is an example that shows the difference in the “report” and
-“out” options:</p>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># Output dataset using "report" option</span></span>
-<span><span class="va">res1</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/proc_means.html">proc_means</a></span><span class="op">(</span><span class="va">dat</span>, </span>
-<span>                   stats <span class="op">=</span> <span class="fu"><a href="https://common.r-sassy.org/reference/v.html" class="external-link">v</a></span><span class="op">(</span><span class="va">median</span>, <span class="va">sum</span>, <span class="va">q1</span>, <span class="va">q3</span><span class="op">)</span>,</span>
-<span>                   output <span class="op">=</span> <span class="va">report</span><span class="op">)</span></span>
-<span></span>
-<span><span class="co"># View results</span></span>
-<span><span class="va">res1</span></span>
-<span><span class="co">#   VAR MEDIAN SUM   Q1   Q3</span></span>
-<span><span class="co"># 1   x      3  29  2.0  5.5</span></span>
-<span><span class="co"># 2   z     65 506 57.5 75.5</span></span>
-<span></span>
-<span></span>
-<span><span class="co"># Output dataset using "all" option</span></span>
-<span><span class="va">res2</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/proc_means.html">proc_means</a></span><span class="op">(</span><span class="va">dat</span>, </span>
-<span>                   stats <span class="op">=</span> <span class="fu"><a href="https://common.r-sassy.org/reference/v.html" class="external-link">v</a></span><span class="op">(</span><span class="va">median</span>, <span class="va">sum</span>, <span class="va">q1</span>, <span class="va">q3</span><span class="op">)</span>,</span>
-<span>                   output <span class="op">=</span> <span class="va">out</span><span class="op">)</span></span>
-<span></span>
-<span><span class="co"># View results</span></span>
-<span><span class="va">res2</span></span>
-<span><span class="co">#   TYPE FREQ VAR MEDIAN SUM   Q1   Q3</span></span>
-<span><span class="co"># 1    0    8   x      3  29  2.0  5.5</span></span>
-<span><span class="co"># 2    0    8   z     65 506 57.5 75.5</span></span></code></pre></div>
-<p>As can be seen in the above example, the “out” dataset includes
-additional variables for TYPE and FREQ. These additional variables can
-be turned off with options:</p>
+<p>We can see this difference by redoing the above paired T-Test with
+the “report” output option.</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span></span>
-<span><span class="co"># Turn off TYPE and FREQ variables</span></span>
-<span><span class="va">res3</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/proc_means.html">proc_means</a></span><span class="op">(</span><span class="va">dat</span>, </span>
-<span>                   stats <span class="op">=</span> <span class="fu"><a href="https://common.r-sassy.org/reference/v.html" class="external-link">v</a></span><span class="op">(</span><span class="va">median</span>, <span class="va">sum</span>, <span class="va">q1</span>, <span class="va">q3</span><span class="op">)</span>,</span>
-<span>                   output <span class="op">=</span> <span class="va">all</span>,</span>
-<span>                   options <span class="op">=</span> <span class="fu"><a href="https://common.r-sassy.org/reference/v.html" class="external-link">v</a></span><span class="op">(</span><span class="va">notype</span>, <span class="va">nofreq</span><span class="op">)</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="co"># Output dataset using "report" option</span></span>
+<span><span class="va">res4</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/proc_ttest.html">proc_ttest</a></span><span class="op">(</span><span class="va">paird</span>, </span>
+<span>                   paired <span class="op">=</span> <span class="st">"before * after"</span>,</span>
+<span>                   output <span class="op">=</span> <span class="st">"report"</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># View results</span></span>
-<span><span class="va">res3</span></span>
-<span><span class="co">#   VAR MEDIAN SUM   Q1   Q3</span></span>
-<span><span class="co"># 1   x      3  29  2.0  5.5</span></span>
-<span><span class="co"># 2   z     65 506 57.5 75.5</span></span></code></pre></div>
+<span><span class="va">res4</span></span>
+<span><span class="co"># $`diff1:Statistics`</span></span>
+<span><span class="co">#    N MEAN      STD    STDERR MIN MAX</span></span>
+<span><span class="co"># 1 10   -2 1.054093 0.3333333  -4  -1</span></span>
+<span><span class="co"># </span></span>
+<span><span class="co"># $`diff1:ConfLimits`</span></span>
+<span><span class="co">#   MEAN      LCLM      UCLM      STD  LCLMSTD  UCLMSTD</span></span>
+<span><span class="co"># 1   -2 -2.754052 -1.245948 1.054093 0.725042 1.924362</span></span>
+<span><span class="co"># </span></span>
+<span><span class="co"># $`diff1:TTests`</span></span>
+<span><span class="co">#   DF  T        PROBT</span></span>
+<span><span class="co"># 1  9 -6 0.0002024993</span></span></code></pre></div>
+<p>As can be seen in the above example, the “report” dataset contains
+fewer identifying variables than the default “out” dataset. The default
+datasets are generally more useful than the report datasets.
+Nevertheless, there may be times when you want to output the report
+datasets. For these times, the “report” output option is conveniently
+available.</p>
 </div>
 <div class="section level2">
-<h2 id="by-groups">By Groups<a class="anchor" aria-label="anchor" href="#by-groups"></a>
+<h2 id="data-shaping">Data Shaping<a class="anchor" aria-label="anchor" href="#data-shaping"></a>
 </h2>
-<p>The <code>proc_ttest</code> function provides a grouping parameter:
-<code>by</code>. The <code>by</code> parameter identifies a variable or
-variables for subsetting the input data.<br>
-Here is the single sample analysis shown above, but using the
-<code>by</code> parameter to perform separate tests for Males and
-Females:</p>
+<p>The “output” parameter may also be used to shape the data. There are
+three shaping options: “wide”, “long”, and “stacked”. The default is
+“wide”, and contains the statistics in columns and variables in
+rows.</p>
+<p>Let’s use the single variable analysis with two variables to examine
+the “wide”, “long” and “stacked” shaping options. By running each option
+with the same analysis, we will be able to see the differences in the
+the output datasets clearly:</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># By grouping</span></span>
-<span><span class="va">res4</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/proc_ttest.html">proc_ttest</a></span><span class="op">(</span><span class="va">cls</span>, var <span class="op">=</span> <span class="va">Height</span>,</span>
-<span>                   by <span class="op">=</span> <span class="va">Sex</span>, options <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>h0 <span class="op">=</span> <span class="fl">65</span><span class="op">)</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="co"># Output option "wide" </span></span>
+<span><span class="va">res5</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/proc_ttest.html">proc_ttest</a></span><span class="op">(</span><span class="va">cls</span>, var <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Height"</span>, <span class="st">"Weight"</span><span class="op">)</span>,</span>
+<span>                   options <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>h0 <span class="op">=</span> <span class="fl">65</span><span class="op">)</span>,</span>
+<span>                   output <span class="op">=</span> <span class="st">"wide"</span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># View Results</span></span>
-<span><span class="va">res4</span></span>
+<span><span class="co"># View results</span></span>
+<span><span class="va">res5</span></span>
 <span><span class="co"># $Statistics</span></span>
-<span><span class="co">#   BY    VAR  N     MEAN      STD   STDERR  MIN  MAX</span></span>
-<span><span class="co"># 1  F Height  9 60.58889 5.018328 1.672776 51.3 66.5</span></span>
-<span><span class="co"># 2  M Height 10 63.91000 4.937937 1.561513 57.3 72.0</span></span>
+<span><span class="co">#      VAR  N      MEAN       STD   STDERR  MIN MAX</span></span>
+<span><span class="co"># 1 Height 19  62.33684  5.127075 1.176232 51.3  72</span></span>
+<span><span class="co"># 2 Weight 19 100.02632 22.773933 5.224699 50.5 150</span></span>
 <span><span class="co"># </span></span>
 <span><span class="co"># $ConfLimits</span></span>
-<span><span class="co">#   BY    VAR     MEAN     LCLM     UCLM      STD</span></span>
-<span><span class="co"># 1  F Height 60.58889 56.73146 64.44632 5.018328</span></span>
-<span><span class="co"># 2  M Height 63.91000 60.37761 67.44239 4.937937</span></span>
+<span><span class="co">#      VAR      MEAN     LCLM      UCLM       STD   LCLMSTD   UCLMSTD</span></span>
+<span><span class="co"># 1 Height  62.33684 59.86567  64.80801  5.127075  3.874083  7.582045</span></span>
+<span><span class="co"># 2 Weight 100.02632 89.04963 111.00300 22.773933 17.208272 33.678652</span></span>
 <span><span class="co"># </span></span>
 <span><span class="co"># $TTests</span></span>
-<span><span class="co">#   BY    VAR DF         T      PROBT</span></span>
-<span><span class="co"># 1  F Height  8 -2.637001 0.02985198</span></span>
-<span><span class="co"># 2  M Height  9 -0.698041 0.50278618</span></span></code></pre></div>
-<p>For the interactive report, the by groups will be separated onto
-their own page:</p>
-<p><img src="../man/images/ttest4.png"></p>
+<span><span class="co">#      VAR DF         T        PROBT</span></span>
+<span><span class="co"># 1 Height 18 -2.264144 3.615222e-02</span></span>
+<span><span class="co"># 2 Weight 18  6.703988 2.754086e-06</span></span>
+<span></span>
+<span><span class="co"># Output option "long" </span></span>
+<span><span class="va">res6</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/proc_ttest.html">proc_ttest</a></span><span class="op">(</span><span class="va">cls</span>, var <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Height"</span>, <span class="st">"Weight"</span><span class="op">)</span>,</span>
+<span>                   options <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>h0 <span class="op">=</span> <span class="fl">65</span><span class="op">)</span>,</span>
+<span>                   output <span class="op">=</span> <span class="st">"long"</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># View results</span></span>
+<span><span class="va">res6</span></span>
+<span><span class="co"># $Statistics</span></span>
+<span><span class="co">#     STAT    Height     Weight</span></span>
+<span><span class="co"># 1      N 19.000000  19.000000</span></span>
+<span><span class="co"># 2   MEAN 62.336842 100.026316</span></span>
+<span><span class="co"># 3    STD  5.127075  22.773933</span></span>
+<span><span class="co"># 4 STDERR  1.176232   5.224699</span></span>
+<span><span class="co"># 5    MIN 51.300000  50.500000</span></span>
+<span><span class="co"># 6    MAX 72.000000 150.000000</span></span>
+<span><span class="co"># </span></span>
+<span><span class="co"># $ConfLimits</span></span>
+<span><span class="co">#      STAT    Height    Weight</span></span>
+<span><span class="co"># 1    MEAN 62.336842 100.02632</span></span>
+<span><span class="co"># 2    LCLM 59.865671  89.04963</span></span>
+<span><span class="co"># 3    UCLM 64.808013 111.00300</span></span>
+<span><span class="co"># 4     STD  5.127075  22.77393</span></span>
+<span><span class="co"># 5 LCLMSTD  3.874083  17.20827</span></span>
+<span><span class="co"># 6 UCLMSTD  7.582045  33.67865</span></span>
+<span><span class="co"># </span></span>
+<span><span class="co"># $TTests</span></span>
+<span><span class="co">#    STAT      Height       Weight</span></span>
+<span><span class="co"># 1    DF 18.00000000 1.800000e+01</span></span>
+<span><span class="co"># 2     T -2.26414390 6.703988e+00</span></span>
+<span><span class="co"># 3 PROBT  0.03615222 2.754086e-06</span></span>
+<span></span>
+<span><span class="co"># Output option "stacked" </span></span>
+<span><span class="va">res7</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/proc_ttest.html">proc_ttest</a></span><span class="op">(</span><span class="va">cls</span>, var <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Height"</span>, <span class="st">"Weight"</span><span class="op">)</span>,</span>
+<span>                   options <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>h0 <span class="op">=</span> <span class="fl">65</span><span class="op">)</span>,</span>
+<span>                   output <span class="op">=</span> <span class="st">"stacked"</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># View results</span></span>
+<span><span class="va">res7</span></span>
+<span><span class="co"># $Statistics</span></span>
+<span><span class="co">#       VAR   STAT     VALUES</span></span>
+<span><span class="co"># 1  Height      N  19.000000</span></span>
+<span><span class="co"># 2  Height   MEAN  62.336842</span></span>
+<span><span class="co"># 3  Height    STD   5.127075</span></span>
+<span><span class="co"># 4  Height STDERR   1.176232</span></span>
+<span><span class="co"># 5  Height    MIN  51.300000</span></span>
+<span><span class="co"># 6  Height    MAX  72.000000</span></span>
+<span><span class="co"># 7  Weight      N  19.000000</span></span>
+<span><span class="co"># 8  Weight   MEAN 100.026316</span></span>
+<span><span class="co"># 9  Weight    STD  22.773933</span></span>
+<span><span class="co"># 10 Weight STDERR   5.224699</span></span>
+<span><span class="co"># 11 Weight    MIN  50.500000</span></span>
+<span><span class="co"># 12 Weight    MAX 150.000000</span></span>
+<span><span class="co"># </span></span>
+<span><span class="co"># $ConfLimits</span></span>
+<span><span class="co">#       VAR    STAT     VALUES</span></span>
+<span><span class="co"># 1  Height    MEAN  62.336842</span></span>
+<span><span class="co"># 2  Height    LCLM  59.865671</span></span>
+<span><span class="co"># 3  Height    UCLM  64.808013</span></span>
+<span><span class="co"># 4  Height     STD   5.127075</span></span>
+<span><span class="co"># 5  Height LCLMSTD   3.874083</span></span>
+<span><span class="co"># 6  Height UCLMSTD   7.582045</span></span>
+<span><span class="co"># 7  Weight    MEAN 100.026316</span></span>
+<span><span class="co"># 8  Weight    LCLM  89.049631</span></span>
+<span><span class="co"># 9  Weight    UCLM 111.003000</span></span>
+<span><span class="co"># 10 Weight     STD  22.773933</span></span>
+<span><span class="co"># 11 Weight LCLMSTD  17.208272</span></span>
+<span><span class="co"># 12 Weight UCLMSTD  33.678652</span></span>
+<span><span class="co"># </span></span>
+<span><span class="co"># $TTests</span></span>
+<span><span class="co">#      VAR  STAT        VALUES</span></span>
+<span><span class="co"># 1 Height    DF  1.800000e+01</span></span>
+<span><span class="co"># 2 Height     T -2.264144e+00</span></span>
+<span><span class="co"># 3 Height PROBT  3.615222e-02</span></span>
+<span><span class="co"># 4 Weight    DF  1.800000e+01</span></span>
+<span><span class="co"># 5 Weight     T  6.703988e+00</span></span>
+<span><span class="co"># 6 Weight PROBT  2.754086e-06</span></span></code></pre></div>
 <p>Next: <a href="procs-dm.html">Data Manipulation</a></p>
 </div>
   </div>

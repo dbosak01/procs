@@ -31,9 +31,11 @@ in the class variable.  If the \code{class} variable is not specified,
 enter the baseline hypothesis value on the "h0" option.  Default "h0" value
 is zero (0).}
 
-\item{paired}{A vector of paired variables to perform a T-Test on.  Variables should
+\item{paired}{A vector of paired variables to perform a paired T-Test on.
+Variables should
 be separated by a star (*).  The entire string should be quoted, for example,
-\code{paired = "var1 * var2"}.  To test multiple pairs, place each pair in a vector
+\code{paired = "var1 * var2"}.  To test multiple pairs, place the pairs in a
+quoted vector
 : \code{paired = c("var1 * var2", "var3 * var4")}.  The parameter does not
 accept parenthesis, hyphens, or any other shortcut syntax.}
 
@@ -44,30 +46,29 @@ option will return a NULL instead of a dataset or list of datasets.
 The "report" keyword returns the datasets from the interactive report, which
 may be different from the standard output. The output parameter also accepts
 data shaping keywords "long, "stacked", and "wide".
-These keywords are
-shaping options that control the structure of the output data. See the
+These shaping keywords control the structure of the output data. See the
 \strong{Data Shaping} section for additional details. Note that
 multiple output keywords may be passed on a
 character vector. For example,
 to produce both a report dataset and a "long" output dataset,
 use the parameter \code{output = c("report", "out", "long")}.}
 
-\item{by}{An optional by group. If you specify an by group, the input
+\item{by}{An optional by group. If you specify a by group, the input
 data will be subset on the by variable(s) prior to performing any
 statistics.}
 
-\item{class}{The \code{class} parameter is used to perform a T-Test
+\item{class}{The \code{class} parameter is used to perform a unpaired T-Test
 between two different groups of the same variable.  For example, if you
 want to test for a significant difference between a control group and a test
 group, where the control and test groups are in rows identified by a
 variable "Group".  Note that
-there can only be two different values on the class variable.  Also the
+there can only be two different values on the class variable.  Also, the
 analysis is restricted to only one class variable.}
 
 \item{options}{A vector of optional keywords. Valid values are: "alpha =",
 "h0 =", and "noprint". The "alpha = " option will set the alpha
 value for confidence limit statistics.  The default is 95\% (alpha = 0.05).
-The "h0 = " option sets the baseline hypothosis value for single-variable
+The "h0 = " option sets the baseline hypothesis value for single-variable
 hypothesis testing.  The "noprint" option turns off the interactive report.}
 
 \item{titles}{A vector of one or more titles to use for the report output.}
@@ -126,7 +127,7 @@ grouping variable on the \code{class} parameter.
 \section{Interactive Output}{
 
 By default, \code{proc_ttest} results will
-be immediately sent to the viewer as an HTML report.  This functionality
+be sent to the viewer as an HTML report.  This functionality
 makes it easy to get a quick analysis of your data. To turn off the
 interactive report, pass the "noprint" keyword
 to the \code{options} parameter.
@@ -135,7 +136,7 @@ The \code{titles} parameter allows you to set one or more titles for your
 report.  Pass these titles as a vector of strings.
 
 The exact datasets used for the interactive report can be returned as a list.
-To return these datasets as a list, pass
+To return these datasets, pass
 the "report" keyword on the \code{output} parameter. This list may in
 turn be passed to \code{\link{proc_print}} to write the report to a file.
 }
@@ -144,8 +145,8 @@ turn be passed to \code{\link{proc_print}} to write the report to a file.
 
 Dataset results are also returned from the function by default.
 \code{proc_ttest} typically returns multiple datasets in a list. Each
-dataset in the list will be named according to the category of statistical
-results.  There are three standard categories of results: "Statistics",
+dataset will be named according to the category of statistical
+results.  There are three standard categories: "Statistics",
 "ConfLimits", and "TTests". For the class style analysis, the function
 also returns a dataset called "Equality" that shows the Folded F analysis.
 
@@ -174,7 +175,9 @@ such as \code{h0 = 95}.
 }
 \item{\strong{noprint}: Whether to print the interactive report to the
 viewer.  By default, the report is printed to the viewer. The "noprint"
-option will inhibit printing.
+option will inhibit printing.  You may inhibit printing globally by
+setting the package print option to false:
+\code{options("procs.print" = FALSE)}.
 }
 }
 }
@@ -214,6 +217,7 @@ dat2 <- subset(sleep, group == 2, c("ID", "extra"))
 dat <- data.frame(ID = dat1$ID, group1 = dat1$extra, group2 = dat2$extra)
 
 # View sample data
+dat
 #    ID group1 group2
 # 1   1    0.7    1.9
 # 2   2   -1.6    0.8
@@ -249,16 +253,16 @@ res2 <- proc_ttest(dat, paired = "group2 * group1")
 # View results
 res2
 # $Statistics
-#      VAR  N MEAN      STD    STDERR MIN MAX
-# 1 ..diff 10 1.58 1.229995 0.3889587   0 4.6
+#     VAR1   VAR2          DIFF  N MEAN      STD    STDERR MIN MAX
+# 1 group2 group1 group2-group1 10 1.58 1.229995 0.3889587   0 4.6
 #
 # $ConfLimits
-#      VAR MEAN      LCLM     UCLM      STD
-# 1 ..diff 1.58 0.7001142 2.459886 1.229995
+#     VAR1   VAR2          DIFF MEAN      LCLM     UCLM      STD   LCLMSTD  UCLMSTD
+# 1 group2 group1 group2-group1 1.58 0.7001142 2.459886 1.229995 0.8460342 2.245492
 #
 # $TTests
-#      VAR DF        T      PROBT
-# 1 ..diff  9 4.062128 0.00283289
+#     VAR1   VAR2          DIFF DF        T      PROBT
+# 1 group2 group1 group2-group1  9 4.062128 0.00283289
 
 # Example 3: T-Test using class parameter
 res3 <- proc_ttest(sleep, var = "extra", class = "group")
@@ -285,11 +289,11 @@ res3
 # 2 extra Satterthwaite   Unequal 17.77647 -1.860813 0.07939414
 #
 # $Equality
-#     VAR   METHOD NDF DDF      FVAL     PROBF
-# 1 extra Folded F   9   9 0.7983426 0.7427199
+#    VAR   METHOD NDF DDF      FVAL     PROBF
+# 1 extra Folded F   9   9 1.252595 0.7427199
 
-# Example 4: T-Test using h0 option and by variable
-res4 <- proc_ttest(sleep, var = "extra", by = "group", options = c("h0" = 0))
+# Example 4: T-Test using alpha option and by variable
+res4 <- proc_ttest(sleep, var = "extra", by = "group", options = c(alpha = 0.1))
 
 # View results
 res4
@@ -299,9 +303,9 @@ res4
 # 2  2 extra 10 2.33 2.002249 0.6331666 -0.1 5.5
 #
 # $ConfLimits
-#   BY   VAR MEAN       LCLM     UCLM      STD
-# 1  1 extra 0.75 -0.5297804 2.029780 1.789010
-# 2  2 extra 2.33  0.8976775 3.762322 2.002249
+# BY   VAR MEAN       LCLM     UCLM      STD  LCLMSTD  UCLMSTD
+# 1  1 extra 0.75 -0.2870553 1.787055 1.789010 1.304809 2.943274
+# 2  2 extra 2.33  1.1693340 3.490666 2.002249 1.460334 3.294095
 #
 # $TTests
 #   BY   VAR DF        T       PROBT
@@ -310,6 +314,7 @@ res4
 
 # Example 5: Single variable T-Test using "long" shaping option
 res5 <- proc_ttest(sleep, var = "extra", output = "long")
+
 # View results
 res5
 # $Statistics
@@ -331,7 +336,7 @@ res5
 # 6 UCLMSTD 2.9473163
 #
 # $TTests
-#    STAT     ..extra
+#    STAT       extra
 # 1    DF 19.00000000
 # 2     T  3.41296500
 # 3 PROBT  0.00291762

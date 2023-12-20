@@ -291,9 +291,9 @@ manipulate the output data.</p>
 performs hypothesis testing and calculates confidence limits. The
 function can operate on a single variable, two independent samples, or
 paired observations.</p>
-<p>The paired observation test can be used in cases when you have data
-on the same value at different time points, or before and after a
-procedure. This example attemps to determine whether there is a
+<p>The paired observation test can be used in cases when you have
+samples on the same measure at different time points, or before and
+after a procedure. This example attempts to determine whether there is a
 significant change in systolic blood pressure before and after a
 stimulus. It uses the following data:</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
@@ -314,7 +314,7 @@ stimulus. It uses the following data:</p>
 <span><span class="st">  127 135</span></span>
 <span><span class="st">  '</span><span class="op">)</span></span></code></pre></div>
 <p>Now let’s determine if there is a significant change before and after
-the stimulus measures:</p>
+the stimulus:</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Perform T-Test</span></span>
 <span><span class="va">res</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/proc_ttest.html">proc_ttest</a></span><span class="op">(</span><span class="va">pressure</span>, paired <span class="op">=</span> <span class="st">"SBPbefore * SBPafter"</span><span class="op">)</span></span>
@@ -346,8 +346,8 @@ manipulated to produce a more desirable result. Some additional
 functions have been added to the <strong>procs</strong> package that
 SAS® programmers will be familiar with: <code><a href="../reference/proc_transpose.html">proc_transpose()</a></code>,
 <code><a href="../reference/proc_sort.html">proc_sort()</a></code>, and <code><a href="../reference/proc_print.html">proc_print()</a></code>.</p>
-<p>Continuing from the example above, let’s take some additional steps
-to produce a little report:</p>
+<p>Continuing from the means example above, let’s take some additional
+steps to produce a little report:</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://fmtr.r-sassy.org" class="external-link">fmtr</a></span><span class="op">)</span></span>
 <span></span>
@@ -429,6 +429,7 @@ articles. Those articles include:</p>
 <ul>
 <li><a href="procs-freq.html">The Frequency Function</a></li>
 <li><a href="procs-means.html">The Means Function</a></li>
+<li><a href="procs-ttest.html">The T-Test Function</a></li>
 <li><a href="procs-dm.html">Data Manipulation Functions</a></li>
 <li><a href="procs-example1.html">Example 1: Demographics</a></li>
 <li><a href="procs-example2.html">Example 2: Adverse Events</a></li>

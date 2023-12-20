@@ -1161,4 +1161,14 @@ test_that("ttest27: Check F Values for different var and class combinations.", {
   expect_equal(as.numeric(res3$Equality$DDF), c(3, 3))
   expect_equal(as.numeric(res3$Equality$FVAL), c(1.41818182, 1.290000))
 
+  res4 <- proc_ttest(cls,
+                     by = "region",
+                     var = c("Height", "Weight", "Age"),
+                     class = "Sex",
+                     options = c(alpha = 0.1))
+
+  res4
+
+
+
 })

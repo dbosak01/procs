@@ -206,14 +206,13 @@
 #' The "report" keyword returns the datasets from the interactive report, which
 #' may be different from the standard output. The output parameter also accepts
 #' data shaping keywords "long, "stacked", and "wide".
-#' The keywords are
-#' shaping options that control the structure of the output data. See the
+#' The shaping keywords control the structure of the output data. See the
 #' \strong{Data Shaping} section for additional details. Note that
 #' multiple output keywords may be passed on a
 #' character vector. For example,
 #' to produce both a report dataset and a "long" output dataset,
 #' use the parameter \code{output = c("report", "out", "long")}.
-#' @param by An optional by group. If you specify an by group, the input
+#' @param by An optional by group. If you specify a by group, the input
 #' data will be subset on the by variable(s) prior to performing any
 #' statistics.
 #' @param class The \code{class} parameter is similar to the \code{by}
