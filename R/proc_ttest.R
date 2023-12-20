@@ -1329,7 +1329,12 @@ gen_output_ttest <- function(data,
                              output = NULL,
                              opts = NULL) {
 
-
+  # Assign CL Percentage on Labels
+  alph <- (1 - get_alpha(opts)) * 100
+  tlbls[["UCLM"]] <- sprintf(tlbls[["UCLM"]], alph)
+  tlbls[["LCLM"]] <- sprintf(tlbls[["LCLM"]], alph)
+  tlbls[["UCLMSTD"]] <- sprintf(tlbls[["UCLMSTD"]], alph)
+  tlbls[["LCLMSTD"]] <- sprintf(tlbls[["LCLMSTD"]], alph)
 
   spcs <- get_output_specs_ttest(data, var, paired, class,
                                  opts, output, report = FALSE)
@@ -1488,6 +1493,31 @@ gen_output_ttest <- function(data,
       byres <- NULL
 
 
+      # Replace VAR value
+      if (!is.null(paired)) {
+        if ("DIFF" %in% names(tmpres)) {
+          if (!is.null(outp$varlbl))
+            tmpres[["DIFF"]] <- outp$varlbl
+          else
+            tmpres[["DIFF"]] <- outp$var
+        }
+      } else if ((!is.null(var) && is.null(class))) {
+        if (outp$shape != "stacked") {
+          if ("VAR" %in% names(tmpres)) {
+            if (!is.null(outp$varlbl))
+              tmpres[["VAR"]] <- outp$varlbl
+            else
+              tmpres[["VAR"]] <- outp$var
+          }
+        }
+      }
+
+      # Kill type variable for output datasets
+      if ("TYPE" %in% names(tmpres)) {
+
+        tmpres[["TYPE"]] <- NULL
+      }
+
       # System Labels
       if (!is.null(tmpres))
         labels(tmpres) <- append(tlbls, bylbls)
@@ -1517,30 +1547,7 @@ gen_output_ttest <- function(data,
       # Reset rownames
       rownames(tmpres) <- NULL
 
-      # Kill type variable for output datasets
-      if ("TYPE" %in% names(tmpres)) {
 
-        tmpres[["TYPE"]] <- NULL
-      }
-
-      # Replace VAR value
-      if (!is.null(paired)) {
-        if ("DIFF" %in% names(tmpres)) {
-          if (!is.null(outp$varlbl))
-            tmpres[["DIFF"]] <- outp$varlbl
-          else
-            tmpres[["DIFF"]] <- outp$var
-        }
-      } else if ((!is.null(var) && is.null(class))) {
-        if (outp$shape != "stacked") {
-          if ("VAR" %in% names(tmpres)) {
-            if (!is.null(outp$varlbl))
-              tmpres[["VAR"]] <- outp$varlbl
-            else
-              tmpres[["VAR"]] <- outp$var
-          }
-        }
-      }
 
       res[[nms[i]]]  <- tmpres
 
