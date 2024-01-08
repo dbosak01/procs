@@ -684,9 +684,16 @@ restore_datatypes <- function(res, data, class, clsnms = NULL) {
         res[[clsnms[k]]] <- NA
 
       } else {
-        if (all(class(data[[class[k]]]) == "factor")) {
+        if (any(class(data[[class[k]]]) == "factor")) {
 
-          res[[clsnms[k]]] <- factor(res[[clsnms[k]]], levels = attr(data[[class[k]]], "levels"))
+          if (any(class(data[[class[k]]]) == "ordered")) {
+            res[[clsnms[k]]] <- factor(res[[clsnms[k]]],
+                                       levels = attr(data[[class[k]]], "levels"),
+                                       ordered = TRUE)
+          } else {
+            res[[clsnms[k]]] <- factor(res[[clsnms[k]]],
+                                       levels = attr(data[[class[k]]], "levels"))
+          }
 
         } else if (all(class(data[[class[k]]]) == "Date")) {
 

@@ -1448,7 +1448,7 @@ test_that("means54: completetypes on one factor works.", {
 
 
 
-test_that("means29: completetypes option on two factors works.", {
+test_that("means55: completetypes option on two factors works.", {
 
   var1 <- c("Age", "PresentScore", "TasteScore")
   var2 <- c("n",  "mean", "std", "min", "max")
@@ -1480,6 +1480,31 @@ test_that("means29: completetypes option on two factors works.", {
 })
 
 
+test_that("means56: Ordered factors on class work.", {
+
+  datsp <- datm
+  datsp$Flavor <- factor(datsp$Flavor,
+                         levels = c("Vanilla", "Chocolate", "Spice", "Rum"),
+                         ordered = TRUE)
+  datsp$Layers <- factor(datsp$Layers, levels = c("3", "2", "1"))
+
+
+  res1 <- proc_means(datsp, var = c("Age", "PresentScore", "TasteScore"),
+                     output = out,
+                     class = c("Flavor"),
+                     options = c("notype", "nofreq", "nway"))
+
+  res1
+
+
+  expect_equal(nrow(res1), 12)
+  expect_equal(ncol(res1), 7)
+
+  ucls <- unique(res1$CLASS)
+
+  expect_equal(as.character(ucls),  c("Vanilla", "Chocolate", "Spice", "Rum"))
+
+})
 
 
 
