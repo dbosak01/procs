@@ -674,3 +674,19 @@ test_that("utils20: fix_var_names works as expected.", {
   expect_equal(res2$VAR, c("VAR1", "VAR2"))
 
 })
+
+test_that("utils21: get_formulas() works as expected.", {
+
+  str <- c("x = y", "z = w x y")
+
+
+  res <- get_formulas(str)
+
+  res
+
+  expect_equal(length(res), 2)
+  expect_equal(is.list(res), TRUE)
+  expect_equal("formula" %in% class(res[[1]]), TRUE)
+  expect_equal("formula" %in% class(res[[2]]), TRUE)
+
+})

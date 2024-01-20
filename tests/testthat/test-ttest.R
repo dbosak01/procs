@@ -1172,3 +1172,64 @@ test_that("ttest27: Check F Values for different var and class combinations.", {
 
 
 })
+
+
+# Not sure how to do this.  Can't get lognormal dist to match SAS.
+# test_that("ttest28: Paired ttest with lognormal data works.", {
+#
+#
+#
+# auc <- read.table(header = TRUE, text = '
+#   TestAUC RefAUC
+#   103.4 90.11
+#   59.92 77.71
+#   68.17 77.71
+#   94.54 97.51
+#   69.48 58.21
+#   72.17 101.3
+#   74.37 79.84
+#   84.44 96.06
+#   96.74 89.30
+#   94.26 97.22
+#   48.52 61.62
+#   95.68 85.80')
+#
+# t.test(auc$TestAUC, paired = FALSE, var.equal = FALSE)
+#
+# t.test(auc$TestAUC, auc$RefAUC, paired = TRUE, var.equal = TRUE)
+#
+# t.test(auc$TestAUC, auc$RefAUC, paired = FALSE, var.equal = FALSE)
+#
+#
+# t.test(auc$RefAUC, auc$TestAUC, data = auc,  paired = TRUE, var.equal = TRUE)
+#
+# t.test(auc$RefAUC, auc$TestAUC, data = auc,  paired = TRUE, var.equal = FALSE)
+#
+#   res <- proc_ttest(auc,
+#                     paired = "TestAUC * RefAUC")
+#
+#   res
+#
+#   expect_equal(is.null(res), FALSE)
+#   expect_equal(length(res), 3)
+#
+#   # expect_equal(as.numeric(res$Statistics$MEAN), 62.336842)
+#   # expect_equal(as.numeric(res$Statistics$STD), 5.1270752)
+#   # expect_equal(as.numeric(res$Statistics$STDERR), 1.17623173)
+#   # expect_equal(as.numeric(res$ConfLimits$LCLM), 59.8656709)
+#   # expect_equal(as.numeric(res$ConfLimits$UCLM), 64.808013)
+#   # expect_equal(as.numeric(res$TTests$DF), 18)
+#   # expect_equal(as.numeric(res$TTests$T), -2.2641439)
+#   # expect_equal(as.numeric(res$TTests$PROBT), 0.036152218)
+#
+# })
+
+# CO2
+# t.test(uptake ~ Treatment, CO2)
+#
+#
+# t.test(uptake ~ Treatment, CO2, var.equal = TRUE)
+#
+# mean(auc$TestAUC)
+# mean(auc$RefAUC)
+

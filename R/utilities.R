@@ -940,3 +940,25 @@ fix_var_names <- function(dat, varnms, varlbls, shp, dnam) {
 
   return(ret)
 }
+
+
+# Pass a vector of strings and get back a list of formulas
+get_formulas <- function(models) {
+
+  ret <- list()
+
+  for (ml in models) {
+
+    s1 <- trimws(strsplit(ml, "=", fixed = TRUE)[[1]])
+
+    dv <- s1[1]
+
+    s2 <- trimws(strsplit(s1[2], " ", fixed = TRUE)[[1]])
+
+    iv <- paste(s2, collapse = "+")
+
+    ret[[length(ret) + 1]] <- formula(paste(dv, "~", iv))
+  }
+
+  return(ret)
+}

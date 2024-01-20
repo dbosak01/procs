@@ -351,9 +351,15 @@ proc_transpose <- function(data,
        bygrps <- list()
        for (grp in seq_len(length(by))) {
 
-        if (all(class(data[[by[grp]]]) == "factor")) {
-          bygrps[[by[[grp]]]] <- factor(bylbls[[j]][[grp]],
-                                        levels = levels(data[[by[grp]]]))
+        if (any(class(data[[by[grp]]]) == "factor")) {
+          if ("ordered" %in% class(data[[by[grp]]])) {
+            bygrps[[by[[grp]]]] <- factor(bylbls[[j]][[grp]],
+                                          levels = levels(data[[by[grp]]]),
+                                          ordered = TRUE)
+          } else {
+            bygrps[[by[[grp]]]] <- factor(bylbls[[j]][[grp]],
+                                          levels = levels(data[[by[grp]]]))
+          }
         } else {
           if (typeof(data[[by[grp]]]) == "integer")
             bygrps[[by[[grp]]]] <- as.integer(bylbls[[j]][[grp]])

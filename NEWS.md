@@ -1,9 +1,8 @@
 # procs 1.0.5
 
 * Fixed bug on `proc_means()` when ordered factor used as class.
+* Fixed bug on `proc_transpose()` when ordered factor used on by parameter.
 * Updates to documentation.
-* Fixed bug on `proc_transpose()` when factor used on by parameter.
-* Added "dist" option to `proc_ttest()`.
 
 # procs 1.0.4
 

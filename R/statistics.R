@@ -120,7 +120,7 @@ get_t <- function(x, y = NULL, narm = TRUE, alpha = 0.05, paired = FALSE) {
   if (is.null(y) & paired == FALSE) {
 
 
-    res <- unclass(t.test(x, paired = FALSE, conf.level = alp))
+    res <- unclass(t.test(x, paired = FALSE, conf.level = alp, var.equal = FALSE))
 
     names(res[["statistic"]]) <- NULL
     names(res[["p.value"]]) <- NULL

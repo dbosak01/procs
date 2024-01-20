@@ -648,3 +648,37 @@ test_that("transpose27: noname options works as expected.", {
 
 })
 
+
+test_that("transpose28: by factor works as expected.", {
+
+
+  s2 <- score
+  sect <- ifelse(s2$Section == 1, "Fork", "Bork")
+  s2$Section <- factor(sect, c("Fork", "Bork"))
+
+  res <- proc_transpose(s2, by = Section)
+
+  res
+
+  expect_equal(nrow(res), 6)
+  expect_equal(ncol(res), 6)
+  expect_equal(typeof(res$Section), "integer")
+  expect_equal(class(res$Section), c("factor"))
+
+  s2 <- score
+  sect <- ifelse(s2$Section == 1, "Fork", "Bork")
+  s2$Section <- factor(sect, c("Fork", "Bork"), ordered = TRUE)
+
+  res <- proc_transpose(s2, by = Section)
+
+  res
+
+  expect_equal(nrow(res), 6)
+  expect_equal(ncol(res), 6)
+  expect_equal(typeof(res$Section), "integer")
+  expect_equal(class(res$Section), c("ordered", "factor"))
+
+})
+
+
+
