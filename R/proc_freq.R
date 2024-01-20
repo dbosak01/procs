@@ -621,10 +621,6 @@ freq_oneway <- function(data, tb, weight, options, out = FALSE, stats = NULL) {
 
     if (is.factor(var)) {
 
-      # num <- length(levels(var)) + 1
-      # var <- ifelse(is.na(var), mnum, var)
-      # levels(var) <- c(levels(var), ".")
-
       nmiss <- sum(is.na(var))
 
       if (nmiss > 0) {
@@ -808,7 +804,7 @@ freq_twoway <- function(data, tb1, tb2, weight, options,
     v1 <- data[[tb1]]
   }
 
-  if (is.factor(data[[tb1]])) {
+  if (is.factor(data[[tb2]])) {
     l2 <- levels(data[[tb2]])
     v2 <- as.character(data[[tb2]])
   } else {
@@ -817,8 +813,33 @@ freq_twoway <- function(data, tb1, tb2, weight, options,
 
   # Deal with missing
   if (has_option(options, "missing")) {
-    v1 <- ifelse(is.na(v1), ".", v1)
-    v2 <- ifelse(is.na(v2), ".", v2)
+
+    if (is.factor(v1)) {
+
+      nmiss <- sum(is.na(v1))
+
+      if (nmiss > 0) {
+
+        v1 <- as.character(v1)
+        v1 <- ifelse(is.na(v1), ".", v1)
+      }
+    } else {
+      v1 <- ifelse(is.na(v1), ".", v1)
+    }
+
+    if (is.factor(v2)) {
+
+      nmiss <- sum(is.na(v2))
+
+      if (nmiss > 0) {
+
+        v2 <- as.character(v2)
+        v2 <- ifelse(is.na(v2), ".", v2)
+      }
+    } else {
+      v2 <- ifelse(is.na(v2), ".", v2)
+    }
+
   }
 
   # Get unique values of variables
@@ -994,8 +1015,37 @@ cross_tab <- function(freqdata, options, var1, var2, bylbl = NULL) {
   #browser()
   if (has_option(options, "missing")) {
 
-    freqdata$CAT1 <- ifelse(is.na(freqdata$CAT1), ".", freqdata$CAT1)
-    freqdata$CAT2 <- ifelse(is.na(freqdata$CAT2), ".", freqdata$CAT2)
+    v1 <- freqdata$CAT1
+    v2 <- freqdata$CAT2
+
+    if (is.factor(v1)) {
+
+      nmiss <- sum(is.na(v1))
+
+      if (nmiss > 0) {
+
+        v1 <- as.character(v1)
+        v1 <- ifelse(is.na(v1), ".", v1)
+      }
+    } else {
+      v1 <- ifelse(is.na(v1), ".", v1)
+    }
+
+    if (is.factor(v2)) {
+
+      nmiss <- sum(is.na(v2))
+
+      if (nmiss > 0) {
+
+        v2 <- as.character(v2)
+        v2 <- ifelse(is.na(v2), ".", v2)
+      }
+    } else {
+      v2 <- ifelse(is.na(v2), ".", v2)
+    }
+
+    freqdata$CAT1 <- v1
+    freqdata$CAT2 <- v2
   }
 
   nms <- names(freqdata)

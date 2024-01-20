@@ -2131,4 +2131,25 @@ test_that("freq71: factor with missing works as expected.", {
 
   expect_equal(as.character(res3$CAT), c("green", "brown", "blue"))
 
+
+  res4 <- proc_freq(datsp, tables = c("Eyes * Hair"),
+                    output = out,
+                    options = missing,
+                    titles = "Eye and Hair Color of European Children")
+
+  res4
+
+  expect_equal(unique(as.character(res4$CAT1)), c("green", "brown", "blue", NA))
+
+
+  res5 <- proc_freq(datsp, tables = c("Hair * Eyes"),
+                    output = out,
+                    options = missing,
+                    titles = "Eye and Hair Color of European Children")
+
+  res5
+
+  expect_equal(unique(as.character(res5$CAT2)), c("green", "brown", "blue", NA))
+
+
 })
