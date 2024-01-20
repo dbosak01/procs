@@ -102,7 +102,9 @@ The \code{proc_ttest} function allows for three types of analysis:
 \item{\strong{One Sample}: The one sample test allows you to perform
 significance testing of a single variable against a known baseline
 value or null hypothesis.  To perform this test, pass the variable name
-on the \code{var} parameter and the baseline on the \code{h0=} option.
+on the \code{var} parameter and the baseline on the \code{h0=} option. The
+one sample T-Test performs a classic Student's T-Test and assumes your
+data has a normal distribution.
 }
 \item{\strong{Paired Comparison}: The paired comparison is for tests of
 two variables with a natural pairing and the same number of observations
@@ -110,7 +112,8 @@ for both measures.
 For instance, if you are checking for a change in blood pressure for
 the same group of patients at different time points. To perform a paired
 comparison, use the \code{paired} parameter with the two variables
-separated by a star (*).
+separated by a star (*). The paired T-Test performs a classic Student's T-Test
+and assumes your data has a normal distribution.
 }
 \item{\strong{Two Independant Samples}: The analysis of two independent
 samples is used when there is no natural pairing, and there may be a different
@@ -120,7 +123,9 @@ groups of patients. The function assumes that there is
 a single variable that contains the analysis values for both groups, and
 another variable to identify the groups.  To perform this analysis,
 pass the target variable name on the \code{var} parameter, and the
-grouping variable on the \code{class} parameter.
+grouping variable on the \code{class} parameter. The Two Sample T-Test
+provides both a Student's T-Test and a Welch-Satterthwaite T-Test.  Select
+the appropriate T-Test results for your data based on the known normality.
 }
 }
 }

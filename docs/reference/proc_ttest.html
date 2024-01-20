@@ -208,14 +208,17 @@ options to determine whether and what results are returned.</p>
 <p>The <code>proc_ttest</code> function allows for three types of analysis:</p><ul><li><p><strong>One Sample</strong>: The one sample test allows you to perform
 significance testing of a single variable against a known baseline
 value or null hypothesis.  To perform this test, pass the variable name
-on the <code>var</code> parameter and the baseline on the <code>h0=</code> option.</p></li>
+on the <code>var</code> parameter and the baseline on the <code>h0=</code> option. The
+one sample T-Test performs a classic Student's T-Test and assumes your
+data has a normal distribution.</p></li>
 <li><p><strong>Paired Comparison</strong>: The paired comparison is for tests of
 two variables with a natural pairing and the same number of observations
 for both measures.
 For instance, if you are checking for a change in blood pressure for
 the same group of patients at different time points. To perform a paired
 comparison, use the <code>paired</code> parameter with the two variables
-separated by a star (*).</p></li>
+separated by a star (*). The paired T-Test performs a classic Student's T-Test
+and assumes your data has a normal distribution.</p></li>
 <li><p><strong>Two Independant Samples</strong>: The analysis of two independent
 samples is used when there is no natural pairing, and there may be a different
 number of observations in each group. This method is used, for example,
@@ -224,7 +227,9 @@ groups of patients. The function assumes that there is
 a single variable that contains the analysis values for both groups, and
 another variable to identify the groups.  To perform this analysis,
 pass the target variable name on the <code>var</code> parameter, and the
-grouping variable on the <code>class</code> parameter.</p></li>
+grouping variable on the <code>class</code> parameter. The Two Sample T-Test
+provides both a Student's T-Test and a Welch-Satterthwaite T-Test.  Select
+the appropriate T-Test results for your data based on the known normality.</p></li>
 </ul></div>
     <div id="interactive-output">
     <h2>Interactive Output</h2>

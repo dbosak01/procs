@@ -2090,4 +2090,45 @@ expect_equal(as.numeric(res$`NLevels:var3`$VAR), 0)
 
 })
 
+test_that("freq71: factor with missing works as expected.", {
 
+
+  datsp <- dat
+
+  datsp$Eyes <- ifelse(datsp$Eyes == "green", "brown", datsp$Eyes)
+
+
+  datsp$Eyes <- factor(datsp$Eyes, levels = c("green", "brown", "blue"))
+
+
+  res1 <- proc_freq(datsp, tables = c("Eyes"),
+                    output = out,
+                    options = missing,
+                    titles = "Eye and Hair Color of European Children")
+
+  res1
+
+  expect_equal(as.character(res1$CAT), c("green", "brown", "blue"))
+
+
+  datsp$Eyes[2] <- NA
+
+  res2 <- proc_freq(datsp, tables = c("Eyes"),
+                    output = out,
+                    options = missing,
+                    titles = "Eye and Hair Color of European Children")
+
+  res2
+
+  expect_equal(as.character(res2$CAT), c(".", "blue", "brown", "green"))
+
+
+  res3 <- proc_freq(datsp, tables = c("Eyes"),
+                    output = out,
+                    titles = "Eye and Hair Color of European Children")
+
+  res3
+
+  expect_equal(as.character(res3$CAT), c("green", "brown", "blue"))
+
+})

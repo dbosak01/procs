@@ -619,7 +619,23 @@ freq_oneway <- function(data, tb, weight, options, out = FALSE, stats = NULL) {
 
   if (has_option(options, "missing")) {
 
-    var <- ifelse(is.na(var), ".", var)
+    if (is.factor(var)) {
+
+      # num <- length(levels(var)) + 1
+      # var <- ifelse(is.na(var), mnum, var)
+      # levels(var) <- c(levels(var), ".")
+
+      nmiss <- sum(is.na(var))
+
+      if (nmiss > 0) {
+
+        var <- as.character(var)
+        var <- ifelse(is.na(var), ".", var)
+      }
+    } else {
+      var <- ifelse(is.na(var), ".", var)
+    }
+
   }
 
   # Get frequency counts
