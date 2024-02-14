@@ -680,5 +680,12 @@ test_that("transpose28: by factor works as expected.", {
 
 })
 
+test_that("transpose29: parameter checks work.", {
 
+
+  expect_error(proc_transpose("bork", var = c("Student")))
+  expect_error(proc_transpose(score[0, ], var = c("Student")))
+  expect_error(proc_transpose(score, var = c("fork")))
+
+})
 

@@ -1507,6 +1507,30 @@ test_that("means56: Ordered factors on class work.", {
 })
 
 
+test_that("means57: Output is tibble when input is a tibble.", {
+
+  datsp <- tibble::as_tibble(datm)
+
+
+  res1 <- proc_means(datsp, var = c("Age", "PresentScore", "TasteScore"),
+                     output = out,
+                     options = c("notype", "nofreq", "nway"))
+
+  res1
+
+  expect_equal("tbl_df" %in% class(res1), TRUE)
+
+})
+
+test_that("means58: parameter checks work.", {
+
+
+  expect_error(proc_means("bork", var = c("Age")))
+  expect_error(proc_means(datm[0, ], var = c("Age")))
+  expect_error(proc_means(datm, var = c("fork")))
+
+})
+
 
 # res3 <- proc_means(datm, var = v(Age, PresentScore, TasteScore, Layers),
 #            stats = c("css", "cv", "lclm", "mode",  "nobs", "stddev"),

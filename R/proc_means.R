@@ -355,6 +355,15 @@ proc_means <- function(data,
                       error = function(cond) {oout})
 
   # Parameter checks
+
+  if (!"data.frame" %in% class(data)) {
+    stop("Input data is not a data frame.")
+  }
+
+  if (nrow(data) == 0) {
+    stop("Input data has no rows.")
+  }
+
   nms <- names(data)
 
   if (is.null(var)) {
@@ -1129,6 +1138,7 @@ mlbls <- list(MEAN = "Mean", STD = "Std Dev", MEDIAN = "Median", MIN = "Minimum"
               )
 
 #' @import common
+#' @import tibble
 gen_report_means <- function(data,
                             by = NULL,
                             class = NULL,
@@ -1349,6 +1359,7 @@ get_class_report <- function(data, var, class, outp, freq = TRUE,
 
 #' @import fmtr
 #' @import common
+#' @import tibble
 gen_output_means <- function(data,
                              by = NULL,
                              class = NULL,
@@ -1503,6 +1514,12 @@ gen_output_means <- function(data,
 
       # Reset rownames
       rownames(tmpres) <- NULL
+
+      # Cast to tibble if incoming data was a tibble
+      if ("tbl_df" %in% class(data)) {
+        if (!is.null(tmpres))
+          tmpres <- as_tibble(tmpres)
+      }
 
       res[[nms[i]]]  <- tmpres
 

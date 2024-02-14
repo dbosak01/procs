@@ -264,4 +264,12 @@ test_that("sort15: as.character parameter works as expected.", {
 })
 
 
+test_that("sort16: parameter checks work.", {
+
+
+  expect_error(proc_sort("bork", by = c("sex")))
+  expect_error(proc_sort(prt[0, ], by = c("sex")))
+  expect_error(proc_sort(prt, by = c("fork")))
+
+})
 

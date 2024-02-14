@@ -221,6 +221,15 @@ proc_transpose <- function(data,
                         error = function(cond) {ooptions})
 
   # Parameter checks
+
+  if (!"data.frame" %in% class(data)) {
+    stop("Input data is not a data frame.")
+  }
+
+  if (nrow(data) == 0) {
+    stop("Input data has no rows.")
+  }
+
   nms <- names(data)
   if (!is.null(by)) {
     if (!all(by %in% nms)) {

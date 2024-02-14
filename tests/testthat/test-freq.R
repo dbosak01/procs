@@ -2059,6 +2059,8 @@ test_that("freq68: var and by as factors work.", {
 test_that("freq69: Param checks work.", {
 
 
+  expect_error(proc_freq("bork", tables = c("Hair")))
+  expect_error(proc_freq(dat[0, ], tables = c("Hair")))
   expect_error(proc_freq(dat, tables = c("Hairy")))
   expect_error(proc_freq(dat, tables = c("Hair"), output = "spork"))
   expect_error(proc_freq(dat, tables = c("Hair"), options = "spork"))

@@ -129,6 +129,16 @@ proc_sort <- function(data,  by = NULL, keep = NULL, order = "ascending",
   options <- tryCatch({if (typeof(options) %in% c("integer", "double", "character", "NULL")) options else oopt},
                       error = function(cond) {oopt})
 
+  # Parameter checks
+
+  if (!"data.frame" %in% class(data)) {
+    stop("Input data is not a data frame.")
+  }
+
+  if (nrow(data) == 0) {
+    stop("Input data has no rows.")
+  }
+
   if (!is.null(order)) {
     order <- substr(tolower(order), 1, 1)
     if (length(order) < length(by))
@@ -147,8 +157,6 @@ proc_sort <- function(data,  by = NULL, keep = NULL, order = "ascending",
 
     keep <- names(data)
   }
-
-
 
   if (has_option(options, 'nodupkey')) {
     dt <- data[ , by]

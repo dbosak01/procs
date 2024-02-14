@@ -423,8 +423,16 @@ proc_freq <- function(data,
   output <- tryCatch({if (typeof(output) %in% c("character", "NULL")) output else oout},
                       error = function(cond) {oout})
 
-
   # Parameter checks
+
+  if (!"data.frame" %in% class(data)) {
+    stop("Input data is not a data frame.")
+  }
+
+  if (nrow(data) == 0) {
+    stop("Input data has no rows.")
+  }
+
   nms <- names(data)
   if (!is.null(by)) {
     if (!all(by %in% nms)) {

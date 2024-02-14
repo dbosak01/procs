@@ -31,7 +31,7 @@ William   M  15   66.5  112.0  B')
 
 
 
-test_that("ttest28: Paired ttest with lognormal data works.", {
+test_that("reg01: Basic proc_reg() works.", {
 
   # library(sasLM)
   #
@@ -57,4 +57,13 @@ test_that("ttest28: Paired ttest with lognormal data works.", {
 
 })
 
+test_that("reg02: parameter checks work.", {
 
+  myfm <- formula(Weight ~ Height)
+  bfm <- formula(Weight ~ Fork)
+
+  expect_error(proc_reg("bork", model = myfm))
+  expect_error(proc_reg(cls[0, ], model = myfm))
+  expect_error(proc_reg(cls, model = bfm))
+
+})

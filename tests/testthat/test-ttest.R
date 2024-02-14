@@ -973,6 +973,8 @@ test_that("ttest23: shape_ttest_data works as expected.", {
 test_that("ttest24: test parameter checks.", {
 
 
+  expect_error(proc_ttest("fork", var = "Height"))
+  expect_error(proc_ttest(cls[0, ], var = "Height"))
   expect_error(proc_ttest(cls, var = "fork"))
   expect_error(proc_ttest(cls, var = "Height", options = "bork"))
   expect_error(proc_ttest(cls, var = "Height", options = c("bork"= 2)))

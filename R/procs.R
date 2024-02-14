@@ -27,8 +27,7 @@
 #' }
 #'
 #' See function documentation for additional details.
-#' @docType package
 #' @keywords internal
 #' @aliases procs-package
 #' @name procs
-NULL
+"_PACKAGE"

@@ -1,3 +1,9 @@
+# procs 1.0.6
+
+* Fixed bug on `proc_means()` to return a tibble when input is a tibble.
+* Added parameter check for no rows on input data for all functions.
+
+
 # procs 1.0.5
 
 * Fixed bug on `proc_means()` when ordered factor used as class.
