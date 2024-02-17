@@ -21,6 +21,8 @@
 #' \itemize{
 #'   \item \code{\link{proc_freq}}: Performs frequency  counts and statistics.
 #'   \item \code{\link{proc_means}}: Generates summary statistics.
+#'   \item \code{\link{proc_ttest}}: Performs hypothesis testing.
+#'   \item \code{\link{proc_reg}}: Performs regression testing.
 #'   \item \code{\link{proc_transpose}}: A function to pivot datasets.
 #'   \item \code{\link{proc_sort}}: Sorts and dedupes a dataset.
 #'   \item \code{\link{proc_print}}: An easy dataset print function.

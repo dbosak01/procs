@@ -2,6 +2,7 @@
 
 * Fixed bug on `proc_means()` to return a tibble when input is a tibble.
 * Added parameter check for no rows on input data for all functions.
+* Added `proc_reg()` function.
 
 
 # procs 1.0.5

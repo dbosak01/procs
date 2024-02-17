@@ -690,3 +690,54 @@ test_that("utils21: get_formulas() works as expected.", {
   expect_equal("formula" %in% class(res[[2]]), TRUE)
 
 })
+
+
+test_that("utils22: get_vars() works as expected.", {
+
+
+  myfm <- formula(Weight ~ Height + Sex + BMI)
+
+  res <- get_vars(myfm)
+
+  res
+
+  expect_equal(res$dvar, "Weight")
+  expect_equal(res$ivar, c("Height", "Sex", "BMI"))
+
+  myfm <- formula(Weight ~ Height)
+
+  res <- get_vars(myfm)
+
+  res
+
+  expect_equal(res$dvar, "Weight")
+  expect_equal(res$ivar, c("Height"))
+
+})
+
+
+test_that("utils22: get_obs() works as expected.", {
+
+
+  myfm <- formula(Weight ~ Height + Age)
+
+  cls2 <- cls
+
+  cls2[5, "Age"] <- NA
+  cls2[7, "Height"] <- NA
+  cls2[11, "Weight"] <- NA
+  cls2[17, "Age"] <- NA
+  cls2[17, "Height"] <- NA
+
+  cls2
+
+
+  res <- get_obs(cls2, myfm)
+
+  res
+
+  expect_equal(res$NOBS[1], 19)
+  expect_equal(res$NOBS[2], 15)
+  expect_equal(res$NOBS[3], 4)
+
+})

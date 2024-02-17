@@ -29,35 +29,9 @@ Ronald   M  15   67.0  133.0   B
 Thomas   M  11   57.5   85.0   B
 William   M  15   66.5  112.0  B')
 
+dev <- FALSE
 
-
-test_that("reg01: Basic proc_reg() works.", {
-
-  # library(sasLM)
-  #
-  #
-  # myfm <- formula("Weight ~ Height + Age + Sex + region")
-  #
-  #
-  # myfm <- formula(Weight ~ Height + Age + Sex + region)
-  #
-  # # R Squared
-  # cor(cls$Weight, cls$Height) ^ 2
-  #
-  #
-  # sasLM::REG(myfm, cls)
-  #
-  # myfm2 <- formula(Weight ~ Height)
-  #
-  # sasLM::REG(myfm2, cls, summarize = TRUE)
-  #
-  # sasLM::aov1(myfm2, cls)
-
-  expect_equal(TRUE, TRUE)
-
-})
-
-test_that("reg02: parameter checks work.", {
+test_that("reg1: parameter checks work.", {
 
   myfm <- formula(Weight ~ Height)
   bfm <- formula(Weight ~ Fork)
@@ -65,5 +39,201 @@ test_that("reg02: parameter checks work.", {
   expect_error(proc_reg("bork", model = myfm))
   expect_error(proc_reg(cls[0, ], model = myfm))
   expect_error(proc_reg(cls, model = bfm))
+
+})
+
+
+test_that("reg2: get_output_specs_reg works.", {
+
+  myfm <- formula(Weight ~ Height)
+
+  res <- get_output_specs_reg(myfm, "", "report", report = TRUE)
+
+  res
+
+  expect_equal(names(res), "MODEL1")
+  expect_equal(res$MODEL1$var, "Weight")
+  expect_equal(res$MODEL1$report, TRUE)
+  expect_equal(res$MODEL1$formula, myfm)
+
+})
+
+test_that("reg3: get_model_reg() works.", {
+
+
+  myfm <- formula(Weight ~ Height)
+
+
+  res <- get_model_reg(cls, "Weight", myfm)
+
+  res
+
+  expect_equal(length(res), 4)
+  expect_equal(res$Observations$NOBS, c(19, 19))
+
+  cls2 <- cls
+
+  cls2$Height[5] <- NA
+
+  res2 <- get_model_reg(cls2, "Weight", myfm)
+
+  res2
+
+
+  expect_equal(length(res2), 4)
+  expect_equal(res2$Observations$NOBS, c(19, 18, 1))
+
+})
+
+
+test_that("reg4: Basic proc_reg() works.", {
+
+  # R Syntax
+  myfm1 <- formula(Weight ~ Height)
+
+
+  res1 <- proc_reg(cls, myfm1, output = "report")
+
+  res1
+
+  expect_equal(length(res1), 4)
+
+
+  # SAS Syntax
+  myfm2 <- "Weight = Height"
+
+
+  res2 <- proc_reg(cls, myfm2, output = "report")
+
+  res2
+
+  expect_equal(length(res2), 4)
+
+})
+
+test_that("reg5: Multiple independant variables works.", {
+
+
+  # R Syntax
+  myfm1 <- formula(Weight ~ Height + Age)
+
+
+  res1 <- proc_reg(cls, myfm1, output = "report")
+
+  res1
+
+  expect_equal(length(res1), 4)
+
+
+  # SAS Syntax
+  myfm2 <- "Weight = Height Age"
+
+
+  res2 <- proc_reg(cls, myfm2, output = "report")
+
+  res2
+
+  expect_equal(length(res2), 4)
+
+})
+
+test_that("reg6: Missing values work.", {
+
+  cls2 <- cls
+
+  cls2[2, "Height"] <- NA
+  cls2[5, "Weight"] <- NA
+
+
+  # R Syntax
+  myfm1 <- formula(Weight ~ Height)
+
+
+  res1 <- proc_reg(cls2, myfm1, output = "report")
+
+  res1
+
+  expect_equal(length(res1), 4)
+
+
+  # SAS Syntax
+  myfm2 <- "Weight = Height"
+
+
+  res2 <- proc_reg(cls2, myfm2, output = "report")
+
+  res2
+
+  expect_equal(length(res2), 4)
+
+})
+
+
+test_that("reg7: by parameter works.", {
+
+  # R Syntax
+  myfm1 <- formula(Weight ~ Height)
+
+
+  res1 <- proc_reg(cls, myfm1,
+                   by = Sex,
+                   output = "report")
+
+  res1
+
+  expect_equal(length(res1), 2)
+
+
+  # SAS Syntax
+  myfm2 <- "Weight = Height"
+
+
+  res2 <- proc_reg(cls, myfm2)
+
+  res2
+
+  expect_equal(length(res2), 2)
+
+})
+
+
+test_that("reg8: Multiple models  works.", {
+
+
+  # R Syntax
+  myfm1 <- list(formula(Weight ~ Height),
+                formula(Weight ~ Height + Age))
+
+
+  res1 <- proc_reg(cls, myfm1, output = "report")
+
+  res1
+
+  expect_equal(length(res1), 2)
+
+
+  # SAS Syntax
+  myfm2 <- c("Weight = Height",
+             "Weight = Height Age")
+
+
+  res2 <- proc_reg(cls, myfm2, output = "report")
+
+  res2
+
+  expect_equal(length(res2), 2)
+
+  # SAS Syntax
+  myfm3 <- c("Weight = Height",
+             "Height = Weight",
+             "Weight = Height Age")
+
+
+  res3 <- proc_reg(cls, myfm3, output = "report")
+
+  res3
+
+  expect_equal(length(res3), 3)
+
 
 })
