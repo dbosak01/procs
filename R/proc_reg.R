@@ -153,14 +153,15 @@
 #' # 10 10    2.0    3.4
 #'
 proc_reg <- function(data,
-                       model = NULL,
-                       by = NULL,
-                       #var = NULL,
-                       output = NULL,
-                       # freq = NULL, ?
-                       # weight = NULL, ?
-                       options = NULL,
-                       titles = NULL
+                     model = NULL,
+                     by = NULL,
+                     stats = NULL,
+                     #var = NULL,
+                     output = NULL,
+                     # freq = NULL, ?
+                     # weight = NULL, ?
+                     options = NULL,
+                     titles = NULL
 ) {
 
   # SAS seems to always ignore these
@@ -178,9 +179,9 @@ proc_reg <- function(data,
   by <- tryCatch({if (typeof(by) %in% c("character", "NULL")) by else oby},
                  error = function(cond) {oby})
 
-  # ovar <- deparse(substitute(var, env = environment()))
-  # var <- tryCatch({if (typeof(var) %in% c("character", "NULL")) var else ovar},
-  #                 error = function(cond) {ovar})
+  ostats <- deparse(substitute(stats, env = environment()))
+  stats <- tryCatch({if (typeof(stats) %in% c("character", "NULL")) stats else ostats},
+                  error = function(cond) {ostats})
 
   oopt <- deparse(substitute(options, env = environment()))
   options <- tryCatch({if (typeof(options) %in% c("integer", "double", "character", "NULL")) options else oopt},
@@ -277,9 +278,9 @@ proc_reg <- function(data,
   if (view == TRUE | rptflg) {
     rptres <- gen_report_reg(data,
                              model = model,
-                             by = by, #var = var, class = class,
+                             by = by, stats = stats,
                              view = view,
-                             titles = titles, #weight = weight,
+                             titles = titles,
                              opts = options, output = output)
   }
 
@@ -288,8 +289,7 @@ proc_reg <- function(data,
     res <- gen_output_reg(data,
                           model = model,
                           by = by,
-                          # class = class,
-                          # var = var,
+                          stats = stats,
                           output = output,
                           opts = options
     )
@@ -428,14 +428,19 @@ get_output_specs_reg <- function(model, opts, output,
 
   if (length(mlist) > 0) {
 
-    if (report == TRUE) {
+    # if (report == TRUE) {
+
+      nms <- names(mlist)
 
       mnum <- 1
 
       for (mdl in mlist) {
 
         # Concat model number
-        vlbl <- paste0("MODEL", mnum)
+        if (length(nms) > 0 && !is.na(nms[mnum]) && nms[mnum] != "")
+          vlbl <- nms[mnum]
+        else
+          vlbl <- paste0("MODEL", mnum)
 
         # Get dependant variable
         vr <- as.character(mdl)
@@ -447,16 +452,16 @@ get_output_specs_reg <- function(model, opts, output,
         mnum <- mnum + 1
       }
 
-    } else {
-
-      shp <- "wide"
-      if (!is.null(output)) {
-        if ("long" %in% output)
-          shp <- "long"
-        else if ("stacked" %in% output)
-          shp <- "stacked"
-
-      }
+    # } else {
+    #
+    #   shp <- "wide"
+    #   if (!is.null(output)) {
+    #     if ("long" %in% output)
+    #       shp <- "long"
+    #     else if ("stacked" %in% output)
+    #       shp <- "stacked"
+    #
+    #   }
 
       # stats <- c("n", "mean", "std", "stderr", "min", "max")
       #
@@ -475,7 +480,7 @@ get_output_specs_reg <- function(model, opts, output,
       # spcs[["Equality"]] <- out_spec(stats = "dummy", var = var, types = FALSE, freq = FALSE, shape = shp)
       #
 
-    }
+    #}
   }
 
   return(ret)
@@ -486,8 +491,7 @@ get_output_specs_reg <- function(model, opts, output,
 #' @import sasLM
 #' @import common
 #' @import fmtr
-get_model_reg <- function(data, var, model, report = TRUE, opts = NULL,  # clean up parms if not needed
-                            byvar = NULL, byval = NULL, shape = NULL) {
+get_reg_report <- function(data, var, model, opts = NULL) {
 
   ret <- list()
 
@@ -516,7 +520,7 @@ get_model_reg <- function(data, var, model, report = TRUE, opts = NULL,  # clean
   # Create labels
   rlbls <- c(METHOD = "Method", VARIANCES = "Variances", NDF = "Num DF", DDF = "Den DF",
              FVAL = "F Value", PROBF = "Pr > F", SUMSQ = "Sum of Squares",
-             MEANSQ = "Mean Square", ROOTMSE = "Root MSE", DEPMEAN = "Dependent Mean",
+             MEANSQ = "Mean Square", RMSE = "Root MSE", DEPMEAN = "Dependent Mean",
              COEFVAR = "Coeff Var", RSQ = "R-Square", ADJRSQ = "Adj R-Sq",
              PRESS = "Pred. SS", PRERSQ = "Pred. R-Sq", EST = "Parameter Estimate",
              mlbls)
@@ -538,13 +542,13 @@ get_model_reg <- function(data, var, model, report = TRUE, opts = NULL,  # clean
                  MIN = "%.4f", MAX = "%.4f", UCLM = "%.4f", LCLM = "%.4f",
                  DF = "%d", "T" = "%.2f", PROBT = pfmt, NDF = "%.3f", DDF = "%.3f",
                  FVAL = "%.2f", PROBF = pfmt, UCLMSTD = "%.4f", LCLMSTD = "%.4f",
-                 SUMSQ = "%.5f", MEANSQ = "%.5f", ROOTMSE = "%.5f", DEPMEAN = "%.5f",
+                 SUMSQ = "%.5f", MEANSQ = "%.5f", RMSE = "%.5f", DEPMEAN = "%.5f",
                  COEFVAR = "%.5f", RSQ = "%.4f", ADJRSQ = "%.4f", PRESS = "%.5f",
                  EST = "%.5f", STDERR = "%.5f", PRERSQ = "%.5f",
                  log = FALSE)
 
   lkp <- c("Df" = "DF", "Sum.Sq" = "SUMSQ", "Mean.Sq" = "MEANSQ", "F.value" = "FVAL",
-           "Pr..F." = "PROBF", "Root.MSE" = "ROOTMSE",
+           "Pr..F." = "PROBF", "Root.MSE" = "RMSE",
            "Coef.Var" = "COEFVAR", "R.square" = "RSQ", "Adj.R.sq" = "ADJRSQ",
            "PRESS" = "PRESS", "R2pred" = "PRERSQ", "Estimate" = "EST",
            "Std..Error" = "STDERR", "Lower.CL" = "LCLM", "Upper.CL" = "UCLM",
@@ -590,58 +594,138 @@ get_model_reg <- function(data, var, model, report = TRUE, opts = NULL,  # clean
   ret[["Fitness"]] <- freg
   ret[["Coefficients"]] <- creg[ , c("stub", "DF", "EST", "STDERR", "T", "PROBT")]
 
-  # if (report == FALSE) {
+  return(ret)
+}
+
+#' @import sasLM
+#' @import common
+#' @import fmtr
+get_reg_output<- function(data, var, model, modelname, opts = NULL, stats = NULL,
+                          byvar = NULL) {
+
+  ret <- list()
+
+  alph <- 1 - get_alpha(opts)
+
+  reg <- REG(Formula = model, Data = data, conf.level = alph, summarize = TRUE)
+
+  # Observations
+  oreg <- get_obs(data, model)
+
+  # Anova
+  areg <- as.data.frame(unclass(reg$ANOVA), stringsAsFactors = FALSE)
+  areg <- data.frame(stub = c("Model", "Error", "Corrected Total"),
+                     areg, stringsAsFactors = FALSE)
+  rownames(areg) <- NULL
+
+  # Fitness
+  freg <- as.data.frame(unclass(reg$Fitness), stringsAsFactors = FALSE)
+  rownames(freg) <- NULL
+
+  # Coefficients
+  creg <- as.data.frame(unclass(reg$Coefficients), stringsAsFactors = FALSE)
+  creg <- data.frame(stub = rownames(reg$Coefficients), creg, stringsAsFactors = FALSE)
+  rownames(creg) <- NULL
+
+  # Create labels
+  # rlbls <- c(METHOD = "Method", VARIANCES = "Variances", NDF = "Num DF", DDF = "Den DF",
+  #            FVAL = "F Value", PROBF = "Pr > F", SUMSQ = "Sum of Squares",
+  #            MEANSQ = "Mean Square", RMSE = "Root MSE", DEPMEAN = "Dependent Mean",
+  #            COEFVAR = "Coeff Var", RSQ = "R-Square", ADJRSQ = "Adj R-Sq",
+  #            PRESS = "Pred. SS", PRERSQ = "Pred. R-Sq", EST = "Parameter Estimate",
+  #            mlbls)
   #
-  #   if (is.null(byvar)) {
-  #     ret[["Statistics"]] <- data.frame(VAR = var, ret[["Statistics"]],
-  #                                       stringsAsFactors = FALSE)
-  #
-  #     ret[["ConfLimits"]] <- data.frame(VAR = var, ret[["ConfLimits"]],
-  #                                       stringsAsFactors = FALSE)
-  #
-  #     ret[["TTests"]] <- data.frame(VAR = var, ret[["TTests"]],
-  #                                   stringsAsFactors = FALSE)
-  #
-  #     ret[["Equality"]] <- data.frame(VAR = var, ret[["Equality"]],
-  #                                     stringsAsFactors = FALSE)
-  #
-  #   } else {
-  #
-  #     vlst <- list(VAR = var)
-  #
-  #     for (nm in names(byval))
-  #       vlst[[nm]] <- byval[nm]
-  #
-  #     vdat <- as.data.frame(vlst, stringsAsFactors = FALSE, row.names = NULL)
-  #
-  #     ret[["Statistics"]] <- data.frame(vdat, ret[["Statistics"]],
-  #                                       stringsAsFactors = FALSE)
-  #
-  #     ret[["ConfLimits"]] <- data.frame(vdat, ret[["ConfLimits"]],
-  #                                       stringsAsFactors = FALSE)
-  #
-  #     ret[["TTests"]] <- data.frame(vdat, ret[["TTests"]],
-  #                                   stringsAsFactors = FALSE)
-  #
-  #     ret[["Equality"]] <- data.frame(vdat, ret[["Equality"]],
-  #                                     stringsAsFactors = FALSE)
-  #
-  #
-  #   }
-  #
-  #   if (!is.null(shape)) {
-  #     ret[["Statistics"]] <- shape_ttest_data(ret[["Statistics"]], shape = shape)
-  #
-  #     ret[["ConfLimits"]] <- shape_ttest_data(ret[["ConfLimits"]], shape = shape)
-  #
-  #     ret[["TTests"]] <- shape_ttest_data(ret[["TTests"]], shape = shape)
-  #
-  #     ret[["Equality"]] <- shape_ttest_data(ret[["Equality"]], shape = shape)
-  #   }
-  # }
+  # # Replace alpha value in labels
+  # alph2 <- (1 - get_alpha(opts)) * 100
+  # rlbls[["UCLM"]] <- sprintf(tlbls[["UCLM"]], alph2)
+  # rlbls[["LCLM"]] <- sprintf(tlbls[["LCLM"]], alph2)
+  # rlbls[["UCLMSTD"]] <- sprintf(tlbls[["UCLMSTD"]], alph2)
+  # rlbls[["LCLMSTD"]] <- sprintf(tlbls[["LCLMSTD"]], alph2)
+
+  # Create
+  # pfmt <- value(condition(is.na(x), "NA"),
+  #               condition(x < .0001, "<.0001"),
+  #               condition(TRUE, "%.4f"),
+  #               log = FALSE)
+
+  # reg_fc <- fcat(N = "%d", MEAN = "%.4f", STD = "%.4f", STDERR = "%.4f",
+  #                MIN = "%.4f", MAX = "%.4f", UCLM = "%.4f", LCLM = "%.4f",
+  #                DF = "%d", "T" = "%.2f", PROBT = pfmt, NDF = "%.3f", DDF = "%.3f",
+  #                FVAL = "%.2f", PROBF = pfmt, UCLMSTD = "%.4f", LCLMSTD = "%.4f",
+  #                SUMSQ = "%.5f", MEANSQ = "%.5f", RMSE = "%.5f", DEPMEAN = "%.5f",
+  #                COEFVAR = "%.5f", RSQ = "%.4f", ADJRSQ = "%.4f", PRESS = "%.5f",
+  #                EST = "%.5f", STDERR = "%.5f", PRERSQ = "%.5f",
+  #                log = FALSE)
+
+  lkp <- c("Df" = "DF", "Sum.Sq" = "SUMSQ", "Mean.Sq" = "MEANSQ", "F.value" = "FVAL",
+           "Pr..F." = "PROBF", "Root.MSE" = "RMSE",
+           "Coef.Var" = "COEFVAR", "R.square" = "RSQ", "Adj.R.sq" = "ADJRSQ",
+           "PRESS" = "PRESS", "R2pred" = "PRERSQ", "Estimate" = "EST",
+           "Std..Error" = "STDERR", "Lower.CL" = "LCLM", "Upper.CL" = "UCLM",
+           "t.value" = "T", "Pr...t.." = "PROBT")
+
+  # Add dependtant mean
+  lkp[paste0(var, ".Mean")] = "DEPMEAN"
+
+  # Translate names
+  names(areg) <- fapply(names(areg), lkp)
+  names(freg) <- fapply(names(freg), lkp)
+  names(creg) <- fapply(names(creg), lkp)
+
+  # Assign DF
+  #creg$DF <- 1 # Not sure why this is always 1.
+
+  # Kill predicted values
+  # freg$PRESS <- NULL
+  # freg$PRERSQ <- NULL
+
+  # Remove parens
+  creg$stub <- sub("(Intercept)", "Intercept", creg$stub, fixed = TRUE)
+
+  # Assign formats
+  # formats(areg) <- reg_fc
+  # formats(freg) <- reg_fc
+  # formats(creg) <- reg_fc
+
+  # Assign labels
+  # labels(areg) <- c(rlbls, stub = "Source")
+  # labels(freg) <- rlbls
+  # labels(creg) <- c(rlbls, stub = "Variable")
+
+  # Assign Widths
+  # widths(areg) <- list(stub = 3)
+
+  vrs <- get_vars(model)
+
+  # Create output list
+  ret <- list()
+
+  # Assign byvar if available
+  if (!is.null(byvar))
+    ret[[names(byvar)]] <- as.character(byvar)
+
+  # Assign base variables
+  ret[["MODEL"]] = modelname
+  ret[["TYPE"]] = "PARMS"
+  ret[["DEPVAR"]] = var
+  ret[["RMSE"]] = freg[1, "RMSE"]
+
+  # Assign independant variables
+  for (i in seq_len(length(creg$stub))) {
+
+    ret[[creg$stub[i]]] <- creg[i, "EST"]
+  }
+
+  # Assign dependent variable
+  ret[[var]] <- -1
+
+  # Convert to data frame
+  ret <- as.data.frame(ret, stringsAsFactors = FALSE)
+
 
   return(ret)
 }
+
 
 # Function to set two tables with unequal columns
 # Possibly needed for output datasets
@@ -732,10 +816,7 @@ shape_reg_data <- function(ds, shape, copy = NULL) {
 gen_report_reg <- function(data,
                            model = NULL,
                            by = NULL,
-                           class = NULL,
-                           var = NULL,
-                           paired = NULL,
-                           weight = NULL,
+                           stats = NULL,
                            opts = NULL,
                            output = NULL,
                            view = TRUE,
@@ -807,7 +888,7 @@ gen_report_reg <- function(data,
       # for (i in seq_len(length(outreq))) {
 
       # data, var, model, report = TRUE, opts = NULL,
-      byres[[bynm]] <- get_model_reg(dt, vnm, outp$formula, report = TRUE, opts = opts)
+      byres[[bynm]] <- get_reg_report(dt, vnm, outp$formula, opts = opts)
 
       # Assign titles
       ttls <- c()
@@ -1004,6 +1085,217 @@ gen_report_reg <- function(data,
 gen_output_reg <- function(data,
                            model = NULL,
                            by = NULL,
+                           stats = NULL,
+                           output = NULL,
+                           opts = NULL) {
+
+  # Prepare specs
+  spcs <- get_output_specs_reg(model, opts, output, report = FALSE)
+
+  res <- list()
+  ctbl <- NULL
+
+  if (length(spcs) > 0) {
+
+
+    bdat <- list(data)
+    if (!is.null(by)) {
+
+      bdat <- split(data, data[ , by, drop = FALSE], sep = "|", drop = TRUE)
+
+    }
+    bynms <- names(bdat)
+
+    # Make up by variable names for output ds
+    byn <- NULL
+    bylbls <- NULL
+    if (!is.null(by)) {
+      if (length(by) == 1)
+        byn <- "BY"
+      else
+        byn <- paste0("BY", seq(1, length(by)))
+
+      bylbls <- by
+      names(bylbls) <- byn
+    }
+
+    tmpres <- NULL
+
+    nms <- names(spcs)
+    for (j in seq_len(length(bdat))) {
+
+      dat <- bdat[[j]]
+
+      # Deal with by variable values
+      bynm <- NULL
+      if (!is.null(bynms)) {
+        bynm <- strsplit(bynms[j], "|", fixed = TRUE)[[1]]
+        names(bynm) <- byn
+      }
+
+      byres <- NULL
+
+      for (i in seq_len(length(spcs))) {
+
+        outp <- spcs[[i]]
+        nm <- nms[i]
+
+        #if (is.null(class)) {
+
+          # data, var, model, modelname, opts = NULL,
+          # byvar = NULL, byval = NULL
+
+          # Always add type 0
+          tmpby <- get_reg_output(dat, var = outp$var,
+                                  model = outp$formula, modelname = nm,
+                                  opts = opts, stats = stats,
+                                  byvar = bynm
+                                  )
+
+          # Get rid of temporary var names
+          # tmpby <- fix_var_names(tmpby, outp$var, outp$varlbl, outp$shape, tnm)
+
+
+          if (is.null(tmpres))
+            tmpres <- tmpby
+          else {
+            tmpres <- perform_set(tmpres, tmpby)
+          }
+
+        #}
+
+
+        # if (!is.null(class)) {
+        #
+        #   for (vr in outp$var) {
+        #
+        #     # Get class-level t-tests
+        #     ctbl <- get_class_ttest(dat, vr, class, FALSE, opts,
+        #                             byvar = by, byval = bynm,
+        #                             shape = outp$shape)
+        #
+        #
+        #     if (nm %in% c("Statistics", "ConfLimits")) {
+        #
+        #       # Get standard statistics
+        #       tmpcls <- get_class_output(dat, var = vr,
+        #                                  class = class, outp = outp,
+        #                                  freq = outp$parameters$freq,
+        #                                  type = outp$parameters$type,
+        #                                  byvals = bynm, opts = opts,
+        #                                  stats = outp$stats)
+        #
+        #       tmpcls <- add_class_ttest(tmpcls, ctbl[[nm]])
+        #
+        #     } else {
+        #
+        #       tmpcls <- ctbl[[nm]]
+        #     }
+        #
+        #
+        #     if (is.null(tmpres))
+        #       tmpres <- tmpcls
+        #     else {
+        #
+        #       if (outp$shape == "long")
+        #         tmpres[[vr]] <- tmpcls[[vr]]
+        #       else
+        #         tmpres <- rbind(tmpres, tmpcls)
+        #
+        #     }
+        #
+        #   }
+        #
+        # }
+
+        # if (is.null(byres))
+        #   byres <- tmpres
+        # else {
+        #   byres <- perform_set(byres, tmpres)
+        # }
+      }
+
+      # tmpres <- byres
+      # byres <- NULL
+
+
+      # Replace VAR value
+      # if (!is.null(paired)) {
+      #   if ("DIFF" %in% names(tmpres)) {
+      #     if (!is.null(outp$varlbl))
+      #       tmpres[["DIFF"]] <- outp$varlbl
+      #     else
+      #       tmpres[["DIFF"]] <- outp$var
+      #   }
+      # } else if ((!is.null(var) && is.null(class))) {
+      #   if (outp$shape != "stacked") {
+      #     if ("VAR" %in% names(tmpres)) {
+      #       if (!is.null(outp$varlbl))
+      #         tmpres[["VAR"]] <- outp$varlbl
+      #       else
+      #         tmpres[["VAR"]] <- outp$var
+      #     }
+      #   }
+      # }
+
+      # Kill type variable for output datasets
+      # if ("TYPE" %in% names(tmpres)) {
+      #
+      #   tmpres[["TYPE"]] <- NULL
+      # }
+
+      # System Labels
+      # if (!is.null(tmpres))
+      #   labels(tmpres) <- append(tlbls, bylbls)
+
+      # Class labels
+      # clbls <- NULL
+      # if (!is.null(class)) {
+      #   if (length(class) == 1)
+      #     cnms <- "CLASS"
+      #   else {
+      #     cnms <- paste0("CLASS", seq(1, length(class)))
+      #   }
+      #   clbls <- as.list(class)
+      #   names(clbls) <- cnms
+      #
+      #   labels(tmpres) <- clbls
+      # }
+
+      # User labels
+      # if (!is.null(outp$label))
+      #   labels(tmpres) <- outp$label
+
+      # Formats
+      # if (!is.null(outp$format))
+      #   formats(tmpres) <- outp$format
+
+      # Reset rownames
+      rownames(tmpres) <- NULL
+
+
+
+      res[[nms[i]]]  <- tmpres
+
+    } # bygrp
+  }  # spcs > 0
+
+  if (length(res) == 1)
+    res <- res[[1]]
+
+
+  return(res)
+
+}
+
+
+
+
+#' @import fmtr
+#' @import common
+gen_output_reg_back <- function(data,
+                           model = NULL,
+                           by = NULL,
                            class = NULL,
                            var = NULL,
                            paired = NULL,
@@ -1011,20 +1303,8 @@ gen_output_reg <- function(data,
                            output = NULL,
                            opts = NULL) {
 
-  # Assign CL Percentage on Labels
-  alph <- (1 - get_alpha(opts)) * 100
-  # tlbls[["UCLM"]] <- sprintf(tlbls[["UCLM"]], alph)
-  # tlbls[["LCLM"]] <- sprintf(tlbls[["LCLM"]], alph)
-  # tlbls[["UCLMSTD"]] <- sprintf(tlbls[["UCLMSTD"]], alph)
-  # tlbls[["LCLMSTD"]] <- sprintf(tlbls[["LCLMSTD"]], alph)
-
-  spcs <- get_output_specs_ttest(data, var, paired, class,
-                                 opts, output, report = FALSE)
-
-  data <- spcs$data
-  outreq <- spcs$outreq
-
-
+  # Prepare specs
+  spcs <- get_output_specs_reg(model, opts, output, report = FALSE)
 
   res <- list()
   ctbl <- NULL
@@ -1243,3 +1523,4 @@ gen_output_reg <- function(data,
   return(res)
 
 }
+

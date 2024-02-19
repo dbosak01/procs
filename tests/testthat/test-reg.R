@@ -237,3 +237,114 @@ test_that("reg8: Multiple models  works.", {
 
 
 })
+
+
+
+test_that("reg9: Model names work as expected.", {
+
+  # R Syntax
+  myfm1 <- list(md1 =  formula(Weight ~ Height),
+                md2 = formula(Height ~ Weight),
+                formula(Weight ~ Height + Age))
+
+
+  res1 <- proc_reg(cls, myfm1, output = "report")
+
+  res1
+
+  expect_equal(length(res1), 2)
+
+
+  # SAS Syntax
+  myfm2 <- c(md1 = "Weight = Height",
+             md2 = "Height = Weight",
+             "Weight = Height Age")
+
+
+  res2 <- proc_reg(cls, myfm2, output = "report",
+                   titles = "My nice title")
+
+  res2
+
+  expect_equal(length(res2), 2)
+
+})
+
+
+test_that("reg10: Output dataset works.", {
+
+  # R Syntax
+  myfm1 <- formula(Weight ~ Height)
+
+
+  res1 <- proc_reg(cls, myfm1)
+
+  res1
+
+  expect_equal(nrow(res1), 1)
+
+
+  # SAS Syntax
+  myfm2 <- "Weight = Height"
+
+
+  res2 <- proc_reg(cls, myfm2)
+
+  res2
+
+  expect_equal(nrow(res2), 1)
+
+})
+
+test_that("reg10: Output dataset two models works.", {
+
+  # R Syntax
+  myfm1 <- list(formula(Weight ~ Height),
+                formula(Height ~ Weight + Age))
+
+
+  res1 <- proc_reg(cls, myfm1)
+
+  res1
+
+  expect_equal(nrow(res1), 2)
+
+
+  # SAS Syntax
+  myfm2 <- c("Weight = Height",
+             "Weight = Height Age")
+
+
+  res2 <- proc_reg(cls, myfm2)
+
+  res2
+
+  expect_equal(nrow(res2), 2)
+
+})
+
+
+test_that("reg10: Output by dataset works.", {
+
+  # R Syntax
+  myfm1 <- formula(Weight ~ Height)
+
+
+  res1 <- proc_reg(cls, myfm1, by = Sex)
+
+  res1
+
+  expect_equal(nrow(res1), 1)
+
+
+  # SAS Syntax
+  myfm2 <- "Weight = Height"
+
+
+  res2 <- proc_reg(cls, myfm2)
+
+  res2
+
+  expect_equal(nrow(res2), 1)
+
+})

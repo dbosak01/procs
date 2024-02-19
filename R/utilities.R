@@ -946,6 +946,9 @@ fix_var_names <- function(dat, varnms, varlbls, shp, dnam) {
 get_formulas <- function(models) {
 
   ret <- list()
+  nms <- names(models)
+
+  cnt <- 1
 
   for (ml in models) {
 
@@ -957,7 +960,12 @@ get_formulas <- function(models) {
 
     iv <- paste(s2, collapse = "+")
 
-    ret[[length(ret) + 1]] <- formula(paste(dv, "~", iv))
+    if (length(nms) > 0 && !is.na(nms[cnt]) && nms[cnt] != "")
+      ret[[nms[cnt]]] <- formula(paste(dv, "~", iv))
+    else
+      ret[[length(ret) + 1]] <- formula(paste(dv, "~", iv))
+
+    cnt <- cnt + 1
   }
 
   return(ret)
