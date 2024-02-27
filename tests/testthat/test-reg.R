@@ -31,6 +31,21 @@ William   M  15   66.5  112.0  B')
 
 dev <- FALSE
 
+options("procs.print" = FALSE)
+
+
+test_that("reg0: sasLM version", {
+
+  myfm <- formula(Weight ~ Height)
+
+  res1 <- sasLM::REG(myfm, cls, HC = TRUE)
+
+  res1
+
+  expect_equal(TRUE, TRUE)
+
+})
+
 test_that("reg1: parameter checks work.", {
 
   myfm <- formula(Weight ~ Height)
@@ -252,7 +267,7 @@ test_that("reg9: Model names work as expected.", {
 
   res1
 
-  expect_equal(length(res1), 2)
+  expect_equal(length(res1), 3)
 
 
   # SAS Syntax
@@ -266,8 +281,15 @@ test_that("reg9: Model names work as expected.", {
 
   res2
 
-  expect_equal(length(res2), 2)
+  expect_equal(length(res2), 3)
 
+  # R Syntax
+  res3 <- proc_reg(cls, myfm1, output = "out")
+
+  res3
+
+  expect_equal(nrow(res3), 3)
+  expect_equal(res3$MODEL, c("md1", "md2", "MODEL3"))
 })
 
 
@@ -329,22 +351,310 @@ test_that("reg10: Output by dataset works.", {
   # R Syntax
   myfm1 <- formula(Weight ~ Height)
 
-
   res1 <- proc_reg(cls, myfm1, by = Sex)
 
   res1
 
-  expect_equal(nrow(res1), 1)
+  expect_equal(nrow(res1), 2)
 
 
   # SAS Syntax
   myfm2 <- "Weight = Height"
 
 
-  res2 <- proc_reg(cls, myfm2)
+  res2 <- proc_reg(cls, myfm2, by = Sex)
 
   res2
 
-  expect_equal(nrow(res2), 1)
+  expect_equal(nrow(res2), 2)
+
+  # Multiple by
+  res3 <- proc_reg(cls, myfm1, by = v(region, Sex))
+
+  res3
+
+  expect_equal(nrow(res3), 4)
+
+
+})
+
+test_that("reg11: Optional statistics work.", {
+
+
+  myfm1 <- formula(Weight ~ Height)
+
+  # PRESS
+  res1 <- proc_reg(cls, myfm1, stats = press)
+
+  res1
+
+  expect_equal(res1$PRESS, 2651.35206)
+
+  # EDF
+  res2 <- proc_reg(cls, myfm1, stats = edf)
+
+  res2
+
+  expect_equal(res2$IN, 1)
+  expect_equal(res2$P, 2)
+  expect_equal(res2$EDF, 17)
+  expect_equal(res2$RSQ, 0.7705068427)
+
+  res2 <- proc_reg(cls, myfm1, options = edf)
+
+  res2
+
+  expect_equal("EDF" %in% names(res2), TRUE)
+
+  # RSQUARE + 2 IV
+  myfm2 <- formula(Weight ~ Height + Age)
+  res3 <- proc_reg(cls, myfm2, stats = rsquare)
+
+  res3
+
+  expect_equal(res3$IN, 2)
+  expect_equal(res3$P, 3)
+  expect_equal(res3$EDF, 16)
+  expect_equal(res3$RSQ, 0.7729049378)
+
+  # ADJRSQ
+  res4 <- proc_reg(cls, myfm1, stats = adjrsq)
+
+  res4
+
+  expect_equal(res4$ADJRSQ, 0.7570072452)
+
+  # MSE
+  res5 <- proc_reg(cls, myfm1, stats = mse)
+
+  res5
+
+  expect_equal(res5$MSE, 126.02868962)
+
+  # SSE
+  res6 <- proc_reg(cls, myfm1, stats = sse)
+
+  res6
+
+  expect_equal(res6$SSE, 2142.4877235)
+
+
+  # SEB
+  res7 <- proc_reg(cls, myfm1, stats = seb)
+
+  res7
+
+  expect_equal(nrow(res7), 2)
+  expect_equal(res7$Intercept[2], 32.274591303)
+  expect_equal(res7$Height[2], 0.5160939482)
+
+  res7 <- proc_reg(cls, myfm1, options = outseb)
+
+  res7
+
+  expect_equal(nrow(res7), 2)
+
+
+})
+
+
+
+test_that("reg12: table statistics work.", {
+
+  myfm1 <- formula(Weight ~ Height)
+
+  # TABLE
+  res1 <- proc_reg(cls, myfm1, stats = table)
+
+  res1
+
+  expect_equal(res1$RMSE[1], 11.2262500246)
+
+  expect_equal(res1$TYPE, c("PARMS", "STDERR", "T", "PVALUE", "L95B", "U95B"))
+
+  inval <- c(-143.026918439, 32.2745913033, -4.43156404663, 0.000365578926885,
+    -211.120353939, -74.9334829395)
+
+  expect_equal(res1$Intercept, inval)
+
+  hval <- c(3.89903026878, 0.516093948163, 7.55488469233, 0.000000788681647101,
+            2.81016721732, 4.98789332024)
+
+  expect_equal(res1$Height, hval)
+
+  # Check tableout option
+  res2 <- proc_reg(cls, myfm1, options = tableout)
+
+  res2
+
+  expect_equal(nrow(res2), 6)
+
+})
+
+
+test_that("reg13: alpha option works.", {
+
+
+  myfm1 <- formula(Weight ~ Height)
+
+  res1 <- proc_reg(cls, myfm1, options = c(alpha = .1),
+                   stats = table)
+
+  res1
+
+  expect_equal(res1$TYPE[5], "L90B")
+  expect_equal(res1$TYPE[6], "U90B")
+  expect_equal(res1$Height[5], 3.0012298)
+  expect_equal(res1$Height[6], 4.7968308)
+
+})
+
+
+test_that("reg14: weight parameters works.", {
+
+  # R Syntax
+  myfm1 <- formula(Weight ~ Height)
+
+  res1 <- proc_reg(cls, myfm1, weight = Age)
+
+  res1
+
+  expect_equal(length(res1), 1)
+  expect_equal(res1$RMSE, 41.262062)
+  expect_equal(res1$Intercept, -144.839944)
+  expect_equal(res1$Height, 3.9290125)
+
+})
+
+
+test_that("reg14: single model output options work.", {
+
+
+  myfm1 <- formula(Weight ~ Height)
+
+  # Wide
+  res1 <- proc_reg(cls, myfm1, stats = v(seb, edf))
+
+  res1
+
+  expect_equal(nrow(res1), 2)
+  expect_equal("EDF" %in% names(res1), TRUE)
+
+  # Long
+  res1 <- proc_reg(cls, myfm1, stats = v(seb, edf),
+                   output = "long")
+
+  res1
+
+  expect_equal(nrow(res1), 8)
+  expect_equal(all(c("PARMS", "SEB") %in% names(res1)), TRUE)
+
+  # Stacked
+  res1 <- proc_reg(cls, myfm1, stats = v(seb, edf),
+                   output = "stacked")
+
+  res1
+
+  expect_equal(nrow(res1), 16)
+  expect_equal("VALUES" %in% names(res1), TRUE)
+
+})
+
+test_that("reg15: doble model output options work.", {
+
+
+  myfm1 <- formula(Weight ~ Height)
+  myfm2 <- formula(Height ~ Weight + Age)
+
+  # Wide
+  res1 <- proc_reg(cls, list(myfm1, myfm2), stats = v(seb, edf))
+
+  res1
+
+  expect_equal(nrow(res1), 4)
+  expect_equal("EDF" %in% names(res1), TRUE)
+
+  # Long
+  res1 <- proc_reg(cls, list(myfm1, myfm2), stats = v(seb, edf),
+                   output = "long")
+
+  res1
+
+  expect_equal(nrow(res1), 18)
+  expect_equal(all(c("PARMS", "SEB") %in% names(res1)), TRUE)
+
+  # Stacked
+  res1 <- proc_reg(cls, list(myfm1, myfm2), stats = v(seb, edf),
+                   output = "stacked")
+
+  res1
+
+  expect_equal(nrow(res1), 36)
+  expect_equal("VALUES" %in% names(res1), TRUE)
+
+
+})
+
+
+test_that("reg16: white/spec options work.", {
+
+
+  myfm1 <- formula(Weight ~ Height)
+
+  res1 <- proc_reg(cls, myfm1, output = "report",
+                   stats = spec)
+
+  res1
+
+  expect_equal(length(res1), 5)
+  expect_equal(as.integer(res1$Specification$DF), 2)
+  expect_equal(as.double(res1$Specification$CHISQ), 6.24599610)
+  expect_equal(round(as.double(res1$Specification$PCHISQ), 8), 0.04402498)
+
+})
+
+
+
+test_that("reg17: acov option works.", {
+
+
+  myfm1 <- formula(Weight ~ Height)
+
+  res1 <- proc_reg(cls, myfm1, output = 'report', stats = acov)
+
+  res1
+
+
+
+})
+
+
+
+test_that("reg18: hc option works.", {
+
+
+  myfm1 <- formula(Weight ~ Height)
+
+  res1 <- proc_reg(cls, myfm1, stats = hcc)
+
+  res1
+
+})
+
+
+test_that("reg19: Confidence limit statistics work.", {
+
+
+  myfm1 <- formula(Weight ~ Height)
+
+  # CLB
+  res1 <- proc_reg(cls, myfm1, stats = clb, output = "report")
+
+  res1
+
+  expect_equal("LCLM" %in% names(res1$Coefficients), TRUE)
+  expect_equal("UCLM" %in% names(res1$Coefficients), TRUE)
+  expect_equal(res1$Coefficients$LCLM[1], -211.120354)
+  expect_equal(res1$Coefficients$UCLM[1], -74.933483)
 
 })

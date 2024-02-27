@@ -113,6 +113,8 @@
 #' character vector. For example,
 #' to produce both a report dataset and a "long" output dataset,
 #' use the parameter \code{output = c("report", "out", "long")}.
+#' @param weight The weights for each observation or residual square.  The
+#' weight is commonly provided as the inverse of each variance.
 #' @param options A vector of optional keywords. Valid values are: "alpha =",
 #' "h0 =", and "noprint". The "alpha = " option will set the alpha
 #' value for confidence limit statistics.  The default is 95% (alpha = 0.05).
@@ -159,7 +161,7 @@ proc_reg <- function(data,
                      #var = NULL,
                      output = NULL,
                      # freq = NULL, ?
-                     # weight = NULL, ?
+                     weight = NULL,
                      options = NULL,
                      titles = NULL
 ) {
@@ -168,11 +170,10 @@ proc_reg <- function(data,
   # Not sure why R has an option to keep them
   missing <- FALSE
 
-
   # Deal with single value unquoted parameter values
-  # omodel <- deparse(substitute(model, env = environment()))
-  # model <- tryCatch({if (typeof(model) %in% c("character", "NULL")) model else omodel},
-  #                   error = function(cond) {omodel})
+  oweight <- deparse(substitute(weight, env = environment()))
+  weight <- tryCatch({if (typeof(weight) %in% c("character", "NULL")) weight else oweight},
+                    error = function(cond) {oweight})
 
   # Deal with single value unquoted parameter values
   oby <- deparse(substitute(by, env = environment()))
@@ -190,10 +191,6 @@ proc_reg <- function(data,
   oout <- deparse(substitute(output, env = environment()))
   output <- tryCatch({if (typeof(output) %in% c("character", "NULL")) output else oout},
                      error = function(cond) {oout})
-
-  # opaired <- deparse(substitute(paired, env = environment()))
-  # paired <- tryCatch({if (typeof(paired) %in% c("character", "NULL")) paired else opaired},
-  #                    error = function(cond) {opaired})
 
   # Parameter checks
 
@@ -236,7 +233,14 @@ proc_reg <- function(data,
   # Parameter checks for options
   if (!is.null(options)) {
 
-    kopts <- c("alpha", "h0", "noprint")
+    kopts <- c("alpha", "h0", "noprint",
+               "tableout", "outseb", "outest", "edf")
+
+    # Dataset options
+    # outsscp covout edf outseb outstb outvif pcomit? press rsquare
+
+    # Display options
+    # corr simple usscp all noprint alpha singular plots
 
     # Deal with "alpha =" and "maxdec = " by using name instead of value
     nopts <- names(options)
@@ -253,6 +257,29 @@ proc_reg <- function(data,
     }
   }
 
+  if (!is.null(stats)) {
+
+    sopts <- c("seb", "table", "est", "press",
+               "rsquare", "edf", "adjrsq", "mse", "sse", "spec", "clb", "hcc")
+
+    nsopts <- names(stats)
+
+
+    if (!all(tolower(stats) %in% sopts)) {
+
+      stop(paste0("Invalid stats keyword: ", stats[!tolower(stats) %in% sopts], "\n"))
+    }
+  }
+
+  if (!is.null(weight)) {
+
+    if (length(weight) > 1)
+      stop("Only one variable allowed for the weight parameter.")
+
+    if (!weight %in% nms)
+      stop("Variable specified for weight paramter not found in data.")
+
+  }
 
 
   rptflg <- FALSE
@@ -281,7 +308,9 @@ proc_reg <- function(data,
                              by = by, stats = stats,
                              view = view,
                              titles = titles,
-                             opts = options, output = output)
+                             opts = options,
+                             output = output,
+                             weight = weight)
   }
 
   # Get output datasets if requested
@@ -291,7 +320,8 @@ proc_reg <- function(data,
                           by = by,
                           stats = stats,
                           output = output,
-                          opts = options
+                          opts = options,
+                          weight = weight
     )
   }
 
@@ -491,13 +521,24 @@ get_output_specs_reg <- function(model, opts, output,
 #' @import sasLM
 #' @import common
 #' @import fmtr
-get_reg_report <- function(data, var, model, opts = NULL) {
+get_reg_report <- function(data, var, model, opts = NULL, weight = NULL, stats = NULL) {
 
   ret <- list()
 
   alph <- 1 - get_alpha(opts)
 
-  reg <- REG(Formula = model, Data = data, conf.level = alph, summarize = TRUE)
+  hasHC <- FALSE
+  if ("spec" %in% stats) {
+    hasHC <- TRUE
+  }
+
+  if (!is.null(weight)) {
+    reg <- REG(Formula = model, Data = data, conf.level = alph, summarize = TRUE,
+               Weights = data[[weight]], HC = hasHC)
+  } else {
+    reg <- REG(Formula = model, Data = data, conf.level = alph, summarize = TRUE,
+               HC = hasHC)
+  }
 
   # Observations
   oreg <- get_obs(data, model)
@@ -516,6 +557,15 @@ get_reg_report <- function(data, var, model, opts = NULL) {
   creg <- as.data.frame(unclass(reg$Coefficients), stringsAsFactors = FALSE)
   creg <- data.frame(stub = rownames(reg$Coefficients), creg, stringsAsFactors = FALSE)
   rownames(creg) <- NULL
+
+  hc0reg <- NULL
+  hc3reg <- NULL
+  wreg <- NULL
+  if (hasHC) {
+    hc0reg <- as.data.frame(unclass(reg$HC0), stringsAsFactors = FALSE)
+    hc3reg <- as.data.frame(unclass(reg$HC3), stringsAsFactors = FALSE)
+    wreg <- as.data.frame(unclass(reg$`White Test`), stringsAsFactors = FALSE)
+  }
 
   # Create labels
   rlbls <- c(METHOD = "Method", VARIANCES = "Variances", NDF = "Num DF", DDF = "Den DF",
@@ -554,7 +604,7 @@ get_reg_report <- function(data, var, model, opts = NULL) {
            "Std..Error" = "STDERR", "Lower.CL" = "LCLM", "Upper.CL" = "UCLM",
            "t.value" = "T", "Pr...t.." = "PROBT")
 
-  # Add dependtant mean
+  # Add dependant mean
   lkp[paste0(var, ".Mean")] = "DEPMEAN"
 
   # Translate names
@@ -592,7 +642,34 @@ get_reg_report <- function(data, var, model, opts = NULL) {
   ret[["Observations"]] <- oreg
   ret[["ANOVA"]] <- areg
   ret[["Fitness"]] <- freg
-  ret[["Coefficients"]] <- creg[ , c("stub", "DF", "EST", "STDERR", "T", "PROBT")]
+
+  cols <- c("stub", "DF", "EST", "STDERR", "T", "PROBT")
+  if (!is.null(stats)) {
+    if ("clb" %in% stats)
+      cols <- c("stub", "DF", "EST", "STDERR", "T", "PROBT", "LCLM", "UCLM")
+  }
+
+  ret[["Coefficients"]] <- creg[ , cols]
+
+  # Deal with White's test/spec keyword
+  if (has_option(stats, "spec")) {
+
+    # Create data frame for White's test/Specs
+    ret[["Specification"]] <- data.frame(DF = wreg[2, 1],
+                                         CHISQ = wreg[1, 1],
+                                         PCHISQ = wreg[3, 1],
+                                         stringsAsFactors = FALSE)
+
+    # Assign labels
+    labels(ret[["Specification"]]) <- list(DF = "DF",
+                                           CHISQ = "Chi-Square",
+                                           PCHISQ = "Pr > ChiSq")
+
+    # Assign formats
+    formats(ret[["Specification"]]) <- list(DF = "%d",
+                                            CHISQ = "%.2f",
+                                            PCHISQ = pfmt)
+  }
 
   return(ret)
 }
@@ -601,13 +678,30 @@ get_reg_report <- function(data, var, model, opts = NULL) {
 #' @import common
 #' @import fmtr
 get_reg_output<- function(data, var, model, modelname, opts = NULL, stats = NULL,
-                          byvar = NULL) {
+                          byvars = NULL, weight = NULL) {
 
   ret <- list()
 
+  # Get alpha value
   alph <- 1 - get_alpha(opts)
 
-  reg <- REG(Formula = model, Data = data, conf.level = alph, summarize = TRUE)
+  # Translate options to stat keywords
+  if (has_option(opts, "tableout"))
+      stats <- append(stats, "table")
+
+  if (has_option(opts, "outseb"))
+    stats <- append(stats, "seb")
+
+  if (has_option(opts, "edf"))
+    stats <- append(stats, "edf")
+
+  # Get statistics
+  if (!is.null(weight)) {
+    reg <- REG(Formula = model, Data = data, conf.level = alph, summarize = TRUE,
+               Weights = data[[weight]])
+  } else {
+    reg <- REG(Formula = model, Data = data, conf.level = alph, summarize = TRUE)
+  }
 
   # Observations
   oreg <- get_obs(data, model)
@@ -627,35 +721,6 @@ get_reg_output<- function(data, var, model, modelname, opts = NULL, stats = NULL
   creg <- data.frame(stub = rownames(reg$Coefficients), creg, stringsAsFactors = FALSE)
   rownames(creg) <- NULL
 
-  # Create labels
-  # rlbls <- c(METHOD = "Method", VARIANCES = "Variances", NDF = "Num DF", DDF = "Den DF",
-  #            FVAL = "F Value", PROBF = "Pr > F", SUMSQ = "Sum of Squares",
-  #            MEANSQ = "Mean Square", RMSE = "Root MSE", DEPMEAN = "Dependent Mean",
-  #            COEFVAR = "Coeff Var", RSQ = "R-Square", ADJRSQ = "Adj R-Sq",
-  #            PRESS = "Pred. SS", PRERSQ = "Pred. R-Sq", EST = "Parameter Estimate",
-  #            mlbls)
-  #
-  # # Replace alpha value in labels
-  # alph2 <- (1 - get_alpha(opts)) * 100
-  # rlbls[["UCLM"]] <- sprintf(tlbls[["UCLM"]], alph2)
-  # rlbls[["LCLM"]] <- sprintf(tlbls[["LCLM"]], alph2)
-  # rlbls[["UCLMSTD"]] <- sprintf(tlbls[["UCLMSTD"]], alph2)
-  # rlbls[["LCLMSTD"]] <- sprintf(tlbls[["LCLMSTD"]], alph2)
-
-  # Create
-  # pfmt <- value(condition(is.na(x), "NA"),
-  #               condition(x < .0001, "<.0001"),
-  #               condition(TRUE, "%.4f"),
-  #               log = FALSE)
-
-  # reg_fc <- fcat(N = "%d", MEAN = "%.4f", STD = "%.4f", STDERR = "%.4f",
-  #                MIN = "%.4f", MAX = "%.4f", UCLM = "%.4f", LCLM = "%.4f",
-  #                DF = "%d", "T" = "%.2f", PROBT = pfmt, NDF = "%.3f", DDF = "%.3f",
-  #                FVAL = "%.2f", PROBF = pfmt, UCLMSTD = "%.4f", LCLMSTD = "%.4f",
-  #                SUMSQ = "%.5f", MEANSQ = "%.5f", RMSE = "%.5f", DEPMEAN = "%.5f",
-  #                COEFVAR = "%.5f", RSQ = "%.4f", ADJRSQ = "%.4f", PRESS = "%.5f",
-  #                EST = "%.5f", STDERR = "%.5f", PRERSQ = "%.5f",
-  #                log = FALSE)
 
   lkp <- c("Df" = "DF", "Sum.Sq" = "SUMSQ", "Mean.Sq" = "MEANSQ", "F.value" = "FVAL",
            "Pr..F." = "PROBF", "Root.MSE" = "RMSE",
@@ -672,45 +737,34 @@ get_reg_output<- function(data, var, model, modelname, opts = NULL, stats = NULL
   names(freg) <- fapply(names(freg), lkp)
   names(creg) <- fapply(names(creg), lkp)
 
-  # Assign DF
-  #creg$DF <- 1 # Not sure why this is always 1.
-
-  # Kill predicted values
-  # freg$PRESS <- NULL
-  # freg$PRERSQ <- NULL
 
   # Remove parens
   creg$stub <- sub("(Intercept)", "Intercept", creg$stub, fixed = TRUE)
 
-  # Assign formats
-  # formats(areg) <- reg_fc
-  # formats(freg) <- reg_fc
-  # formats(creg) <- reg_fc
-
-  # Assign labels
-  # labels(areg) <- c(rlbls, stub = "Source")
-  # labels(freg) <- rlbls
-  # labels(creg) <- c(rlbls, stub = "Variable")
-
-  # Assign Widths
-  # widths(areg) <- list(stub = 3)
 
   vrs <- get_vars(model)
 
   # Create output list
   ret <- list()
 
-  # Assign byvar if available
-  if (!is.null(byvar))
-    ret[[names(byvar)]] <- as.character(byvar)
+  # Assign byvars if available
+  if (!is.null(byvars)) {
+    for (bnm in names(byvars)) {
+      ret[[bnm]] <- as.character(byvars[bnm])
+    }
+  }
 
   # Assign base variables
-  ret[["MODEL"]] = modelname
-  ret[["TYPE"]] = "PARMS"
-  ret[["DEPVAR"]] = var
-  ret[["RMSE"]] = freg[1, "RMSE"]
+  ret[["MODEL"]] <- modelname
+  ret[["TYPE"]] <- "PARMS"
+  ret[["DEPVAR"]] <- var
+  ret[["RMSE"]] <- freg[1, "RMSE"]
 
-  # Assign independant variables
+  # Optional Statistics
+  if (has_option(stats, "PRESS"))
+    ret[["PRESS"]] <- freg$PRESS
+
+  # Assign independent variables
   for (i in seq_len(length(creg$stub))) {
 
     ret[[creg$stub[i]]] <- creg[i, "EST"]
@@ -719,8 +773,151 @@ get_reg_output<- function(data, var, model, modelname, opts = NULL, stats = NULL
   # Assign dependent variable
   ret[[var]] <- -1
 
+
+  # Optional Statistics
+  if (has_option(stats, "RSQUARE") ||
+      has_option(stats, "EDF") ||
+      has_option(stats, "ADJRSQ") ||
+      has_option(stats, "MSE") ||
+      has_option(stats, "SSE") ||
+      has_option(stats, "SBC")) {
+
+    ret[["IN"]] <- length(creg$stub) - 1
+    ret[["P"]] <- length(creg$stub)
+    ret[["EDF"]] <- areg[2, "DF"]
+
+    if (has_option(stats, "MSE"))
+      ret[["MSE"]] <- areg[2, "MEANSQ"]
+
+    if (has_option(stats, "SSE"))
+      ret[["SSE"]] <- areg[2, "SUMSQ"]
+
+    ret[["RSQ"]] <- freg$RSQ
+
+    if (has_option(stats, "ADJRSQ"))
+      ret[["ADJRSQ"]] <- freg$ADJRSQ
+
+    if (has_option(stats, "SBC"))
+      ret[["SBC"]] <- freg$ADJRSQ
+
+  }
+
   # Convert to data frame
   ret <- as.data.frame(ret, stringsAsFactors = FALSE)
+
+  if (has_option(stats, "SEB")) {
+
+     lrw <- nrow(ret) + 1
+
+     ret[lrw, "MODEL"] <- modelname
+     ret[lrw, "TYPE"] <- "SEB"
+     ret[lrw, "DEPVAR"] <- var
+     ret[lrw, "RMSE"] <- freg[1, "RMSE"]
+
+     # Assign independent variables
+     for (i in seq_len(length(creg$stub))) {
+
+       ret[lrw, creg$stub[i]] <- creg[i, "STDERR"]
+     }
+
+     # Assign dependent variable
+     ret[lrw, var] <- -1
+  }
+
+  if (has_option(stats, "TABLE")) {
+
+    # STDERR
+    lrw <- nrow(ret) + 1
+
+    # Assign identifying information
+    ret[lrw, "MODEL"] <- modelname
+    ret[lrw, "TYPE"] <- "STDERR"
+    ret[lrw, "DEPVAR"] <- var
+    ret[lrw, "RMSE"] <- freg[1, "RMSE"]
+
+    # Assign independent variables
+    for (i in seq_len(length(creg$stub))) {
+
+      ret[lrw, creg$stub[i]] <- creg[i, "STDERR"]
+    }
+
+    # Assign dependent variable
+    ret[lrw, var] <- NA
+
+    # T
+    lrw <- nrow(ret) + 1
+
+    # Assign identifying information
+    ret[lrw, "MODEL"] <- modelname
+    ret[lrw, "TYPE"] <- "T"
+    ret[lrw, "DEPVAR"] <- var
+    ret[lrw, "RMSE"] <- freg[1, "RMSE"]
+
+    # Assign independent variables
+    for (i in seq_len(length(creg$stub))) {
+
+      ret[lrw, creg$stub[i]] <- creg[i, "T"]
+    }
+
+    # Assign dependent variable
+    ret[lrw, var] <- NA
+
+    # PVALUE
+    lrw <- nrow(ret) + 1
+
+    # Assign identifying information
+    ret[lrw, "MODEL"] <- modelname
+    ret[lrw, "TYPE"] <- "PVALUE"
+    ret[lrw, "DEPVAR"] <- var
+    ret[lrw, "RMSE"] <- freg[1, "RMSE"]
+
+    # Assign independent variables
+    for (i in seq_len(length(creg$stub))) {
+
+      ret[lrw, creg$stub[i]] <- creg[i, "PROBT"]
+    }
+
+    # Assign dependent variable
+    ret[lrw, var] <- NA
+
+
+    # L(alpha)B
+    lrw <- nrow(ret) + 1
+
+    # Assign identifying information
+    ret[lrw, "MODEL"] <- modelname
+    ret[lrw, "TYPE"] <- paste0("L", alph * 100, "B")
+    ret[lrw, "DEPVAR"] <- var
+    ret[lrw, "RMSE"] <- freg[1, "RMSE"]
+
+    # Assign independent variables
+    for (i in seq_len(length(creg$stub))) {
+
+      ret[lrw, creg$stub[i]] <- creg[i, "LCLM"]
+    }
+
+    # Assign dependent variable
+    ret[lrw, var] <- NA
+
+    # U(alpha)B
+    lrw <- nrow(ret) + 1
+
+    # Assign identifying information
+    ret[lrw, "MODEL"] <- modelname
+    ret[lrw, "TYPE"] <- paste0("U", alph * 100, "B")
+    ret[lrw, "DEPVAR"] <- var
+    ret[lrw, "RMSE"] <- freg[1, "RMSE"]
+
+    # Assign independent variables
+    for (i in seq_len(length(creg$stub))) {
+
+      ret[lrw, creg$stub[i]] <- creg[i, "UCLM"]
+    }
+
+    # Assign dependent variable
+    ret[lrw, var] <- NA
+  }
+
 
 
   return(ret)
@@ -755,9 +952,8 @@ add_class_reg <- function(rtbl, ctbl) {
   return(ret)
 }
 
-# Specifically for shaping results of get_class_ttest()
-# Possibly needed for output datasets
-shape_reg_data <- function(ds, shape, copy = NULL) {
+# Specifically for shaping results of get_reg_output()
+shape_reg_data <- function(ds, shape) {
 
   # Assumed to be wide
   ret <- ds
@@ -765,35 +961,32 @@ shape_reg_data <- function(ds, shape, copy = NULL) {
   if (!is.null(shape)) {
     if (all(shape == "long")) {
 
-      bv <- c("CLASS", "METHOD")
-      if (!"CLASS" %in% names(ds))
-        bv <- "METHOD"
+      bv <- c("MODEL", "DEPVAR")
+      # if (!"CLASS" %in% names(ds))
+      #   bv <- "METHOD"
 
       bnms <- find.names(ds, "BY*")
       if (!is.null(bnms))
         bv <- c(bnms, bv)
 
       ret <- proc_transpose(ds, by = bv,
-                            name = "STAT", id = "VAR", copy = copy,
+                            name = "STAT", id = "TYPE",
                             log = FALSE)
-
-      # ret <- proc_transpose(ret, id = "VAR", name = "STAT",
-      #                       copy = copy, log = FALSE)
 
 
     } else if (all(shape == "stacked")) {
 
 
-      bv <- c("VAR", "CLASS", "METHOD")
-      if (!"CLASS" %in% names(ds))
-        bv <- c("VAR", "METHOD")
+      bv <- c("MODEL", "DEPVAR", "TYPE")
+      # if (!"CLASS" %in% names(ds))
+      #   bv <- c("VAR", "METHOD")
 
       bnms <- find.names(ds, "BY*")
       if (!is.null(bnms))
         bv <- c(bnms, bv)
 
       ret <- proc_transpose(ds, by = bv, name = "STAT",
-                            copy = copy, log = FALSE)
+                            log = FALSE)
 
       # ret <- proc_transpose(ret, name = "STAT", by = "VAR",
       #                       copy = copy, log = FALSE)
@@ -820,7 +1013,8 @@ gen_report_reg <- function(data,
                            opts = NULL,
                            output = NULL,
                            view = TRUE,
-                           titles = NULL) {
+                           titles = NULL,
+                           weight = NULL) {
 
 
   spcs <- get_output_specs_reg(model, opts, output, report = TRUE)
@@ -888,7 +1082,8 @@ gen_report_reg <- function(data,
       # for (i in seq_len(length(outreq))) {
 
       # data, var, model, report = TRUE, opts = NULL,
-      byres[[bynm]] <- get_reg_report(dt, vnm, outp$formula, opts = opts)
+      byres[[bynm]] <- get_reg_report(dt, vnm, outp$formula, opts = opts,
+                                      weight = weight, stats = stats)
 
       # Assign titles
       ttls <- c()
@@ -1039,31 +1234,27 @@ gen_report_reg <- function(data,
         titles <- "The REG Function"
 
 
-      # attr(ret, "ttls") <- c(titles, attr(ret, "ttls"))
+      # Add spanning headers
+      nmsret <- names(ret)
+      if ("ANOVA" %in% nmsret) {
+        spn <- span(1, ncol(ret$ANOVA), label = paste("Analysis of Variance"), level = 1)
+        attr(ret$ANOVA, "spans") <- list(spn)
 
-      # for (bc in seq_len(length(byres))) {
-      #
-      #   ttls <- c()
-      #   for (tc in seq_len(length(var))) {
-      #     if (!is.null(var))
-      #       ttls[length(ttls) + 1] <- paste0("Variable: ", var[tc])
-      #     else if (!is.null(paired))
-      #       ttls[length(ttls) + 1] <- paste0("Variable: ", sub("*", "-", paired, fixed = TRUE))
-      #
-      #
-      #   }
-      #
-      #   if (length(byres) > 1) {
-      #     ttls[length(ttls) + 1] <- names(byres)[bc]
-      #
-      #     attr(ret[[bc]], "ttls") <- ttls
-      #
-      #   } else {
-      #
-      #     attr(ret, "ttls") <- ttls
-      #   }
-      #
-      # }
+      }
+
+      if ("Coefficients" %in% nmsret) {
+        spn <- span(1, ncol(ret$Coefficients), label = paste("Parameter Estimates"), level = 1)
+        attr(ret$Coefficients, "spans") <- list(spn)
+
+      }
+
+      if ("Specification" %in% nmsret) {
+        spn <- span(1, ncol(ret$Specification),
+                    label = paste("Test of First and Second Moment Specification"), level = 1)
+        attr(ret$Specification, "spans") <- list(spn)
+
+      }
+
 
       out <- output_report(ret, dir_name = dirname(vrfl),
                            file_name = basename(vrfl), out_type = "HTML",
@@ -1087,7 +1278,8 @@ gen_output_reg <- function(data,
                            by = NULL,
                            stats = NULL,
                            output = NULL,
-                           opts = NULL) {
+                           opts = NULL,
+                           weight = NULL) {
 
   # Prepare specs
   spcs <- get_output_specs_reg(model, opts, output, report = FALSE)
@@ -1149,7 +1341,7 @@ gen_output_reg <- function(data,
           tmpby <- get_reg_output(dat, var = outp$var,
                                   model = outp$formula, modelname = nm,
                                   opts = opts, stats = stats,
-                                  byvar = bynm
+                                  byvar = bynm, weight = weight
                                   )
 
           # Get rid of temporary var names
@@ -1280,8 +1472,16 @@ gen_output_reg <- function(data,
     } # bygrp
   }  # spcs > 0
 
-  if (length(res) == 1)
+  if (length(res) == 1) {
     res <- res[[1]]
+
+    if (has_option(output, "long"))
+      res <- shape_reg_data(res, "long")
+
+    if (has_option(output, "stacked"))
+      res <- shape_reg_data(res, "stacked")
+
+  }
 
 
   return(res)
