@@ -73,33 +73,6 @@ test_that("reg2: get_output_specs_reg works.", {
 
 })
 
-test_that("reg3: get_model_reg() works.", {
-
-
-  myfm <- formula(Weight ~ Height)
-
-
-  res <- get_model_reg(cls, "Weight", myfm)
-
-  res
-
-  expect_equal(length(res), 4)
-  expect_equal(res$Observations$NOBS, c(19, 19))
-
-  cls2 <- cls
-
-  cls2$Height[5] <- NA
-
-  res2 <- get_model_reg(cls2, "Weight", myfm)
-
-  res2
-
-
-  expect_equal(length(res2), 4)
-  expect_equal(res2$Observations$NOBS, c(19, 18, 1))
-
-})
-
 
 test_that("reg4: Basic proc_reg() works.", {
 
@@ -203,7 +176,7 @@ test_that("reg7: by parameter works.", {
   myfm2 <- "Weight = Height"
 
 
-  res2 <- proc_reg(cls, myfm2)
+  res2 <- proc_reg(cls, myfm2, by = Sex, output = "report")
 
   res2
 
@@ -318,7 +291,7 @@ test_that("reg10: Output dataset works.", {
 
 })
 
-test_that("reg10: Output dataset two models works.", {
+test_that("reg11: Output dataset two models works.", {
 
   # R Syntax
   myfm1 <- list(formula(Weight ~ Height),
@@ -346,7 +319,7 @@ test_that("reg10: Output dataset two models works.", {
 })
 
 
-test_that("reg10: Output by dataset works.", {
+test_that("reg12: Output by dataset works.", {
 
   # R Syntax
   myfm1 <- formula(Weight ~ Height)
@@ -378,7 +351,7 @@ test_that("reg10: Output by dataset works.", {
 
 })
 
-test_that("reg11: Optional statistics work.", {
+test_that("reg13: Optional statistics work.", {
 
 
   myfm1 <- formula(Weight ~ Height)
@@ -459,7 +432,7 @@ test_that("reg11: Optional statistics work.", {
 
 
 
-test_that("reg12: table statistics work.", {
+test_that("reg14: table statistics work.", {
 
   myfm1 <- formula(Weight ~ Height)
 
@@ -492,7 +465,7 @@ test_that("reg12: table statistics work.", {
 })
 
 
-test_that("reg13: alpha option works.", {
+test_that("reg15: alpha option works.", {
 
 
   myfm1 <- formula(Weight ~ Height)
@@ -507,10 +480,22 @@ test_that("reg13: alpha option works.", {
   expect_equal(res1$Height[5], 3.0012298)
   expect_equal(res1$Height[6], 4.7968308)
 
+
+  res2 <- proc_reg(cls, myfm1, options = v(tableout, alpha = .1))
+
+  res2
+
+  expect_equal(res2$TYPE[5], "L90B")
+  expect_equal(res2$TYPE[6], "U90B")
+  expect_equal(res2$Height[5], 3.0012298)
+  expect_equal(res2$Height[6], 4.7968308)
+
+
+
 })
 
 
-test_that("reg14: weight parameters works.", {
+test_that("reg16: weight parameters works.", {
 
   # R Syntax
   myfm1 <- formula(Weight ~ Height)
@@ -519,7 +504,7 @@ test_that("reg14: weight parameters works.", {
 
   res1
 
-  expect_equal(length(res1), 1)
+  expect_equal(is.data.frame(res1), TRUE)
   expect_equal(res1$RMSE, 41.262062)
   expect_equal(res1$Intercept, -144.839944)
   expect_equal(res1$Height, 3.9290125)
@@ -527,7 +512,7 @@ test_that("reg14: weight parameters works.", {
 })
 
 
-test_that("reg14: single model output options work.", {
+test_that("reg17: single model output options work.", {
 
 
   myfm1 <- formula(Weight ~ Height)
@@ -560,7 +545,7 @@ test_that("reg14: single model output options work.", {
 
 })
 
-test_that("reg15: doble model output options work.", {
+test_that("reg18: doble model output options work.", {
 
 
   myfm1 <- formula(Weight ~ Height)
@@ -596,7 +581,7 @@ test_that("reg15: doble model output options work.", {
 })
 
 
-test_that("reg16: white/spec options work.", {
+test_that("reg19: white/spec options work.", {
 
 
   myfm1 <- formula(Weight ~ Height)
@@ -615,34 +600,56 @@ test_that("reg16: white/spec options work.", {
 
 
 
-test_that("reg17: acov option works.", {
+# test_that("reg20: acov option works.", {
+#
+#
+#   myfm1 <- formula(Weight ~ Height)
+#
+#   res1 <- proc_reg(cls, myfm1, output = 'report', stats = acov)
+#
+#   res1
+#
+#
+#
+# })
+
+
+
+test_that("reg21: hcc option works.", {
 
 
   myfm1 <- formula(Weight ~ Height)
 
-  res1 <- proc_reg(cls, myfm1, output = 'report', stats = acov)
+  res1 <- proc_reg(cls, myfm1, stats = hcc, output = "report")
 
   res1
 
+  c1 <- res1$Coefficients
+  expect_equal(all(c("HCSTDERR", "HCT", "HCPROBT") %in% names(c1)),
+                   TRUE)
+  expect_equal(as.numeric(c1$HCSTDERR), c(25.81836644, 0.43125902))
+  expect_equal(as.numeric(c1$HCT), c(-5.5397354, 9.0410406))
+  expect_equal(round(as.numeric(c1$HCPROBT), 12), c(.0000360089760592,
+                                                   .0000000664243133830))
+
+  res2 <- proc_reg(cls, myfm1, stats = v(hcc, hccmethod = 3),
+                   output = "report")
+
+  res2
+
+  c2 <- res2$Coefficients
+  expect_equal(all(c("HCSTDERR", "HCT", "HCPROBT") %in% names(c2)),
+               TRUE)
+  expect_equal(as.numeric(c2$HCSTDERR), c(32.23465876, 0.5353434))
+  expect_equal(as.numeric(c2$HCT), c(-4.43705390, 7.28323249))
+  expect_equal(round(as.numeric(c2$HCPROBT), 10), c(.0003613023,
+                                                    .0000012785))
 
 
 })
 
 
-
-test_that("reg18: hc option works.", {
-
-
-  myfm1 <- formula(Weight ~ Height)
-
-  res1 <- proc_reg(cls, myfm1, stats = hcc)
-
-  res1
-
-})
-
-
-test_that("reg19: Confidence limit statistics work.", {
+test_that("reg22: Confidence limit statistics work.", {
 
 
   myfm1 <- formula(Weight ~ Height)

@@ -260,14 +260,19 @@ proc_reg <- function(data,
   if (!is.null(stats)) {
 
     sopts <- c("seb", "table", "est", "press",
-               "rsquare", "edf", "adjrsq", "mse", "sse", "spec", "clb", "hcc")
+               "rsquare", "edf", "adjrsq", "mse", "sse", "spec", "clb", "hcc", "hccmethod")
 
     nsopts <- names(stats)
 
+    if (is.null(nsopts) & length(stats) > 0)
+      nsopts <- stats
 
-    if (!all(tolower(stats) %in% sopts)) {
+    mnsopts <- ifelse(nsopts == "", stats, nsopts)
 
-      stop(paste0("Invalid stats keyword: ", stats[!tolower(stats) %in% sopts], "\n"))
+
+    if (!all(tolower(mnsopts) %in% sopts)) {
+
+      stop(paste0("Invalid stats keyword: ", mnsopts[!tolower(mnsopts) %in% sopts], "\n"))
     }
   }
 
@@ -528,7 +533,7 @@ get_reg_report <- function(data, var, model, opts = NULL, weight = NULL, stats =
   alph <- 1 - get_alpha(opts)
 
   hasHC <- FALSE
-  if ("spec" %in% stats) {
+  if (has_option(stats, "spec") || has_option(stats, "hcc")) {
     hasHC <- TRUE
   }
 
@@ -650,6 +655,39 @@ get_reg_report <- function(data, var, model, opts = NULL, weight = NULL, stats =
   }
 
   ret[["Coefficients"]] <- creg[ , cols]
+
+  # Deal with HCC option
+  if (has_option(stats, "hcc")) {
+
+    hcctype <- 0
+    if (has_option(stats, "hccmethod")) {
+
+      hcctype <- get_option(stats, "hccmethod")
+      if (!is.numeric(hcctype)) {
+        warning("HCC method invalid.  Set to type 0.")
+        hcctype <- 0
+      }
+    }
+
+    tmpc <- ret[["Coefficients"]]
+    tmphc <- hc0reg
+    if (hcctype == 3)
+      tmphc <- hc3reg
+
+    tmpc$HCSTDERR <- tmphc$`Std. Error`
+    tmpc$HCT <- tmphc$`t value`
+    tmpc$HCPROBT <- tmphc$`Pr(>|t|)`
+
+    labels(tmpc) <- list(HCSTDERR = "Std Error",
+                         HCT = "t Value",
+                         HCPROBT = "Pr>|t|")
+
+    formats(tmpc) <- list(HCSTDERR = "%.5f",
+                          HCT = "%.2f",
+                          HCPROBT = pfmt)
+
+    ret[["Coefficients"]] <- tmpc
+  }
 
   # Deal with White's test/spec keyword
   if (has_option(stats, "spec")) {
@@ -1243,8 +1281,17 @@ gen_report_reg <- function(data,
       }
 
       if ("Coefficients" %in% nmsret) {
-        spn <- span(1, ncol(ret$Coefficients), label = paste("Parameter Estimates"), level = 1)
-        attr(ret$Coefficients, "spans") <- list(spn)
+        if (has_option(stats, "hcc")) {
+
+          spn2 <- span(1, ncol(ret$Coefficients), label = paste("Parameter Estimates"), level = 2)
+          spn1 <- span("HCSTDERR", "HCPROBT", label = paste("Heteroscedasticity Consistent"), level = 1)
+          attr(ret$Coefficients, "spans") <- list(spn1, spn2)
+
+        } else {
+          spn <- span(1, ncol(ret$Coefficients), label = paste("Parameter Estimates"), level = 1)
+          attr(ret$Coefficients, "spans") <- list(spn)
+        }
+
 
       }
 
