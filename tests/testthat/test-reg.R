@@ -73,8 +73,10 @@ test_that("reg2: get_output_specs_reg works.", {
 
 })
 
+"noprint"
 
-test_that("reg4: Basic proc_reg() works.", {
+
+test_that("reg3: Basic proc_reg() works.", {
 
   # R Syntax
   myfm1 <- formula(Weight ~ Height)
@@ -96,6 +98,39 @@ test_that("reg4: Basic proc_reg() works.", {
   res2
 
   expect_equal(length(res2), 4)
+
+  # R Syntax 2
+  myfm3 <- Weight ~ Height
+
+  res2 <- proc_reg(cls, myfm3, output = "report")
+
+  res2
+
+  expect_equal(length(res2), 4)
+
+})
+
+test_that("reg4: noprint and none options works.", {
+
+  # R Syntax
+  myfm1 <- formula(Weight ~ Height)
+
+
+  res1 <- proc_reg(cls, myfm1, output = "report",
+                   options = "noprint")
+
+  res1
+
+  # This is an interactive test.  Make sure nothing
+  # is sent to the viewer.
+  expect_equal(TRUE, TRUE)
+
+  res2 <- proc_reg(cls, myfm1, output = "none",
+                   options = "noprint")
+
+  res2
+
+  expect_equal(is.null(res2), TRUE)
 
 })
 
@@ -427,6 +462,16 @@ test_that("reg13: Optional statistics work.", {
 
   expect_equal(nrow(res7), 2)
 
+  # outest
+  res8 <- proc_reg(cls, myfm1, options = OUTEST)
+
+  res8
+
+  expect_equal(nrow(res8), 1)
+
+  # Bad values
+  expect_error(proc_reg(cls, myfm1, options = fork))
+  expect_error(proc_reg(cls, myfm1, stats = fork))
 
 })
 

@@ -28,6 +28,8 @@ The \strong{procs} package contains the following major functions:
 \itemize{
 \item \code{\link{proc_freq}}: Performs frequency  counts and statistics.
 \item \code{\link{proc_means}}: Generates summary statistics.
+\item \code{\link{proc_ttest}}: Performs hypothesis testing.
+\item \code{\link{proc_reg}}: Performs regression testing.
 \item \code{\link{proc_transpose}}: A function to pivot datasets.
 \item \code{\link{proc_sort}}: Sorts and dedupes a dataset.
 \item \code{\link{proc_print}}: An easy dataset print function.
@@ -36,4 +38,25 @@ The \strong{procs} package contains the following major functions:
 See function documentation for additional details.
 }
 
+\seealso{
+Useful links:
+\itemize{
+  \item \url{https://procs.r-sassy.org}
+  \item \url{https://github.com/dbosak01/procs}
+  \item Report bugs at \url{https://github.com/dbosak01/procs/issues}
+}
+
+}
+\author{
+\strong{Maintainer}: David Bosak \email{dbosak01@gmail.com}
+
+Other contributors:
+\itemize{
+  \item Kevin Kramer \email{kkrame02@amgen.com} [contributor]
+  \item Brian Varney \email{brian.varney@experis.com} [contributor]
+  \item Duong Tran \email{trand000@aol.com} [contributor]
+  \item Yifei Chen \email{yifeichen@andrewsosborne.com} [contributor]
+}
+
+}
 \keyword{internal}

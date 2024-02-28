@@ -20,6 +20,7 @@ reference:
   - proc_freq
   - proc_means
   - proc_ttest
+  - proc_reg
 
 - title: Data Manipulation
   desc: Functions to manipulate data.

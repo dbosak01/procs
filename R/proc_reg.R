@@ -6,16 +6,29 @@
 #' @title Calculates a Regression
 #' @encoding UTF-8
 #' @description The \code{proc_reg} function performs a regression
-#' for selected variables on the input dataset.
-#' The variables are identified on the \code{var} parameter or the \code{paired}
-#' parameter. The function will calculate a standard set of T-Test statistics.
-#' Results are displayed in
-#' the viewer interactively and returned from the function.
+#' for one or more models.  The model(s) are passed on the \code{model} parameter,
+#' and the input dataset is passed on the \code{data} parameter.  The \code{stats}
+#' parameter allows you to request additional statistics, similar to the
+#' model options in SAS.  The \code{by}
+#' parameter allows you to subset the data into groups and run the model on each
+#' group.  The \code{weight} parameter let's you assign a weight to each observation
+#' in the dataset.  The \code{output} and \code{options} parameters provide
+#' additional customization of the results.
 #' @details
-#' The \code{proc_reg} function is for ...
+#' The \code{proc_reg} function is a general purpose regression function.  It
+#' produces a dataset output by default, and, when working in RStudio,
+#' also produces an interactive report.  The function has many convenient options
+#' for what statistics are produced and how the analysis is performed. All
+#' statistical output from \code{proc_reg} matches SAS.
+#'
+#' A model may be specified using R model syntax or SAS model syntax.  To use
+#' SAS syntax, the model statement must be quoted.  To pass multiple models using
+#' R syntax, pass them to the \code{model} parameter in a list.  To pass multiple
+#' models using SAS syntax, pass them to the \code{model} parameter as a vector
+#' of strings.
 #'
 #' @section Interactive Output:
-#' By default, \code{proc_ttest} results will
+#' By default, \code{proc_reg} results will
 #' be sent to the viewer as an HTML report.  This functionality
 #' makes it easy to get a quick analysis of your data. To turn off the
 #' interactive report, pass the "noprint" keyword
@@ -31,18 +44,64 @@
 #'
 #' @section Dataset Output:
 #' Dataset results are also returned from the function by default.
-#' \code{proc_ttest} typically returns multiple datasets in a list. Each
-#' dataset will be named according to the category of statistical
-#' results.  There are three standard categories: "Statistics",
-#' "ConfLimits", and "TTests". For the class style analysis, the function
-#' also returns a dataset called "Equality" that shows the Folded F analysis.
+#' \code{proc_reg} typically returns a single dataset. The columns and rows
+#' on this dataset can change depending on the keywords passed
+#' to the \code{stats} and \code{options} parameters.
 #'
-#' The output datasets generated are optimized for data manipulation.
+#' The default output dataset is optimized for data manipulation.
 #' The column names have been standardized, and additional variables may
-#' be present to help with data manipulation.  For example, the by variable
-#' will always be named "BY".  In addition, data values in the
-#' output datasets are intentionally not rounded or formatted
+#' be present to help with data manipulation. The data values in the
+#' output dataset are intentionally not rounded or formatted
 #' to give you the most accurate numeric results.
+#'
+#' You may also request
+#' to return the datasets used in the interactive report. To request these
+#' datasets, pass the "report" option to the \code{output} parameter.  Each report
+#' dataset will be named according to the category of statistical
+#' results.  There are four standard categories: "Observations",
+#' "ANOVA", "Fitness", and "Coefficients". When the "spec" statistics option
+#' is passed, the function will also return a "Specification" dataset containing
+#' the White's test results.
+#'
+#' If you don't want any datasets returned, pass the "none" option on the
+#' \code{output} parameter.
+#'
+#' @section Statistics Keywords:
+#' The following statistics keywords can be passed on the \code{stats}
+#' parameter. You may pass statistic keywords as a
+#' quoted vector of strings, or an unquoted vector using the \code{v()} function.
+#' An individual statistics keyword can be passed without quoting.
+#' \itemize{
+#'   \item{\strong{adjrsq}: Added adjusted r-square value to the output dataset.}
+#'   \item{\strong{clb}: Requests confidence limits be added to the interactive report.}
+#'   \item{\strong{edf}: Includes the number of regressors, the error degress of freedom,
+#'   and the model r-square to the output dataset.}
+#'   \item{\strong{est}: Request an output dataset of parameter estimate and optional
+#'   model fit summary statistics. This statistics option is the default.}
+#'   \item{\strong{hcc}: The "hcc" statistics keyword requests that
+#'   heteroscedasticity-consistent standard errors of the parameter estimates be
+#'   sent to the interactive report.}
+#'   \item{\strong{hccmethod=}: When the "hcc" option is present, the "hccmethod="
+#'   option specifies the type of method to use. Valid values are 0 and 3.}
+#'   \item{\strong{mse}: Computes the mean square error for each model and adds to the
+#'   output dataset.}
+#'   \item{\strong{press}: Includes the PRESS statistic in the output dataset.}
+#'   \item{\strong{rsquare}: Include the r-square statistic in the output dataset.
+#'   The "rsquare" option has the same effect as the "edf" option.}
+#'   \item{\strong{seb}: Outputs the standard errors of the parameter estimates
+#'   to the output dataset.  These values will be identified as type "SEB".}
+#'   \item{\strong{spec}: Adds the "White's test" table to the interactive output.
+#'   This test determines whether the first and second moments of the model
+#'   are correctly specified.}
+#'   \item{\strong{sse}: Adds the error sum of squares to the output dataset.}
+#'   \item{\strong{table}: The "table" keyword is used to send standard
+#'   errors, t-statistics, p-values, and confidence limits to the output
+#'   dataset.  These additional statistics are identified by types "STDERR",
+#'   "T", and "PVALUE". The confidence limits are identified by "LxxB" and "UxxB",
+#'   where "xx" is the alpha value in percentage terms. The "table" keyword
+#'   on the \code{stats} parameter performs the same functions as the "tableout"
+#'   option on the \code{options} parameter.}
+#'   }
 #'
 #' @section Options:
 #' The \code{proc_reg} function recognizes the following options.  Options may
@@ -54,15 +113,31 @@
 #' between 0 and 1.  For example, you can set a 90% confidence limit as
 #' \code{alpha = 0.1}.
 #' }
-#' \item{\strong{h0}: The "h0 =" option is used to set the baseline mean value
-#' for testing a single variable.  Pass the option as a name/value pair,
-#' such as \code{h0 = 95}.
-#' }
 #' \item{\strong{noprint}: Whether to print the interactive report to the
 #' viewer.  By default, the report is printed to the viewer. The "noprint"
 #' option will inhibit printing.  You may inhibit printing globally by
 #' setting the package print option to false:
 #' \code{options("procs.print" = FALSE)}.
+#' }
+#' \item{\strong{outest}: The "outest" option is used to request the parameter
+#' estimates and model fit summary statistic be sent to the output dataset.
+#' The parameter estimates are identified as type "PARMS" on the output
+#' dataset.
+#' The "outest" dataset is the default output dataset, and this option
+#' does not normally need to be passed.
+#' }
+#' \item{\strong{outseb}: The "outseb" option is used to request the standard
+#' errors be sent to the output dataset.  The standard errors will be added
+#' as a new row identified by type "SEB".  This request
+#' can also be made by passing the "seb" keyword to the \code{stats} parameter.
+#' }
+#' \item{\strong{tableout}: The "tableout" option is used to send standard
+#' errors, t-statistics, p-values, and confidence limits to the output
+#' dataset.  These additional statistics are identified by types "STDERR",
+#' "T", and "PVALUE". The confidence limits are identified by "LxxB" and "UxxB",
+#' where "xx" is the alpha value in percentage terms. The "tableout" option
+#' on the \code{options} parameter performs the same functions as the "table"
+#' keyword on the \code{stats} parameter.
 #' }
 #' }
 #' @section Data Shaping:
@@ -88,24 +163,34 @@
 #' These shaping options are passed on the \code{output} parameter.  For example,
 #' to return the data in "long" form, use \code{output = "long"}.
 #'
-#' @param data The input data frame for which to calculate summary statistics.
+#' @param data The input data frame for which to perform the regression analysis.
 #' This parameter is required.
-#' @param model A vector of paired variables to perform a paired T-Test on.
-#' Variables should
-#' be separated by a star (*).  The entire string should be quoted, for example,
-#' \code{paired = "var1 * var2"}.  To test multiple pairs, place the pairs in a
-#' quoted vector
-#' : \code{paired = c("var1 * var2", "var3 * var4")}.  The parameter does not
-#' accept parenthesis, hyphens, or any other shortcut syntax.
+#' @param model A model for the regression to be performed.  The model can be
+#' specified using either R syntax or SAS syntax. \code{model = var1 ~ var2 + var3} is
+#' an example of R style model syntax. If you wish to pass multiple models using
+#' R syntax, pass them in a list.  For SAS syntax, pass the model as a quoted string.
+#' \code{model = "var1 = var2 var3"} is an example of SAS model syntax.  To pass
+#' multiple models using SAS syntax, pass them as a vector of strings. By default,
+#' the models will be named "MODEL1", "MODEL2", etc.  If you want to name your
+#' model, pass it as a named list or named vector.
 #' @param by An optional by group. If you specify a by group, the input
-# data will be subset on the by variable(s) prior to performing any
-#' statistics.
+#'  data will be subset on the by variable(s) prior to performing the regression.
+#' @param stats Optional statistics keywords.  Valid values are "adjrsq", "clb",
+#' "est", "edf", "hcc", "hccmethod", "mse", "press", "rsquare",
+#' "sse", "spec", "seb", and "table".  A single keyword may be passed with or
+#' without quotes. Pass multiple keywords either as a quoted vector, or unquoted
+#' vector using the \code{v()} function.  These statistics keywords largely
+#' correspond to the options on the "model" statement in SAS. Most of them
+#' control which statistics are added to the output dataset.  Some
+#' control statistics on the interactive report.  See the \strong{Statistics Keywords}
+#' section for details on the purpose and target of each keyword.
 #' @param output Whether or not to return datasets from the function. Valid
 #' values are "out", "none", and "report".  Default is "out", and will
 #' produce dataset output specifically designed for programmatic use. The "none"
 #' option will return a NULL instead of a dataset or list of datasets.
 #' The "report" keyword returns the datasets from the interactive report, which
-#' may be different from the standard output. The output parameter also accepts
+#' may be different from the standard output. Note that some statistics are only
+#' available on the interactive report.  The output parameter also accepts
 #' data shaping keywords "long, "stacked", and "wide".
 #' These shaping keywords control the structure of the output data. See the
 #' \strong{Data Shaping} section for additional details. Note that
@@ -116,15 +201,16 @@
 #' @param weight The weights for each observation or residual square.  The
 #' weight is commonly provided as the inverse of each variance.
 #' @param options A vector of optional keywords. Valid values are: "alpha =",
-#' "h0 =", and "noprint". The "alpha = " option will set the alpha
+#' "noprint", "outest", "outseb" and "tableout". The "alpha = " option will set the alpha
 #' value for confidence limit statistics.  The default is 95% (alpha = 0.05).
-#' The "h0 = " option sets the baseline hypothesis value for single-variable
-#' hypothesis testing.  The "noprint" option turns off the interactive report.
+#' The "noprint" option turns off the interactive report. For the statistical options,
+#' see the \strong{Options} section for additional explanation.
 #' @param titles A vector of one or more titles to use for the report output.
-#' @return Normally, the requested T-Test statistics are shown interactively
-#' in the viewer, and output results are returned as a list of data frames.
-#' You may then access individual datasets from the list using dollar sign ($)
-#' syntax.
+#' @return Normally, the requested regression statistics are shown interactively
+#' in the viewer, and output results are returned as a data frame.
+#' If you request "report" datasets, they will be returned as a list.
+#' You may then access individual report datasets from the list using dollar sign
+#' ($) syntax.
 #' The interactive report can be turned off using the "noprint" option, and
 #' the output datasets can be turned off using the "none" keyword on the
 #' \code{output} parameter.
@@ -136,26 +222,89 @@
 #' options("procs.print" = FALSE)
 #'
 #' # Prepare sample data
-#' dat1 <- subset(sleep, group == 1, c("ID", "extra"))
-#' dat2 <- subset(sleep, group == 2, c("ID", "extra"))
-#' dat <- data.frame(ID = dat1$ID, group1 = dat1$extra, group2 = dat2$extra)
+#' set.seed(123)
+#' dat <- cars
+#' samplecar <- sample(c(TRUE, FALSE), nrow(cars), replace=T, prob=c(0.6, 0.4))
+#' dat$group <- ifelse(samplecar %in% seq(1, nrow(cars)), "Group A", "Group B")
 #'
-#' # View sample data
-#' dat
-#' #    ID group1 group2
-#' # 1   1    0.7    1.9
-#' # 2   2   -1.6    0.8
-#' # 3   3   -0.2    1.1
-#' # 4   4   -1.2    0.1
-#' # 5   5   -0.1   -0.1
-#' # 6   6    3.4    4.4
-#' # 7   7    3.7    5.5
-#' # 8   8    0.8    1.6
-#' # 9   9    0.0    4.6
-#' # 10 10    2.0    3.4
+#' # Example 1: R Model Syntax
+#' res1 <- proc_reg(dat, model = dist ~ speed)
 #'
+#' # View Results
+#' res1
+#' #    MODEL  TYPE DEPVAR     RMSE Intercept    speed dist
+#' # 1 MODEL1 PARMS   dist 15.37959 -17.57909 3.932409   -1
+#'
+#' # Example 2: SAS Model Syntax
+#' res2 <- proc_reg(dat, model = "dist = speed")
+#'
+#' # View Results
+#' res2
+#' #    MODEL  TYPE DEPVAR     RMSE Intercept    speed dist
+#' # 1 MODEL1 PARMS   dist 15.37959 -17.57909 3.932409   -1
+#'
+#' # Example 3: Report Output
+#' res3 <- proc_reg(dat, model = dist ~ speed, output = report)
+#'
+#' # View Results
+#' res3
+#' # $Observations
+#' # stub NOBS
+#' # 1 Number of Observations Read   50
+#' # 2 Number of Observations Used   50
+#' #
+#' # $ANOVA
+#' # stub DF    SUMSQ     MEANSQ     FVAL        PROBF
+#' # 1           Model  1 21185.46 21185.4589 89.56711 1.489919e-12
+#' # 2           Error 48 11353.52   236.5317       NA           NA
+#' # 3 Corrected Total 49 32538.98         NA       NA           NA
+#' #
+#' # $Fitness
+#' # RMSE DEPMEAN  COEFVAR       RSQ    ADJRSQ
+#' # 1 15.37959   42.98 35.78312 0.6510794 0.6438102
+#' #
+#' # $Coefficients
+#' # stub DF        EST    STDERR         T        PROBT
+#' # 1 Intercept  1 -17.579095 6.7584402 -2.601058 1.231882e-02
+#' # 2     speed  1   3.932409 0.4155128  9.463990 1.489919e-12
+#'
+#' # Example 4: By variable
+#' res4 <- proc_reg(dat, model = dist ~ speed, by = group)
+#'
+#' # View Results
+#' res4
+#' #        BY  MODEL  TYPE DEPVAR     RMSE  Intercept    speed dist
+#' # 1 Group A MODEL1 PARMS   dist 15.35049 -24.888326 4.275357   -1
+#' # 2 Group B MODEL1 PARMS   dist 15.53676  -8.705547 3.484381   -1
+#'
+#' # Example 5: "tableout" Option
+#' res5 <- proc_reg(dat, model = dist ~ speed, options = tableout)
+#'
+#' # View Results
+#' res5
+#' #    MODEL   TYPE DEPVAR     RMSE    Intercept        speed dist
+#' # 1 MODEL1  PARMS   dist 15.37959 -17.57909489 3.932409e+00   -1
+#' # 2 MODEL1 STDERR   dist 15.37959   6.75844017 4.155128e-01   NA
+#' # 3 MODEL1      T   dist 15.37959  -2.60105800 9.463990e+00   NA
+#' # 4 MODEL1 PVALUE   dist 15.37959   0.01231882 1.489919e-12   NA
+#' # 5 MODEL1   L95B   dist 15.37959 -31.16784960 3.096964e+00   NA
+#' # 6 MODEL1   U95B   dist 15.37959  -3.99034018 4.767853e+00   NA
+#'
+#' # Example 6: Multiple Models plus Statistics Keywords
+#' res6 <- proc_reg(dat, model = list(mod1 = dist ~ speed,
+#'                                    mod2 = speed ~ dist),
+#'                  stats = v(press, seb))
+#'
+#' # View Results
+#' res6
+#' #  MODEL  TYPE DEPVAR      RMSE      PRESS   Intercept      speed        dist
+#' # 1 mod1 PARMS   dist 15.379587 12320.2708 -17.5790949  3.9324088 -1.00000000
+#' # 2 mod1   SEB   dist 15.379587         NA   6.7584402  0.4155128 -1.00000000
+#' # 3 mod2 PARMS  speed  3.155753   526.2665   8.2839056 -1.0000000  0.16556757
+#' # 4 mod2   SEB  speed  3.155753         NA   0.8743845 -1.0000000  0.01749448
+
 proc_reg <- function(data,
-                     model = NULL,
+                     model,
                      by = NULL,
                      stats = NULL,
                      #var = NULL,
@@ -224,17 +373,14 @@ proc_reg <- function(data,
 
   }
 
-  # https://documentation.sas.com/doc/en/pgmsascdc/9.4_3.4/statug/statug_ttest_overview.htm
-  # https://documentation.sas.com/doc/en/pgmsascdc/9.4_3.4/statug/statug_ttest_syntax01.htm
-  # aopts <- c("alpha=", "dist", "H0=", "sides", "test", "tost", "crossover=") # analysis options
-  # dopts <- c("ci", "cochran", "plots") # display options
-  # oopts <- c("byvar", "nobyvar")  # Output ordering
+  # https://documentation.sas.com/doc/en/pgmsascdc/9.4_3.4/statug/statug_reg_syntax01.htm
+  # https://documentation.sas.com/doc/en/pgmsascdc/9.4_3.4/statug/statug_reg_syntax08.htm
 
   # Parameter checks for options
   if (!is.null(options)) {
 
-    kopts <- c("alpha", "h0", "noprint",
-               "tableout", "outseb", "outest", "edf")
+    kopts <- c("alpha", "noprint",
+               "tableout", "outseb", "outest")
 
     # Dataset options
     # outsscp covout edf outseb outstb outvif pcomit? press rsquare
@@ -242,7 +388,7 @@ proc_reg <- function(data,
     # Display options
     # corr simple usscp all noprint alpha singular plots
 
-    # Deal with "alpha =" and "maxdec = " by using name instead of value
+    # Deal with "alpha =" by using name instead of value
     nopts <- names(options)
 
     if (is.null(nopts) & length(options) > 0)
@@ -346,10 +492,9 @@ proc_reg <- function(data,
   log_reg(data,
             model = model,
             by = by,
-            # class = class,
-            # var = var,
+            stats = stats,
             output = output,
-            # weight = weight,
+            weight = weight,
             view = view,
             titles = titles,
             options = options,
@@ -372,10 +517,9 @@ proc_reg <- function(data,
 log_reg <- function(data,
                       model = NULL,
                       by = NULL,
-                      # class = NULL,
-                      # var = NULL,
+                      stats = NULL,
                       output = NULL,
-                      #weight = NULL,
+                      weight = NULL,
                       view = TRUE,
                       titles = NULL,
                       options = NULL,
@@ -395,15 +539,15 @@ log_reg <- function(data,
   if (!is.null(by))
     ret[length(ret) + 1] <- paste0(indt, "by: ", paste(by, collapse = " "))
 
-  # if (!is.null(var))
-  #   ret[length(ret) + 1] <- paste0(indt, "var: ",
-  #                                  paste(var, collapse = " "))
+  if (!is.null(stats))
+    ret[length(ret) + 1] <- paste0(indt, "stats: ",
+                                   paste(stats, collapse = " "))
 
   if (!is.null(output))
     ret[length(ret) + 1] <- paste0(indt, "output: ", paste(output, collapse = " "))
 
-  # if (!is.null(weight))
-  #   ret[length(ret) + 1] <- paste0(indt, "weight: ", paste(weight, collapse = " "))
+  if (!is.null(weight))
+    ret[length(ret) + 1] <- paste0(indt, "weight: ", paste(weight, collapse = " "))
 
   if (!is.null(view))
     ret[length(ret) + 1]<- paste0(indt, "view: ", paste(view, collapse = " "))
