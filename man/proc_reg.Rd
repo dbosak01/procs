@@ -256,7 +256,7 @@ options("procs.print" = FALSE)
 # Prepare sample data
 set.seed(123)
 dat <- cars
-samplecar <- sample(c(TRUE, FALSE), nrow(cars), replace=T, prob=c(0.6, 0.4))
+samplecar <- sample(c(TRUE, FALSE), nrow(cars), replace=TRUE, prob=c(0.6, 0.4))
 dat$group <- ifelse(samplecar \%in\% seq(1, nrow(cars)), "Group A", "Group B")
 
 # Example 1: R Model Syntax

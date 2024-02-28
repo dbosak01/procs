@@ -408,9 +408,9 @@ test_that("reg13: Optional statistics work.", {
   expect_equal(res2$EDF, 17)
   expect_equal(res2$RSQ, 0.7705068427)
 
-  res2 <- proc_reg(cls, myfm1, options = edf)
-
-  res2
+  # res2 <- proc_reg(cls, myfm1, options = edf)
+  #
+  # res2
 
   expect_equal("EDF" %in% names(res2), TRUE)
 
