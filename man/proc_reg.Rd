@@ -23,8 +23,8 @@ This parameter is required.}
 \item{model}{A model for the regression to be performed.  The model can be
 specified using either R syntax or SAS syntax. \code{model = var1 ~ var2 + var3} is
 an example of R style model syntax. If you wish to pass multiple models using
-R syntax, pass them in a list.  For SAS syntax, pass the model as a quoted string.
-\code{model = "var1 = var2 var3"} is an example of SAS model syntax.  To pass
+R syntax, pass them in a list.  For SAS syntax, pass the model as a quoted string:
+\code{model = "var1 = var2 var3"}.  To pass
 multiple models using SAS syntax, pass them as a vector of strings. By default,
 the models will be named "MODEL1", "MODEL2", etc.  If you want to name your
 model, pass it as a named list or named vector.}
@@ -38,7 +38,7 @@ data will be subset on the by variable(s) prior to performing the regression.}
 without quotes. Pass multiple keywords either as a quoted vector, or unquoted
 vector using the \code{v()} function.  These statistics keywords largely
 correspond to the options on the "model" statement in SAS. Most of them
-control which statistics are added to the output dataset.  Some
+control which statistics are added to the output dataset.  Some keywords
 control statistics on the interactive report.  See the \strong{Statistics Keywords}
 section for details on the purpose and target of each keyword.}
 
@@ -163,9 +163,9 @@ heteroscedasticity-consistent standard errors of the parameter estimates be
 sent to the interactive report.}
 \item{\strong{hccmethod=}: When the "hcc" option is present, the "hccmethod="
 option specifies the type of method to use. Valid values are 0 and 3.}
-\item{\strong{mse}: Computes the mean square error for each model and adds to the
+\item{\strong{mse}: Computes the mean squared error for each model and adds to the
 output dataset.}
-\item{\strong{press}: Includes the PRESS statistic in the output dataset.}
+\item{\strong{press}: Includes the predicted sum of squares statistic in the output dataset.}
 \item{\strong{rsquare}: Include the r-square statistic in the output dataset.
 The "rsquare" option has the same effect as the "edf" option.}
 \item{\strong{seb}: Outputs the standard errors of the parameter estimates

@@ -129,8 +129,8 @@ This parameter is required.</p></dd>
 <dd><p>A model for the regression to be performed.  The model can be
 specified using either R syntax or SAS syntax. <code>model = var1 ~ var2 + var3</code> is
 an example of R style model syntax. If you wish to pass multiple models using
-R syntax, pass them in a list.  For SAS syntax, pass the model as a quoted string.
-<code>model = "var1 = var2 var3"</code> is an example of SAS model syntax.  To pass
+R syntax, pass them in a list.  For SAS syntax, pass the model as a quoted string:
+<code>model = "var1 = var2 var3"</code>.  To pass
 multiple models using SAS syntax, pass them as a vector of strings. By default,
 the models will be named "MODEL1", "MODEL2", etc.  If you want to name your
 model, pass it as a named list or named vector.</p></dd>
@@ -148,7 +148,7 @@ data will be subset on the by variable(s) prior to performing the regression.</p
 without quotes. Pass multiple keywords either as a quoted vector, or unquoted
 vector using the <code><a href="https://common.r-sassy.org/reference/v.html" class="external-link">v()</a></code> function.  These statistics keywords largely
 correspond to the options on the "model" statement in SAS. Most of them
-control which statistics are added to the output dataset.  Some
+control which statistics are added to the output dataset.  Some keywords
 control statistics on the interactive report.  See the <strong>Statistics Keywords</strong>
 section for details on the purpose and target of each keyword.</p></dd>
 
@@ -271,9 +271,9 @@ heteroscedasticity-consistent standard errors of the parameter estimates be
 sent to the interactive report.</p></li>
 <li><p><strong>hccmethod=</strong>: When the "hcc" option is present, the "hccmethod="
 option specifies the type of method to use. Valid values are 0 and 3.</p></li>
-<li><p><strong>mse</strong>: Computes the mean square error for each model and adds to the
+<li><p><strong>mse</strong>: Computes the mean squared error for each model and adds to the
 output dataset.</p></li>
-<li><p><strong>press</strong>: Includes the PRESS statistic in the output dataset.</p></li>
+<li><p><strong>press</strong>: Includes the predicted sum of squares statistic in the output dataset.</p></li>
 <li><p><strong>rsquare</strong>: Include the r-square statistic in the output dataset.
 The "rsquare" option has the same effect as the "edf" option.</p></li>
 <li><p><strong>seb</strong>: Outputs the standard errors of the parameter estimates
