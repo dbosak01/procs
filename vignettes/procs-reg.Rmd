@@ -13,14 +13,15 @@ knitr::opts_chunk$set(
   comment = "#>"
 )
 ```
-The `proc_reg()` function simulates a SAS® PROC REG procedure.  It is used to
+The `proc_reg()` function replicates a SAS® PROC REG procedure.  It is used to
 perform a regression analysis.  The function is both 
 interactive and returns datasets.   
 
 ## Create Sample Data
 
 First, let's create some sample data.  This sample data shows Sex, Age, Height,
-and Weight for a group of students:  
+and Weight for a group of students.  In this example, we'll examine the relationship
+between Weight and Height:  
 ```{r eval=FALSE, echo=TRUE} 
 # Create sample data
 cls <- read.table(header = TRUE, text = '
@@ -180,7 +181,7 @@ res3
 ```
 
 If you want to return the statistics from the interactive report as data, 
-you do that using `output = "report"`:
+you can do that using `output = "report"`:
 
 ```{r eval=FALSE, echo=TRUE} 
 # Output dataset using "report" output
@@ -297,8 +298,8 @@ Here is the interactive display for the two models:
 ## Data Shaping
 
 The `proc_reg` function also offers options for data shaping.  The
-shaping options can reduce the number of transformations needed to
-get to your target table.  
+shaping options can reduce the number of transformations needed for 
+follow-on analysis.  
 
 There are three shaping options: "wide", "long", and "stacked".  The "wide"
 option is the default, and places the statistics in columns and variables in
