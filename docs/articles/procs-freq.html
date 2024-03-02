@@ -67,6 +67,9 @@
       <a href="../articles/procs-ttest.html">The TTest Function</a>
     </li>
     <li>
+      <a href="../articles/procs-reg.html">The Reg Function</a>
+    </li>
+    <li>
       <a href="../articles/procs-dm.html">Data Manipulation Functions</a>
     </li>
     <li>
@@ -121,7 +124,7 @@
 
     
     
-<p>The <code>proc_freq</code> function simulates a SAS® PROC FREQ
+<p>The <code><a href="../reference/proc_freq.html">proc_freq()</a></code> function simulates a SAS® PROC FREQ
 procedure. Below is a short tutorial on the function. Like PROC FREQ,
 the function is both an interactive function and returns datasets.</p>
 <div class="section level2">
@@ -157,7 +160,7 @@ the function is both an interactive function and returns datasets.</p>
 <h2 id="get-frequencies">Get Frequencies<a class="anchor" aria-label="anchor" href="#get-frequencies"></a>
 </h2>
 <p>Now that we have some data, let’s send that data to the
-<code>proc_freq</code> function to see the frequency distribution.</p>
+<code><a href="../reference/proc_freq.html">proc_freq()</a></code> function to see the frequency distribution.</p>
 <p>The <code><a href="https://rdrr.io/r/base/options.html" class="external-link">options()</a></code> statement below turns off printing of all
 <strong>procs</strong> functions. This statement is necessary so that
 the sample code below can pass CRAN checks. When running sample code
@@ -179,7 +182,7 @@ percent shown for each frequency count.</p>
 <h2 id="control-columns">Control Columns<a class="anchor" aria-label="anchor" href="#control-columns"></a>
 </h2>
 <p>The <code>options</code> parameter can control many aspects of the
-<code>proc_freq</code> function. For example, if you did not want the
+<code><a href="../reference/proc_freq.html">proc_freq()</a></code> function. For example, if you did not want the
 cumulative frequency and percent, you could turn off these columns with
 the option “nocum”.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
@@ -228,7 +231,7 @@ cross-tabulation table:</p>
 </h2>
 <p>The <code>tables</code> parameter accepts more than one table
 request. To request multiple tables, pass a quoted or unquoted vector.
-Note that <code>proc_freq</code> does not accept grouping syntax, such
+Note that <code><a href="../reference/proc_freq.html">proc_freq()</a></code> does not accept grouping syntax, such
 as that allowed by SAS®. You must specify each cross-tab
 individually:</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
@@ -251,8 +254,9 @@ values in a categorical variable:</p>
 <h2 id="weighted-frequencies">Weighted Frequencies<a class="anchor" aria-label="anchor" href="#weighted-frequencies"></a>
 </h2>
 <p>The <code>weight</code> parameter is used to achieve weighted
-frequencies. When a weight is specified, <code>proc_freq</code> will use
-the counts in the indicated variable for all frequency calculations.</p>
+frequencies. When a weight is specified, <code><a href="../reference/proc_freq.html">proc_freq()</a></code> will
+use the counts in the indicated variable for all frequency
+calculations.</p>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Add weight variable</span></span>
 <span><span class="fu"><a href="../reference/proc_freq.html">proc_freq</a></span><span class="op">(</span><span class="va">dat</span>, tables <span class="op">=</span> <span class="va">y</span>, weight <span class="op">=</span> <span class="va">z</span><span class="op">)</span></span></code></pre></div>
@@ -293,7 +297,7 @@ of association. Here is an example of the Chi-Square test:</p>
 <div class="section level2">
 <h2 id="output-datasets">Output Datasets<a class="anchor" aria-label="anchor" href="#output-datasets"></a>
 </h2>
-<p>You may control datasets returned from the <code>proc_freq</code>
+<p>You may control datasets returned from the <code><a href="../reference/proc_freq.html">proc_freq()</a></code>
 function using the <code>output</code> parameter. This parameter takes
 three basic values: “out”, “report”, and “none”. The “out” keyword
 requests datasets meant for output, and is the default. These datasets
@@ -339,15 +343,15 @@ table request.</p>
 <span id="cb13-32"><a href="#cb13-32" tabindex="-1"></a><span class="dv">11</span>    y    x    C    <span class="dv">5</span> <span class="dv">8</span>   <span class="dv">1</span> <span class="fl">12.5</span></span>
 <span id="cb13-33"><a href="#cb13-33" tabindex="-1"></a><span class="dv">12</span>    y    x    C    <span class="dv">6</span> <span class="dv">8</span>   <span class="dv">0</span>  <span class="fl">0.0</span></span></code></pre></div>
 <p>Notice that the way output datasets are requested from the
-<code>proc_freq</code> function is much simpler than the corresponding
-mechanism in SAS®. With <code>proc_freq</code>, by default, all
+<code><a href="../reference/proc_freq.html">proc_freq()</a></code> function is much simpler than the corresponding
+mechanism in SAS®. With <code><a href="../reference/proc_freq.html">proc_freq()</a></code>, by default, all
 requested tables and statistics will be returned in a list. No other
 output parameters are needed.</p>
 </div>
 <div class="section level2">
 <h2 id="data-shaping">Data Shaping<a class="anchor" aria-label="anchor" href="#data-shaping"></a>
 </h2>
-<p>The <code>proc_freq</code> function provides three options for
+<p>The <code><a href="../reference/proc_freq.html">proc_freq()</a></code> function provides three options for
 shaping data: “wide”, “long”, and “stacked”. These options control how
 the output data is organized. The options are also passed on the
 <code>output</code> parameter. The shaping options are best illustrated

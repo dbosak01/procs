@@ -67,6 +67,9 @@
       <a href="../articles/procs-ttest.html">The TTest Function</a>
     </li>
     <li>
+      <a href="../articles/procs-reg.html">The Reg Function</a>
+    </li>
+    <li>
       <a href="../articles/procs-dm.html">Data Manipulation Functions</a>
     </li>
     <li>
@@ -121,14 +124,14 @@
 
     
     
-<p>The <code>proc_means</code> function simulates a SAS® PROC MEANS
+<p>The <code><a href="../reference/proc_means.html">proc_means()</a></code> function simulates a SAS® PROC MEANS
 procedure. It is used to generate summary statistics on numeric
 variables. The function is both interactive and returns datasets.</p>
 <div class="section level2">
 <h2 id="create-sample-data">Create Sample Data<a class="anchor" aria-label="anchor" href="#create-sample-data"></a>
 </h2>
 <p>Let’s again create some sample data. This sample data is identical to
-that created for the <code>proc_freq</code> tutorial, but has an
+that created for the <code><a href="../reference/proc_freq.html">proc_freq()</a></code> tutorial, but has an
 additional grouping variable “g”:</p>
 <div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a><span class="co"># Create sample data</span></span>
 <span id="cb1-2"><a href="#cb1-2" tabindex="-1"></a>dat <span class="ot">&lt;-</span> <span class="fu">read.table</span>(<span class="at">header =</span> <span class="cn">TRUE</span>, </span>
@@ -157,9 +160,9 @@ additional grouping variable “g”:</p>
 <div class="section level2">
 <h2 id="get-summary-statistics">Get Summary Statistics<a class="anchor" aria-label="anchor" href="#get-summary-statistics"></a>
 </h2>
-<p>If no parameters are specified, the <code>proc_means</code> function
-will calculate N, Means, Standard Deviation, Minimum, and Maximum on all
-numeric variables.</p>
+<p>If no parameters are specified, the <code><a href="../reference/proc_means.html">proc_means()</a></code>
+function will calculate N, Means, Standard Deviation, Minimum, and
+Maximum on all numeric variables.</p>
 <p>Note that the <code>options</code> statement has been added to pass
 CRAN checks. When you are running code samples, this statement may be
 omitted.</p>
@@ -184,7 +187,7 @@ specify variables on the <code>var</code> parameter:</p>
 <div class="section level2">
 <h2 id="statistics-options">Statistics Options<a class="anchor" aria-label="anchor" href="#statistics-options"></a>
 </h2>
-<p>The <code>proc_means</code> function has a <code>stats</code>
+<p>The <code><a href="../reference/proc_means.html">proc_means()</a></code> function has a <code>stats</code>
 parameter that allows you to control which statistics are generated.
 There are many statistics keywords. Here is a sample of some of the most
 frequently used keywords:</p>
@@ -337,8 +340,8 @@ third quartile for all numeric variables in our sample data:</p>
 <div class="section level2">
 <h2 id="output-datasets">Output Datasets<a class="anchor" aria-label="anchor" href="#output-datasets"></a>
 </h2>
-<p>Similar to the <code>proc_freq</code> function,
-<code>proc_means</code> can return datasets. There are three options:
+<p>Similar to the <code><a href="../reference/proc_freq.html">proc_freq()</a></code> function,
+<code><a href="../reference/proc_means.html">proc_means()</a></code> can return datasets. There are three options:
 “out”, “report”, and “none”. The “out” option returns datasets meant for
 further manipulation and analysis, and is the default. The “report”
 keyword requests the exact datasets used in the interactive report.
@@ -359,7 +362,7 @@ data.</p>
 <span><span class="co"># 2   z     65 506 57.5 75.5</span></span>
 <span></span>
 <span></span>
-<span><span class="co"># Output dataset using "all" option</span></span>
+<span><span class="co"># Output dataset using "out" option</span></span>
 <span><span class="va">res2</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/proc_means.html">proc_means</a></span><span class="op">(</span><span class="va">dat</span>, </span>
 <span>                   stats <span class="op">=</span> <span class="fu"><a href="https://common.r-sassy.org/reference/v.html" class="external-link">v</a></span><span class="op">(</span><span class="va">median</span>, <span class="va">sum</span>, <span class="va">q1</span>, <span class="va">q3</span><span class="op">)</span>,</span>
 <span>                   output <span class="op">=</span> <span class="va">out</span><span class="op">)</span></span>
@@ -389,7 +392,7 @@ be turned off with options:</p>
 <div class="section level2">
 <h2 id="grouping">Grouping<a class="anchor" aria-label="anchor" href="#grouping"></a>
 </h2>
-<p>The <code>proc_means</code> function provides two grouping
+<p>The <code><a href="../reference/proc_means.html">proc_means()</a></code> function provides two grouping
 parameters: <code>class</code> and <code>by</code>. These parameters
 identify a variable or variables for subsetting the input data. While
 these parameters have similar capabilities, there are some difference
@@ -456,7 +459,7 @@ should select the grouping parameter that most suits your needs.</p>
 <div class="section level3">
 <h3 id="class-1">Class<a class="anchor" aria-label="anchor" href="#class-1"></a>
 </h3>
-<p>The <code>proc_means</code> function can perform analysis with
+<p>The <code><a href="../reference/proc_means.html">proc_means()</a></code> function can perform analysis with
 multiple grouping variables. First let’s examine what happens when we
 pass multiple grouping variables to the <code>class</code>
 parameter:</p>
@@ -552,7 +555,7 @@ and <code>class</code> parameters:</p>
 <div class="section level2">
 <h2 id="data-shaping">Data Shaping<a class="anchor" aria-label="anchor" href="#data-shaping"></a>
 </h2>
-<p>The <code>proc_means</code> function also offers options for data
+<p>The <code><a href="../reference/proc_means.html">proc_means()</a></code> function also offers options for data
 shaping. The shaping options can reduce the number of transformations
 needed to get to your target table.</p>
 <p>There are three shaping options: “wide”, “long”, and “stacked”. The
@@ -600,7 +603,7 @@ shaping options:</p>
 <span><span class="co"># 6    0    8   z    SUM  506.0</span></span>
 <span><span class="co"># 7    0    8   z     Q1   57.5</span></span>
 <span><span class="co"># 8    0    8   z     Q3   75.5</span></span></code></pre></div>
-<p>Next: <a href="procs-dm.html">Data Manipulation</a></p>
+<p>Next: <a href="procs-ttest.html">T-Test Function</a></p>
 </div>
   </div>
 

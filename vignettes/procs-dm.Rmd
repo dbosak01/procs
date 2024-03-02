@@ -19,7 +19,7 @@ knitr::opts_chunk$set(
 There are several functions in base R to pivot data.  These include the `t()`
 and `reshape()` functions.  There are also well-designed functions in the
 **tidyverse** for transposing data.  Nevertheless, some users will prefer
-the syntax of `proc_transpose`.  This function provides control over output
+the syntax of `proc_transpose()`.  This function provides control over output
 column naming, and an intuitive set of parameters.
 
 To explore `proc_transpose`, let's first create some sample data:
@@ -48,7 +48,7 @@ dat
 ```
 ### Default Transpose
 
-The `proc_tranpose` function may be executed without any parameters.  The 
+The `proc_tranpose()` function may be executed without any parameters.  The 
 default usage will tranpose all numeric variables and construct generic 
 column names for the new columns:
 ```{r eval=FALSE, echo=TRUE} 
@@ -174,7 +174,7 @@ res
 # 13 William Semester1     87      NA    NA
 # 14 William Semester2     75      NA    NA 
 ```
-The `by` parameter is a valuable feature of `proc_transpose`.  The by variable
+The `by` parameter is a valuable feature of `proc_transpose()`.  The by variable
 can have a significant effect on the shape of the output data. Let's see
 what happens when we use a different by variable.
 ```{r eval=FALSE, echo=TRUE} 
@@ -235,7 +235,7 @@ res2[ , c("Name", "Subject", "Semester1", "Semester2")]
 ```
 ## Sort
 
-The `proc_sort` function in the **procs** package attempts to recreate the most
+The `proc_sort()` function in the **procs** package attempts to recreate the most
 basic functionality of PROC SORT.  The function accepts an input data frame
 and returns the sorted result. Before examining the function, first let's create
 some sample data:
@@ -273,7 +273,7 @@ dat
 # 12  5    Ken    87
 ```
 
-Like `proc_transpose`, the function has a default
+Like `proc_transpose()`, the function has a default
 usage, which is to sort by all variables:
 ```{r eval=FALSE, echo=TRUE} 
 # Default sort
@@ -416,7 +416,7 @@ res
 ```
 
 ### Options
-Another convenient feature of `proc_sort` is the `nodupkey` option.  This 
+Another convenient feature of `proc_sort()` is the `nodupkey` option.  This 
 option will eliminate duplicates based on the unique combination of values
 of the `by` variables. For instance, to get a unique list of students, you
 could use `keep` and `options = nodupkey`:

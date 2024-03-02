@@ -138,13 +138,11 @@ If you wish to do dataset comparisons, please research these existing packages.
 ### Are there any other statistics procedures coming? {#other}
 
 **Q:** The `proc_freq()` and `proc_means()` functions are helpful.  But what about
-some other stats procedures?  What about PROC GLM, PROC ANOVA, and PROC REG?
+some other stats procedures?  What about PROC GLM and PROC ANOVA?
 
-**A:** These functions are planned for a future release.  The focus of this
-release was `proc_freq()` and `proc_means()`, as those are the most basic SAS® 
-procedures and the most commonly used. In the meantime, please see the 
-excellent package [sasLM](https://cran.r-project.org/package=sasLM) for 
-functions that replicate SAS® statistics related to linear modeling.
+**A:** These functions are planned for a future release. In the meantime, 
+please see the excellent package [sasLM](https://cran.r-project.org/package=sasLM) 
+for functions that replicate SAS® statistics related to linear modeling.
 
 [top](#top)
 

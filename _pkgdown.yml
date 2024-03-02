@@ -7,6 +7,7 @@ articles:
   - procs-freq
   - procs-means
   - procs-ttest
+  - procs-reg
   - procs-dm
   - procs-example1
   - procs-example2

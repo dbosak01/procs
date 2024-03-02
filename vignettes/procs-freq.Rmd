@@ -13,7 +13,7 @@ knitr::opts_chunk$set(
   comment = "#>"
 )
 ```
-The `proc_freq` function simulates a SAS® PROC FREQ procedure.  Below is 
+The `proc_freq()` function simulates a SAS® PROC FREQ procedure.  Below is 
 a short tutorial on the function. Like PROC FREQ, the function is both 
 an interactive function and returns datasets. 
 
@@ -49,7 +49,7 @@ dat
 
 ## Get Frequencies
 
-Now that we have some data, let's send that data to the `proc_freq` function
+Now that we have some data, let's send that data to the `proc_freq()` function
 to see the frequency distribution.  
 
 The `options()` statement below turns
@@ -74,7 +74,7 @@ each frequency count.
 
 ## Control Columns
 
-The `options` parameter can control many aspects of the `proc_freq` function.
+The `options` parameter can control many aspects of the `proc_freq()` function.
 For example, if you did not want the cumulative frequency and percent,
 you could turn off these columns with the option "nocum".
 ```{r eval=FALSE, echo=TRUE} 
@@ -128,7 +128,7 @@ proc_freq(dat, tables = y * x,
 
 The `tables` parameter accepts more than one table request.  To request
 multiple tables, pass a quoted or unquoted vector. Note that 
-`proc_freq` does not accept grouping syntax, such as that allowed by SAS®.
+`proc_freq()` does not accept grouping syntax, such as that allowed by SAS®.
 You must specify each cross-tab individually:
 ```{r eval=FALSE, echo=TRUE} 
 # Request two crosstabs
@@ -150,7 +150,7 @@ proc_freq(dat, tables = y, options = nlevels)
 ## Weighted Frequencies
 
 The `weight` parameter is used to achieve weighted frequencies.  When a 
-weight is specified, `proc_freq` will use the counts in the indicated 
+weight is specified, `proc_freq()` will use the counts in the indicated 
 variable for all frequency calculations.
 ```{r eval=FALSE, echo=TRUE} 
 # Add weight variable
@@ -195,7 +195,7 @@ res
 
 ## Output Datasets
 
-You may control datasets returned from the `proc_freq` function using the `output`
+You may control datasets returned from the `proc_freq()` function using the `output`
 parameter.  This parameter takes three basic values: "out", "report", and "none".
 The "out" keyword requests datasets meant for output, and is the default.
 These datasets have standardized column names, and sometimes have additional
@@ -243,14 +243,14 @@ $MyCross
 12    y    x    C    6 8   0  0.0
 
 ```
-Notice that the way output datasets are requested from the `proc_freq` function 
-is much simpler than the corresponding mechanism in SAS®.  With `proc_freq`, 
+Notice that the way output datasets are requested from the `proc_freq()` function 
+is much simpler than the corresponding mechanism in SAS®.  With `proc_freq()`, 
 by default, all requested tables and statistics will be
 returned in a list. No other output parameters are needed.
 
 ## Data Shaping
 
-The `proc_freq` function provides three options for shaping data:
+The `proc_freq()` function provides three options for shaping data:
 "wide", "long", and "stacked".  These options control how the output
 data is organized.  The options are also passed on the `output` parameter.
 The shaping options are best illustrated by an example:

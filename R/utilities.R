@@ -1022,3 +1022,30 @@ get_vars <- function(formula) {
 
   return(ret)
 }
+
+
+get_valid_obs <- function(data, formula) {
+
+  vrs <- get_vars(formula)
+
+  tvrs <- c(vrs$dvar, vrs$ivar)
+
+  naobs <- !is.na(data[[tvrs[1]]])
+
+  for (i in seq_len(length(tvrs) - 1)) {
+
+    v2 <- !is.na(data[[tvrs[i + 1]]])
+
+    naobs <- naobs & v2
+  }
+
+  if (nrow(data) > 0)
+    ret <- data[naobs, ]
+  else
+    ret <- data
+
+
+
+  return(ret)
+
+}

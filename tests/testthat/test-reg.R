@@ -38,11 +38,23 @@ test_that("reg0: sasLM version", {
 
   myfm <- formula(Weight ~ Height)
 
-  res1 <- sasLM::REG(myfm, cls, HC = TRUE)
+  res1 <- sasLM::REG(myfm, cls, Resid = TRUE)
 
   res1
 
   expect_equal(TRUE, TRUE)
+
+
+  cls2 <- cls
+
+  cls2[5, "Weight"] <- NA
+  cls2[11, "Height"] <- NA
+
+  res2 <- sasLM::REG(myfm, cls2, Resid = TRUE)
+
+  res2
+
+
 
 })
 
@@ -398,6 +410,10 @@ test_that("reg13: Optional statistics work.", {
 
   expect_equal(res1$PRESS, 2651.35206)
 
+  res1 <- proc_reg(cls, myfm1, options = press)
+
+  expect_equal("PRESS" %in% names(res1), TRUE)
+
   # EDF
   res2 <- proc_reg(cls, myfm1, stats = edf)
 
@@ -408,9 +424,9 @@ test_that("reg13: Optional statistics work.", {
   expect_equal(res2$EDF, 17)
   expect_equal(res2$RSQ, 0.7705068427)
 
-  # res2 <- proc_reg(cls, myfm1, options = edf)
-  #
-  # res2
+  res2 <- proc_reg(cls, myfm1, options = edf)
+
+  res2
 
   expect_equal("EDF" %in% names(res2), TRUE)
 
@@ -424,6 +440,10 @@ test_that("reg13: Optional statistics work.", {
   expect_equal(res3$P, 3)
   expect_equal(res3$EDF, 16)
   expect_equal(res3$RSQ, 0.7729049378)
+
+  res3 <- proc_reg(cls, myfm2, options = rsquare)
+
+  expect_equal("RSQ" %in% names(res3), TRUE)
 
   # ADJRSQ
   res4 <- proc_reg(cls, myfm1, stats = adjrsq)
@@ -710,3 +730,80 @@ test_that("reg22: Confidence limit statistics work.", {
   expect_equal(res1$Coefficients$UCLM[1], -74.933483)
 
 })
+
+test_that("reg23: Test P option.", {
+
+
+  myfm1 <- formula(Weight ~ Height)
+
+  # P
+  res1 <- proc_reg(cls, myfm1, stats = p, output = "report")
+
+  res1
+
+  expect_equal(length(res1), 6)
+
+  t5 <- res1$Statistics
+  t6 <- res1$Residuals
+
+  expect_equal(t5[1, "DEPVAL"], 112.5)
+  expect_equal(t5[1, "PREVAL"], 126.00617)
+  expect_equal(t5[1, "RESID"], -13.50617)
+
+  expect_equal(as.numeric(round(t6$VALUE, 4)), c(0, 2142.4877, 2651.3521))
+
+
+  cls2 <- cls
+
+  cls2[5, "Weight"] <- NA
+  cls2[11, "Height"] <- NA
+
+  res2 <- proc_reg(cls2, myfm1, stats = p, output = "report")
+
+  expect_equal(nrow(res2$Statistics), 17)
+
+
+})
+
+
+test_that("reg23: Multiple output options works.", {
+
+
+  myfm1 <- formula(Weight ~ Height)
+
+  # P
+  res1 <- proc_reg(cls, myfm1,
+                   output = c("report", "out", "long"))
+
+  res1
+
+  expect_equal(length(res1), 2)
+  expect_equal(is.data.frame(res1$out), TRUE)
+  expect_equal(length(res1$report), 4)
+
+})
+
+# Testing plots
+
+# library(ggplot2)
+#
+# ggplot(res2$Statistics, aes(x = PREVAL, y = RESID)) +
+#   geom_point() +
+#   geom_hline(yintercept = 0) +
+#   geom_smooth(se = FALSE, color = "red") +
+#   labs(title='Residual vs. Fitted Values Plot', x='Fitted Values', y='Residuals')
+#
+
+
+# res1 <- proc_reg(cars, dist ~ speed, output = report, stats = p)
+# cars |>
+# ggplot(aes(speed, dist))+
+#   geom_point(aes(size = abs(res1$Statistics$RESID)))+
+#   geom_point(aes(y=res1$Statistics$PREVAL), color="green")+
+#   geom_smooth(method = "lm")+
+#   geom_smooth(se = FALSE, color="blue")+
+#   geom_segment(aes(xend = speed, yend = res1$Statistics$PREVAL), color="red")
+#pltcar
+
+
+

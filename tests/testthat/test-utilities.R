@@ -763,3 +763,21 @@ test_that("utils23: get_obs() works as expected.", {
   expect_equal(res$NOBS[3], 4)
 
 })
+
+test_that("utils23: get_valid_obs() works as expected.", {
+
+
+  myfm <- formula(Weight ~ Height + Age)
+
+  cls2 <- cls
+
+  cls2[2, "Weight"] <- NA
+  cls2[5, "Age"] <- NA
+  cls2[11, "Height"] <- NA
+
+  res1 <- get_valid_obs(cls2, myfm)
+
+  expect_equal(nrow(cls), 19)
+  expect_equal(nrow(res1), 16)
+
+})

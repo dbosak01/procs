@@ -30,16 +30,18 @@ the models will be named "MODEL1", "MODEL2", etc.  If you want to name your
 model, pass it as a named list or named vector.}
 
 \item{by}{An optional by group. If you specify a by group, the input
-data will be subset on the by variable(s) prior to performing the regression.}
+data will be subset on the by variable(s) prior to performing the regression.
+For multiple by variables, pass them as a quoted vector of variable names.
+You may also pass them unquoted using the \code{\link{v}} function.}
 
 \item{stats}{Optional statistics keywords.  Valid values are "adjrsq", "clb",
-"est", "edf", "hcc", "hccmethod", "mse", "press", "rsquare",
+"est", "edf", "hcc", "hccmethod", "mse", "p", "press", "rsquare",
 "sse", "spec", "seb", and "table".  A single keyword may be passed with or
 without quotes. Pass multiple keywords either as a quoted vector, or unquoted
 vector using the \code{v()} function.  These statistics keywords largely
 correspond to the options on the "model" statement in SAS. Most of them
-control which statistics are added to the output dataset.  Some keywords
-control statistics on the interactive report.  See the \strong{Statistics Keywords}
+control which statistics are added to the interactive report.  Some keywords
+control statistics on the output dataset.  See the \strong{Statistics Keywords}
 section for details on the purpose and target of each keyword.}
 
 \item{output}{Whether or not to return datasets from the function. Valid
@@ -57,14 +59,15 @@ character vector. For example,
 to produce both a report dataset and a "long" output dataset,
 use the parameter \code{output = c("report", "out", "long")}.}
 
-\item{weight}{The weights for each observation or residual square.  The
-weight is commonly provided as the inverse of each variance.}
+\item{weight}{The name of a variable to use as a weight for each observation.
+The weight is commonly provided as the inverse of each variance.}
 
 \item{options}{A vector of optional keywords. Valid values are: "alpha =",
-"noprint", "outest", "outseb" and "tableout". The "alpha = " option will set the alpha
+"edf", "noprint", "outest", "outseb", "press", "rsquare", and "tableout".
+The "alpha = " option will set the alpha
 value for confidence limit statistics.  The default is 95\% (alpha = 0.05).
-The "noprint" option turns off the interactive report. For the statistical options,
-see the \strong{Options} section for additional explanation.}
+The "noprint" option turns off the interactive report. For other options,
+see the \strong{Options} section for explanations of each.}
 
 \item{titles}{A vector of one or more titles to use for the report output.}
 }
@@ -72,11 +75,12 @@ see the \strong{Options} section for additional explanation.}
 Normally, the requested regression statistics are shown interactively
 in the viewer, and output results are returned as a data frame.
 If you request "report" datasets, they will be returned as a list.
-You may then access individual report datasets from the list using dollar sign
+You may then access individual datasets from the list using dollar sign
 ($) syntax.
-The interactive report can be turned off using the "noprint" option, and
-the output datasets can be turned off using the "none" keyword on the
-\code{output} parameter.
+The interactive report can be turned off using the "noprint" option.
+The output dataset can be turned off using the "none" keyword on the
+\code{output} parameter. If the output dataset is turned off, the function
+will return a NULL.
 }
 \description{
 The \code{proc_reg} function performs a regression
@@ -152,7 +156,7 @@ parameter. You may pass statistic keywords as a
 quoted vector of strings, or an unquoted vector using the \code{v()} function.
 An individual statistics keyword can be passed without quoting.
 \itemize{
-\item{\strong{adjrsq}: Added adjusted r-square value to the output dataset.}
+\item{\strong{adjrsq}: Adds adjusted r-square value to the output dataset.}
 \item{\strong{clb}: Requests confidence limits be added to the interactive report.}
 \item{\strong{edf}: Includes the number of regressors, the error degress of freedom,
 and the model r-square to the output dataset.}
@@ -165,7 +169,10 @@ sent to the interactive report.}
 option specifies the type of method to use. Valid values are 0 and 3.}
 \item{\strong{mse}: Computes the mean squared error for each model and adds to the
 output dataset.}
-\item{\strong{press}: Includes the predicted sum of squares statistic in the output dataset.}
+\item{\strong{p}: Computes predicted and residual values and sends to
+a separate table on the interactive report.}
+\item{\strong{press}: Includes the predicted residual sum of squares
+(PRESS) statistic in the output dataset.}
 \item{\strong{rsquare}: Include the r-square statistic in the output dataset.
 The "rsquare" option has the same effect as the "edf" option.}
 \item{\strong{seb}: Outputs the standard errors of the parameter estimates
@@ -195,6 +202,9 @@ value for confidence limit statistics.  Set the alpha as a decimal value
 between 0 and 1.  For example, you can set a 90\% confidence limit as
 \code{alpha = 0.1}.
 }
+\item{\strong{edf}: Includes the number of regressors, the error degress of freedom,
+and the model r-square to the output dataset.
+}
 \item{\strong{noprint}: Whether to print the interactive report to the
 viewer.  By default, the report is printed to the viewer. The "noprint"
 option will inhibit printing.  You may inhibit printing globally by
@@ -212,6 +222,12 @@ does not normally need to be passed.
 errors be sent to the output dataset.  The standard errors will be added
 as a new row identified by type "SEB".  This request
 can also be made by passing the "seb" keyword to the \code{stats} parameter.
+}
+\item{\strong{press}: Includes the predicted residual sum of squares
+(PRESS) statistic in the output dataset.
+}
+\item{\strong{rsquare}: Include the r-square statistic in the output dataset.
+The "rsquare" option has the same effect as the "edf" option.
 }
 \item{\strong{tableout}: The "tableout" option is used to send standard
 errors, t-statistics, p-values, and confidence limits to the output

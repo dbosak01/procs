@@ -28,7 +28,7 @@ Maintainer: David Bosak <dbosak01@gmail.com>
 Description: Contains functions to simulate the most commonly used 
     'SAS®' procedures.  Specifically, the package aims to 
     simulate the functionality of 'proc freq', 'proc means', 'proc ttest',
-    'proc transpose', 'proc sort', and 'proc print'. 
+    'proc reg', 'proc transpose', 'proc sort', and 'proc print'. 
     The simulation will include recreating 
     all statistics with the highest fidelity possible. 
 License: CC0

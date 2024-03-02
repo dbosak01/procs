@@ -67,6 +67,9 @@
       <a href="../articles/procs-ttest.html">The TTest Function</a>
     </li>
     <li>
+      <a href="../articles/procs-reg.html">The Reg Function</a>
+    </li>
+    <li>
       <a href="../articles/procs-dm.html">Data Manipulation Functions</a>
     </li>
     <li>
@@ -128,8 +131,8 @@
 the <code><a href="https://rdrr.io/r/base/t.html" class="external-link">t()</a></code> and <code><a href="https://rdrr.io/r/stats/reshape.html" class="external-link">reshape()</a></code> functions. There are
 also well-designed functions in the <strong>tidyverse</strong> for
 transposing data. Nevertheless, some users will prefer the syntax of
-<code>proc_transpose</code>. This function provides control over output
-column naming, and an intuitive set of parameters.</p>
+<code><a href="../reference/proc_transpose.html">proc_transpose()</a></code>. This function provides control over
+output column naming, and an intuitive set of parameters.</p>
 <p>To explore <code>proc_transpose</code>, let’s first create some
 sample data:</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
@@ -157,7 +160,7 @@ sample data:</p>
 <div class="section level3">
 <h3 id="default-transpose">Default Transpose<a class="anchor" aria-label="anchor" href="#default-transpose"></a>
 </h3>
-<p>The <code>proc_tranpose</code> function may be executed without any
+<p>The <code>proc_tranpose()</code> function may be executed without any
 parameters. The default usage will tranpose all numeric variables and
 construct generic column names for the new columns:</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
@@ -275,7 +278,7 @@ can identify which rows belong to which group.</p>
 <span><span class="co"># 13 William Semester1     87      NA    NA</span></span>
 <span><span class="co"># 14 William Semester2     75      NA    NA </span></span></code></pre></div>
 <p>The <code>by</code> parameter is a valuable feature of
-<code>proc_transpose</code>. The by variable can have a significant
+<code><a href="../reference/proc_transpose.html">proc_transpose()</a></code>. The by variable can have a significant
 effect on the shape of the output data. Let’s see what happens when we
 use a different by variable.</p>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
@@ -332,7 +335,7 @@ you can nearly restore the original data frame.</p>
 <div class="section level2">
 <h2 id="sort">Sort<a class="anchor" aria-label="anchor" href="#sort"></a>
 </h2>
-<p>The <code>proc_sort</code> function in the <strong>procs</strong>
+<p>The <code><a href="../reference/proc_sort.html">proc_sort()</a></code> function in the <strong>procs</strong>
 package attempts to recreate the most basic functionality of PROC SORT.
 The function accepts an input data frame and returns the sorted result.
 Before examining the function, first let’s create some sample data:</p>
@@ -368,7 +371,7 @@ Before examining the function, first let’s create some sample data:</p>
 <span><span class="co"># 10  2    Ram    54</span></span>
 <span><span class="co"># 11  3   Bane    87</span></span>
 <span><span class="co"># 12  5    Ken    87</span></span></code></pre></div>
-<p>Like <code>proc_transpose</code>, the function has a default usage,
+<p>Like <code><a href="../reference/proc_transpose.html">proc_transpose()</a></code>, the function has a default usage,
 which is to sort by all variables:</p>
 <div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Default sort</span></span>
@@ -511,7 +514,7 @@ variables for the output dataset:</p>
 <div class="section level3">
 <h3 id="options">Options<a class="anchor" aria-label="anchor" href="#options"></a>
 </h3>
-<p>Another convenient feature of <code>proc_sort</code> is the
+<p>Another convenient feature of <code><a href="../reference/proc_sort.html">proc_sort()</a></code> is the
 <code>nodupkey</code> option. This option will eliminate duplicates
 based on the unique combination of values of the <code>by</code>
 variables. For instance, to get a unique list of students, you could use

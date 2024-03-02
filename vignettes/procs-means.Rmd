@@ -13,14 +13,14 @@ knitr::opts_chunk$set(
   comment = "#>"
 )
 ```
-The `proc_means` function simulates a SAS® PROC MEANS procedure.  It is used to
+The `proc_means()` function simulates a SAS® PROC MEANS procedure.  It is used to
 generate summary statistics on numeric variables.  The function is both 
 interactive and returns datasets.   
 
 ## Create Sample Data
 
 Let's again create some sample data.  This sample data is identical to that
-created for the `proc_freq` tutorial, but has an additional grouping 
+created for the `proc_freq()` tutorial, but has an additional grouping 
 variable "g":  
 ```{r eval=FALSE, echo=TRUE} 
 # Create sample data
@@ -50,7 +50,7 @@ dat
 ```
 ## Get Summary Statistics
 
-If no parameters are specified, the `proc_means` function will calculate
+If no parameters are specified, the `proc_means()` function will calculate
 N, Means, Standard Deviation, Minimum, and Maximum on all numeric variables.  
 
 Note that the `options` statement has been added to pass CRAN checks.
@@ -76,7 +76,7 @@ proc_means(dat, var = x)
 
 ## Statistics Options
 
-The `proc_means` function has a `stats` parameter that allows you to control
+The `proc_means()` function has a `stats` parameter that allows you to control
 which statistics are generated.  There are many statistics keywords.  Here is 
 a sample of some of the most frequently used keywords:
 
@@ -114,7 +114,7 @@ proc_means(dat, stats = v(median, sum, q1, q3))
 
 ## Output Datasets
 
-Similar to the `proc_freq` function, `proc_means` can return datasets.
+Similar to the `proc_freq()` function, `proc_means()` can return datasets.
 There are three options: "out", "report", and "none".  The 
 "out" option returns datasets meant for further manipulation and analysis, and
 is the default.
@@ -136,7 +136,7 @@ res1
 # 2   z     65 506 57.5 75.5
 
 
-# Output dataset using "all" option
+# Output dataset using "out" option
 res2 <- proc_means(dat, 
                    stats = v(median, sum, q1, q3),
                    output = out)
@@ -168,7 +168,7 @@ res3
 
 ## Grouping 
 
-The `proc_means` function provides two grouping parameters: `class` and `by`.
+The `proc_means()` function provides two grouping parameters: `class` and `by`.
 These parameters identify a variable or variables for subsetting the input
 data.  While these parameters have similar capabilities, there are some
 difference between them.  The differences can be examined by comparing
@@ -235,7 +235,7 @@ the grouping parameter that most suits your needs.
 
 ## Multiple Groups
 ### Class
-The `proc_means` function can perform analysis with multiple grouping variables.
+The `proc_means()` function can perform analysis with multiple grouping variables.
 First let's examine what happens when we pass multiple grouping variables to
 the `class` parameter:
 ```{r eval=FALSE, echo=TRUE} 
@@ -333,7 +333,7 @@ res3
 
 ## Data Shaping
 
-The `proc_means` function also offers options for data shaping.  The
+The `proc_means()` function also offers options for data shaping.  The
 shaping options can reduce the number of transformations needed to
 get to your target table.  
 
@@ -386,4 +386,4 @@ res3
 ```
 
 
-Next: [Data Manipulation](procs-dm.html)
+Next: [T-Test Function](procs-ttest.html)
