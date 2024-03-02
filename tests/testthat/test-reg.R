@@ -783,6 +783,23 @@ test_that("reg23: Multiple output options works.", {
 
 })
 
+
+
+test_that("reg24: Check for no rows.", {
+
+
+  myfm1 <- formula(Weight ~ Height)
+
+  cls2 <- cls[0, ]
+
+  expect_error(proc_reg(cls2, myfm1))
+
+
+})
+
+
+
+
 # Testing plots
 
 # library(ggplot2)

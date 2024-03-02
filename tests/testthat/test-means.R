@@ -213,6 +213,10 @@ test_that("means9: parameter checks work.", {
                           var = "PresentScore",
                           stats = "mean"))
 
+  datm2 <- datm[ 0, ]
+
+  expect_error(proc_means(datm2, var = "PresentScore"))
+
 })
 
 
