@@ -761,14 +761,14 @@ get_reg_report <- function(data, var, model, opts = NULL, weight = NULL, stats =
   rlbls[["LCLMSTD"]] <- sprintf(tlbls[["LCLMSTD"]], alph2)
 
   # Create p-val format.
-  # Creating this from a string to bypass CMD check notes on unassigned variable x
+  # Creating this from a string to bypass CMD check notes on "unassigned" variable x
   pfmt <- eval(str2lang('value(condition(is.na(x), "NA"),
                 condition(x < .0001, "<.0001"),
                 condition(TRUE, "%.4f"),
                 log = FALSE)'))
 
   reg_fc <- fcat(N = "%d", MEAN = "%.4f", STD = "%.4f", STDERR = "%.5f",
-                 MIN = "%.4f", MAX = "%.4f", UCLM = "%.4f", LCLM = "%.4f",
+                 MIN = "%.4f", MAX = "%.4f", UCLM = "%.5f", LCLM = "%.5f",
                  DF = "%d", "T" = "%.2f", PROBT = pfmt, NDF = "%.3f", DDF = "%.3f",
                  FVAL = "%.2f", PROBF = pfmt, UCLMSTD = "%.4f", LCLMSTD = "%.4f",
                  SUMSQ = "%.5f", MEANSQ = "%.5f", RMSE = "%.5f", DEPMEAN = "%.5f",
