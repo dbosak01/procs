@@ -229,6 +229,21 @@ test_that("reg7: by parameter works.", {
 
   expect_equal(length(res2), 2)
 
+
+  # Multiple Bys
+  res3 <- proc_reg(cls, myfm1,
+                   by = v(Sex, region),
+                   output = c("out", "report"))
+
+  res3
+
+  expect_equal(length(res3), 2)
+  expect_equal(is.data.frame(res3$out), TRUE)
+  expect_equal(nrow(res3$out), 4)
+  expect_equal(length(res3$report), 4)
+  expect_equal(length(res3$report$`MODEL1:Sex=F, region=A`), 4)
+
+
 })
 
 
