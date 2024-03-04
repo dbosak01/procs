@@ -60,14 +60,6 @@ of functions with a similarly intense concern for stability.  The package
 aims to avoid breaking changes at all costs.  The dream is that programs
 written with these functions will still work years from now.
 
-### Call for Contributors
-
-There are many useful SAS® procedures, and these procedures are very complicated.
-The **procs** package is therefore also a potentially large and complicated 
-package.  The package would benefit from an energetic team of contributors,
-rather than relying on a single individual.  If you wish to contribute to
-**procs**, please contact the package author at dbosak01 at gmail.com.
-
 
 ### Installation
 

@@ -783,7 +783,7 @@ get_reg_report <- function(data, var, model, opts = NULL, weight = NULL, stats =
            "Std..Error" = "STDERR", "Lower.CL" = "LCLM", "Upper.CL" = "UCLM",
            "t.value" = "T", "Pr...t.." = "PROBT")
 
-  # Add dependant mean
+  # Add dependent mean
   lkp[paste0(var, ".Mean")] = "DEPMEAN"
 
   # Translate names
