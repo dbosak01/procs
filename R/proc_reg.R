@@ -266,12 +266,12 @@
 #' # View Results
 #' res3
 #' # $NObs
-#' #                          stub NOBS
+#' #                         LABEL NOBS
 #' # 1 Number of Observations Read   50
 #' # 2 Number of Observations Used   50
 #' #
 #' # $ANOVA
-#' #              stub DF    SUMSQ     MEANSQ     FVAL        PROBF
+#' #             LABEL DF    SUMSQ     MEANSQ     FVAL        PROBF
 #' # 1           Model  1 21185.46 21185.4589 89.56711 1.489919e-12
 #' # 2           Error 48 11353.52   236.5317       NA           NA
 #' # 3 Corrected Total 49 32538.98         NA       NA           NA
@@ -281,7 +281,7 @@
 #' # 1 15.37959   42.98 35.78312 0.6510794 0.6438102
 #' #
 #' # $ParameterEstimates
-#' #        stub DF        EST    STDERR         T        PROBT
+#' #        PARM DF        EST    STDERR         T        PROBT
 #' # 1 Intercept  1 -17.579095 6.7584402 -2.601058 1.231882e-02
 #' # 2     speed  1   3.932409 0.4155128  9.463990 1.489919e-12
 #'

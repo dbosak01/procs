@@ -19,7 +19,7 @@ interactive and returns datasets.
 
 ## Create Sample Data
 
-First, let's create some sample data.  This sample data shows Sex, Age, Height,
+Below is some sample data.  This sample data shows Sex, Age, Height,
 and Weight for a group of students.  In this example, we'll examine the relationship
 between Weight and Height:  
 ```{r eval=FALSE, echo=TRUE} 
@@ -52,16 +52,16 @@ cls <- read.table(header = TRUE, text = '
 If no options are specified, the `proc_reg()` function will produce 
 an interactive report in the RStudio viewer.  The report contains four tables:
 
-* **Observations**:  The number of used and unused observations in the input 
+* **NObs**:  The number of used and unused observations in the input 
 dataset.  If there are missing values in any of the dependent or independent variables,
 these observations will be removed from the input dataset, and a count of 
 observations with missing values will also be shown in this table.
 * **ANOVA**: A table showing the Analysis of Variance for the model, the Error,
 and a Corrected Total.  This table includes the Degrees of Freedom, Sum of Squares,
 Mean Square, and the F and P values for the model.
-* **Fitness**: The Fitness table shows measures related to fitness, such as the
+* **FitStatistics**: The Fitness table shows measures related to fitness, such as the
 Root MSE, R-Square value, and Adjusted R-Square.
-* **Coefficients**: The Coefficients table includes parameter estimates for 
+* **ParameterEstimates**: This table includes parameter estimates for 
 the y intercept and any independent variables.  These values can be used
 to construct the model. This table also contains the t and p-values necessary 
 to determine the significance of the coefficient.
