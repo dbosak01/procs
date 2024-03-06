@@ -58,10 +58,11 @@
 #' to return the datasets used in the interactive report. To request these
 #' datasets, pass the "report" option to the \code{output} parameter.  Each report
 #' dataset will be named according to the category of statistical
-#' results.  There are four standard categories: "Observations",
-#' "ANOVA", "Fitness", and "Coefficients". When the "spec" statistics option
-#' is passed, the function will also return a "Specification" dataset containing
-#' the White's test results.
+#' results.  There are four standard categories: "NObs",
+#' "ANOVA", "FitStatistics", and "ParameterEstimates". When the "spec" statistics option
+#' is passed, the function will also return a "SpecTest" dataset containing
+#' the White's test results.  If the "p" option is present, the "OutputStatistics"
+#' and "ResidualStatistics" tables will be included.
 #'
 #' If you don't want any datasets returned, pass the "none" option on the
 #' \code{output} parameter.
@@ -264,23 +265,23 @@
 #'
 #' # View Results
 #' res3
-#' # $Observations
-#' # stub NOBS
+#' # $NObs
+#' #                          stub NOBS
 #' # 1 Number of Observations Read   50
 #' # 2 Number of Observations Used   50
 #' #
 #' # $ANOVA
-#' # stub DF    SUMSQ     MEANSQ     FVAL        PROBF
+#' #              stub DF    SUMSQ     MEANSQ     FVAL        PROBF
 #' # 1           Model  1 21185.46 21185.4589 89.56711 1.489919e-12
 #' # 2           Error 48 11353.52   236.5317       NA           NA
 #' # 3 Corrected Total 49 32538.98         NA       NA           NA
 #' #
-#' # $Fitness
+#' # $FitStatistics
 #' # RMSE DEPMEAN  COEFVAR       RSQ    ADJRSQ
 #' # 1 15.37959   42.98 35.78312 0.6510794 0.6438102
 #' #
-#' # $Coefficients
-#' # stub DF        EST    STDERR         T        PROBT
+#' # $ParameterEstimates
+#' #        stub DF        EST    STDERR         T        PROBT
 #' # 1 Intercept  1 -17.579095 6.7584402 -2.601058 1.231882e-02
 #' # 2     speed  1   3.932409 0.4155128  9.463990 1.489919e-12
 #'
@@ -711,7 +712,7 @@ get_reg_report <- function(data, var, model, opts = NULL, weight = NULL, stats =
                HC = hasHC, Resid = hasP)
   }
 
-  # Observations
+  # NObs
   oreg <- get_obs(data, model)
 
   # Anova
@@ -720,11 +721,11 @@ get_reg_report <- function(data, var, model, opts = NULL, weight = NULL, stats =
                      areg, stringsAsFactors = FALSE)
   rownames(areg) <- NULL
 
-  # Fitness
+  # FitStatistics
   freg <- as.data.frame(unclass(reg$Fitness), stringsAsFactors = FALSE)
   rownames(freg) <- NULL
 
-  # Coefficients
+  # ParameterEstimates
   creg <- as.data.frame(unclass(reg$Coefficients), stringsAsFactors = FALSE)
   creg <- data.frame(stub = rownames(reg$Coefficients), creg, stringsAsFactors = FALSE)
   rownames(creg) <- NULL
@@ -820,9 +821,9 @@ get_reg_report <- function(data, var, model, opts = NULL, weight = NULL, stats =
   ret <- list()
 
   # Create return list
-  ret[["Observations"]] <- oreg
+  ret[["NObs"]] <- oreg
   ret[["ANOVA"]] <- areg
-  ret[["Fitness"]] <- freg
+  ret[["FitStatistics"]] <- freg
 
   cols <- c("stub", "DF", "EST", "STDERR", "T", "PROBT")
   if (!is.null(stats)) {
@@ -830,7 +831,7 @@ get_reg_report <- function(data, var, model, opts = NULL, weight = NULL, stats =
       cols <- c("stub", "DF", "EST", "STDERR", "T", "PROBT", "LCLM", "UCLM")
   }
 
-  ret[["Coefficients"]] <- creg[ , cols]
+  ret[["ParameterEstimates"]] <- creg[ , cols]
 
   # Deal with HCC option
   if (has_option(stats, "hcc")) {
@@ -845,7 +846,7 @@ get_reg_report <- function(data, var, model, opts = NULL, weight = NULL, stats =
       }
     }
 
-    tmpc <- ret[["Coefficients"]]
+    tmpc <- ret[["ParameterEstimates"]]
     tmphc <- hc0reg
     if (hcctype == 3)
       tmphc <- hc3reg
@@ -862,25 +863,25 @@ get_reg_report <- function(data, var, model, opts = NULL, weight = NULL, stats =
                           HCT = "%.2f",
                           HCPROBT = pfmt)
 
-    ret[["Coefficients"]] <- tmpc
+    ret[["ParameterEstimates"]] <- tmpc
   }
 
   # Deal with White's test/spec keyword
   if (has_option(stats, "spec")) {
 
     # Create data frame for White's test/Specs
-    ret[["Specification"]] <- data.frame(DF = wreg[2, 1],
+    ret[["SpecTest"]] <- data.frame(DF = wreg[2, 1],
                                          CHISQ = wreg[1, 1],
                                          PCHISQ = wreg[3, 1],
                                          stringsAsFactors = FALSE)
 
     # Assign labels
-    labels(ret[["Specification"]]) <- list(DF = "DF",
+    labels(ret[["SpecTest"]]) <- list(DF = "DF",
                                            CHISQ = "Chi-Square",
                                            PCHISQ = "Pr > ChiSq")
 
     # Assign formats
-    formats(ret[["Specification"]]) <- list(DF = "%d",
+    formats(ret[["SpecTest"]]) <- list(DF = "%d",
                                             CHISQ = "%.2f",
                                             PCHISQ = pfmt)
   }
@@ -913,7 +914,7 @@ get_reg_report <- function(data, var, model, opts = NULL, weight = NULL, stats =
                           PREVAL = "%.4f",
                           RESID = "%.4f")
 
-      ret[["Statistics"]] <- st
+      ret[["OutputStatistics"]] <- st
 
       resi <- data.frame(stub = c("Sum of Residuals",
                                   "Sum of Squared Residuals",
@@ -926,7 +927,7 @@ get_reg_report <- function(data, var, model, opts = NULL, weight = NULL, stats =
 
       formats(resi) <- list(VALUE = "%.5f")
 
-      ret[["Residuals"]] <- resi
+      ret[["ResidualStatistics"]] <- resi
 
     } else {
 
@@ -1363,122 +1364,8 @@ gen_report_reg <- function(data,
 
       attr(byres[[bynm]][[1]], "ttls") <- ttls
 
-        # # Get class-level t-tests
-        # if (!is.null(class)) {
-        #
-        #   ctbl <- get_class_ttest(dt, outp$var, class, TRUE, opts)
-        # }
-        #
-        # if (is.null(class) ||
-        #     (!is.null(class) && tnm %in% c("Statistics", "ConfLimits"))) {   # Fix this
-        #
-        #   # data, var, class, outp, freq = TRUE,
-        #   # type = NULL, byvals = NULL
-        #   #outp <- out_spec(stats = stats, shape = "wide")
-        #   smtbl <- get_class_report(dt, outp$var, class, outp, freq = FALSE, opts = opts)
-        #
-        #
-        #
-        #   # Add in class-level tests if needed
-        #   if (!is.null(class)) {
-        #
-        #     smtbl <- add_class_ttest(smtbl, ctbl[[tnm]])
-        #   }
-        #
-        # } else if (!is.null(class)) {
-        #
-        #   # Add extra tests for class comparison
-        #   smtbl <- ctbl[[tnm]]
-        #
-        # }
 
-        # if (tnm == "Statistics") {
-        #
-        #   if (!is.null(outp$varlbl)) {
-        #     if (!is.null(paired)) {
-        #       attr(smtbl, "ttls") <- paste0("Difference: ", outp$varlbl)
-        #     } else {
-        #       attr(smtbl, "ttls") <- paste0("Variable: ", outp$varlbl)
-        #     }
-        #
-        #   } else {
-        #     attr(smtbl, "ttls") <- paste0("Variable: ", outp$var)
-        #   }
-        # }
-
-
-        # Add spanning headers if there are by groups
-        # if (!is.null(by) & !is.null(smtbl)) {
-        #
-        #   # Add spanning headers
-        #   # spn <- span(1, ncol(smtbl), label = bylbls[j], level = 1)
-        #   # attr(smtbl, "spans") <- list(spn)
-        #
-        #   bynm <-  bylbls[j]
-        #
-        #   if (tnm == "Statistics") {
-        #
-        #     attr(smtbl, "ttls") <- c(attr(smtbl, "ttls"), bynm)
-        #
-        #   }
-        #
-        # }
-
-        # Add default formats
-        # fmt <- "%.4f"
-    #    formats(smtbl) <- ttest_fc
-        # for (cnm in names(smtbl)) {
-        #
-        #   if (typeof(smtbl[[cnm]]) %in% c("double")) {
-        #
-        #     attr(smtbl[[cnm]], "format") <- fmt
-        #   }
-        #
-        # }
-
-
-        # Assign labels
-        # if (is.null(class))
-        #   labels(smtbl) <- tlbls
-        # else {
-        #
-        #   cv <- class
-        #   if (length(class) == 1)
-        #     cnms <- "CLASS"
-        #   else
-        #     cnms <- paste0("CLASS", seq(1, length(class)))
-        #
-        #   names(cv) <- cnms
-        #
-        #   labels(smtbl) <- append(as.list(cv), tlbls)
-        #
-        # }
-
-        # Kill var variable for reports
-        # if ("VAR" %in% names(smtbl)) {
-        #
-        #   smtbl[["VAR"]] <- NULL
-        #
-        # } else {
-        #
-        #   if (!is.null(outp$varlbl))
-        #     smtbl[["VAR"]] <- outp$varlbl
-        # }
-
-        # Convert to tibble if incoming data is a tibble
-        # if ("tbl_df" %in% class(data)) {
-        #   res[[nm]] <- as_tibble(smtbl)
-        # } else {
-        #   res[[nm]] <- smtbl
-        # }
-
-      # } outreq
-
-      #byres[[bynm]] <- res
     }
-
-    # Add summary plot  - Commented for now because I can't get it to match SAS.
-    # res[["SummaryPanel"]] <- gen_summarypanel(dt, var, confidence = alph)
 
   }
 
@@ -1511,35 +1398,35 @@ gen_report_reg <- function(data,
 
       }
 
-      if ("Coefficients" %in% nmsret) {
+      if ("ParameterEstimates" %in% nmsret) {
         if (has_option(stats, "hcc")) {
 
-          spn2 <- span(1, ncol(ret$Coefficients), label = paste("Parameter Estimates"),
+          spn2 <- span(1, ncol(ret$ParameterEstimates), label = paste("Parameter Estimates"),
                        level = 2)
           spn1 <- span("HCSTDERR", "HCPROBT", label = paste("Heteroscedasticity Consistent"),
                        level = 1)
-          attr(ret$Coefficients, "spans") <- list(spn1, spn2)
+          attr(ret$ParameterEstimates, "spans") <- list(spn1, spn2)
 
         } else {
-          spn <- span(1, ncol(ret$Coefficients), label = paste("Parameter Estimates"),
+          spn <- span(1, ncol(ret$ParameterEstimates), label = paste("Parameter Estimates"),
                       level = 1)
-          attr(ret$Coefficients, "spans") <- list(spn)
+          attr(ret$ParameterEstimates, "spans") <- list(spn)
         }
 
 
       }
 
-      if ("Specification" %in% nmsret) {
-        spn <- span(1, ncol(ret$Specification),
+      if ("SpecTest" %in% nmsret) {
+        spn <- span(1, ncol(ret$SpecTest),
                     label = paste("Test of First and Second Moment Specification"),
                     level = 1)
-        attr(ret$Specification, "spans") <- list(spn)
+        attr(ret$SpecTest, "spans") <- list(spn)
 
       }
 
-      if ("Statistics" %in% nmsret) {
+      if ("OutputStatistics" %in% nmsret) {
 
-        attr(ret$Statistics, "spans") <- list(span(1, ncol(ret$Statistics),
+        attr(ret$OutputStatistics, "spans") <- list(span(1, ncol(ret$OutputStatistics),
                                              label = "Output Statistics",
                                              level = 1))
 
@@ -1553,6 +1440,43 @@ gen_report_reg <- function(data,
 
       show_viewer(out)
     }
+  }
+
+  if (has_option(output, "report")) {
+
+     nmsret <- names(ret)
+
+     if ("NObs" %in% nmsret) {
+
+       names(ret$NObs)  <- sub("stub", "LABEL", names(ret$NObs), fixed = TRUE)
+
+     }
+
+     if ("ANOVA" %in% nmsret) {
+
+       names(ret$ANOVA)  <- sub("stub", "LABEL", names(ret$ANOVA), fixed = TRUE)
+
+     }
+
+     if ("ParameterEstimates" %in% nmsret) {
+
+       names(ret$ParameterEstimates)  <- sub("stub", "PARM",
+                                             names(ret$ParameterEstimates),
+                                             fixed = TRUE)
+     }
+
+     if ("OutputStatistics" %in% nmsret) {
+
+       names(ret$OutputStatistics)  <- sub("stub", "OBS", names(ret$OutputStatistics), fixed = TRUE)
+
+     }
+
+     if ("ResidualStatistics" %in% nmsret) {
+
+       names(ret$ResidualStatistics)  <- sub("stub", "LABEL", names(ret$ResidualStatistics), fixed = TRUE)
+
+     }
+
   }
 
   return(ret)

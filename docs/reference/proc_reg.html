@@ -253,10 +253,11 @@ to give you the most accurate numeric results.</p>
 to return the datasets used in the interactive report. To request these
 datasets, pass the "report" option to the <code>output</code> parameter.  Each report
 dataset will be named according to the category of statistical
-results.  There are four standard categories: "Observations",
-"ANOVA", "Fitness", and "Coefficients". When the "spec" statistics option
-is passed, the function will also return a "Specification" dataset containing
-the White's test results.</p>
+results.  There are four standard categories: "NObs",
+"ANOVA", "FitStatistics", and "ParameterEstimates". When the "spec" statistics option
+is passed, the function will also return a "SpecTest" dataset containing
+the White's test results.  If the "p" option is present, the "OutputStatistics"
+and "ResidualStatistics" tables will be included.</p>
 <p>If you don't want any datasets returned, pass the "none" option on the
 <code>output</code> parameter.</p>
     </div>
@@ -392,23 +393,23 @@ to return the data in "long" form, use <code>output = "long"</code>.</p>
 <span></span>
 <span><span class="co"># View Results</span></span>
 <span><span class="va">res3</span></span>
-<span><span class="co"># $Observations</span></span>
-<span><span class="co"># stub NOBS</span></span>
+<span><span class="co"># $NObs</span></span>
+<span><span class="co">#                          stub NOBS</span></span>
 <span><span class="co"># 1 Number of Observations Read   50</span></span>
 <span><span class="co"># 2 Number of Observations Used   50</span></span>
 <span><span class="co">#</span></span>
 <span><span class="co"># $ANOVA</span></span>
-<span><span class="co"># stub DF    SUMSQ     MEANSQ     FVAL        PROBF</span></span>
+<span><span class="co">#              stub DF    SUMSQ     MEANSQ     FVAL        PROBF</span></span>
 <span><span class="co"># 1           Model  1 21185.46 21185.4589 89.56711 1.489919e-12</span></span>
 <span><span class="co"># 2           Error 48 11353.52   236.5317       NA           NA</span></span>
 <span><span class="co"># 3 Corrected Total 49 32538.98         NA       NA           NA</span></span>
 <span><span class="co">#</span></span>
-<span><span class="co"># $Fitness</span></span>
+<span><span class="co"># $FitStatistics</span></span>
 <span><span class="co"># RMSE DEPMEAN  COEFVAR       RSQ    ADJRSQ</span></span>
 <span><span class="co"># 1 15.37959   42.98 35.78312 0.6510794 0.6438102</span></span>
 <span><span class="co">#</span></span>
-<span><span class="co"># $Coefficients</span></span>
-<span><span class="co"># stub DF        EST    STDERR         T        PROBT</span></span>
+<span><span class="co"># $ParameterEstimates</span></span>
+<span><span class="co">#        stub DF        EST    STDERR         T        PROBT</span></span>
 <span><span class="co"># 1 Intercept  1 -17.579095 6.7584402 -2.601058 1.231882e-02</span></span>
 <span><span class="co"># 2     speed  1   3.932409 0.4155128  9.463990 1.489919e-12</span></span>
 <span></span>

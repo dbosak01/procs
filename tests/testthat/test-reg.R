@@ -94,7 +94,8 @@ test_that("reg3: Basic proc_reg() works.", {
   myfm1 <- formula(Weight ~ Height)
 
 
-  res1 <- proc_reg(cls, myfm1, output = "report")
+  res1 <- proc_reg(cls, myfm1,
+                   output = "report")
 
   res1
 
@@ -625,7 +626,7 @@ test_that("reg17: single model output options work.", {
 
 })
 
-test_that("reg18: doble model output options work.", {
+test_that("reg18: double model output options work.", {
 
 
   myfm1 <- formula(Weight ~ Height)
@@ -672,9 +673,9 @@ test_that("reg19: white/spec options work.", {
   res1
 
   expect_equal(length(res1), 5)
-  expect_equal(as.integer(res1$Specification$DF), 2)
-  expect_equal(as.double(res1$Specification$CHISQ), 6.24599610)
-  expect_equal(round(as.double(res1$Specification$PCHISQ), 8), 0.04402498)
+  expect_equal(as.integer(res1$SpecTest$DF), 2)
+  expect_equal(as.double(res1$SpecTest$CHISQ), 6.24599610)
+  expect_equal(round(as.double(res1$SpecTest$PCHISQ), 8), 0.04402498)
 
 })
 
@@ -704,7 +705,7 @@ test_that("reg21: hcc option works.", {
 
   res1
 
-  c1 <- res1$Coefficients
+  c1 <- res1$ParameterEstimates
   expect_equal(all(c("HCSTDERR", "HCT", "HCPROBT") %in% names(c1)),
                    TRUE)
   expect_equal(as.numeric(c1$HCSTDERR), c(25.81836644, 0.43125902))
@@ -717,7 +718,7 @@ test_that("reg21: hcc option works.", {
 
   res2
 
-  c2 <- res2$Coefficients
+  c2 <- res2$ParameterEstimates
   expect_equal(all(c("HCSTDERR", "HCT", "HCPROBT") %in% names(c2)),
                TRUE)
   expect_equal(as.numeric(c2$HCSTDERR), c(32.23465876, 0.5353434))
@@ -739,10 +740,10 @@ test_that("reg22: Confidence limit statistics work.", {
 
   res1
 
-  expect_equal("LCLM" %in% names(res1$Coefficients), TRUE)
-  expect_equal("UCLM" %in% names(res1$Coefficients), TRUE)
-  expect_equal(res1$Coefficients$LCLM[1], -211.120354)
-  expect_equal(res1$Coefficients$UCLM[1], -74.933483)
+  expect_equal("LCLM" %in% names(res1$ParameterEstimates), TRUE)
+  expect_equal("UCLM" %in% names(res1$ParameterEstimates), TRUE)
+  expect_equal(res1$ParameterEstimates$LCLM[1], -211.120354)
+  expect_equal(res1$ParameterEstimates$UCLM[1], -74.933483)
 
 })
 
@@ -758,8 +759,8 @@ test_that("reg23: Test P option.", {
 
   expect_equal(length(res1), 6)
 
-  t5 <- res1$Statistics
-  t6 <- res1$Residuals
+  t5 <- res1$OutputStatistics
+  t6 <- res1$ResidualStatistics
 
   expect_equal(t5[1, "DEPVAL"], 112.5)
   expect_equal(t5[1, "PREVAL"], 126.00617)
@@ -775,7 +776,7 @@ test_that("reg23: Test P option.", {
 
   res2 <- proc_reg(cls2, myfm1, stats = p, output = "report")
 
-  expect_equal(nrow(res2$Statistics), 17)
+  expect_equal(nrow(res2$OutputStatistics), 17)
 
 
 })
