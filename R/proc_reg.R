@@ -1188,6 +1188,12 @@ get_reg_output<- function(data, var, model, modelname, opts = NULL, stats = NULL
     ret[lrw, var] <- NA
   }
 
+  # Assign byvars again to pick up added rows
+  if (!is.null(byvars)) {
+    for (bnm in names(byvars)) {
+      ret[[bnm]] <- as.character(byvars[bnm])
+    }
+  }
 
 
   return(ret)

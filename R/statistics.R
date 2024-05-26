@@ -365,7 +365,27 @@ get_chisq <- function(x, y, wgt = NULL, corrct = FALSE, bylbl = "", output = FAL
 
 }
 
+#' @import sasLM
 get_skewness <- function(x, narm = TRUE) {
+
+  ret <- NULL
+
+  if(any(ina <- is.na(x))) {
+    if(narm)
+      x <- x[!ina]
+  }
+
+  n <- length(x)
+  if(n < 3)
+    stop("Skewness requires at least 3 complete observations.")
+
+  ret <- Skewness(x)
+
+  return(ret)
+}
+
+
+get_skewness_back <- function(x, narm = TRUE) {
 
   ret <- NULL
 
@@ -386,7 +406,28 @@ get_skewness <- function(x, narm = TRUE) {
 }
 
 
+#' @import sasLM
 get_kurtosis <- function(x, narm = TRUE) {
+
+  ret <- NULL
+
+  if(any(ina <- is.na(x))) {
+    if(narm)
+      x <- x[!ina]
+  }
+
+  n <- length(x)
+
+  if(n < 4)
+    stop("Kurtosis requires at least 4 complete observations.")
+
+  ret <- Kurtosis(x)
+
+  return(ret)
+}
+
+
+get_kurtosis_back <- function(x, narm = TRUE) {
 
   ret <- NULL
 
@@ -407,8 +448,6 @@ get_kurtosis <- function(x, narm = TRUE) {
 
   return(ret)
 }
-
-
 
 
 # get_cmh <- function(x, y, wgt = NULL, corrct = FALSE, bylbl = "", output = FALSE) {

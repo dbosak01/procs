@@ -1,3 +1,13 @@
+# procs 1.0.7
+
+* Fixed bug on `prog_reg()` where by variable was not populating for all rows
+when "tableout" option was used.
+* Changed skewness and kurtosis statistics to use functions from **sasLM**. Output
+is the same, but it is easier to maintain.
+* Added default titles to `proc_freq()` and `proc_means()`.
+* Made corrections to validation document.
+* Added adjusted Chi-Square to `proc_freq()` output.
+
 # procs 1.0.6
 
 * Fixed bug on `proc_means()` to return a tibble when input is a tibble.

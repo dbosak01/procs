@@ -8,7 +8,7 @@ data_dir <- "."
 
 
 cls <- read.table(header = TRUE, text = '
-Name Sex Age Height Weight    region
+Name Sex Age Height Weight Region
 Alfred   M  14   69.0  112.5   A
 Alice   F  13   56.5   84.0    A
 Barbara   F  13   65.3   98.0  A
@@ -233,7 +233,7 @@ test_that("reg7: by parameter works.", {
 
   # Multiple Bys
   res3 <- proc_reg(cls, myfm1,
-                   by = v(Sex, region),
+                   by = v(Sex, Region),
                    output = c("out", "report"))
 
   res3
@@ -242,7 +242,7 @@ test_that("reg7: by parameter works.", {
   expect_equal(is.data.frame(res3$out), TRUE)
   expect_equal(nrow(res3$out), 4)
   expect_equal(length(res3$report), 4)
-  expect_equal(length(res3$report$`MODEL1:Sex=F, region=A`), 4)
+  expect_equal(length(res3$report$`MODEL1:Sex=F, Region=A`), 4)
 
 
 })
@@ -405,7 +405,7 @@ test_that("reg12: Output by dataset works.", {
   expect_equal(nrow(res2), 2)
 
   # Multiple by
-  res3 <- proc_reg(cls, myfm1, by = v(region, Sex))
+  res3 <- proc_reg(cls, myfm1, by = v(Region, Sex))
 
   res3
 
@@ -814,6 +814,37 @@ test_that("reg24: Check for no rows.", {
 })
 
 
+test_that("reg25: by parameter with output options works.", {
+
+  # R Syntax
+  myfm1 <- formula(Weight ~ Height)
+
+
+  res1 <- proc_reg(cls, myfm1,
+                   by = Sex,
+                   options = tableout)
+
+  res1
+
+  expect_equal(nrow(res1), 12)
+  expect_equal(any(is.na(res1$BY)), FALSE)
+
+
+
+
+  # Multiple Bys
+  res3 <- proc_reg(cls, myfm1,
+                   by = v(Sex, Region),
+                   options = tableout)
+
+  res3
+
+  expect_equal(nrow(res3), 24)
+  expect_equal(any(is.na(res3$BY1)), FALSE)
+  expect_equal(any(is.na(res3$BY2)), FALSE)
+
+
+})
 
 
 # Testing plots
