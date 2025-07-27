@@ -189,7 +189,7 @@
 #' @param by An optional by group. If you specify a by group, the input
 #'  data will be subset on the by variable(s) prior to performing the regression.
 #'  For multiple by variables, pass them as a quoted vector of variable names.
-#'  You may also pass them unquoted using the \code{\link{v}} function.
+#'  You may also pass them unquoted using the \code{\link[common]{v}} function.
 #' @param stats Optional statistics keywords.  Valid values are "adjrsq", "clb",
 #' "est", "edf", "hcc", "hccmethod", "mse", "p", "press", "rsquare",
 #' "sse", "spec", "seb", and "table".  A single keyword may be passed with or

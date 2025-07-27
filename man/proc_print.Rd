@@ -24,8 +24,8 @@ a list of datasets.}
 
 \item{titles}{A vector of titles.}
 
-\item{style}{A style object, as defined by the \strong{\link{reporter}}
-package.  See that package for details.}
+\item{style}{A style object, as defined by the \strong{reporter}
+package.  See \link[reporter]{create_style} for details.}
 
 \item{view}{Whether to send the print output to the viewer.  Valid
 values are TRUE and FALSE. Default is TRUE.}
@@ -42,7 +42,7 @@ By default, the function prints to the viewer. It may also be used
 to print to the file system using the \code{output_type} and
 \code{file_path} parameters.  This print function has limited options,
 and is meant to quickly view your data or dump it out to a file.
-For more reporting options, use the \strong{\link{reporter}} package.
+For more reporting options, use the \strong{reporter} package.
 }
 \examples{
 # Turn off printing to pass CRAN checks

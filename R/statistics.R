@@ -294,7 +294,111 @@ get_fisher <- function(x, y, wgt = NULL, bylbl = "", output = FALSE) {
 }
 
 
-get_chisq <- function(x, y, wgt = NULL, corrct = FALSE, bylbl = "", output = FALSE) {
+get_chisq <- function(x, y, wgt = NULL, bylbl = "", output = FALSE) {
+
+  if (!"character" %in% class(x))
+    x <- as.character(x)
+
+  if (!"character" %in% class(y))
+    y <- as.character(y)
+
+  if (!is.null(wgt)) {
+
+    z <- wgt != 0
+
+    wgt <- wgt[z]
+    x <- x[z]
+    y <- y[z]
+
+    tb <- xtabs(wgt~x + y)
+
+  } else {
+
+    cnt <- rep(1, length(x))
+
+    tb <- xtabs(cnt~x + y)
+
+  }
+
+  ret <- NULL
+
+  # res <- suppressWarnings(chisq.test(tb, correct = FALSE))
+  # res2 <- suppressWarnings(chisq.test(tb, correct = TRUE))
+
+  res <- chisq.test(tb, correct = FALSE)
+  res2 <- chisq.test(tb, correct = TRUE)
+
+  if (output) {
+
+    lbls <- c("Chi-Square", "Continuity Adj. Chi-Square")
+    df <- c(res[["parameter"]], res2[["parameter"]])
+    val <- c(res[["statistic"]], res2[["statistic"]])
+    pval <- c(res[["p.value"]], res2[["p.value"]])
+
+    ret <- data.frame(STAT = lbls,
+                      DF = df,
+                      VAL = val,
+                      PROB = pval, stringsAsFactors = FALSE)
+
+    # ret <- data.frame(CHISQ = res[["statistic"]],
+    #                   CHISQ.DF = res[["parameter"]],
+    #                   CHISQ.P = res[["p.value"]],
+    #                   stringsAsFactors = FALSE)
+
+
+    # Add by variables if exist
+    if (length(bylbl) > 0) {
+      bv <- bylbl[[1]]
+      if (!is.null(bv)) {
+        lst <- list()
+        nms <- names(bv)
+        if (length(nms) > 0) {
+          for (nm in nms) {
+            lst[[nm]] <- bv[[nm]]
+          }
+          bvds <- as.data.frame(lst, stringsAsFactors = FALSE)
+          names(bvds) <- nms
+          ret <- cbind(bvds, ret)
+        }
+
+      }
+    }
+
+  } else {
+
+    lbls <- c("Chi-Square", "Continuity Adj. Chi-Square")
+    df <- c(res[["parameter"]], res2[["parameter"]])
+    val <- c(res[["statistic"]], res2[["statistic"]])
+    pval <- c(res[["p.value"]], res2[["p.value"]])
+
+    names(df) <- NULL
+    names(val) <- NULL
+    names(pval) <- NULL
+
+    ret <- data.frame(STAT = lbls,
+                      DF = df,
+                      VAL = val,
+                      PROB = pval, stringsAsFactors = FALSE)
+
+    widths(ret) <- list(STAT = 18)
+  }
+
+  if (!is.null(ret)) {
+
+    rownames(ret) <- NULL
+    formats(ret) <- list(DF = "%d", VAL = "%.4f", PROB = pfmt)
+    labels(ret) <- list(STAT = "Statistic", DF = "DF",
+                        VAL = "Value", PROB = "Prob")
+  }
+
+
+  return(ret)
+
+
+}
+
+
+get_chisq_back <- function(x, y, wgt = NULL, corrct = FALSE, bylbl = "", output = FALSE) {
 
 
   if (!is.null(wgt)) {
@@ -361,7 +465,6 @@ get_chisq <- function(x, y, wgt = NULL, corrct = FALSE, bylbl = "", output = FAL
 
 
   return(ret)
-
 
 }
 

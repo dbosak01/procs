@@ -1,114 +1,40 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <url>
-    <loc>https://procs.r-sassy.org/404.html</loc>
-  </url>
-  <url>
-    <loc>https://procs.r-sassy.org/articles/index.html</loc>
-  </url>
-  <url>
-    <loc>https://procs.r-sassy.org/articles/procs-dm.html</loc>
-  </url>
-  <url>
-    <loc>https://procs.r-sassy.org/articles/procs-example1.html</loc>
-  </url>
-  <url>
-    <loc>https://procs.r-sassy.org/articles/procs-example2.html</loc>
-  </url>
-  <url>
-    <loc>https://procs.r-sassy.org/articles/procs-example3.html</loc>
-  </url>
-  <url>
-    <loc>https://procs.r-sassy.org/articles/procs-faq.html</loc>
-  </url>
-  <url>
-    <loc>https://procs.r-sassy.org/articles/procs-freq.html</loc>
-  </url>
-  <url>
-    <loc>https://procs.r-sassy.org/articles/procs-means.html</loc>
-  </url>
-  <url>
-    <loc>https://procs.r-sassy.org/articles/procs-other.html</loc>
-  </url>
-  <url>
-    <loc>https://procs.r-sassy.org/articles/procs-reg.html</loc>
-  </url>
-  <url>
-    <loc>https://procs.r-sassy.org/articles/procs-transpose.html</loc>
-  </url>
-  <url>
-    <loc>https://procs.r-sassy.org/articles/procs-ttest.html</loc>
-  </url>
-  <url>
-    <loc>https://procs.r-sassy.org/articles/procs.html</loc>
-  </url>
-  <url>
-    <loc>https://procs.r-sassy.org/articles/_procs-faq.html</loc>
-  </url>
-  <url>
-    <loc>https://procs.r-sassy.org/authors.html</loc>
-  </url>
-  <url>
-    <loc>https://procs.r-sassy.org/index.html</loc>
-  </url>
-  <url>
-    <loc>https://procs.r-sassy.org/LICENSE.html</loc>
-  </url>
-  <url>
-    <loc>https://procs.r-sassy.org/news/index.html</loc>
-  </url>
-  <url>
-    <loc>https://procs.r-sassy.org/reference/compare_ds.html</loc>
-  </url>
-  <url>
-    <loc>https://procs.r-sassy.org/reference/index.html</loc>
-  </url>
-  <url>
-    <loc>https://procs.r-sassy.org/reference/opts.html</loc>
-  </url>
-  <url>
-    <loc>https://procs.r-sassy.org/reference/out.html</loc>
-  </url>
-  <url>
-    <loc>https://procs.r-sassy.org/reference/print_proc.html</loc>
-  </url>
-  <url>
-    <loc>https://procs.r-sassy.org/reference/ProcFreqOptions.html</loc>
-  </url>
-  <url>
-    <loc>https://procs.r-sassy.org/reference/ProcMeansOptions.html</loc>
-  </url>
-  <url>
-    <loc>https://procs.r-sassy.org/reference/procs.html</loc>
-  </url>
-  <url>
-    <loc>https://procs.r-sassy.org/reference/proc_compare.html</loc>
-  </url>
-  <url>
-    <loc>https://procs.r-sassy.org/reference/proc_freq.html</loc>
-  </url>
-  <url>
-    <loc>https://procs.r-sassy.org/reference/proc_means.html</loc>
-  </url>
-  <url>
-    <loc>https://procs.r-sassy.org/reference/proc_print.html</loc>
-  </url>
-  <url>
-    <loc>https://procs.r-sassy.org/reference/proc_reg.html</loc>
-  </url>
-  <url>
-    <loc>https://procs.r-sassy.org/reference/proc_sort.html</loc>
-  </url>
-  <url>
-    <loc>https://procs.r-sassy.org/reference/proc_transpose.html</loc>
-  </url>
-  <url>
-    <loc>https://procs.r-sassy.org/reference/proc_ttest.html</loc>
-  </url>
-  <url>
-    <loc>https://procs.r-sassy.org/reference/round_up.html</loc>
-  </url>
-  <url>
-    <loc>https://procs.r-sassy.org/reference/v.html</loc>
-  </url>
+<urlset xmlns = 'http://www.sitemaps.org/schemas/sitemap/0.9'>
+<url><loc>https://procs.r-sassy.org/404.html</loc></url>
+<url><loc>https://procs.r-sassy.org/articles/index.html</loc></url>
+<url><loc>https://procs.r-sassy.org/articles/procs-dm.html</loc></url>
+<url><loc>https://procs.r-sassy.org/articles/procs-example1.html</loc></url>
+<url><loc>https://procs.r-sassy.org/articles/procs-example2.html</loc></url>
+<url><loc>https://procs.r-sassy.org/articles/procs-example3.html</loc></url>
+<url><loc>https://procs.r-sassy.org/articles/procs-faq.html</loc></url>
+<url><loc>https://procs.r-sassy.org/articles/procs-freq.html</loc></url>
+<url><loc>https://procs.r-sassy.org/articles/procs-means.html</loc></url>
+<url><loc>https://procs.r-sassy.org/articles/procs-other.html</loc></url>
+<url><loc>https://procs.r-sassy.org/articles/procs-reg.html</loc></url>
+<url><loc>https://procs.r-sassy.org/articles/procs-transpose.html</loc></url>
+<url><loc>https://procs.r-sassy.org/articles/procs-ttest.html</loc></url>
+<url><loc>https://procs.r-sassy.org/articles/procs.html</loc></url>
+<url><loc>https://procs.r-sassy.org/articles/_procs-faq.html</loc></url>
+<url><loc>https://procs.r-sassy.org/authors.html</loc></url>
+<url><loc>https://procs.r-sassy.org/index.html</loc></url>
+<url><loc>https://procs.r-sassy.org/LICENSE.html</loc></url>
+<url><loc>https://procs.r-sassy.org/news/index.html</loc></url>
+<url><loc>https://procs.r-sassy.org/reference/compare_ds.html</loc></url>
+<url><loc>https://procs.r-sassy.org/reference/index.html</loc></url>
+<url><loc>https://procs.r-sassy.org/reference/opts.html</loc></url>
+<url><loc>https://procs.r-sassy.org/reference/out.html</loc></url>
+<url><loc>https://procs.r-sassy.org/reference/print_proc.html</loc></url>
+<url><loc>https://procs.r-sassy.org/reference/ProcFreqOptions.html</loc></url>
+<url><loc>https://procs.r-sassy.org/reference/ProcMeansOptions.html</loc></url>
+<url><loc>https://procs.r-sassy.org/reference/procs.html</loc></url>
+<url><loc>https://procs.r-sassy.org/reference/proc_compare.html</loc></url>
+<url><loc>https://procs.r-sassy.org/reference/proc_freq.html</loc></url>
+<url><loc>https://procs.r-sassy.org/reference/proc_means.html</loc></url>
+<url><loc>https://procs.r-sassy.org/reference/proc_print.html</loc></url>
+<url><loc>https://procs.r-sassy.org/reference/proc_reg.html</loc></url>
+<url><loc>https://procs.r-sassy.org/reference/proc_sort.html</loc></url>
+<url><loc>https://procs.r-sassy.org/reference/proc_transpose.html</loc></url>
+<url><loc>https://procs.r-sassy.org/reference/proc_ttest.html</loc></url>
+<url><loc>https://procs.r-sassy.org/reference/round_up.html</loc></url>
+<url><loc>https://procs.r-sassy.org/reference/v.html</loc></url>
 </urlset>
+

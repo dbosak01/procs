@@ -126,49 +126,55 @@ test_that("stats4: CLM works with NA.", {
 })
 
 # Matches SAS!
-test_that("stat5: chisq works no weight uncorrected", {
+test_that("stat5: chisq works no weight", {
 
 
   res <- get_chisq(prt$enrollment, prt$internship)
 
   res
 
-  expect_equal(res[1, 2], 0)
-  expect_equal(res[2, 2], 1)
-  expect_equal(res[3, 2], 1)
+  expect_equal(res[1, "VAL"], 0)
+  expect_equal(res[1, "DF"], 1)
+  expect_equal(res[1, "PROB"], 1)
+  expect_equal(res[2, "VAL"], 0)
+  expect_equal(res[2, "DF"], 1)
+  expect_equal(res[2, "PROB"], 1)
 
 })
 
 
 # Matches SAS!
-test_that("stat6: chisq works with weight uncorrected", {
+test_that("stat6: chisq works with weight", {
 
   res <- get_chisq(prt$internship, prt$enrollment, prt$count)
 
   res
 
-  expect_equal(res[1, 2], 0.8189423)
-  expect_equal(res[2, 2], 1)
-  expect_equal(res[3, 2], 0.365489592)
+  expect_equal(res[1, "VAL"], 0.8189423)
+  expect_equal(res[1, "DF"], 1)
+  expect_equal(res[1, "PROB"], 0.365489592)
 
-
-
-})
-
-
-test_that("stat7: chisq works with weight corrected", {
-
-  res <- get_chisq(prt$internship, prt$enrollment, prt$count, TRUE)
-
-  res
-
-  expect_equal(res[1, 2], 0.58989261)
-  expect_equal(res[2, 2], 1)
-  expect_equal(res[3, 2], 0.44246065)
-
+  expect_equal(res[2, "VAL"], 0.58989261)
+  expect_equal(res[2, "DF"], 1)
+  expect_equal(res[2, "PROB"], 0.44246065)
 
 
 })
+
+
+# test_that("stat7: chisq works with weight corrected", {
+#
+#   res <- get_chisq(prt$internship, prt$enrollment, prt$count, TRUE)
+#
+#   res
+#
+#   expect_equal(res[1, 2], 0.58989261)
+#   expect_equal(res[2, 2], 1)
+#   expect_equal(res[3, 2], 0.44246065)
+#
+#
+#
+# })
 
 # Matches SAS!
 test_that("stat8: fisher works no weight", {

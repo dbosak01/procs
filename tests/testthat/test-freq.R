@@ -60,6 +60,25 @@ prt2 <- read.table(header = TRUE, text = '
   7 girls        yes         no    10      2
   8 girls         no         no    23      2')
 
+adsl <- read.table(header = TRUE, text = '
+  SUBJID  ARM    SEX  RACE    AGE
+  "001"   "ARM A" "F"  "WHITE" 19
+  "002"   "ARM B" "F"  "WHITE" 21
+  "003"   "ARM C" "F"  "WHITE" 23
+  "004"   "ARM D" "F"  "BLACK" 28
+  "005"   "ARM A" "M"  "WHITE" 37
+  "006"   "ARM B" "M"  "WHITE" 34
+  "007"   "ARM C" "M"  "WHITE" 36
+  "008"   "ARM D" "M"  "WHITE" 30
+  "009"   "ARM A" "F"  "WHITE" 39
+  "010"   "ARM B" "F"  "WHITE" 31
+  "011"   "ARM C" "F"  "BLACK" 33
+  "012"   "ARM D" "F"  "WHITE" 38
+  "013"   "ARM A" "M"  "BLACK" 37
+  "014"   "ARM B" "M"  "WHITE" 34
+  "015"   "ARM C" "M"  "WHITE" 36
+  "016"   "ARM A" "M"  "WHITE" 40')
+
 
 options("logr.output" = FALSE)
 options("procs.print" = FALSE)
@@ -840,10 +859,13 @@ test_that("freq32: chi sqr works with weight.", {
   expect_equal(length(res), 2)
 
   res2 <- res[[2]]
-  expect_equal(res2[1, 2], 0.8189423)
-  expect_equal(res2[2, 2], 1)
-  expect_equal(res2[3, 2], 0.365489592)
-  #expect_equal(nrow(res[[2]]), 14)
+  expect_equal("STAT" %in% names(res2), TRUE)
+  expect_equal(res2[1, "VAL"], 0.8189423)
+  expect_equal(res2[1, "DF"], 1)
+  expect_equal(res2[1, "PROB"], 0.365489592)
+  expect_equal(res2[2, "VAL"], 0.58989261)
+  expect_equal(res2[2, "DF"], 1)
+  expect_equal(res2[2, "PROB"],  0.44246065)
 
 })
 
@@ -937,15 +959,20 @@ test_that("freq35: chi sqr works with weight and by.", {
   expect_equal(length(res), 4)
 
   res2 <- res[[2]]
-  expect_equal(res2[1, 2], 4.23661395)
-  expect_equal(res2[2, 2], 1)
-  expect_equal(res2[3, 2], 0.039560993)
-
+  expect_equal(res2[1, "VAL"], 4.23661395)
+  expect_equal(res2[1, "DF"], 1)
+  expect_equal(res2[1, "PROB"], 0.039560993)
+  expect_equal(res2[2, "VAL"], 3.4514934)
+  expect_equal(res2[2, "DF"], 1)
+  expect_equal(res2[2, "PROB"], 0.063194646)
 
   res4 <- res[[4]]
-  expect_equal(res4[1, 2], 0.55926894)
-  expect_equal(res4[2, 2], 1)
-  expect_equal(res4[3, 2], 0.45455495)
+  expect_equal(res4[1, "VAL"], 0.55926894)
+  expect_equal(res4[1, "DF"], 1)
+  expect_equal(res4[1, "PROB"], 0.45455495)
+  expect_equal(res4[2, "VAL"], 0.2847875035)
+  expect_equal(res4[2, "DF"], 1)
+  expect_equal(res4[2, "PROB"], 0.5935803491)
 
 
   res <- proc_freq(prt, tables = "internship * enrollment",
@@ -957,13 +984,23 @@ test_that("freq35: chi sqr works with weight and by.", {
 
   expect_equal(length(res), 2)
 
+
   res2 <- res[[2]]
-  expect_equal(res2[1, 2], 4.23661395)
-  expect_equal(res2[1, 3], 1)
-  expect_equal(res2[1, 4], 0.039560993)
-  expect_equal(res2[2, 2], 0.55926894)
-  expect_equal(res2[2, 3], 1)
-  expect_equal(res2[2, 4], 0.45455495)
+  expect_equal(res2[1, "VAL"], 4.23661395)
+  expect_equal(res2[1, "DF"], 1)
+  expect_equal(res2[1, "PROB"], 0.039560993)
+  expect_equal(res2[2, "VAL"], 3.4514934)
+  expect_equal(res2[2, "DF"], 1)
+  expect_equal(res2[2, "PROB"], 0.063194646)
+
+  expect_equal(res2[3, "VAL"], 0.55926894)
+  expect_equal(res2[3, "DF"], 1)
+  expect_equal(res2[3, "PROB"], 0.45455495)
+  expect_equal(res2[4, "VAL"], 0.2847875035)
+  expect_equal(res2[4, "DF"], 1)
+  expect_equal(res2[4, "PROB"], 0.5935803491)
+
+
 
 })
 
@@ -1316,8 +1353,8 @@ test_that("freq50: chisq output statistics works.", {
   expect_equal(length(res), 2)
   expect_equal(nrow(res[[1]]), 8)
   expect_equal(ncol(res[[1]]), 8)
-  expect_equal(nrow(res[[2]]), 2)
-  expect_equal(ncol(res[[2]]), 4)
+  expect_equal(nrow(res[[2]]), 4)
+  expect_equal(ncol(res[[2]]), 5)
 
 
 })
@@ -1776,9 +1813,9 @@ test_that("freq59: chi sqr works without weight.", {
   expect_equal(length(res), 2)
 
   res2 <- res[[2]]
-  expect_equal(res2[1, 2], 0.0)
-  expect_equal(res2[2, 2], 1)
-  expect_equal(res2[3, 2], 1.0)
+  expect_equal(res2[1, "VAL"], 0.0)
+  expect_equal(res2[1, "DF"], 1)
+  expect_equal(res2[1, "PROB"], 1.0)
 
 })
 
@@ -2155,5 +2192,28 @@ test_that("freq71: factor with missing works as expected.", {
 
   expect_equal(unique(as.character(res5$CAT2)), c("green", "brown", "blue", NA))
 
+
+})
+
+test_that("freq72: chisquare with age group works as expected.", {
+
+  agecat <- value(condition(x >= 18 & x <= 29, "18 to 29"),
+                  condition(x >=30 & x <= 39, "30 to 39"),
+                  condition(x >=40 & x <=49, "40 to 49"),
+                  condition(x >= 50, ">= 50"),
+                  as.factor = TRUE)
+
+  adsl$AGECAT <- fapply(adsl$AGE, agecat)
+
+
+  proc_freq(adsl, tables = v(AGECAT * ARM),
+            options = v(chisq, nosparse)) -> ageg_chisq
+
+  ageg_chisq
+
+  expect_equal(is.nan(ageg_chisq[[2]]$VAL[1]), FALSE)
+  expect_equal(is.nan(ageg_chisq[[2]]$VAL[2]), FALSE)
+  expect_equal(is.nan(ageg_chisq[[2]]$PROB[1]), FALSE)
+  expect_equal(is.nan(ageg_chisq[[2]]$PROB[2]), FALSE)
 
 })

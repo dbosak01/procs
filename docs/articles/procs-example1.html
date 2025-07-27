@@ -12,21 +12,19 @@
 <link rel="apple-touch-icon" type="image/png" sizes="120x120" href="../apple-touch-icon-120x120.png">
 <link rel="apple-touch-icon" type="image/png" sizes="76x76" href="../apple-touch-icon-76x76.png">
 <link rel="apple-touch-icon" type="image/png" sizes="60x60" href="../apple-touch-icon-60x60.png">
-<!-- jquery --><script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script><!-- Bootstrap --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/css/bootstrap.min.css" integrity="sha256-bZLfwXAP04zRMK2BjiO8iu9pf4FbLqX6zitd+tIvLhE=" crossorigin="anonymous">
+<!-- jquery --><script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js" integrity="sha512-v2CJ7UaYy4JwqLDIrZUI/4hqeoQieOmAZNXBeQyjo21dadnwR+8ZaIJVT8EE2iyI61OV8e6M8PP2/4hpQINQ/g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script><!-- Bootstrap --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/css/bootstrap.min.css" integrity="sha256-bZLfwXAP04zRMK2BjiO8iu9pf4FbLqX6zitd+tIvLhE=" crossorigin="anonymous">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/js/bootstrap.min.js" integrity="sha256-nuL8/2cJ5NDSSwnKD8VqreErSWHtnEP9E7AySL+1ev4=" crossorigin="anonymous"></script><!-- bootstrap-toc --><link rel="stylesheet" href="../bootstrap-toc.css">
 <script src="../bootstrap-toc.js"></script><!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/v4-shims.min.css" integrity="sha256-wZjR52fzng1pJHwx4aV2AO3yyTOXrcDW7jBpJtTwVxw=" crossorigin="anonymous">
 <!-- clipboard.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script><!-- headroom.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/headroom.min.js" integrity="sha256-AsUX4SJE1+yuDu5+mAVzJbuYNPHj/WroHuZ8Ir/CkE0=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script><!-- pkgdown --><link href="../pkgdown.css" rel="stylesheet">
 <script src="../pkgdown.js"></script><script src="../extra.js"></script><meta property="og:title" content="Example 1: Demographics">
-<meta property="og:description" content="procs">
-<meta property="og:image" content="https://procs.r-sassy.org/logo.png">
 <!-- mathjax --><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js" integrity="sha256-nvJJv9wWKEm88qvoQl9ekL2J+k/RWIsaSScxxlsrv8k=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/config/TeX-AMS-MML_HTMLorMML.js" integrity="sha256-84DKXVJXs0/F8OTMzX4UR909+jtl4G7SPypPavF+GfA=" crossorigin="anonymous"></script><!--[if lt IE 9]>
 <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
 <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
 <![endif]-->
 </head>
 <body data-spy="scroll" data-target="#toc">
-    
+
 
     <div class="container template-article">
       <header><div class="navbar navbar-inverse navbar-fixed-top" role="navigation">
@@ -40,7 +38,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">procs</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.0.6</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.0.7</span>
       </span>
     </div>
 
@@ -53,7 +51,7 @@
 <li class="dropdown">
   <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
     Articles
-     
+
     <span class="caret"></span>
   </a>
   <ul class="dropdown-menu" role="menu">
@@ -98,7 +96,7 @@
 <li>
   <a href="https://github.com/dbosak01/procs/" class="external-link">
     <span class="fab fa-github fa-lg"></span>
-     
+
   </a>
 </li>
       </ul>
@@ -109,7 +107,7 @@
 </div>
 <!--/.navbar -->
 
-      
+
 
       </header><div class="row">
   <div class="col-md-9 contents">
@@ -133,7 +131,6 @@ interact with other <strong>sassy</strong> functions to create a
 demographics table with p-value statistics.</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://r-sassy.org" class="external-link">sassy</a></span><span class="op">)</span></span>
-<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://procs.r-sassy.org">procs</a></span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Prepare Log -------------------------------------------------------------</span></span>
 <span></span>
@@ -160,19 +157,22 @@ demographics table with p-value statistics.</p>
 <span>                <span class="fu">condition</span><span class="op">(</span><span class="va">x</span> <span class="op">&gt;=</span><span class="fl">30</span> <span class="op">&amp;</span> <span class="va">x</span> <span class="op">&lt;=</span> <span class="fl">39</span>, <span class="st">"30 to 39"</span><span class="op">)</span>,</span>
 <span>                <span class="fu">condition</span><span class="op">(</span><span class="va">x</span> <span class="op">&gt;=</span><span class="fl">40</span> <span class="op">&amp;</span> <span class="va">x</span> <span class="op">&lt;=</span><span class="fl">49</span>, <span class="st">"40 to 49"</span><span class="op">)</span>,</span>
 <span>                <span class="fu">condition</span><span class="op">(</span><span class="va">x</span> <span class="op">&gt;=</span> <span class="fl">50</span>, <span class="st">"&gt;= 50"</span><span class="op">)</span>,</span>
-<span>                <span class="fu">condition</span><span class="op">(</span><span class="cn">TRUE</span>, <span class="st">"Out of range"</span><span class="op">)</span><span class="op">)</span> </span>
+<span>                <span class="fu">condition</span><span class="op">(</span><span class="cn">TRUE</span>, <span class="st">"Out of range"</span><span class="op">)</span>,</span>
+<span>                as.factor <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span> </span>
 <span></span>
 <span><span class="fu">put</span><span class="op">(</span><span class="st">"Sex decodes"</span><span class="op">)</span></span>
 <span><span class="va">fmt_sex</span> <span class="op">&lt;-</span> <span class="fu">value</span><span class="op">(</span><span class="fu">condition</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/NA.html" class="external-link">is.na</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span>, <span class="st">"Missing"</span><span class="op">)</span>,</span>
 <span>                 <span class="fu">condition</span><span class="op">(</span><span class="va">x</span> <span class="op">==</span> <span class="st">"M"</span>, <span class="st">"Male"</span><span class="op">)</span>,</span>
 <span>                 <span class="fu">condition</span><span class="op">(</span><span class="va">x</span> <span class="op">==</span> <span class="st">"F"</span>, <span class="st">"Female"</span><span class="op">)</span>,</span>
-<span>                 <span class="fu">condition</span><span class="op">(</span><span class="cn">TRUE</span>, <span class="st">"Other"</span><span class="op">)</span><span class="op">)</span> </span>
+<span>                 <span class="fu">condition</span><span class="op">(</span><span class="cn">TRUE</span>, <span class="st">"Other"</span><span class="op">)</span>,</span>
+<span>                 as.factor <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span> </span>
 <span></span>
 <span><span class="fu">put</span><span class="op">(</span><span class="st">"Race decodes"</span><span class="op">)</span></span>
 <span><span class="va">fmt_race</span> <span class="op">&lt;-</span> <span class="fu">value</span><span class="op">(</span><span class="fu">condition</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/NA.html" class="external-link">is.na</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span>, <span class="st">"Missing"</span><span class="op">)</span>,</span>
 <span>                  <span class="fu">condition</span><span class="op">(</span><span class="va">x</span> <span class="op">==</span> <span class="st">"WHITE"</span>, <span class="st">"White"</span><span class="op">)</span>,</span>
 <span>                  <span class="fu">condition</span><span class="op">(</span><span class="va">x</span> <span class="op">==</span> <span class="st">"BLACK"</span>, <span class="st">"Black or African American"</span><span class="op">)</span>,</span>
-<span>                  <span class="fu">condition</span><span class="op">(</span><span class="cn">TRUE</span>, <span class="st">"Other"</span><span class="op">)</span><span class="op">)</span></span>
+<span>                  <span class="fu">condition</span><span class="op">(</span><span class="cn">TRUE</span>, <span class="st">"Other"</span><span class="op">)</span>, </span>
+<span>                  as.factor <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span></span>
 <span></span>
 <span><span class="fu">put</span><span class="op">(</span><span class="st">"Compile format catalog"</span><span class="op">)</span></span>
@@ -182,11 +182,7 @@ demographics table with p-value statistics.</p>
 <span>           CNT <span class="op">=</span> <span class="st">"%2d"</span>, PCT <span class="op">=</span> <span class="st">"(%5.1f%%)"</span>,</span>
 <span>           AGECAT <span class="op">=</span> <span class="va">agecat</span>,</span>
 <span>           SEX <span class="op">=</span> <span class="va">fmt_sex</span>,</span>
-<span>           RACE <span class="op">=</span> <span class="va">fmt_race</span>,</span>
-<span>           AOV.F <span class="op">=</span> <span class="st">"%5.3f"</span>,</span>
-<span>           AOV.P <span class="op">=</span> <span class="st">"(%5.3f)"</span>,</span>
-<span>           CHISQ <span class="op">=</span> <span class="st">"%5.3f"</span>,</span>
-<span>           CHISQ.P <span class="op">=</span> <span class="st">"(%5.3f)"</span><span class="op">)</span> </span>
+<span>           RACE <span class="op">=</span> <span class="va">fmt_race</span><span class="op">)</span> </span>
 <span></span>
 <span></span>
 <span><span class="co"># Load and Prepare Data ---------------------------------------------------</span></span>
@@ -253,7 +249,8 @@ demographics table with p-value statistics.</p>
 <span><span class="fu"><a href="../reference/proc_transpose.html">proc_transpose</a></span><span class="op">(</span><span class="va">age_comb</span>, </span>
 <span>               var <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">age_comb</span><span class="op">)</span>,</span>
 <span>               copy <span class="op">=</span> <span class="va">VAR</span>, id <span class="op">=</span> <span class="va">BY</span>, </span>
-<span>               name <span class="op">=</span> <span class="va">LABEL</span><span class="op">)</span> <span class="op">-&gt;</span> <span class="va">age_trans</span> </span>
+<span>               name <span class="op">=</span> <span class="va">LABEL</span><span class="op">)</span> <span class="op">-&gt;</span> <span class="va">age_trans</span></span>
+<span></span>
 <span></span>
 <span><span class="fu">put</span><span class="op">(</span><span class="st">"Calculate aov"</span><span class="op">)</span></span>
 <span><span class="va">age_aov</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/aov.html" class="external-link">aov</a></span><span class="op">(</span><span class="va">AGE</span> <span class="op">~</span> <span class="va">ARM</span>, data <span class="op">=</span> <span class="va">adsl</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
@@ -276,6 +273,7 @@ demographics table with p-value statistics.</p>
 <span></span>
 <span><span class="fu">put</span><span class="op">(</span><span class="st">"Append aov"</span><span class="op">)</span></span>
 <span><span class="fu">datastep</span><span class="op">(</span><span class="va">age_trans</span>, merge <span class="op">=</span> <span class="va">age_aov_comb</span>, <span class="op">{</span><span class="op">}</span><span class="op">)</span> <span class="op">-&gt;</span> <span class="va">age_block</span></span>
+<span></span>
 <span></span>
 <span><span class="co"># Sex Block ---------------------------------------------------------------</span></span>
 <span></span>
@@ -308,12 +306,12 @@ demographics table with p-value statistics.</p>
 <span>         <span class="op">{</span></span>
 <span>           </span>
 <span>           <span class="va">LABEL</span> <span class="op">&lt;-</span> <span class="fu">fapply</span><span class="op">(</span><span class="va">LABEL</span>, <span class="va">fc</span><span class="op">$</span><span class="va">SEX</span><span class="op">)</span></span>
-<span>           <span class="va">LABEL</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">factor</a></span><span class="op">(</span><span class="va">LABEL</span>, levels <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/levels.html" class="external-link">levels</a></span><span class="op">(</span><span class="va">fc</span><span class="op">$</span><span class="va">SEX</span><span class="op">)</span><span class="op">)</span></span>
 <span>           </span>
 <span>         <span class="op">}</span><span class="op">)</span> <span class="op">-&gt;</span> <span class="va">sex_cnts</span></span>
 <span></span>
 <span><span class="fu">put</span><span class="op">(</span><span class="st">"Sort by label"</span><span class="op">)</span></span>
-<span><span class="fu"><a href="../reference/proc_sort.html">proc_sort</a></span><span class="op">(</span><span class="va">sex_cnts</span>, by <span class="op">=</span> <span class="va">LABEL</span><span class="op">)</span> <span class="op">-&gt;</span> <span class="va">sex_cnts</span> </span>
+<span><span class="fu"><a href="../reference/proc_sort.html">proc_sort</a></span><span class="op">(</span><span class="va">sex_cnts</span>, by <span class="op">=</span> <span class="va">LABEL</span><span class="op">)</span> <span class="op">-&gt;</span> <span class="va">sex_cnts</span></span>
+<span></span>
 <span></span>
 <span><span class="fu">put</span><span class="op">(</span><span class="st">"Get sex chisq"</span><span class="op">)</span></span>
 <span><span class="fu"><a href="../reference/proc_freq.html">proc_freq</a></span><span class="op">(</span><span class="va">adsl</span>, tables <span class="op">=</span> <span class="fu"><a href="https://common.r-sassy.org/reference/v.html" class="external-link">v</a></span><span class="op">(</span><span class="va">SEX</span> <span class="op">*</span> <span class="va">ARM</span><span class="op">)</span>,</span>
@@ -325,7 +323,7 @@ demographics table with p-value statistics.</p>
 <span>         keep <span class="op">=</span> <span class="va">PVALUE</span>, </span>
 <span>         <span class="op">{</span></span>
 <span>           </span>
-<span>           <span class="va">PVALUE</span> <span class="op">=</span> <span class="fu">fapply2</span><span class="op">(</span><span class="va">CHISQ</span>, <span class="va">CHISQ.P</span><span class="op">)</span></span>
+<span>           <span class="va">PVALUE</span> <span class="op">=</span> <span class="fu">fapply2</span><span class="op">(</span><span class="va">VAL</span>, <span class="va">PROB</span><span class="op">)</span></span>
 <span>         <span class="op">}</span><span class="op">)</span> <span class="op">-&gt;</span> <span class="va">sex_chisq_comb</span> </span>
 <span></span>
 <span><span class="fu">put</span><span class="op">(</span><span class="st">"Append chisq"</span><span class="op">)</span></span>
@@ -361,7 +359,7 @@ demographics table with p-value statistics.</p>
 <span>               copy <span class="op">=</span> <span class="va">VAR</span>, by <span class="op">=</span> <span class="va">LABEL</span><span class="op">)</span> <span class="op">-&gt;</span> <span class="va">race_trans</span></span>
 <span></span>
 <span><span class="fu">put</span><span class="op">(</span><span class="st">"Clean up"</span><span class="op">)</span></span>
-<span>           </span>
+<span></span>
 <span><span class="fu">datastep</span><span class="op">(</span><span class="va">race_trans</span>, drop <span class="op">=</span> <span class="va">NAME</span>,</span>
 <span>         where <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/expression.html" class="external-link">expression</a></span><span class="op">(</span><span class="va">del</span> <span class="op">==</span> <span class="cn">FALSE</span><span class="op">)</span>,</span>
 <span>         <span class="op">{</span></span>
@@ -371,7 +369,7 @@ demographics table with p-value statistics.</p>
 <span>         <span class="op">}</span><span class="op">)</span> <span class="op">-&gt;</span> <span class="va">race_cnts</span> </span>
 <span></span>
 <span><span class="fu">put</span><span class="op">(</span><span class="st">"Sort by label"</span><span class="op">)</span></span>
-<span><span class="fu"><a href="../reference/proc_sort.html">proc_sort</a></span><span class="op">(</span><span class="va">race_cnts</span>, by <span class="op">=</span> <span class="va">LABEL</span><span class="op">)</span> <span class="op">-&gt;</span> <span class="va">race_cnts</span> </span>
+<span><span class="fu"><a href="../reference/proc_sort.html">proc_sort</a></span><span class="op">(</span><span class="va">race_cnts</span>, by <span class="op">=</span> <span class="va">LABEL</span><span class="op">)</span> <span class="op">-&gt;</span> <span class="va">race_block</span></span>
 <span></span>
 <span><span class="fu">put</span><span class="op">(</span><span class="st">"Get race chisq"</span><span class="op">)</span></span>
 <span><span class="fu"><a href="../reference/proc_freq.html">proc_freq</a></span><span class="op">(</span><span class="va">adsl</span>, tables <span class="op">=</span> <span class="va">RACE</span> <span class="op">*</span> <span class="va">ARM</span>,</span>
@@ -388,7 +386,6 @@ demographics table with p-value statistics.</p>
 <span></span>
 <span><span class="fu">put</span><span class="op">(</span><span class="st">"Append chisq"</span><span class="op">)</span></span>
 <span><span class="fu">datastep</span><span class="op">(</span><span class="va">race_cnts</span>, merge <span class="op">=</span> <span class="va">race_chisq_comb</span>, <span class="op">{</span><span class="op">}</span><span class="op">)</span> <span class="op">-&gt;</span> <span class="va">race_block</span></span>
-<span></span>
 <span></span>
 <span><span class="co"># Age Group Block ----------------------------------------------------------</span></span>
 <span></span>
@@ -424,7 +421,7 @@ demographics table with p-value statistics.</p>
 <span><span class="fu">put</span><span class="op">(</span><span class="st">"Some clean up"</span><span class="op">)</span></span>
 <span><span class="fu">datastep</span><span class="op">(</span><span class="va">ageg_trans</span>,</span>
 <span>         drop <span class="op">=</span> <span class="va">NAME</span>,</span>
-<span>         <span class="op">{</span><span class="op">}</span><span class="op">)</span> <span class="op">-&gt;</span> <span class="va">ageg_cnts</span> </span>
+<span>         <span class="op">{</span><span class="op">}</span><span class="op">)</span> <span class="op">-&gt;</span> <span class="va">ageg_block</span></span>
 <span></span>
 <span><span class="fu">put</span><span class="op">(</span><span class="st">"Get ageg chisq"</span><span class="op">)</span></span>
 <span><span class="fu"><a href="../reference/proc_freq.html">proc_freq</a></span><span class="op">(</span><span class="va">adsl</span>, tables <span class="op">=</span> <span class="va">AGECAT</span> <span class="op">*</span> <span class="va">ARM</span>,</span>
@@ -435,13 +432,12 @@ demographics table with p-value statistics.</p>
 <span>         format <span class="op">=</span> <span class="va">fc</span>,</span>
 <span>         keep <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"PVALUE"</span><span class="op">)</span>, </span>
 <span>         <span class="op">{</span></span>
-<span>           <span class="va">PVALUE</span> <span class="op">=</span> <span class="fu">fapply2</span><span class="op">(</span><span class="va">CHISQ</span>, <span class="va">CHISQ.P</span><span class="op">)</span></span>
+<span>           <span class="va">PVALUE</span> <span class="op">=</span> <span class="fu">fapply2</span><span class="op">(</span><span class="va">VAL</span>, <span class="va">PROB</span><span class="op">)</span></span>
 <span>         <span class="op">}</span><span class="op">)</span> <span class="op">-&gt;</span> <span class="va">ageg_chisq_comb</span> </span>
 <span></span>
 <span><span class="fu">put</span><span class="op">(</span><span class="st">"Append chisq"</span><span class="op">)</span></span>
 <span><span class="fu">datastep</span><span class="op">(</span><span class="va">ageg_cnts</span>, merge <span class="op">=</span> <span class="va">ageg_chisq_comb</span>, </span>
 <span>         <span class="op">{</span><span class="op">}</span><span class="op">)</span> <span class="op">-&gt;</span> <span class="va">ageg_block</span></span>
-<span></span>
 <span></span>
 <span><span class="fu">put</span><span class="op">(</span><span class="st">"Combine blocks into final data frame"</span><span class="op">)</span></span>
 <span><span class="fu">datastep</span><span class="op">(</span><span class="va">age_block</span>, </span>
@@ -449,7 +445,6 @@ demographics table with p-value statistics.</p>
 <span>         <span class="op">{</span><span class="op">}</span><span class="op">)</span> <span class="op">-&gt;</span> <span class="va">final</span></span>
 <span></span>
 <span><span class="co"># Report ------------------------------------------------------------------</span></span>
-<span></span>
 <span></span>
 <span><span class="fu">sep</span><span class="op">(</span><span class="st">"Create and print report"</span><span class="op">)</span></span>
 <span></span>
@@ -511,17 +506,17 @@ demographics table with p-value statistics.</p>
 </h2>
 <p>And here is the log:</p>
 <pre><code>=========================================================================
-Log Path: C:/Users/dbosa/AppData/Local/Temp/RtmpKQddL7/log/example1.log
-Program Path: C:/Projects/Archytas/Demo/example1.R
-Working Directory: C:/Projects/Archytas/Demo
+Log Path: C:/Users/dbosa/AppData/Local/Temp/RtmpAXQUo8/log/example1.log
+Program Path: C:/Projects/Archytas/Westat/Tutorial2/Project/Chisq2.R
+Working Directory: C:/Projects/Archytas/Westat/Tutorial2/Project
 User Name: dbosa
-R Version: 4.2.1 (2022-06-23 ucrt)
+R Version: 4.4.0 (2024-04-24 ucrt)
 Machine: SOCRATES x86-64
-Operating System: Windows 10 x64 build 19044
-Base Packages: stats graphics grDevices utils datasets methods base Other
-Packages: tidylog_1.0.2 procs_0.0.9007 reporter_1.3.7 libr_1.2.6 fmtr_1.5.9
-logr_1.3.3 common_1.0.5 sassy_1.0.8
-Log Start Time: 2022-10-15 20:01:02
+Operating System: Windows 10 x64 build 22631
+Base Packages: stats graphics grDevices utils datasets methods base
+Other Packages: tidylog_1.0.2 procs_1.0.7 reporter_1.4.4 libr_1.3.3 logr_1.3.7
+fmtr_1.6.4 common_1.1.3 sassy_1.2.4
+Log Start Time: 2024-05-28 09:09:21.582908
 =========================================================================
 
 =========================================================================
@@ -558,7 +553,7 @@ Race decodes
 
 Compile format catalog
 
-# A format catalog: 15 formats
+# A format catalog: 11 formats
 - $MEAN: type S, "%.1f"
 - $STD: type S, "(%.2f)"
 - $Q1: type S, "%.1f"
@@ -570,10 +565,6 @@ Compile format catalog
 - $AGECAT: type U, 5 conditions
 - $SEX: type U, 4 conditions
 - $RACE: type U, 4 conditions
-- $AOV.F: type S, "%5.3f"
-- $AOV.P: type S, "(%5.3f)"
-- $CHISQ: type S, "%5.3f"
-- $CHISQ.P: type S, "(%5.3f)"
 
 =========================================================================
 Prepare Data
@@ -607,6 +598,7 @@ Get ARM population counts
 
 proc_freq: input data set 16 rows and 6 columns
            tables: ARM
+           output: long
            view: TRUE
            output: 1 datasets
 
@@ -657,31 +649,6 @@ proc_transpose: input data set 4 rows and 7 columns
 3 AGE    Median        37.0        32.5        34.5        30.0
 4 AGE   Q1 - Q3 37.0 - 39.0 26.0 - 34.0 28.0 - 36.0 28.0 - 38.0
 5 AGE Min - Max     19 - 40     21 - 34     23 - 36     28 - 38
-
-Calculate aov
-
-Get aov into proper data frame
-
-                AOV.F     AOV.P
-ARM         0.2983651 0.8259486
-
-Combine aov statistics
-
-datastep: columns decreased from 2 to 1
-
-         PVALUE
-1 0.298 (0.826)
-
-Append aov
-
-datastep: columns increased from 6 to 7
-
-  VAR     LABEL       ARM A       ARM B       ARM C       ARM D        PVALUE
-1 AGE         N           5           4           4           3 0.298 (0.826)
-2 AGE Mean (SD) 34.4 (8.71) 30.0 (6.16) 32.0 (6.16) 32.0 (5.29)          &lt;NA&gt;
-3 AGE    Median        37.0        32.5        34.5        30.0          &lt;NA&gt;
-4 AGE   Q1 - Q3 37.0 - 39.0 26.0 - 34.0 28.0 - 36.0 28.0 - 38.0          &lt;NA&gt;
-5 AGE Min - Max     19 - 40     21 - 34     23 - 36     28 - 38          &lt;NA&gt;
 
 =========================================================================
 Create frequency counts for SEX
@@ -747,37 +714,11 @@ proc_sort: input data set 2 rows and 6 columns
            by: LABEL
            keep: VAR LABEL ARM A ARM B ARM C ARM D
            order: a
-           nodupkey: FALSE
            output data set 2 rows and 6 columns
 
   VAR  LABEL       ARM A       ARM B       ARM C       ARM D
 2 SEX   Male  3 ( 60.0%)  2 ( 50.0%)  2 ( 50.0%)  1 ( 33.3%)
 1 SEX Female  2 ( 40.0%)  2 ( 50.0%)  2 ( 50.0%)  2 ( 66.7%)
-
-Get sex chisq
-
-proc_freq: input data set 16 rows and 6 columns
-           tables: SEX * ARM
-           view: TRUE
-           output: 1 datasets
-
-      CHISQ CHISQ.DF   CHISQ.P
-1 0.5333333        3 0.9115095
-
-Combine chisq statistics
-
-datastep: columns decreased from 3 to 1
-
-         PVALUE
-1 0.533 (0.912)
-
-Append chisq
-
-datastep: columns increased from 6 to 7
-
-  VAR  LABEL       ARM A       ARM B       ARM C       ARM D        PVALUE
-1 SEX   Male  3 ( 60.0%)  2 ( 50.0%)  2 ( 50.0%)  1 ( 33.3%) 0.533 (0.912)
-2 SEX Female  2 ( 40.0%)  2 ( 50.0%)  2 ( 50.0%)  2 ( 66.7%)          &lt;NA&gt;
 
 =========================================================================
 Create frequency counts for RACE
@@ -825,17 +766,23 @@ proc_transpose: input data set 8 rows and 4 columns
                 name: NAME
                 output dataset 2 rows and 7 columns
 
-   VAR LABEL   NAME       ARM A       ARM B       ARM C       ARM D
-1 RACE BLACK CNTPCT  1 ( 20.0%)  0 (  0.0%)  1 ( 25.0%)  1 ( 33.3%)
-2 RACE WHITE CNTPCT  4 ( 80.0%)  4 (100.0%)  3 ( 75.0%)  2 ( 66.7%)
+   VAR LABEL   NAME       ARM A       ARM B       ARM C
+1 RACE BLACK CNTPCT  1 ( 20.0%)  0 (  0.0%)  1 ( 25.0%)
+2 RACE WHITE CNTPCT  4 ( 80.0%)  4 (100.0%)  3 ( 75.0%)
+        ARM D
+1  1 ( 33.3%)
+2  2 ( 66.7%)
 
 Clean up
 
 datastep: columns decreased from 7 to 6
 
-   VAR                     LABEL       ARM A       ARM B       ARM C       ARM D
-1 RACE Black or African American  1 ( 20.0%)  0 (  0.0%)  1 ( 25.0%)  1 ( 33.3%)
-2 RACE                     White  4 ( 80.0%)  4 (100.0%)  3 ( 75.0%)  2 ( 66.7%)
+   VAR                     LABEL       ARM A       ARM B
+1 RACE Black or African American  1 ( 20.0%)  0 (  0.0%)
+2 RACE                     White  4 ( 80.0%)  4 (100.0%)
+        ARM C       ARM D
+1  1 ( 25.0%)  1 ( 33.3%)
+2  3 ( 75.0%)  2 ( 66.7%)
 
 Sort by label
 
@@ -843,40 +790,14 @@ proc_sort: input data set 2 rows and 6 columns
            by: LABEL
            keep: VAR LABEL ARM A ARM B ARM C ARM D
            order: a
-           nodupkey: FALSE
            output data set 2 rows and 6 columns
 
-   VAR                     LABEL       ARM A       ARM B       ARM C       ARM D
-2 RACE                     White  4 ( 80.0%)  4 (100.0%)  3 ( 75.0%)  2 ( 66.7%)
-1 RACE Black or African American  1 ( 20.0%)  0 (  0.0%)  1 ( 25.0%)  1 ( 33.3%)
-
-Get race chisq
-
-proc_freq: input data set 16 rows and 6 columns
-           tables: RACE * ARM
-           view: TRUE
-           output: 1 datasets
-
-     CHISQ CHISQ.DF   CHISQ.P
-1 1.449573        3 0.6939569
-
-Combine chisq statistics
-
-datastep: columns decreased from 3 to 1
-
-         PVALUE
-1 1.450 (0.694)
-
-Append chisq
-
-datastep: columns increased from 6 to 7
-
-   VAR                     LABEL       ARM A       ARM B       ARM C       ARM D
-1 RACE                     White  4 ( 80.0%)  4 (100.0%)  3 ( 75.0%)  2 ( 66.7%)
-2 RACE Black or African American  1 ( 20.0%)  0 (  0.0%)  1 ( 25.0%)  1 ( 33.3%)
-         PVALUE
-1 1.450 (0.694)
-2          &lt;NA&gt;
+   VAR                     LABEL       ARM A       ARM B
+2 RACE                     White  4 ( 80.0%)  4 (100.0%)
+1 RACE Black or African American  1 ( 20.0%)  0 (  0.0%)
+        ARM C       ARM D
+2  3 ( 75.0%)  2 ( 66.7%)
+1  1 ( 25.0%)  1 ( 33.3%)
 
 =========================================================================
 Create frequency counts for Age Group
@@ -928,7 +849,6 @@ proc_sort: input data set 12 rows and 4 columns
            by: BY LABEL
            keep: VAR LABEL BY CNTPCT
            order: a a
-           nodupkey: FALSE
            output data set 12 rows and 4 columns
 
       VAR    LABEL    BY      CNTPCT
@@ -955,10 +875,14 @@ proc_transpose: input data set 12 rows and 4 columns
                 name: NAME
                 output dataset 3 rows and 7 columns
 
-     VAR    LABEL   NAME       ARM A       ARM B       ARM C       ARM D
-1 AGECAT 18 to 29 CNTPCT  1 ( 20.0%)  1 ( 25.0%)  1 ( 25.0%)  1 ( 33.3%)
-2 AGECAT 30 to 39 CNTPCT  3 ( 60.0%)  3 ( 75.0%)  3 ( 75.0%)  2 ( 66.7%)
-3 AGECAT 40 to 49 CNTPCT  1 ( 20.0%)  0 (  0.0%)  0 (  0.0%)  0 (  0.0%)
+     VAR    LABEL   NAME       ARM A       ARM B       ARM C
+1 AGECAT 18 to 29 CNTPCT  1 ( 20.0%)  1 ( 25.0%)  1 ( 25.0%)
+2 AGECAT 30 to 39 CNTPCT  3 ( 60.0%)  3 ( 75.0%)  3 ( 75.0%)
+3 AGECAT 40 to 49 CNTPCT  1 ( 20.0%)  0 (  0.0%)  0 (  0.0%)
+        ARM D
+1  1 ( 33.3%)
+2  2 ( 66.7%)
+3  0 (  0.0%)
 
 Some clean up
 
@@ -969,62 +893,36 @@ datastep: columns decreased from 7 to 6
 2 AGECAT 30 to 39  3 ( 60.0%)  3 ( 75.0%)  3 ( 75.0%)  2 ( 66.7%)
 3 AGECAT 40 to 49  1 ( 20.0%)  0 (  0.0%)  0 (  0.0%)  0 (  0.0%)
 
-Get ageg chisq
-
-proc_freq: input data set 16 rows and 6 columns
-           tables: AGECAT * ARM
-           view: TRUE
-           output: 1 datasets
-
-     CHISQ CHISQ.DF   CHISQ.P
-1 2.436364        6 0.8755205
-
-Combine chisq statistics
-
-datastep: columns decreased from 3 to 1
-
-         PVALUE
-1 2.436 (0.876)
-
-Append chisq
-
-datastep: columns increased from 6 to 7
-
-     VAR    LABEL       ARM A       ARM B       ARM C       ARM D        PVALUE
-1 AGECAT 18 to 29  1 ( 20.0%)  1 ( 25.0%)  1 ( 25.0%)  1 ( 33.3%) 2.436 (0.876)
-2 AGECAT 30 to 39  3 ( 60.0%)  3 ( 75.0%)  3 ( 75.0%)  2 ( 66.7%)          &lt;NA&gt;
-3 AGECAT 40 to 49  1 ( 20.0%)  0 (  0.0%)  0 (  0.0%)  0 (  0.0%)          &lt;NA&gt;
-
 Combine blocks into final data frame
 
-datastep: columns started with 7 and ended with 7
+datastep: columns started with 6 and ended with 6
 
-      VAR                     LABEL       ARM A       ARM B       ARM C       ARM D
-1     AGE                         N           5           4           4           3
-2     AGE                 Mean (SD) 34.4 (8.71) 30.0 (6.16) 32.0 (6.16) 32.0 (5.29)
-3     AGE                    Median        37.0        32.5        34.5        30.0
-4     AGE                   Q1 - Q3 37.0 - 39.0 26.0 - 34.0 28.0 - 36.0 28.0 - 38.0
-5     AGE                 Min - Max     19 - 40     21 - 34     23 - 36     28 - 38
-6  AGECAT                  18 to 29  1 ( 20.0%)  1 ( 25.0%)  1 ( 25.0%)  1 ( 33.3%)
-7  AGECAT                  30 to 39  3 ( 60.0%)  3 ( 75.0%)  3 ( 75.0%)  2 ( 66.7%)
-8  AGECAT                  40 to 49  1 ( 20.0%)  0 (  0.0%)  0 (  0.0%)  0 (  0.0%)
-9     SEX                      Male  3 ( 60.0%)  2 ( 50.0%)  2 ( 50.0%)  1 ( 33.3%)
-10    SEX                    Female  2 ( 40.0%)  2 ( 50.0%)  2 ( 50.0%)  2 ( 66.7%)
-11   RACE                     White  4 ( 80.0%)  4 (100.0%)  3 ( 75.0%)  2 ( 66.7%)
-12   RACE Black or African American  1 ( 20.0%)  0 (  0.0%)  1 ( 25.0%)  1 ( 33.3%)
-          PVALUE
-1  0.298 (0.826)
-2           &lt;NA&gt;
-3           &lt;NA&gt;
-4           &lt;NA&gt;
-5           &lt;NA&gt;
-6  2.436 (0.876)
-7           &lt;NA&gt;
-8           &lt;NA&gt;
-9  0.533 (0.912)
-10          &lt;NA&gt;
-11 1.450 (0.694)
-12          &lt;NA&gt;
+      VAR                     LABEL       ARM A       ARM B
+1     AGE                         N           5           4
+2     AGE                 Mean (SD) 34.4 (8.71) 30.0 (6.16)
+3     AGE                    Median        37.0        32.5
+4     AGE                   Q1 - Q3 37.0 - 39.0 26.0 - 34.0
+5     AGE                 Min - Max     19 - 40     21 - 34
+6  AGECAT                  18 to 29  1 ( 20.0%)  1 ( 25.0%)
+7  AGECAT                  30 to 39  3 ( 60.0%)  3 ( 75.0%)
+8  AGECAT                  40 to 49  1 ( 20.0%)  0 (  0.0%)
+9     SEX                      Male  3 ( 60.0%)  2 ( 50.0%)
+10    SEX                    Female  2 ( 40.0%)  2 ( 50.0%)
+11   RACE                     White  4 ( 80.0%)  4 (100.0%)
+12   RACE Black or African American  1 ( 20.0%)  0 (  0.0%)
+         ARM C       ARM D
+1            4           3
+2  32.0 (6.16) 32.0 (5.29)
+3         34.5        30.0
+4  28.0 - 36.0 28.0 - 38.0
+5      23 - 36     28 - 38
+6   1 ( 25.0%)  1 ( 33.3%)
+7   3 ( 75.0%)  2 ( 66.7%)
+8   0 (  0.0%)  0 (  0.0%)
+9   2 ( 50.0%)  1 ( 33.3%)
+10  2 ( 50.0%)  2 ( 66.7%)
+11  3 ( 75.0%)  2 ( 66.7%)
+12  1 ( 25.0%)  1 ( 33.3%)
 
 =========================================================================
 Create and print report
@@ -1033,17 +931,17 @@ Create and print report
 Write out the report
 
 # A report specification: 1 pages
-- file_path: 'C:\Users\dbosa\AppData\Local\Temp\RtmpKQddL7/ProcsDemoDM.rtf'
+- file_path: 'C:\Users\dbosa\AppData\Local\Temp\RtmpAXQUo8/ProcsDemoDM.rtf'
 - output_type: RTF
 - units: inches
 - orientation: landscape
 - margins: top 1 bottom 1 left 1 right 1
 - line size/count: 9/36
 - page_header: left=Sponsor: Company right=Study: ABC
-- page_footer: left=Date Produced: 2022-10-15 center= right=Page [pg] of [tpg]
+- page_footer: left=Date Produced: 2024-05-28 center= right=Page [pg] of [tpg]
 - content: 
 # A table specification:
-- data: data.frame 'final' 12 rows 7 cols
+- data: data.frame 'final' 12 rows 6 cols
 - show_cols: all
 - use_attributes: all
 - title 1: 'Table 1.0'
@@ -1051,7 +949,6 @@ Write out the report
 - title 3: 'Safety Population'
 - footnote 1: 'Program: DM_Table.R'
 - footnote 2: 'NOTE: Denominator based on number of non-missing responses.'
-- footnote 3: '¹Pearson's Chi-Square tests will be used for Categorical variables and ANOVA tests for continuous variables.'
 - stub: VAR LABEL 'Variable' width=2.5 align='left' 
 - define: VAR 'Variable' dedupe='TRUE' 
 - define: LABEL 'Demographic Category' 
@@ -1059,23 +956,15 @@ Write out the report
 - define: ARM B 'Drug 50mg' 
 - define: ARM C 'Drug 100mg' 
 - define: ARM D 'Competitor' 
-- define: PVALUE 'Tests of Association¹
- Value (P-Value)' width=2 align='center' dedupe='TRUE' 
 
 =========================================================================
 Clean Up
 =========================================================================
 
-Unload libname
-
-lib_sync: synchronized data in library 'sdtm'
-
-lib_unload: library 'sdtm' unloaded
-
 Close log
 
 =========================================================================
-Log End Time: 2022-10-15 20:01:03
+Log End Time: 2024-05-28 09:09:22.306942
 Log Elapsed Time: 0 00:00:00
 =========================================================================
 
@@ -1085,9 +974,7 @@ Log Elapsed Time: 0 00:00:00
 
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
 
-        <nav id="toc" data-toggle="toc"><h2 data-toc-skip>Contents</h2>
-    </nav>
-</div>
+      </div>
 
 </div>
 
@@ -1100,16 +987,16 @@ Log Elapsed Time: 0 00:00:00
 
 <div class="pkgdown">
   <p></p>
-<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.7.</p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.0.</p>
 </div>
 
       </footer>
 </div>
 
-  
 
 
-  
+
+
 
   </body>
 </html>

@@ -1,12 +1,17 @@
 # procs 1.0.7
 
-* Fixed bug on `prog_reg()` where by variable was not populating for all rows
+* Fixed bug on `prog_reg()` where by-variable was not populating for all rows
 when "tableout" option was used.
-* Changed skewness and kurtosis statistics to use functions from **sasLM**. Output
-is the same, but it is easier to maintain.
+* Changed skewness and kurtosis statistics to use functions from **sasLM** package. 
+Output is the same.
 * Added default titles to `proc_freq()` and `proc_means()`.
 * Made corrections to validation document.
-* Added adjusted Chi-Square to `proc_freq()` output.
+* Added adjusted Chi-Square to `proc_freq()` output.  Had to alter Chi-square 
+table to make this change.  May cause code breakage if the table 
+was being accessed programmatically.
+* Fixed bug on Chi-Square when there was a factor variable with zero categories.
+Was coming out NaN.
+* Documentation fixes.
 
 # procs 1.0.6
 

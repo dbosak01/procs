@@ -1,5 +1,5 @@
-pandoc: 3.1.1
-pkgdown: 2.0.7
+pandoc: '3.4'
+pkgdown: 2.1.0
 pkgdown_sha: ~
 articles:
   procs-dm: procs-dm.html
@@ -12,8 +12,7 @@ articles:
   procs-reg: procs-reg.html
   procs-ttest: procs-ttest.html
   procs: procs.html
-last_built: 2024-03-06T14:54Z
+last_built: 2025-07-27T00:13Z
 urls:
   reference: https://procs.r-sassy.org/reference
   article: https://procs.r-sassy.org/articles
-

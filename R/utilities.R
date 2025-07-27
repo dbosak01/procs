@@ -92,10 +92,19 @@ output_report <- function(lst,
             names(dt) <- gsub("CAT", "stub", nms, fixed = TRUE)
           }
 
+          if ("STAT" %in% names(dt)) {
+            if ("Chi-Square" %in% dt$STAT) {
+              nms <- names(dt)
+              names(dt) <- gsub("STAT", "stub", nms, fixed = TRUE)
+            }
+          }
+
+
           if ("stub" %in% names(dt)) {
-           lbl <- attr(dt$stub, "label")
-           if (is.null(lbl))
-             lbl <- ""
+
+            lbl <- attr(dt$stub, "label")
+            if (is.null(lbl))
+              lbl <- ""
 
           }
 
@@ -105,7 +114,12 @@ output_report <- function(lst,
           # Dedupe stub column if it exists
           if ("stub" %in% names(dt)) {
 
-            wth <- rpt$char_width * nchar(lbl)
+            wdth <- attr(dt$stub, "width")
+            if (is.null(wdth)) {
+              wth <- rpt$char_width * nchar(lbl)
+            } else {
+              wth <- rpt$char_width * wdth
+            }
             tbl <- define(tbl, "stub", dedupe = TRUE, label =lbl, width = wth,
                           standard_eval = "true")
 

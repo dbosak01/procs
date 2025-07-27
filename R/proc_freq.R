@@ -320,8 +320,9 @@
 #' #18    Total   Percent  36.317568  37.162162 10.8108108 15.709459 100.00000
 #'
 #' # $`chisq:Hair * Eye`
-#' #      CHISQ CHISQ.DF      CHISQ.P
-#' # 1 138.2898        9 2.325287e-25
+#' #                         STAT DF      VAL         PROB
+#' # 1                 Chi-Square  9 138.2898 2.325287e-25
+#' # 2 Continuity Adj. Chi-Square  9 138.2898 2.325287e-25
 #'
 #' #' # Example #3: By variable with named table request
 #' res <- proc_freq(df, tables = v(Hair, Eye, Cross = Hair * Eye),
@@ -1897,6 +1898,10 @@ gen_report_freq <- function(data,
 
 
       vrfl <- tempfile()
+
+      if (is.null(titles)) {
+        titles <- "The FREQ Function"
+      }
 
       out <- output_report(res, dir_name = dirname(vrfl),
                            file_name = basename(vrfl), out_type = "HTML",

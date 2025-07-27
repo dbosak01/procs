@@ -8,15 +8,15 @@
 #' to print to the file system using the \code{output_type} and
 #' \code{file_path} parameters.  This print function has limited options,
 #' and is meant to quickly view your data or dump it out to a file.
-#' For more reporting options, use the \strong{\link{reporter}} package.
+#' For more reporting options, use the \strong{reporter} package.
 #' @param data The data to print.  Can be either a single dataset, or
 #' a list of datasets.
 #' @param file_path The path of the report to print.
 #' @param output_type The type of report to create.  Valid values are
 #' "TXT", "RTF", "PDF", "HTML", and "DOCX".  Default is "HTML".
 #' @param titles A vector of titles.
-#' @param style A style object, as defined by the \strong{\link{reporter}}
-#' package.  See that package for details.
+#' @param style A style object, as defined by the \strong{reporter}
+#' package.  See \link[reporter]{create_style} for details.
 #' @param view Whether to send the print output to the viewer.  Valid
 #' values are TRUE and FALSE. Default is TRUE.
 #' @return If a file report was produced, the full path of the report.

@@ -189,7 +189,8 @@ test_that("means8: proc_means with unquoted parameter values.", {
 
   res <- proc_means(datm, var = PresentScore,
                     stats = mean,
-                    titles = "My first title for Means")
+                    titles = "My first title for Means"
+                    )
 
   res
 
@@ -1043,9 +1044,6 @@ test_that("means44: skewness and kurtosis work as expected.", {
   expect_equal(res[2, "MEAN"], 76.15)
   expect_equal(res[2, "SKEW"], -0.36762986)
   expect_equal(res[2, "KURT"], -0.30448351)
-
-
-
 
 })
 

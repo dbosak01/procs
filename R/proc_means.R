@@ -1266,6 +1266,10 @@ gen_report_means <- function(data,
 
       vrfl <- tempfile()
 
+      if (is.null(titles)) {
+        titles <- "The MEANS Function"
+      }
+
       out <- output_report(res, dir_name = dirname(vrfl),
                            file_name = basename(vrfl), out_type = "HTML",
                            titles = titles, margins = .5, viewer = TRUE)
