@@ -19,7 +19,7 @@
 # type = (barchart or dotplot)
 
 
-#' @export
+#' @noRd
 freqplot <- function(groupby = NULL, npanelpos = 4, orient = "vertical",
                      scale = "freq", twoway = "groupvertical", type = "barchart") {
 
@@ -43,7 +43,7 @@ freqplot <- function(groupby = NULL, npanelpos = 4, orient = "vertical",
 
 
 #' @noRd
-render_plot <- function (dat, table) {
+render_plot <- function (dat, table, ...) {
   UseMethod("render_plot", dat, table)
 }
 
@@ -51,8 +51,9 @@ render_plot <- function (dat, table) {
 #' @importFrom stats aggregate
 #' @import graphics
 #' @noRd
-render_plot.freqplot <- function(dat, table) {
+render_plot.freqplot <- function(dat, table, plt) {
 
+  z <- table
 
   # Get variables
   xvar <- cmd$var
@@ -194,7 +195,7 @@ render_plot.freqplot <- function(dat, table) {
 #' @importFrom stats aggregate
 #' @import graphics
 #' @noRd
-render_bar <- function(dat, cmd, interactive = FALSE) {
+render_bar <- function(dat, cmd, plt, interactive = FALSE) {
 
 
   # Get variables
