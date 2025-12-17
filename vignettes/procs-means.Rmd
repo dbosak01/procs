@@ -63,7 +63,7 @@ options("procs.print" = FALSE)
 proc_means(dat)
 
 ```
-<img src="../man/images/meanstut1.png"/>
+<img src="../man/images/meanstut1.png" alt="Basic proc means"/>
 
 ## Selected Variables
 If you don't want statistics on all numeric variables, you may specify
@@ -72,7 +72,7 @@ variables on the `var` parameter:
 # Specific variable
 proc_means(dat, var = x)
 ```
-<img src="../man/images/meanstut8.png"/>
+<img src="../man/images/meanstut8.png" alt="Proc means selected variables"/>
 
 ## Statistics Options
 
@@ -110,7 +110,7 @@ and third quartile for all numeric variables in our sample data:
 proc_means(dat, stats = v(median, sum, q1, q3))
 
 ```
-<img src="../man/images/meanstut2.png"/>
+<img src="../man/images/meanstut2.png" alt="Proc means selected statistics"/>
 
 ## Output Datasets
 
@@ -180,7 +180,7 @@ the two function calls.
 res1 <- proc_means(dat, stats = v(median, sum, q1, q3),
                    class = y, options = v(maxdec = 4))
 ```
-<img src="../man/images/meanstut3.png"/>
+<img src="../man/images/meanstut3.png" alt= "Proc means class grouping"/>
 
 Below is the output dataset from the `class` parameter.  Notice that 
 summary values have been provided for each variable, in addition to the subsets
@@ -210,7 +210,7 @@ res2 <- proc_means(dat, stats = v(median, sum, q1, q3),
                    by = y, options = v(maxdec = 4))
 
 ```
-<img src="../man/images/meanstut4.png"/>
+<img src="../man/images/meanstut4.png" alt = "Proc means by grouping"/>
 
 Notice that with the `by` parameter, separate tables are created for each
 by group on the interactive report.  
@@ -243,7 +243,7 @@ the `class` parameter:
 res1 <- proc_means(dat, stats = v(median, sum, q1, q3),
                    class = v(g, y), options = v(maxdec = 0))
 ```
-<img src="../man/images/meanstut5.png"/>
+<img src="../man/images/meanstut5.png" alt = "Proc means multiple groups"/>
 
 Here is the output dataset:
 ```{r eval=FALSE, echo=TRUE} 
@@ -283,7 +283,7 @@ two variables:
 res2 <- proc_means(dat, stats = v(median, sum, q1, q3),
                    by = v(g, y), options = v(maxdec = 0))
 ```
-<img src="../man/images/meanstut6.png"/>
+<img src="../man/images/meanstut6.png" alt = "Proc means multiple by variables"/>
 
 Here is the output dataset for the `by` parameter:
 ```{r eval=FALSE, echo=TRUE} 
@@ -310,7 +310,7 @@ res3 <- proc_means(dat, stats = v(median, sum, q1, q3),
                    class = y, 
                    options = v(maxdec = 0))
 ```
-<img src="../man/images/meanstut7.png"/>
+<img src="../man/images/meanstut7.png" alt = "Proc means combined by and class"/>
 
 ```{r eval=FALSE, echo=TRUE} 
 # View results - by and class

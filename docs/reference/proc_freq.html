@@ -23,7 +23,7 @@ requested tables in a named list."><meta property="og:image" content="https://pr
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">procs</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.0.7</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.0.8</span>
       </span>
     </div>
 
@@ -112,7 +112,9 @@ requested tables in a named list.</p>
 <span>  by <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  weight <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  options <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  titles <span class="op">=</span> <span class="cn">NULL</span></span>
+<span>  titles <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  order <span class="op">=</span> <span class="st">"internal"</span>,</span>
+<span>  plots <span class="op">=</span> <span class="cn">NULL</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -175,6 +177,18 @@ the <strong>Options</strong> section for a description of these options.</p></dd
 
 <dt id="arg-titles">titles<a class="anchor" aria-label="anchor" href="#arg-titles"></a></dt>
 <dd><p>A vector of titles to assign to the interactive report.</p></dd>
+
+
+<dt id="arg-order">order<a class="anchor" aria-label="anchor" href="#arg-order"></a></dt>
+<dd><p>Indicates how to order the function output. Options are "internal",
+"formatted", "freq" and "data".  Default is "internal".  See the section
+on "Ordering Frequency Output" for more information on this parameter.</p></dd>
+
+
+<dt id="arg-plots">plots<a class="anchor" aria-label="anchor" href="#arg-plots"></a></dt>
+<dd><p>Pass the desired plot(s) on this parameter.  If only one plot
+is desired, you can pass it directly.  For multiple plots, pass them
+in a list. Default is NULL, meaning no plots are desired.</p></dd>
 
 </dl></div>
     <div id="value">
@@ -343,6 +357,31 @@ that the "sparse" option is actually the default.</p>
 show the zero-count categories on a variable that is defined as a factor,
 pass the "nosparse" keyword on the <code>options</code> parameter.</p>
     </div>
+    <div id="ordering-frequency-output">
+    <h2>Ordering Frequency Output</h2>
+
+
+<p>Frequency output can be ordered using the <code>order</code> parameter. There are
+several choices:</p><ul><li><p><strong>internal</strong>: The internal or "natural" order of the table variables.
+For character variables, "internal" means alphabetical order.  For factors,
+"internal" means by order of the levels.</p></li>
+<li><p><strong>data</strong>: "data" order is different from "internal" order.  "data"
+order means the order that the data appears in the incoming data frame, which
+may or may not be the same as the "internal" order. This
+choice essentially sorts the frequencies according to however the
+table variable values were ordered in the incoming data.</p></li>
+<li><p><strong>freq</strong>: The "freq" order value means to sort the output in
+descending frequency order.</p></li>
+<li><p><strong>formatted</strong>: If there is a format assigned to the table variable(s),
+you may also use "formatted" order.  "formatted" order means to apply the
+format to the table variable(s) and then sort the frequencies according to the
+order specified in the format.  The format should be a user-defined
+format as defined in the <strong>fmtr</strong> package.</p></li>
+</ul><p>Note that the <code>order</code> parameter applies to both the interactive report
+and the data frame output.  This behavior is different from SAS, which only
+orders the interactive report. The behavior of the <code>order</code> parameter was
+modified to reduce subsequent sorts and make it more convenient for the user.</p>
+    </div>
     <div id="data-shaping">
     <h2>Data Shaping</h2>
 
@@ -380,234 +419,137 @@ see <code><a href="proc_transpose.html">proc_transpose</a></code>.</p></div>
 
     <div id="ref-examples">
     <h2>Examples</h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://procs.r-sassy.org">procs</a></span><span class="op">)</span></span></span>
-<span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># Turn off printing for CRAN checks</span></span></span>
-<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">options</a></span><span class="op">(</span><span class="st">"procs.print"</span> <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></span>
-<span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># Create sample data</span></span></span>
-<span class="r-in"><span><span class="va">df</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/as.data.frame.html" class="external-link">as.data.frame</a></span><span class="op">(</span><span class="va">HairEyeColor</span>, stringsAsFactors <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></span>
-<span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># Assign labels</span></span></span>
-<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/labels.html" class="external-link">labels</a></span><span class="op">(</span><span class="va">df</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>Hair <span class="op">=</span> <span class="st">"Hair Color"</span>,</span></span>
-<span class="r-in"><span>                   Eye <span class="op">=</span> <span class="st">"Eye Color"</span>,</span></span>
-<span class="r-in"><span>                   Sex <span class="op">=</span> <span class="st">"Sex at Birth"</span><span class="op">)</span></span></span>
-<span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># Example #1: One way frequencies on Hair and Eye color with weight option.</span></span></span>
-<span class="r-in"><span><span class="va">res</span> <span class="op">&lt;-</span> <span class="fu">proc_freq</span><span class="op">(</span><span class="va">df</span>,</span></span>
-<span class="r-in"><span>                 tables <span class="op">=</span> <span class="fu"><a href="https://common.r-sassy.org/reference/v.html" class="external-link">v</a></span><span class="op">(</span><span class="va">Hair</span>, <span class="va">Eye</span><span class="op">)</span>,</span></span>
-<span class="r-in"><span>                 options <span class="op">=</span> <span class="va">outcum</span>,</span></span>
-<span class="r-in"><span>                 weight <span class="op">=</span> <span class="va">Freq</span><span class="op">)</span></span></span>
-<span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># View result data</span></span></span>
-<span class="r-in"><span><span class="va">res</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> $Hair</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    VAR   CAT   N CNT      PCT CUMSUM    CUMPCT</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1 Hair Black 592 108 18.24324    108  18.24324</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2 Hair Blond 592 127 21.45270    235  39.69595</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3 Hair Brown 592 286 48.31081    521  88.00676</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 4 Hair   Red 592  71 11.99324    592 100.00000</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> $Eye</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   VAR   CAT   N CNT      PCT CUMSUM    CUMPCT</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1 Eye  Blue 592 215 36.31757    215  36.31757</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2 Eye Brown 592 220 37.16216    435  73.47973</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3 Eye Green 592  64 10.81081    499  84.29054</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 4 Eye Hazel 592  93 15.70946    592 100.00000</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-in"><span><span class="co"># $Hair</span></span></span>
-<span class="r-in"><span><span class="co">#    VAR   CAT   N CNT      PCT CUMSUM    CUMPCT</span></span></span>
-<span class="r-in"><span><span class="co"># 1 Hair Black 592 108 18.24324    108  18.24324</span></span></span>
-<span class="r-in"><span><span class="co"># 2 Hair Blond 592 127 21.45270    235  39.69595</span></span></span>
-<span class="r-in"><span><span class="co"># 3 Hair Brown 592 286 48.31081    521  88.00676</span></span></span>
-<span class="r-in"><span><span class="co"># 4 Hair   Red 592  71 11.99324    592 100.00000</span></span></span>
-<span class="r-in"><span><span class="co">#</span></span></span>
-<span class="r-in"><span><span class="co"># $Eye</span></span></span>
-<span class="r-in"><span><span class="co">#   VAR   CAT   N CNT      PCT CUMSUM    CUMPCT</span></span></span>
-<span class="r-in"><span><span class="co"># 1 Eye  Blue 592 215 36.31757    215  36.31757</span></span></span>
-<span class="r-in"><span><span class="co"># 2 Eye Brown 592 220 37.16216    435  73.47973</span></span></span>
-<span class="r-in"><span><span class="co"># 3 Eye Green 592  64 10.81081    499  84.29054</span></span></span>
-<span class="r-in"><span><span class="co"># 4 Eye Hazel 592  93 15.70946    592 100.00000</span></span></span>
-<span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># Example #2: 2 x 2 Crosstabulation table with Chi-Square statistic</span></span></span>
-<span class="r-in"><span><span class="va">res</span> <span class="op">&lt;-</span> <span class="fu">proc_freq</span><span class="op">(</span><span class="va">df</span>, tables <span class="op">=</span> <span class="va">Hair</span> <span class="op">*</span> <span class="va">Eye</span>,</span></span>
-<span class="r-in"><span>                     weight <span class="op">=</span> <span class="va">Freq</span>,</span></span>
-<span class="r-in"><span>                     options <span class="op">=</span> <span class="fu"><a href="https://common.r-sassy.org/reference/v.html" class="external-link">v</a></span><span class="op">(</span><span class="va">crosstab</span>, <span class="va">chisq</span><span class="op">)</span><span class="op">)</span></span></span>
-<span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># View result data</span></span></span>
-<span class="r-in"><span><span class="va">res</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> $`Hair * Eye`</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>      CAT Statistic       Blue      Brown      Green     Hazel     Total</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1  Black Frequency  20.000000  68.000000  5.0000000 15.000000 108.00000</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2  Black   Percent   3.378378  11.486486  0.8445946  2.533784  18.24324</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3  Black   Row Pct  18.518519  62.962963  4.6296296 13.888889        NA</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 4  Black   Col Pct   9.302326  30.909091  7.8125000 16.129032        NA</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 5  Blond Frequency  94.000000   7.000000 16.0000000 10.000000 127.00000</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 6  Blond   Percent  15.878378   1.182432  2.7027027  1.689189  21.45270</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 7  Blond   Row Pct  74.015748   5.511811 12.5984252  7.874016        NA</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 8  Blond   Col Pct  43.720930   3.181818 25.0000000 10.752688        NA</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 9  Brown Frequency  84.000000 119.000000 29.0000000 54.000000 286.00000</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 10 Brown   Percent  14.189189  20.101351  4.8986486  9.121622  48.31081</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 11 Brown   Row Pct  29.370629  41.608392 10.1398601 18.881119        NA</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 12 Brown   Col Pct  39.069767  54.090909 45.3125000 58.064516        NA</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 13   Red Frequency  17.000000  26.000000 14.0000000 14.000000  71.00000</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 14   Red   Percent   2.871622   4.391892  2.3648649  2.364865  11.99324</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 15   Red   Row Pct  23.943662  36.619718 19.7183099 19.718310        NA</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 16   Red   Col Pct   7.906977  11.818182 21.8750000 15.053763        NA</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 17 Total Frequency 215.000000 220.000000 64.0000000 93.000000 592.00000</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 18 Total   Percent  36.317568  37.162162 10.8108108 15.709459 100.00000</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> $`chisq:Hair * Eye`</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                         STAT DF      VAL         PROB</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1                 Chi-Square  9 138.2898 2.325287e-25</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2 Continuity Adj. Chi-Square  9 138.2898 2.325287e-25</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-in"><span><span class="co">#$`Hair * Eye`</span></span></span>
-<span class="r-in"><span><span class="co">#   Category Statistic       Blue      Brown      Green     Hazel     Total</span></span></span>
-<span class="r-in"><span><span class="co">#1     Black Frequency  20.000000  68.000000  5.0000000 15.000000 108.00000</span></span></span>
-<span class="r-in"><span><span class="co">#2     Black   Percent   3.378378  11.486486  0.8445946  2.533784  18.24324</span></span></span>
-<span class="r-in"><span><span class="co">#3     Black   Row Pct  18.518519  62.962963  4.6296296 13.888889        NA</span></span></span>
-<span class="r-in"><span><span class="co">#4     Black   Col Pct   9.302326  30.909091  7.8125000 16.129032        NA</span></span></span>
-<span class="r-in"><span><span class="co">#5     Blond Frequency  94.000000   7.000000 16.0000000 10.000000 127.00000</span></span></span>
-<span class="r-in"><span><span class="co">#6     Blond   Percent  15.878378   1.182432  2.7027027  1.689189  21.45270</span></span></span>
-<span class="r-in"><span><span class="co">#7     Blond   Row Pct  74.015748   5.511811 12.5984252  7.874016        NA</span></span></span>
-<span class="r-in"><span><span class="co">#8     Blond   Col Pct  43.720930   3.181818 25.0000000 10.752688        NA</span></span></span>
-<span class="r-in"><span><span class="co">#9     Brown Frequency  84.000000 119.000000 29.0000000 54.000000 286.00000</span></span></span>
-<span class="r-in"><span><span class="co">#10    Brown   Percent  14.189189  20.101351  4.8986486  9.121622  48.31081</span></span></span>
-<span class="r-in"><span><span class="co">#11    Brown   Row Pct  29.370629  41.608392 10.1398601 18.881119        NA</span></span></span>
-<span class="r-in"><span><span class="co">#12    Brown   Col Pct  39.069767  54.090909 45.3125000 58.064516        NA</span></span></span>
-<span class="r-in"><span><span class="co">#13      Red Frequency  17.000000  26.000000 14.0000000 14.000000  71.00000</span></span></span>
-<span class="r-in"><span><span class="co">#14      Red   Percent   2.871622   4.391892  2.3648649  2.364865  11.99324</span></span></span>
-<span class="r-in"><span><span class="co">#15      Red   Row Pct  23.943662  36.619718 19.7183099 19.718310        NA</span></span></span>
-<span class="r-in"><span><span class="co">#16      Red   Col Pct   7.906977  11.818182 21.8750000 15.053763        NA</span></span></span>
-<span class="r-in"><span><span class="co">#17    Total Frequency 215.000000 220.000000 64.0000000 93.000000 592.00000</span></span></span>
-<span class="r-in"><span><span class="co">#18    Total   Percent  36.317568  37.162162 10.8108108 15.709459 100.00000</span></span></span>
-<span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># $`chisq:Hair * Eye`</span></span></span>
-<span class="r-in"><span><span class="co">#      CHISQ CHISQ.DF      CHISQ.P</span></span></span>
-<span class="r-in"><span><span class="co"># 1 138.2898        9 2.325287e-25</span></span></span>
-<span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co">#' # Example #3: By variable with named table request</span></span></span>
-<span class="r-in"><span><span class="va">res</span> <span class="op">&lt;-</span> <span class="fu">proc_freq</span><span class="op">(</span><span class="va">df</span>, tables <span class="op">=</span> <span class="fu"><a href="https://common.r-sassy.org/reference/v.html" class="external-link">v</a></span><span class="op">(</span><span class="va">Hair</span>, <span class="va">Eye</span>, Cross <span class="op">=</span> <span class="va">Hair</span> <span class="op">*</span> <span class="va">Eye</span><span class="op">)</span>,</span></span>
-<span class="r-in"><span>                 by <span class="op">=</span> <span class="va">Sex</span>,</span></span>
-<span class="r-in"><span>                 weight <span class="op">=</span> <span class="va">Freq</span><span class="op">)</span></span></span>
-<span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># View result data</span></span></span>
-<span class="r-in"><span><span class="va">res</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> $Hair</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>       BY  VAR   CAT   N CNT      PCT</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1 Female Hair Black 313  52 16.61342</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2 Female Hair Blond 313  81 25.87859</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3 Female Hair Brown 313 143 45.68690</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 4 Female Hair   Red 313  37 11.82109</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 5   Male Hair Black 279  56 20.07168</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 6   Male Hair Blond 279  46 16.48746</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 7   Male Hair Brown 279 143 51.25448</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 8   Male Hair   Red 279  34 12.18638</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> $Eye</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>       BY VAR   CAT   N CNT       PCT</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1 Female Eye  Blue 313 114 36.421725</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2 Female Eye Brown 313 122 38.977636</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3 Female Eye Green 313  31  9.904153</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 4 Female Eye Hazel 313  46 14.696486</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 5   Male Eye  Blue 279 101 36.200717</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 6   Male Eye Brown 279  98 35.125448</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 7   Male Eye Green 279  33 11.827957</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 8   Male Eye Hazel 279  47 16.845878</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> $Cross</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>        BY VAR1 VAR2  CAT1  CAT2   N CNT        PCT</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1  Female Hair  Eye Black  Blue 313   9  2.8753994</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2  Female Hair  Eye Black Brown 313  36 11.5015974</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3  Female Hair  Eye Black Green 313   2  0.6389776</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 4  Female Hair  Eye Black Hazel 313   5  1.5974441</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 5  Female Hair  Eye Blond  Blue 313  64 20.4472843</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 6  Female Hair  Eye Blond Brown 313   4  1.2779553</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 7  Female Hair  Eye Blond Green 313   8  2.5559105</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 8  Female Hair  Eye Blond Hazel 313   5  1.5974441</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 9  Female Hair  Eye Brown  Blue 313  34 10.8626198</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 10 Female Hair  Eye Brown Brown 313  66 21.0862620</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 11 Female Hair  Eye Brown Green 313  14  4.4728435</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 12 Female Hair  Eye Brown Hazel 313  29  9.2651757</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 13 Female Hair  Eye   Red  Blue 313   7  2.2364217</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 14 Female Hair  Eye   Red Brown 313  16  5.1118211</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 15 Female Hair  Eye   Red Green 313   7  2.2364217</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 16 Female Hair  Eye   Red Hazel 313   7  2.2364217</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 17   Male Hair  Eye Black  Blue 279  11  3.9426523</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 18   Male Hair  Eye Black Brown 279  32 11.4695341</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 19   Male Hair  Eye Black Green 279   3  1.0752688</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 20   Male Hair  Eye Black Hazel 279  10  3.5842294</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 21   Male Hair  Eye Blond  Blue 279  30 10.7526882</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 22   Male Hair  Eye Blond Brown 279   3  1.0752688</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 23   Male Hair  Eye Blond Green 279   8  2.8673835</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 24   Male Hair  Eye Blond Hazel 279   5  1.7921147</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 25   Male Hair  Eye Brown  Blue 279  50 17.9211470</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 26   Male Hair  Eye Brown Brown 279  53 18.9964158</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 27   Male Hair  Eye Brown Green 279  15  5.3763441</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 28   Male Hair  Eye Brown Hazel 279  25  8.9605735</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 29   Male Hair  Eye   Red  Blue 279  10  3.5842294</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 30   Male Hair  Eye   Red Brown 279  10  3.5842294</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 31   Male Hair  Eye   Red Green 279   7  2.5089606</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 32   Male Hair  Eye   Red Hazel 279   7  2.5089606</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-in"><span><span class="co"># $Hair</span></span></span>
-<span class="r-in"><span><span class="co">#       BY  VAR   CAT   N CNT      PCT</span></span></span>
-<span class="r-in"><span><span class="co"># 1 Female Hair Black 313  52 16.61342</span></span></span>
-<span class="r-in"><span><span class="co"># 2 Female Hair Blond 313  81 25.87859</span></span></span>
-<span class="r-in"><span><span class="co"># 3 Female Hair Brown 313 143 45.68690</span></span></span>
-<span class="r-in"><span><span class="co"># 4 Female Hair   Red 313  37 11.82109</span></span></span>
-<span class="r-in"><span><span class="co"># 5   Male Hair Black 279  56 20.07168</span></span></span>
-<span class="r-in"><span><span class="co"># 6   Male Hair Blond 279  46 16.48746</span></span></span>
-<span class="r-in"><span><span class="co"># 7   Male Hair Brown 279 143 51.25448</span></span></span>
-<span class="r-in"><span><span class="co"># 8   Male Hair   Red 279  34 12.18638</span></span></span>
-<span class="r-in"><span><span class="co">#</span></span></span>
-<span class="r-in"><span><span class="co"># $Eye</span></span></span>
-<span class="r-in"><span><span class="co">#       BY VAR   CAT   N CNT       PCT</span></span></span>
-<span class="r-in"><span><span class="co"># 1 Female Eye  Blue 313 114 36.421725</span></span></span>
-<span class="r-in"><span><span class="co"># 2 Female Eye Brown 313 122 38.977636</span></span></span>
-<span class="r-in"><span><span class="co"># 3 Female Eye Green 313  31  9.904153</span></span></span>
-<span class="r-in"><span><span class="co"># 4 Female Eye Hazel 313  46 14.696486</span></span></span>
-<span class="r-in"><span><span class="co"># 5   Male Eye  Blue 279 101 36.200717</span></span></span>
-<span class="r-in"><span><span class="co"># 6   Male Eye Brown 279  98 35.125448</span></span></span>
-<span class="r-in"><span><span class="co"># 7   Male Eye Green 279  33 11.827957</span></span></span>
-<span class="r-in"><span><span class="co"># 8   Male Eye Hazel 279  47 16.845878</span></span></span>
-<span class="r-in"><span><span class="co">#</span></span></span>
-<span class="r-in"><span><span class="co"># $Cross</span></span></span>
-<span class="r-in"><span><span class="co">#        BY VAR1 VAR2  CAT1  CAT2   N CNT        PCT</span></span></span>
-<span class="r-in"><span><span class="co"># 1  Female Hair  Eye Black  Blue 313   9  2.8753994</span></span></span>
-<span class="r-in"><span><span class="co"># 2  Female Hair  Eye Black Brown 313  36 11.5015974</span></span></span>
-<span class="r-in"><span><span class="co"># 3  Female Hair  Eye Black Green 313   2  0.6389776</span></span></span>
-<span class="r-in"><span><span class="co"># 4  Female Hair  Eye Black Hazel 313   5  1.5974441</span></span></span>
-<span class="r-in"><span><span class="co"># 5  Female Hair  Eye Blond  Blue 313  64 20.4472843</span></span></span>
-<span class="r-in"><span><span class="co"># 6  Female Hair  Eye Blond Brown 313   4  1.2779553</span></span></span>
-<span class="r-in"><span><span class="co"># 7  Female Hair  Eye Blond Green 313   8  2.5559105</span></span></span>
-<span class="r-in"><span><span class="co"># 8  Female Hair  Eye Blond Hazel 313   5  1.5974441</span></span></span>
-<span class="r-in"><span><span class="co"># 9  Female Hair  Eye Brown  Blue 313  34 10.8626198</span></span></span>
-<span class="r-in"><span><span class="co"># 10 Female Hair  Eye Brown Brown 313  66 21.0862620</span></span></span>
-<span class="r-in"><span><span class="co"># 11 Female Hair  Eye Brown Green 313  14  4.4728435</span></span></span>
-<span class="r-in"><span><span class="co"># 12 Female Hair  Eye Brown Hazel 313  29  9.2651757</span></span></span>
-<span class="r-in"><span><span class="co"># 13 Female Hair  Eye   Red  Blue 313   7  2.2364217</span></span></span>
-<span class="r-in"><span><span class="co"># 14 Female Hair  Eye   Red Brown 313  16  5.1118211</span></span></span>
-<span class="r-in"><span><span class="co"># 15 Female Hair  Eye   Red Green 313   7  2.2364217</span></span></span>
-<span class="r-in"><span><span class="co"># 16 Female Hair  Eye   Red Hazel 313   7  2.2364217</span></span></span>
-<span class="r-in"><span><span class="co"># 17   Male Hair  Eye Black  Blue 279  11  3.9426523</span></span></span>
-<span class="r-in"><span><span class="co"># 18   Male Hair  Eye Black Brown 279  32 11.4695341</span></span></span>
-<span class="r-in"><span><span class="co"># 19   Male Hair  Eye Black Green 279   3  1.0752688</span></span></span>
-<span class="r-in"><span><span class="co"># 20   Male Hair  Eye Black Hazel 279  10  3.5842294</span></span></span>
-<span class="r-in"><span><span class="co"># 21   Male Hair  Eye Blond  Blue 279  30 10.7526882</span></span></span>
-<span class="r-in"><span><span class="co"># 22   Male Hair  Eye Blond Brown 279   3  1.0752688</span></span></span>
-<span class="r-in"><span><span class="co"># 23   Male Hair  Eye Blond Green 279   8  2.8673835</span></span></span>
-<span class="r-in"><span><span class="co"># 24   Male Hair  Eye Blond Hazel 279   5  1.7921147</span></span></span>
-<span class="r-in"><span><span class="co"># 25   Male Hair  Eye Brown  Blue 279  50 17.9211470</span></span></span>
-<span class="r-in"><span><span class="co"># 26   Male Hair  Eye Brown Brown 279  53 18.9964158</span></span></span>
-<span class="r-in"><span><span class="co"># 27   Male Hair  Eye Brown Green 279  15  5.3763441</span></span></span>
-<span class="r-in"><span><span class="co"># 28   Male Hair  Eye Brown Hazel 279  25  8.9605735</span></span></span>
-<span class="r-in"><span><span class="co"># 29   Male Hair  Eye   Red  Blue 279  10  3.5842294</span></span></span>
-<span class="r-in"><span><span class="co"># 30   Male Hair  Eye   Red Brown 279  10  3.5842294</span></span></span>
-<span class="r-in"><span><span class="co"># 31   Male Hair  Eye   Red Green 279   7  2.5089606</span></span></span>
-<span class="r-in"><span><span class="co"># 32   Male Hair  Eye   Red Hazel 279   7  2.5089606</span></span></span>
-</code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://procs.r-sassy.org">procs</a></span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Turn off printing for CRAN checks</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">options</a></span><span class="op">(</span><span class="st">"procs.print"</span> <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Create sample data</span></span>
+<span><span class="va">df</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/as.data.frame.html" class="external-link">as.data.frame</a></span><span class="op">(</span><span class="va">HairEyeColor</span>, stringsAsFactors <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Assign labels</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/labels.html" class="external-link">labels</a></span><span class="op">(</span><span class="va">df</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>Hair <span class="op">=</span> <span class="st">"Hair Color"</span>,</span>
+<span>                   Eye <span class="op">=</span> <span class="st">"Eye Color"</span>,</span>
+<span>                   Sex <span class="op">=</span> <span class="st">"Sex at Birth"</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Example #1: One way frequencies on Hair and Eye color with weight option.</span></span>
+<span><span class="va">res</span> <span class="op">&lt;-</span> <span class="fu">proc_freq</span><span class="op">(</span><span class="va">df</span>,</span>
+<span>                 tables <span class="op">=</span> <span class="fu"><a href="https://common.r-sassy.org/reference/v.html" class="external-link">v</a></span><span class="op">(</span><span class="va">Hair</span>, <span class="va">Eye</span><span class="op">)</span>,</span>
+<span>                 options <span class="op">=</span> <span class="va">outcum</span>,</span>
+<span>                 weight <span class="op">=</span> <span class="va">Freq</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># View result data</span></span>
+<span><span class="va">res</span></span>
+<span><span class="co"># $Hair</span></span>
+<span><span class="co">#    VAR   CAT   N CNT      PCT CUMSUM    CUMPCT</span></span>
+<span><span class="co"># 1 Hair Black 592 108 18.24324    108  18.24324</span></span>
+<span><span class="co"># 2 Hair Blond 592 127 21.45270    235  39.69595</span></span>
+<span><span class="co"># 3 Hair Brown 592 286 48.31081    521  88.00676</span></span>
+<span><span class="co"># 4 Hair   Red 592  71 11.99324    592 100.00000</span></span>
+<span><span class="co">#</span></span>
+<span><span class="co"># $Eye</span></span>
+<span><span class="co">#   VAR   CAT   N CNT      PCT CUMSUM    CUMPCT</span></span>
+<span><span class="co"># 1 Eye  Blue 592 215 36.31757    215  36.31757</span></span>
+<span><span class="co"># 2 Eye Brown 592 220 37.16216    435  73.47973</span></span>
+<span><span class="co"># 3 Eye Green 592  64 10.81081    499  84.29054</span></span>
+<span><span class="co"># 4 Eye Hazel 592  93 15.70946    592 100.00000</span></span>
+<span></span>
+<span><span class="co"># Example #2: 2 x 2 Crosstabulation table with Chi-Square statistic</span></span>
+<span><span class="va">res</span> <span class="op">&lt;-</span> <span class="fu">proc_freq</span><span class="op">(</span><span class="va">df</span>, tables <span class="op">=</span> <span class="va">Hair</span> <span class="op">*</span> <span class="va">Eye</span>,</span>
+<span>                     weight <span class="op">=</span> <span class="va">Freq</span>,</span>
+<span>                     options <span class="op">=</span> <span class="fu"><a href="https://common.r-sassy.org/reference/v.html" class="external-link">v</a></span><span class="op">(</span><span class="va">crosstab</span>, <span class="va">chisq</span><span class="op">)</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># View result data</span></span>
+<span><span class="va">res</span></span>
+<span><span class="co">#$`Hair * Eye`</span></span>
+<span><span class="co">#   Category Statistic       Blue      Brown      Green     Hazel     Total</span></span>
+<span><span class="co">#1     Black Frequency  20.000000  68.000000  5.0000000 15.000000 108.00000</span></span>
+<span><span class="co">#2     Black   Percent   3.378378  11.486486  0.8445946  2.533784  18.24324</span></span>
+<span><span class="co">#3     Black   Row Pct  18.518519  62.962963  4.6296296 13.888889        NA</span></span>
+<span><span class="co">#4     Black   Col Pct   9.302326  30.909091  7.8125000 16.129032        NA</span></span>
+<span><span class="co">#5     Blond Frequency  94.000000   7.000000 16.0000000 10.000000 127.00000</span></span>
+<span><span class="co">#6     Blond   Percent  15.878378   1.182432  2.7027027  1.689189  21.45270</span></span>
+<span><span class="co">#7     Blond   Row Pct  74.015748   5.511811 12.5984252  7.874016        NA</span></span>
+<span><span class="co">#8     Blond   Col Pct  43.720930   3.181818 25.0000000 10.752688        NA</span></span>
+<span><span class="co">#9     Brown Frequency  84.000000 119.000000 29.0000000 54.000000 286.00000</span></span>
+<span><span class="co">#10    Brown   Percent  14.189189  20.101351  4.8986486  9.121622  48.31081</span></span>
+<span><span class="co">#11    Brown   Row Pct  29.370629  41.608392 10.1398601 18.881119        NA</span></span>
+<span><span class="co">#12    Brown   Col Pct  39.069767  54.090909 45.3125000 58.064516        NA</span></span>
+<span><span class="co">#13      Red Frequency  17.000000  26.000000 14.0000000 14.000000  71.00000</span></span>
+<span><span class="co">#14      Red   Percent   2.871622   4.391892  2.3648649  2.364865  11.99324</span></span>
+<span><span class="co">#15      Red   Row Pct  23.943662  36.619718 19.7183099 19.718310        NA</span></span>
+<span><span class="co">#16      Red   Col Pct   7.906977  11.818182 21.8750000 15.053763        NA</span></span>
+<span><span class="co">#17    Total Frequency 215.000000 220.000000 64.0000000 93.000000 592.00000</span></span>
+<span><span class="co">#18    Total   Percent  36.317568  37.162162 10.8108108 15.709459 100.00000</span></span>
+<span></span>
+<span><span class="co"># $`chisq:Hair * Eye`</span></span>
+<span><span class="co">#                         STAT DF      VAL         PROB</span></span>
+<span><span class="co"># 1                 Chi-Square  9 138.2898 2.325287e-25</span></span>
+<span><span class="co"># 2 Continuity Adj. Chi-Square  9 138.2898 2.325287e-25</span></span>
+<span></span>
+<span><span class="co">#' # Example #3: By variable with named table request</span></span>
+<span><span class="va">res</span> <span class="op">&lt;-</span> <span class="fu">proc_freq</span><span class="op">(</span><span class="va">df</span>, tables <span class="op">=</span> <span class="fu"><a href="https://common.r-sassy.org/reference/v.html" class="external-link">v</a></span><span class="op">(</span><span class="va">Hair</span>, <span class="va">Eye</span>, Cross <span class="op">=</span> <span class="va">Hair</span> <span class="op">*</span> <span class="va">Eye</span><span class="op">)</span>,</span>
+<span>                 by <span class="op">=</span> <span class="va">Sex</span>,</span>
+<span>                 weight <span class="op">=</span> <span class="va">Freq</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># View result data</span></span>
+<span><span class="va">res</span></span>
+<span><span class="co"># $Hair</span></span>
+<span><span class="co">#       BY  VAR   CAT   N CNT      PCT</span></span>
+<span><span class="co"># 1 Female Hair Black 313  52 16.61342</span></span>
+<span><span class="co"># 2 Female Hair Blond 313  81 25.87859</span></span>
+<span><span class="co"># 3 Female Hair Brown 313 143 45.68690</span></span>
+<span><span class="co"># 4 Female Hair   Red 313  37 11.82109</span></span>
+<span><span class="co"># 5   Male Hair Black 279  56 20.07168</span></span>
+<span><span class="co"># 6   Male Hair Blond 279  46 16.48746</span></span>
+<span><span class="co"># 7   Male Hair Brown 279 143 51.25448</span></span>
+<span><span class="co"># 8   Male Hair   Red 279  34 12.18638</span></span>
+<span><span class="co">#</span></span>
+<span><span class="co"># $Eye</span></span>
+<span><span class="co">#       BY VAR   CAT   N CNT       PCT</span></span>
+<span><span class="co"># 1 Female Eye  Blue 313 114 36.421725</span></span>
+<span><span class="co"># 2 Female Eye Brown 313 122 38.977636</span></span>
+<span><span class="co"># 3 Female Eye Green 313  31  9.904153</span></span>
+<span><span class="co"># 4 Female Eye Hazel 313  46 14.696486</span></span>
+<span><span class="co"># 5   Male Eye  Blue 279 101 36.200717</span></span>
+<span><span class="co"># 6   Male Eye Brown 279  98 35.125448</span></span>
+<span><span class="co"># 7   Male Eye Green 279  33 11.827957</span></span>
+<span><span class="co"># 8   Male Eye Hazel 279  47 16.845878</span></span>
+<span><span class="co">#</span></span>
+<span><span class="co"># $Cross</span></span>
+<span><span class="co">#        BY VAR1 VAR2  CAT1  CAT2   N CNT        PCT</span></span>
+<span><span class="co"># 1  Female Hair  Eye Black  Blue 313   9  2.8753994</span></span>
+<span><span class="co"># 2  Female Hair  Eye Black Brown 313  36 11.5015974</span></span>
+<span><span class="co"># 3  Female Hair  Eye Black Green 313   2  0.6389776</span></span>
+<span><span class="co"># 4  Female Hair  Eye Black Hazel 313   5  1.5974441</span></span>
+<span><span class="co"># 5  Female Hair  Eye Blond  Blue 313  64 20.4472843</span></span>
+<span><span class="co"># 6  Female Hair  Eye Blond Brown 313   4  1.2779553</span></span>
+<span><span class="co"># 7  Female Hair  Eye Blond Green 313   8  2.5559105</span></span>
+<span><span class="co"># 8  Female Hair  Eye Blond Hazel 313   5  1.5974441</span></span>
+<span><span class="co"># 9  Female Hair  Eye Brown  Blue 313  34 10.8626198</span></span>
+<span><span class="co"># 10 Female Hair  Eye Brown Brown 313  66 21.0862620</span></span>
+<span><span class="co"># 11 Female Hair  Eye Brown Green 313  14  4.4728435</span></span>
+<span><span class="co"># 12 Female Hair  Eye Brown Hazel 313  29  9.2651757</span></span>
+<span><span class="co"># 13 Female Hair  Eye   Red  Blue 313   7  2.2364217</span></span>
+<span><span class="co"># 14 Female Hair  Eye   Red Brown 313  16  5.1118211</span></span>
+<span><span class="co"># 15 Female Hair  Eye   Red Green 313   7  2.2364217</span></span>
+<span><span class="co"># 16 Female Hair  Eye   Red Hazel 313   7  2.2364217</span></span>
+<span><span class="co"># 17   Male Hair  Eye Black  Blue 279  11  3.9426523</span></span>
+<span><span class="co"># 18   Male Hair  Eye Black Brown 279  32 11.4695341</span></span>
+<span><span class="co"># 19   Male Hair  Eye Black Green 279   3  1.0752688</span></span>
+<span><span class="co"># 20   Male Hair  Eye Black Hazel 279  10  3.5842294</span></span>
+<span><span class="co"># 21   Male Hair  Eye Blond  Blue 279  30 10.7526882</span></span>
+<span><span class="co"># 22   Male Hair  Eye Blond Brown 279   3  1.0752688</span></span>
+<span><span class="co"># 23   Male Hair  Eye Blond Green 279   8  2.8673835</span></span>
+<span><span class="co"># 24   Male Hair  Eye Blond Hazel 279   5  1.7921147</span></span>
+<span><span class="co"># 25   Male Hair  Eye Brown  Blue 279  50 17.9211470</span></span>
+<span><span class="co"># 26   Male Hair  Eye Brown Brown 279  53 18.9964158</span></span>
+<span><span class="co"># 27   Male Hair  Eye Brown Green 279  15  5.3763441</span></span>
+<span><span class="co"># 28   Male Hair  Eye Brown Hazel 279  25  8.9605735</span></span>
+<span><span class="co"># 29   Male Hair  Eye   Red  Blue 279  10  3.5842294</span></span>
+<span><span class="co"># 30   Male Hair  Eye   Red Brown 279  10  3.5842294</span></span>
+<span><span class="co"># 31   Male Hair  Eye   Red Green 279   7  2.5089606</span></span>
+<span><span class="co"># 32   Male Hair  Eye   Red Hazel 279   7  2.5089606</span></span></code></pre></div>
     </div>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">

@@ -23,7 +23,7 @@ The parameters will accept either quoted or unquoted values."><meta property="og
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">procs</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.0.7</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.0.8</span>
       </span>
     </div>
 
@@ -177,102 +177,65 @@ all variables returned.</p></li>
 
     <div id="ref-examples">
     <h2>Examples</h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co"># Prepare data subset</span></span></span>
-<span class="r-in"><span><span class="va">dat</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span><span class="va">HairEyeColor</span>, stringsAsFactors <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">32</span> <span class="op"><a href="https://rdrr.io/r/base/Arithmetic.html" class="external-link">%%</a></span> <span class="fl">4</span> <span class="op">==</span> <span class="fl">1</span>, <span class="op">]</span></span></span>
-<span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># View data</span></span></span>
-<span class="r-in"><span><span class="va">dat</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>     Hair   Eye    Sex Freq</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1  Black Brown   Male   32</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 5  Black  Blue   Male   11</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 9  Black Hazel   Male   10</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 13 Black Green   Male    3</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 17 Black Brown Female   36</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 21 Black  Blue Female    9</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 25 Black Hazel Female    5</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 29 Black Green Female    2</span>
-<span class="r-in"><span><span class="co">#     Hair   Eye    Sex Freq</span></span></span>
-<span class="r-in"><span><span class="co"># 1  Black Brown   Male   32</span></span></span>
-<span class="r-in"><span><span class="co"># 5  Black  Blue   Male   11</span></span></span>
-<span class="r-in"><span><span class="co"># 9  Black Hazel   Male   10</span></span></span>
-<span class="r-in"><span><span class="co"># 13 Black Green   Male    3</span></span></span>
-<span class="r-in"><span><span class="co"># 17 Black Brown Female   36</span></span></span>
-<span class="r-in"><span><span class="co"># 21 Black  Blue Female    9</span></span></span>
-<span class="r-in"><span><span class="co"># 25 Black Hazel Female    5</span></span></span>
-<span class="r-in"><span><span class="co"># 29 Black Green Female    2</span></span></span>
-<span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># Sort by Frequency</span></span></span>
-<span class="r-in"><span><span class="va">res1</span> <span class="op">&lt;-</span> <span class="fu">proc_sort</span><span class="op">(</span><span class="va">dat</span>, by <span class="op">=</span> <span class="va">Freq</span><span class="op">)</span></span></span>
-<span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># View results</span></span></span>
-<span class="r-in"><span><span class="va">res1</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>     Hair   Eye    Sex Freq</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 29 Black Green Female    2</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 13 Black Green   Male    3</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 25 Black Hazel Female    5</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 21 Black  Blue Female    9</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 9  Black Hazel   Male   10</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 5  Black  Blue   Male   11</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1  Black Brown   Male   32</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 17 Black Brown Female   36</span>
-<span class="r-in"><span><span class="co">#    Hair   Eye    Sex Freq</span></span></span>
-<span class="r-in"><span><span class="co"># 29 Black Green Female    2</span></span></span>
-<span class="r-in"><span><span class="co"># 13 Black Green   Male    3</span></span></span>
-<span class="r-in"><span><span class="co"># 25 Black Hazel Female    5</span></span></span>
-<span class="r-in"><span><span class="co"># 21 Black  Blue Female    9</span></span></span>
-<span class="r-in"><span><span class="co"># 9  Black Hazel   Male   10</span></span></span>
-<span class="r-in"><span><span class="co"># 5  Black  Blue   Male   11</span></span></span>
-<span class="r-in"><span><span class="co"># 1  Black Brown   Male   32</span></span></span>
-<span class="r-in"><span><span class="co"># 17 Black Brown Female   36</span></span></span>
-<span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># Sort by Frequency descending</span></span></span>
-<span class="r-in"><span><span class="va">res2</span> <span class="op">&lt;-</span> <span class="fu">proc_sort</span><span class="op">(</span><span class="va">dat</span>, by <span class="op">=</span> <span class="va">Freq</span>, order <span class="op">=</span> <span class="va">d</span><span class="op">)</span></span></span>
-<span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># View results</span></span></span>
-<span class="r-in"><span><span class="va">res2</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>     Hair   Eye    Sex Freq</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 17 Black Brown Female   36</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1  Black Brown   Male   32</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 5  Black  Blue   Male   11</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 9  Black Hazel   Male   10</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 21 Black  Blue Female    9</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 25 Black Hazel Female    5</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 13 Black Green   Male    3</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 29 Black Green Female    2</span>
-<span class="r-in"><span><span class="co">#     Hair   Eye    Sex Freq</span></span></span>
-<span class="r-in"><span><span class="co"># 17 Black Brown Female   36</span></span></span>
-<span class="r-in"><span><span class="co"># 1  Black Brown   Male   32</span></span></span>
-<span class="r-in"><span><span class="co"># 5  Black  Blue   Male   11</span></span></span>
-<span class="r-in"><span><span class="co"># 9  Black Hazel   Male   10</span></span></span>
-<span class="r-in"><span><span class="co"># 21 Black  Blue Female    9</span></span></span>
-<span class="r-in"><span><span class="co"># 25 Black Hazel Female    5</span></span></span>
-<span class="r-in"><span><span class="co"># 13 Black Green   Male    3</span></span></span>
-<span class="r-in"><span><span class="co"># 29 Black Green Female    2</span></span></span>
-<span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># Get unique combinations of Eye and Sex</span></span></span>
-<span class="r-in"><span><span class="va">res3</span> <span class="op">&lt;-</span> <span class="fu">proc_sort</span><span class="op">(</span><span class="va">dat</span>, keep <span class="op">=</span> <span class="fu"><a href="https://common.r-sassy.org/reference/v.html" class="external-link">v</a></span><span class="op">(</span><span class="va">Eye</span>, <span class="va">Sex</span><span class="op">)</span>, options <span class="op">=</span> <span class="va">nodupkey</span><span class="op">)</span></span></span>
-<span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># View results</span></span></span>
-<span class="r-in"><span><span class="va">res3</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>      Eye    Sex</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1  Brown   Male</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 17 Brown Female</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 5   Blue   Male</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 21  Blue Female</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 9  Hazel   Male</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 25 Hazel Female</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 13 Green   Male</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 29 Green Female</span>
-<span class="r-in"><span><span class="co">#      Eye    Sex</span></span></span>
-<span class="r-in"><span><span class="co"># 1  Brown   Male</span></span></span>
-<span class="r-in"><span><span class="co"># 17 Brown Female</span></span></span>
-<span class="r-in"><span><span class="co"># 5   Blue   Male</span></span></span>
-<span class="r-in"><span><span class="co"># 21  Blue Female</span></span></span>
-<span class="r-in"><span><span class="co"># 9  Hazel   Male</span></span></span>
-<span class="r-in"><span><span class="co"># 25 Hazel Female</span></span></span>
-<span class="r-in"><span><span class="co"># 13 Green   Male</span></span></span>
-<span class="r-in"><span><span class="co"># 29 Green Female</span></span></span>
-</code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="co"># Prepare data subset</span></span>
+<span><span class="va">dat</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span><span class="va">HairEyeColor</span>, stringsAsFactors <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">32</span> <span class="op"><a href="https://rdrr.io/r/base/Arithmetic.html" class="external-link">%%</a></span> <span class="fl">4</span> <span class="op">==</span> <span class="fl">1</span>, <span class="op">]</span></span>
+<span></span>
+<span><span class="co"># View data</span></span>
+<span><span class="va">dat</span></span>
+<span><span class="co">#     Hair   Eye    Sex Freq</span></span>
+<span><span class="co"># 1  Black Brown   Male   32</span></span>
+<span><span class="co"># 5  Black  Blue   Male   11</span></span>
+<span><span class="co"># 9  Black Hazel   Male   10</span></span>
+<span><span class="co"># 13 Black Green   Male    3</span></span>
+<span><span class="co"># 17 Black Brown Female   36</span></span>
+<span><span class="co"># 21 Black  Blue Female    9</span></span>
+<span><span class="co"># 25 Black Hazel Female    5</span></span>
+<span><span class="co"># 29 Black Green Female    2</span></span>
+<span></span>
+<span><span class="co"># Sort by Frequency</span></span>
+<span><span class="va">res1</span> <span class="op">&lt;-</span> <span class="fu">proc_sort</span><span class="op">(</span><span class="va">dat</span>, by <span class="op">=</span> <span class="va">Freq</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># View results</span></span>
+<span><span class="va">res1</span></span>
+<span><span class="co">#    Hair   Eye    Sex Freq</span></span>
+<span><span class="co"># 29 Black Green Female    2</span></span>
+<span><span class="co"># 13 Black Green   Male    3</span></span>
+<span><span class="co"># 25 Black Hazel Female    5</span></span>
+<span><span class="co"># 21 Black  Blue Female    9</span></span>
+<span><span class="co"># 9  Black Hazel   Male   10</span></span>
+<span><span class="co"># 5  Black  Blue   Male   11</span></span>
+<span><span class="co"># 1  Black Brown   Male   32</span></span>
+<span><span class="co"># 17 Black Brown Female   36</span></span>
+<span></span>
+<span><span class="co"># Sort by Frequency descending</span></span>
+<span><span class="va">res2</span> <span class="op">&lt;-</span> <span class="fu">proc_sort</span><span class="op">(</span><span class="va">dat</span>, by <span class="op">=</span> <span class="va">Freq</span>, order <span class="op">=</span> <span class="va">d</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># View results</span></span>
+<span><span class="va">res2</span></span>
+<span><span class="co">#     Hair   Eye    Sex Freq</span></span>
+<span><span class="co"># 17 Black Brown Female   36</span></span>
+<span><span class="co"># 1  Black Brown   Male   32</span></span>
+<span><span class="co"># 5  Black  Blue   Male   11</span></span>
+<span><span class="co"># 9  Black Hazel   Male   10</span></span>
+<span><span class="co"># 21 Black  Blue Female    9</span></span>
+<span><span class="co"># 25 Black Hazel Female    5</span></span>
+<span><span class="co"># 13 Black Green   Male    3</span></span>
+<span><span class="co"># 29 Black Green Female    2</span></span>
+<span></span>
+<span><span class="co"># Get unique combinations of Eye and Sex</span></span>
+<span><span class="va">res3</span> <span class="op">&lt;-</span> <span class="fu">proc_sort</span><span class="op">(</span><span class="va">dat</span>, keep <span class="op">=</span> <span class="fu"><a href="https://common.r-sassy.org/reference/v.html" class="external-link">v</a></span><span class="op">(</span><span class="va">Eye</span>, <span class="va">Sex</span><span class="op">)</span>, options <span class="op">=</span> <span class="va">nodupkey</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># View results</span></span>
+<span><span class="va">res3</span></span>
+<span><span class="co">#      Eye    Sex</span></span>
+<span><span class="co"># 1  Brown   Male</span></span>
+<span><span class="co"># 17 Brown Female</span></span>
+<span><span class="co"># 5   Blue   Male</span></span>
+<span><span class="co"># 21  Blue Female</span></span>
+<span><span class="co"># 9  Hazel   Male</span></span>
+<span><span class="co"># 25 Hazel Female</span></span>
+<span><span class="co"># 13 Green   Male</span></span>
+<span><span class="co"># 29 Green Female</span></span></code></pre></div>
     </div>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">

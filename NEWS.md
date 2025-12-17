@@ -1,3 +1,9 @@
+# procs 1.0.8
+
+* Added "order" parameter to `proc_freq()`.
+* Added "plots" parameter to `proc_freq()`.
+
+
 # procs 1.0.7
 
 * Fixed bug on `prog_reg()` where by-variable was not populating for all rows

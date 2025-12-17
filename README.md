@@ -10,7 +10,8 @@
 <!-- badges: end -->
 
 # Introduction to **procs**
-<img src='man/images/procs_new.png' align="left" height="138px" style="margin-right:10px;height:138px"/>
+<img src='man/images/procs_new.png' align="left" height="138px" 
+  style="margin-right:10px;height:138px" alt="Procs package logo"/>
 
 The purpose of the **procs** package is to recreate commonly used SAS® 
 procedures in R.  This version of the package will attempt to simulate

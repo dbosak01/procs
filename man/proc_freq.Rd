@@ -12,7 +12,9 @@ proc_freq(
   by = NULL,
   weight = NULL,
   options = NULL,
-  titles = NULL
+  titles = NULL,
+  order = "internal",
+  plots = NULL
 )
 }
 \arguments{
@@ -58,6 +60,14 @@ The following options are available:
 the \strong{Options} section for a description of these options.}
 
 \item{titles}{A vector of titles to assign to the interactive report.}
+
+\item{order}{Indicates how to order the function output. Options are "internal",
+"formatted", "freq" and "data".  Default is "internal".  See the section
+on "Ordering Frequency Output" for more information on this parameter.}
+
+\item{plots}{Pass the desired plot(s) on this parameter.  If only one plot
+is desired, you can pass it directly.  For multiple plots, pass them
+in a list. Default is NULL, meaning no plots are desired.}
 }
 \value{
 The function will return all requested datasets by default.  This is
@@ -254,6 +264,33 @@ that the "sparse" option is actually the default.
 If you do not want to
 show the zero-count categories on a variable that is defined as a factor,
 pass the "nosparse" keyword on the \code{options} parameter.
+}
+
+\section{Ordering Frequency Output}{
+
+Frequency output can be ordered using the \code{order} parameter. There are
+several choices:
+\itemize{
+\item{\strong{internal}: The internal or "natural" order of the table variables.
+For character variables, "internal" means alphabetical order.  For factors,
+"internal" means by order of the levels.}
+\item{\strong{data}: "data" order is different from "internal" order.  "data"
+order means the order that the data appears in the incoming data frame, which
+may or may not be the same as the "internal" order. This
+choice essentially sorts the frequencies according to however the
+table variable values were ordered in the incoming data.}
+\item{\strong{freq}: The "freq" order value means to sort the output in
+descending frequency order.}
+\item{\strong{formatted}: If there is a format assigned to the table variable(s),
+you may also use "formatted" order.  "formatted" order means to apply the
+format to the table variable(s) and then sort the frequencies according to the
+order specified in the format.  The format should be a user-defined
+format as defined in the \strong{fmtr} package.}
+}
+Note that the \code{order} parameter applies to both the interactive report
+and the data frame output.  This behavior is different from SAS, which only
+orders the interactive report. The behavior of the \code{order} parameter was
+modified to reduce subsequent sorts and make it more convenient for the user.
 }
 
 \section{Data Shaping}{

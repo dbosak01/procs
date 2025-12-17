@@ -38,7 +38,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">procs</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.0.7</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.0.8</span>
       </span>
     </div>
 
@@ -169,7 +169,7 @@ yourself, the options statement can be omitted.</p>
 <span></span>
 <span><span class="co"># Get frequencies</span></span>
 <span><span class="fu"><a href="../reference/proc_freq.html">proc_freq</a></span><span class="op">(</span><span class="va">dat</span>, tables <span class="op">=</span> <span class="va">y</span><span class="op">)</span></span></code></pre></div>
-<p><img src="../man/images/freqtut1.png"></p>
+<p><img src="../man/images/freqtut1.png" alt="Basic frequency table"></p>
 <p>The above code illustrates a one-way frequency on the “y” variable.
 The result shows that the “A” and “C” categories appears three times,
 and the “B” category appears twice. The “N” column shows that there are
@@ -186,13 +186,13 @@ the option “nocum”.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Turn off cumulative columns</span></span>
 <span><span class="fu"><a href="../reference/proc_freq.html">proc_freq</a></span><span class="op">(</span><span class="va">dat</span>, tables <span class="op">=</span> <span class="va">y</span>, options <span class="op">=</span> <span class="va">nocum</span><span class="op">)</span></span></code></pre></div>
-<p><img src="../man/images/freqtut2.png"></p>
+<p><img src="../man/images/freqtut2.png" alt="proc_freq() nocum option"></p>
 <p>Let’s say you wanted only the frequency counts, and not the other
 columns. This result can be achieved with the following options. Use the
 <code><a href="https://common.r-sassy.org/reference/v.html" class="external-link">v()</a></code> function when you are passing multiple options:</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/proc_freq.html">proc_freq</a></span><span class="op">(</span><span class="va">dat</span>, tables <span class="op">=</span> <span class="va">y</span>, options <span class="op">=</span> <span class="fu"><a href="https://common.r-sassy.org/reference/v.html" class="external-link">v</a></span><span class="op">(</span><span class="va">nocum</span>, <span class="va">nonobs</span>, <span class="va">nopercent</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<p><img src="../man/images/freqtut3.png"></p>
+<p><img src="../man/images/freqtut3.png" alt="proc_freq() multiple options"></p>
 </div>
 <div class="section level2">
 <h2 id="cross-tabulation">Cross Tabulation<a class="anchor" aria-label="anchor" href="#cross-tabulation"></a>
@@ -203,7 +203,7 @@ table by default:</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Create crosstab</span></span>
 <span><span class="fu"><a href="../reference/proc_freq.html">proc_freq</a></span><span class="op">(</span><span class="va">dat</span>, tables <span class="op">=</span> <span class="va">y</span> <span class="op">*</span> <span class="va">x</span><span class="op">)</span></span></code></pre></div>
-<p><img src="../man/images/freqtut4.png"></p>
+<p><img src="../man/images/freqtut4.png" alt="proc_freq() cross tab"></p>
 </div>
 <div class="section level2">
 <h2 id="cross-tabulation-options">Cross Tabulation Options<a class="anchor" aria-label="anchor" href="#cross-tabulation-options"></a>
@@ -215,14 +215,14 @@ included by default:</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Two-way frequency in list form</span></span>
 <span><span class="fu"><a href="../reference/proc_freq.html">proc_freq</a></span><span class="op">(</span><span class="va">dat</span>, tables <span class="op">=</span> <span class="va">y</span> <span class="op">*</span> <span class="va">x</span>, options <span class="op">=</span> <span class="fu"><a href="https://common.r-sassy.org/reference/v.html" class="external-link">v</a></span><span class="op">(</span><span class="va">list</span>, <span class="va">nosparse</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<p><img src="../man/images/freqtut5.png"></p>
+<p><img src="../man/images/freqtut5.png" alt="proc_freq() list and nosparse options on crosstab"></p>
 <p>The following options turn off various features of the
 cross-tabulation table:</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># View frequencies only</span></span>
 <span><span class="fu"><a href="../reference/proc_freq.html">proc_freq</a></span><span class="op">(</span><span class="va">dat</span>, tables <span class="op">=</span> <span class="va">y</span> <span class="op">*</span> <span class="va">x</span>, </span>
 <span>          options <span class="op">=</span> <span class="fu"><a href="https://common.r-sassy.org/reference/v.html" class="external-link">v</a></span><span class="op">(</span><span class="va">norow</span>, <span class="va">nocol</span>, <span class="va">nopercent</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<p><img src="../man/images/freqtut6.png"></p>
+<p><img src="../man/images/freqtut6.png" alt="crosstab remove some stuff"></p>
 </div>
 <div class="section level2">
 <h2 id="multiple-tables">Multiple Tables<a class="anchor" aria-label="anchor" href="#multiple-tables"></a>
@@ -236,7 +236,7 @@ individually:</p>
 <code class="sourceCode R"><span><span class="co"># Request two crosstabs</span></span>
 <span><span class="fu"><a href="../reference/proc_freq.html">proc_freq</a></span><span class="op">(</span><span class="va">dat</span>, tables <span class="op">=</span> <span class="fu"><a href="https://common.r-sassy.org/reference/v.html" class="external-link">v</a></span><span class="op">(</span><span class="va">y</span> <span class="op">*</span> <span class="va">x</span>, <span class="va">y</span> <span class="op">*</span> <span class="va">z</span><span class="op">)</span>, </span>
 <span>          options <span class="op">=</span> <span class="fu"><a href="https://common.r-sassy.org/reference/v.html" class="external-link">v</a></span><span class="op">(</span><span class="va">norow</span>, <span class="va">nocol</span>, <span class="va">nopercent</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<p><img src="../man/images/freqtut7.png"></p>
+<p><img src="../man/images/freqtut7.png" alt="Proc freq multiple tables"></p>
 </div>
 <div class="section level2">
 <h2 id="distinct-values">Distinct Values<a class="anchor" aria-label="anchor" href="#distinct-values"></a>
@@ -246,7 +246,8 @@ values in a categorical variable:</p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Turn on nlevels option</span></span>
 <span><span class="fu"><a href="../reference/proc_freq.html">proc_freq</a></span><span class="op">(</span><span class="va">dat</span>, tables <span class="op">=</span> <span class="va">y</span>, options <span class="op">=</span> <span class="va">nlevels</span><span class="op">)</span></span></code></pre></div>
-<p><img src="../man/images/freqtut8.png"></p>
+<p>&lt;img src=“../man/images/freqtut8.png”, alt=“nlevels option” alt =
+“Proc freq distinct values”/&gt;</p>
 </div>
 <div class="section level2">
 <h2 id="weighted-frequencies">Weighted Frequencies<a class="anchor" aria-label="anchor" href="#weighted-frequencies"></a>
@@ -258,7 +259,7 @@ calculations.</p>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Add weight variable</span></span>
 <span><span class="fu"><a href="../reference/proc_freq.html">proc_freq</a></span><span class="op">(</span><span class="va">dat</span>, tables <span class="op">=</span> <span class="va">y</span>, weight <span class="op">=</span> <span class="va">z</span><span class="op">)</span></span></code></pre></div>
-<p><img src="../man/images/freqtut9.png"></p>
+<p><img src="../man/images/freqtut9.png" alt="Proc freq weighted frequencies"></p>
 </div>
 <div class="section level2">
 <h2 id="statistics-options">Statistics Options<a class="anchor" aria-label="anchor" href="#statistics-options"></a>
@@ -269,7 +270,7 @@ of association. Here is an example of the Chi-Square test:</p>
 <div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Request Chi-Square and Output datasets</span></span>
 <span><span class="va">res</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/proc_freq.html">proc_freq</a></span><span class="op">(</span><span class="va">dat</span>, tables <span class="op">=</span> <span class="va">y</span> <span class="op">*</span> <span class="va">x</span>, options <span class="op">=</span> <span class="va">chisq</span><span class="op">)</span></span></code></pre></div>
-<p><img src="../man/images/freqtut10.png"></p>
+<p><img src="../man/images/freqtut10.png" alt="chisq option"></p>
 <div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># View results</span></span>
 <span><span class="va">res</span></span>
@@ -348,6 +349,40 @@ requested tables and statistics will be returned in a list. No other
 output parameters are needed.</p>
 </div>
 <div class="section level2">
+<h2 id="output-ordering">Output Ordering<a class="anchor" aria-label="anchor" href="#output-ordering"></a>
+</h2>
+<p>The <code>order</code> parameter allows the user to control the sort
+order of the outputs from <code><a href="../reference/proc_freq.html">proc_freq()</a></code>. The possible
+<code>order</code> values are “internal”, “data”, “freq”, and
+“formatted”. These choices align with the corresponding procedure from
+SAS. What is different with <code><a href="../reference/proc_freq.html">proc_freq()</a></code> is that the
+ordering applies to both the interactive report and the data frame
+output.</p>
+<p>Let’s illustrate by taking the weighted frequency example from above,
+and request an order by frequency counts.</p>
+<pre><code><span><span class="co"># Order by frequency counts</span></span>
+<span><span class="va">res</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/proc_freq.html">proc_freq</a></span><span class="op">(</span><span class="va">dat</span>, </span>
+<span>                 tables <span class="op">=</span> <span class="va">y</span>, </span>
+<span>                 weight <span class="op">=</span> <span class="va">z</span>,</span>
+<span>                 order <span class="op">=</span> <span class="va">freq</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># View return data frame</span></span>
+<span><span class="co"># Ordered by frequencies</span></span>
+<span><span class="va">res</span></span>
+<span><span class="co">#   VAR CAT   N CNT      PCT</span></span>
+<span><span class="co"># 1   y   A 506 230 45.45455</span></span>
+<span><span class="co"># 2   y   C 506 199 39.32806</span></span>
+<span><span class="co"># 3   y   B 506  77 15.21739</span></span></code></pre>
+<p>Notice how the output table is ordered by frequency count instead of
+the alphabetical value of “CAT”, which is the default.</p>
+<p>The interactive report shows the same ordering:</p>
+<p><img src="../man/images/freqtut11.png" alt="Frequency order"></p>
+<p>The <code>order</code> parameter gives you control over the sort
+order of <code><a href="../reference/proc_freq.html">proc_freq()</a></code> results, which can help streamline the
+processing of your data. Yet <code><a href="../reference/proc_freq.html">proc_freq()</a></code> contains still
+more capabilities to streamline the processing of your data.</p>
+</div>
+<div class="section level2">
 <h2 id="data-shaping">Data Shaping<a class="anchor" aria-label="anchor" href="#data-shaping"></a>
 </h2>
 <p>The <code><a href="../reference/proc_freq.html">proc_freq()</a></code> function provides three options for
@@ -355,7 +390,7 @@ shaping data: “wide”, “long”, and “stacked”. These options control h
 the output data is organized. The options are also passed on the
 <code>output</code> parameter. The shaping options are best illustrated
 by an example:</p>
-<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Shape wide</span></span>
 <span><span class="va">res1</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/proc_freq.html">proc_freq</a></span><span class="op">(</span><span class="va">dat</span>, tables <span class="op">=</span> <span class="va">y</span>, </span>
 <span>                  output <span class="op">=</span> <span class="va">wide</span><span class="op">)</span></span>

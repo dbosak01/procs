@@ -171,6 +171,30 @@
 #' show the zero-count categories on a variable that is defined as a factor,
 #' pass the "nosparse" keyword on the \code{options} parameter.
 #'
+#' @section Ordering Frequency Output:
+#' Frequency output can be ordered using the \code{order} parameter. There are
+#' several choices:
+#' \itemize{
+#' \item{\strong{internal}: The internal or "natural" order of the table variables.
+#' For character variables, "internal" means alphabetical order.  For factors,
+#' "internal" means by order of the levels.}
+#' \item{\strong{data}: "data" order is different from "internal" order.  "data"
+#' order means the order that the data appears in the incoming data frame, which
+#' may or may not be the same as the "internal" order. This
+#' choice essentially sorts the frequencies according to however the
+#' table variable values were ordered in the incoming data.}
+#' \item{\strong{freq}: The "freq" order value means to sort the output in
+#' descending frequency order.}
+#' \item{\strong{formatted}: If there is a format assigned to the table variable(s),
+#' you may also use "formatted" order.  "formatted" order means to apply the
+#' format to the table variable(s) and then sort the frequencies according to the
+#' order specified in the format.  The format should be a user-defined
+#' format as defined in the \strong{fmtr} package.}
+#' }
+#' Note that the \code{order} parameter applies to both the interactive report
+#' and the data frame output.  This behavior is different from SAS, which only
+#' orders the interactive report. The behavior of the \code{order} parameter was
+#' modified to reduce subsequent sorts and make it more convenient for the user.
 #' @section Data Shaping:
 #' By default, the \code{proc_freq} function returns an output dataset of
 #' frequency results.  If running interactively, the function also prints
@@ -229,8 +253,6 @@
 #' as a variable name to use for the weight.  If a weight variable is
 #' indicated, the weighted value will be summed to calculate the frequency
 #' counts.
-# @param order How to order the output.
-# @param plots Any plots to produce.
 #' @param options The options desired for the function.
 #' Options are passed to the parameter as a vector of quoted strings. You may
 #' also use the \code{v()} function to pass unquoted strings.
@@ -241,6 +263,12 @@
 #' "nonobs", "norow", "nosparse", "notable", "outcum". See
 #' the \strong{Options} section for a description of these options.
 #' @param titles A vector of titles to assign to the interactive report.
+#' @param order Indicates how to order the function output. Options are "internal",
+#' "formatted", "freq" and "data".  Default is "internal".  See the section
+#' on "Ordering Frequency Output" for more information on this parameter.
+#' @param plots Pass the desired plot(s) on this parameter.  If only one plot
+#' is desired, you can pass it directly.  For multiple plots, pass them
+#' in a list. Default is NULL, meaning no plots are desired.
 #' @return The function will return all requested datasets by default.  This is
 #' equivalent to the \code{output = "out"} option.  To return the datasets
 #' as created for the interactive report, pass the "report" output option.  If
@@ -397,9 +425,9 @@ proc_freq <- function(data,
                       by = NULL,
                       weight = NULL,
                       options = NULL,
-                      titles = NULL
-                    #  order = NULL,
-                    #  plots = NULL
+                      titles = NULL,
+                      order = "internal",
+                      plots = NULL
                       ) {
 
 
@@ -423,6 +451,11 @@ proc_freq <- function(data,
   oout <- deparse(substitute(output, env = environment()))
   output <- tryCatch({if (typeof(output) %in% c("character", "NULL")) output else oout},
                       error = function(cond) {oout})
+
+  rout <- deparse(substitute(order, env = environment()))
+  order <- tryCatch({if (typeof(order) %in% c("character", "NULL")) order else rout},
+                     error = function(cond) {rout})
+
 
   # Parameter checks
 
@@ -492,6 +525,18 @@ proc_freq <- function(data,
 
   }
 
+  # Default order parameter
+  if (is.null(order)) {
+    order <- "internal"
+  } else {
+    order <- tolower(order)
+
+    if (!order %in% c("data", "internal", "formatted", "freq")) {
+      stop(paste0("Invalid value for 'order' parameter: '", order, "'\n",
+           "Valid values are: 'internal', 'freq', 'formatted', and 'data'"))
+    }
+  }
+
   # Set default statistics for output parameters
   if (has_output(output))
     outreq <- get_output_specs(tables, list(), options, output)
@@ -520,7 +565,9 @@ proc_freq <- function(data,
                               options = options,
                               weight = weight,
                               view = view,
-                              titles = titles)
+                              titles = titles,
+                              order = order,
+                              plots = plots)
   }
 
   if (length(outreq) > 0) {
@@ -530,7 +577,8 @@ proc_freq <- function(data,
                            tables = tables,
                            options = options,
                            weight = weight,
-                           output = outreq)
+                           output = outreq,
+                           order = order)
 
   }
 
@@ -618,7 +666,8 @@ log_freq <- function(data,
 #' @import reporter
 #' @import common
 #' @noRd
-freq_oneway <- function(data, tb, weight, options, out = FALSE, stats = NULL) {
+freq_oneway <- function(data, tb, weight, options, out = FALSE, stats = NULL,
+                        order = "") {
 
   if (is.null(stats))
     stats <- c("n", "cnt", "pct", "cumsum", "cumpct")
@@ -677,20 +726,25 @@ freq_oneway <- function(data, tb, weight, options, out = FALSE, stats = NULL) {
   # Perform calculations
   n <- sum(frequencies, na.rm = TRUE)
   percentages <- frequencies / n * 100
-  cum_frequencies <- cumsum(frequencies)
-  cum_percentages <- cumsum(percentages)
-
 
   # Create result data frame
   result <- data.frame("CAT" = categories,
                        "N" = n,
                        "CNT" = frequencies,
                        "PCT" = percentages,
-                       "CUMSUM" = cum_frequencies,
-                       "CUMPCT" = cum_percentages,
                        stringsAsFactors = FALSE)
 
+  # Frequency order
+  if (order == "freq") {
 
+    result <- sort(result, by = "CNT", ascending = FALSE)
+    rownames(result) <- NULL
+
+  }
+
+  # Apply cumulative sums and percents
+  result$CUMSUM <- cumsum(frequencies)
+  result$CUMPCT <- cumsum(percentages)
 
   # Get any existing label for target variable
   lbl <- attr(data[[tb]], "label")
@@ -792,7 +846,7 @@ freq_oneway <- function(data, tb, weight, options, out = FALSE, stats = NULL) {
 #' @import common
 #' @noRd
 freq_twoway <- function(data, tb1, tb2, weight, options,
-                        out = FALSE, stats = NULL) {
+                        out = FALSE, stats = NULL, order = "") {
 
   if (is.null(stats))
     stats <- c("n", "cnt", "pct", "cumsum", "cumpct")
@@ -898,6 +952,14 @@ freq_twoway <- function(data, tb1, tb2, weight, options,
                        "CNT" = frequencies,
                        "PCT" = percentages,
                        stringsAsFactors = FALSE)
+
+  # Deal with frequency sort
+  if (order == "freq") {
+    cnt1 <- aggregate(result[["CNT"]], list(result[["CAT1"]]), FUN = sum)
+    cnt2 <- aggregate(result[["CNT"]], list(result[["CAT2"]]), FUN = sum)
+    l1 <- sort(cnt1, by = "x", ascending = FALSE)[["Group.1"]]
+    l2 <- sort(cnt2, by = "x", ascending = FALSE)[["Group.1"]]
+  }
 
   # Restore factors if necessary
   if (!is.null(l1)) {
@@ -1238,11 +1300,13 @@ cross_tab <- function(freqdata, options, var1, var2, bylbl = NULL) {
 }
 
 get_output_oneway <- function(data, tb, weight = NULL, options = NULL,
-                              by = NULL, shape = "wide", stats = NULL) {
+                              by = NULL, shape = "wide", stats = NULL,
+                              order = "") {
 
   # Get frequencies
   ret <- freq_oneway(data = data, tb = tb, weight = weight,
-                     options = options, stats = stats, out = TRUE)
+                     options = options, stats = stats, out = TRUE,
+                     order = order)
 
   # Bind variable name
   tmp <- list(VAR = tb)
@@ -1291,10 +1355,10 @@ get_output_oneway <- function(data, tb, weight = NULL, options = NULL,
 
 
 get_output_twoway <- function(data, tb1, tb2, weight, options, out = FALSE,
-                              by = NULL, shape = "wide", stats = NULL) {
+                              by = NULL, shape = "wide", stats = NULL, order = "") {
 
   ret <- freq_twoway(data = data, tb1 = tb1, tb2 = tb2, weight = weight,
-                     options = options, out = out, stats = stats)
+                     options = options, out = out, stats = stats, order = order)
 
   # Bind variable names
   tmp <- list(VAR1 = tb1, VAR2 = tb2)
@@ -1698,14 +1762,16 @@ get_output_tables <- function(outs) {
 
 # Drivers -----------------------------------------------------------------
 
-
+#' @import fmtr
 gen_report_freq <- function(data,
                             by = NULL,
                             tables = NULL,
                             options = NULL,
                             weight = NULL,
                             view = TRUE,
-                            titles = NULL ) {
+                            titles = NULL,
+                            order = NULL,
+                            plots = NULL) {
 
   res <- list()
   # print("Orig print_location")
@@ -1777,8 +1843,24 @@ gen_report_freq <- function(data,
             attr(dt[[tb]], "label") <- paste0(bylbls[j], tb)
         }
 
+        # Deal with ordering
+        if (order == "data") {
+
+          dt[[tb]] <- factor(dt[[tb]], levels = unique(data[[tb]]))
+
+        } else if (order == "formatted") {
+
+          fmt1 <- formats(data)[[tb]]
+          if (!is.null(fmt1)) {
+            if ("fmt" %in% class(fmt1)) {
+              attr(fmt1, "as.factor") <- TRUE
+              dt[[tb]] <- fapply(dt[[tb]], fmt1)
+            }
+          }
+        }
+
         # Perform one-way frequency
-        result <- freq_oneway(dt, tb, wgt, options, out = FALSE)
+        result <- freq_oneway(dt, tb, wgt, options, out = FALSE, order = order)
 
         # Get nlevels if requested
         if (has_option(options, "nlevels")) {
@@ -1794,9 +1876,34 @@ gen_report_freq <- function(data,
           bylbl <- bylbls[j]
         }
 
+        # Deal with ordering
+        if (order == "data") {
+
+          dt[[splt[1]]] <- factor(dt[[splt[1]]], levels = unique(data[[splt[1]]]))
+          dt[[splt[2]]] <- factor(dt[[splt[2]]], levels = unique(data[[splt[2]]]))
+
+        } else if (order == "formatted") {
+
+          fmt1 <- formats(data)[[splt[1]]]
+          if (!is.null(fmt1)) {
+            if ("fmt" %in% class(fmt1)) {
+              attr(fmt1, "as.factor") <- TRUE
+              dt[[splt[1]]] <- fapply(dt[[splt[1]]], fmt1)
+            }
+          }
+
+          fmt2 <- formats(data)[[splt[2]]]
+          if (!is.null(fmt2)) {
+            if ("fmt" %in% class(fmt2)) {
+              attr(fmt2, "as.factor") <- TRUE
+              dt[[splt[2]]] <- fapply(dt[[splt[2]]], fmt2)
+            }
+          }
+        }
+
         # Perform two-way frequency
         result <- freq_twoway(dt, splt[1], splt[2], wgt, options,
-                              out = FALSE)
+                              out = FALSE, order = order)
 
         if (!has_option(options, "list")) {
           # Perform cross tab by default
@@ -1903,6 +2010,11 @@ gen_report_freq <- function(data,
         titles <- "The FREQ Function"
       }
 
+      if (!is.null(plots)) {
+
+
+      }
+
       out <- output_report(res, dir_name = dirname(vrfl),
                            file_name = basename(vrfl), out_type = "HTML",
                            titles = titles, margins = .5, viewer = TRUE)
@@ -1923,7 +2035,8 @@ gen_output_freq <- function(data,
                             tables = NULL,
                             options = NULL,
                             weight = NULL,
-                            output = NULL) {
+                            output = NULL,
+                            order = NULL) {
 
   # Deal with sparse option
   dta <- get_nway_zero_fills(data, output, by, weight, options)
@@ -1992,14 +2105,30 @@ gen_output_freq <- function(data,
         # Perform either one-way or two-way frequency count
         if (length(splt) == 1) {
 
+          # Deal with ordering
+          if (order == "data") {
+
+            dt[[tb]] <- factor(dt[[tb]], levels = unique(data[[tb]]))
+
+          } else if (order == "formatted") {
+
+            fmt1 <- formats(data)[[tb]]
+            if (!is.null(fmt1)) {
+              if ("fmt" %in% class(fmt1)) {
+                attr(fmt1, "as.factor") <- TRUE
+                dt[[tb]] <- fapply(dt[[tb]], fmt1)
+              }
+            }
+          }
+
           if (length(byvals) >= j) {
             result <- get_output_oneway(dt, tb, wgt, options,
                                       byvals[[j]], shape = outp$shape,
-                                      stats = outp$stats)
+                                      stats = outp$stats, order = order)
           } else {
             result <- get_output_oneway(dt, tb, wgt, options,
                                         NULL, shape = outp$shape,
-                                        stats = outp$stats)
+                                        stats = outp$stats, order = order)
           }
 
           if (has_option(options, "nlevels")) {
@@ -2017,13 +2146,36 @@ gen_output_freq <- function(data,
 
         } else if (length(splt) == 2) {
 
+          # Deal with ordering
+          if (order == "data") {
 
+            dt[[splt[1]]] <- factor(dt[[splt[1]]], levels = unique(data[[splt[1]]]))
+            dt[[splt[2]]] <- factor(dt[[splt[2]]], levels = unique(data[[splt[2]]]))
+
+          } else if (order == "formatted") {
+
+            fmt1 <- formats(data)[[splt[1]]]
+            if (!is.null(fmt1)) {
+              if ("fmt" %in% class(fmt1)) {
+                attr(fmt1, "as.factor") <- TRUE
+                dt[[splt[1]]] <- fapply(dt[[splt[1]]], fmt1)
+              }
+            }
+
+            fmt2 <- formats(data)[[splt[2]]]
+            if (!is.null(fmt2)) {
+              if ("fmt" %in% class(fmt2)) {
+                attr(fmt2, "as.factor") <- TRUE
+                dt[[splt[2]]] <- fapply(dt[[splt[2]]], fmt2)
+              }
+            }
+          }
 
 
           if (has_option(options, "crosstab")) {
 
             result <- freq_twoway(dt, splt[1], splt[2], wgt, options,
-                                  out = FALSE)
+                                  out = FALSE, order = order)
             result <- cross_tab(result, options, splt[1], splt[2], "")
 
 
@@ -2033,14 +2185,13 @@ gen_output_freq <- function(data,
             if (length(byvals) >= j) {
               result <- get_output_twoway(dt, splt[1], splt[2], wgt, options,
                                           byvals[[j]], shape = outp$shape,
-                                          out = TRUE, stats = outp$stats)
+                                          out = TRUE, stats = outp$stats, order = order)
             } else {
 
               result <- get_output_twoway(dt, splt[1], splt[2], wgt, options,
                                           NULL, shape = outp$shape,
-                                          out = TRUE, stats = outp$stats)
+                                          out = TRUE, stats = outp$stats, order = order)
             }
-
 
           }
 
@@ -2175,6 +2326,9 @@ gen_output_freq <- function(data,
   return(res)
 
 }
+
+
+# Plots -------------------------------------------------------------------
 
 
 

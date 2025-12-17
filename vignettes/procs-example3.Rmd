@@ -247,7 +247,7 @@ log_close()
 
 Here is the output:
 
-<img src="../man/images/disp.png"/>
+<img src="../man/images/disp.png" alt = "Disposition table"/>
 
 
 ## Log

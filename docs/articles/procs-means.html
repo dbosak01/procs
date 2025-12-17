@@ -38,7 +38,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">procs</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.0.7</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.0.8</span>
       </span>
     </div>
 
@@ -170,7 +170,7 @@ omitted.</p>
 <span></span>
 <span><span class="co"># No parameters</span></span>
 <span><span class="fu"><a href="../reference/proc_means.html">proc_means</a></span><span class="op">(</span><span class="va">dat</span><span class="op">)</span></span></code></pre></div>
-<p><img src="../man/images/meanstut1.png"></p>
+<p><img src="../man/images/meanstut1.png" alt="Basic proc means"></p>
 </div>
 <div class="section level2">
 <h2 id="selected-variables">Selected Variables<a class="anchor" aria-label="anchor" href="#selected-variables"></a>
@@ -180,7 +180,7 @@ specify variables on the <code>var</code> parameter:</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Specific variable</span></span>
 <span><span class="fu"><a href="../reference/proc_means.html">proc_means</a></span><span class="op">(</span><span class="va">dat</span>, var <span class="op">=</span> <span class="va">x</span><span class="op">)</span></span></code></pre></div>
-<p><img src="../man/images/meanstut8.png"></p>
+<p><img src="../man/images/meanstut8.png" alt="Proc means selected variables"></p>
 </div>
 <div class="section level2">
 <h2 id="statistics-options">Statistics Options<a class="anchor" aria-label="anchor" href="#statistics-options"></a>
@@ -333,7 +333,7 @@ third quartile for all numeric variables in our sample data:</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Custom statistics options</span></span>
 <span><span class="fu"><a href="../reference/proc_means.html">proc_means</a></span><span class="op">(</span><span class="va">dat</span>, stats <span class="op">=</span> <span class="fu"><a href="https://common.r-sassy.org/reference/v.html" class="external-link">v</a></span><span class="op">(</span><span class="va">median</span>, <span class="va">sum</span>, <span class="va">q1</span>, <span class="va">q3</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<p><img src="../man/images/meanstut2.png"></p>
+<p><img src="../man/images/meanstut2.png" alt="Proc means selected statistics"></p>
 </div>
 <div class="section level2">
 <h2 id="output-datasets">Output Datasets<a class="anchor" aria-label="anchor" href="#output-datasets"></a>
@@ -403,7 +403,7 @@ function calls.</p>
 <code class="sourceCode R"><span><span class="co"># Class grouping</span></span>
 <span><span class="va">res1</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/proc_means.html">proc_means</a></span><span class="op">(</span><span class="va">dat</span>, stats <span class="op">=</span> <span class="fu"><a href="https://common.r-sassy.org/reference/v.html" class="external-link">v</a></span><span class="op">(</span><span class="va">median</span>, <span class="va">sum</span>, <span class="va">q1</span>, <span class="va">q3</span><span class="op">)</span>,</span>
 <span>                   class <span class="op">=</span> <span class="va">y</span>, options <span class="op">=</span> <span class="fu"><a href="https://common.r-sassy.org/reference/v.html" class="external-link">v</a></span><span class="op">(</span>maxdec <span class="op">=</span> <span class="fl">4</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<p><img src="../man/images/meanstut3.png"></p>
+<p><img src="../man/images/meanstut3.png" alt="Proc means class grouping"></p>
 <p>Below is the output dataset from the <code>class</code> parameter.
 Notice that summary values have been provided for each variable, in
 addition to the subsets by the class variable. The summary rows are
@@ -430,7 +430,7 @@ of the <code>class</code> parameter:</p>
 <code class="sourceCode R"><span><span class="co"># By grouping</span></span>
 <span><span class="va">res2</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/proc_means.html">proc_means</a></span><span class="op">(</span><span class="va">dat</span>, stats <span class="op">=</span> <span class="fu"><a href="https://common.r-sassy.org/reference/v.html" class="external-link">v</a></span><span class="op">(</span><span class="va">median</span>, <span class="va">sum</span>, <span class="va">q1</span>, <span class="va">q3</span><span class="op">)</span>,</span>
 <span>                   by <span class="op">=</span> <span class="va">y</span>, options <span class="op">=</span> <span class="fu"><a href="https://common.r-sassy.org/reference/v.html" class="external-link">v</a></span><span class="op">(</span>maxdec <span class="op">=</span> <span class="fl">4</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<p><img src="../man/images/meanstut4.png"></p>
+<p><img src="../man/images/meanstut4.png" alt="Proc means by grouping"></p>
 <p>Notice that with the <code>by</code> parameter, separate tables are
 created for each by group on the interactive report.</p>
 <p>Now let’s look at the output dataset:</p>
@@ -465,7 +465,7 @@ parameter:</p>
 <code class="sourceCode R"><span><span class="co"># Class grouping - two variables</span></span>
 <span><span class="va">res1</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/proc_means.html">proc_means</a></span><span class="op">(</span><span class="va">dat</span>, stats <span class="op">=</span> <span class="fu"><a href="https://common.r-sassy.org/reference/v.html" class="external-link">v</a></span><span class="op">(</span><span class="va">median</span>, <span class="va">sum</span>, <span class="va">q1</span>, <span class="va">q3</span><span class="op">)</span>,</span>
 <span>                   class <span class="op">=</span> <span class="fu"><a href="https://common.r-sassy.org/reference/v.html" class="external-link">v</a></span><span class="op">(</span><span class="va">g</span>, <span class="va">y</span><span class="op">)</span>, options <span class="op">=</span> <span class="fu"><a href="https://common.r-sassy.org/reference/v.html" class="external-link">v</a></span><span class="op">(</span>maxdec <span class="op">=</span> <span class="fl">0</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<p><img src="../man/images/meanstut5.png"></p>
+<p><img src="../man/images/meanstut5.png" alt="Proc means multiple groups"></p>
 <p>Here is the output dataset:</p>
 <div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># View results - two class variables</span></span>
@@ -505,7 +505,7 @@ with two variables:</p>
 <code class="sourceCode R"><span><span class="co"># By grouping - two variables</span></span>
 <span><span class="va">res2</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/proc_means.html">proc_means</a></span><span class="op">(</span><span class="va">dat</span>, stats <span class="op">=</span> <span class="fu"><a href="https://common.r-sassy.org/reference/v.html" class="external-link">v</a></span><span class="op">(</span><span class="va">median</span>, <span class="va">sum</span>, <span class="va">q1</span>, <span class="va">q3</span><span class="op">)</span>,</span>
 <span>                   by <span class="op">=</span> <span class="fu"><a href="https://common.r-sassy.org/reference/v.html" class="external-link">v</a></span><span class="op">(</span><span class="va">g</span>, <span class="va">y</span><span class="op">)</span>, options <span class="op">=</span> <span class="fu"><a href="https://common.r-sassy.org/reference/v.html" class="external-link">v</a></span><span class="op">(</span>maxdec <span class="op">=</span> <span class="fl">0</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<p><img src="../man/images/meanstut6.png"></p>
+<p><img src="../man/images/meanstut6.png" alt="Proc means multiple by variables"></p>
 <p>Here is the output dataset for the <code>by</code> parameter:</p>
 <div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># View results - two by variables</span></span>
@@ -531,7 +531,7 @@ and <code>class</code> parameters:</p>
 <span>                   by <span class="op">=</span> <span class="va">g</span>,</span>
 <span>                   class <span class="op">=</span> <span class="va">y</span>, </span>
 <span>                   options <span class="op">=</span> <span class="fu"><a href="https://common.r-sassy.org/reference/v.html" class="external-link">v</a></span><span class="op">(</span>maxdec <span class="op">=</span> <span class="fl">0</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<p><img src="../man/images/meanstut7.png"></p>
+<p><img src="../man/images/meanstut7.png" alt="Proc means combined by and class"></p>
 <div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># View results - by and class</span></span>
 <span><span class="va">res3</span></span>

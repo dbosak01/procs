@@ -75,7 +75,7 @@ res <- proc_freq(dt, tables = v(Hair, Eye, Hair * Eye),
 ```
 When printing is allowed, the `proc_freq()` function will display the 
 following report in the viewer:  
-<img src="../man/images/freq1.png"/>
+<img src="../man/images/freq1.png" alt = "Proc freq example"/>
 
 The function call requested output datasets using the "report" option. If 
 there is more than one output dataset, they will be returned in a list.
@@ -146,7 +146,7 @@ res2 <- proc_means(dt, var = Freq,
 
 The following is sent to the viewer:
 
-<img src="../man/images/means1.png"/>
+<img src="../man/images/means1.png" alt="Proc means example"/>
 
 And here is the output dataset.  Observe that the output dataset
 is not identical to the displayed report.  The output dataset has
@@ -234,7 +234,7 @@ res3
 ```
 If printing is enabled, the following is sent to the viewer:
 
-<img src="../man/images/ttest.png"/>
+<img src="../man/images/ttest.png" alt="Proc ttest example"/>
 
 The above test shows although there was a change before and after the stimulus, 
 that change was not statistically significant.
@@ -319,7 +319,7 @@ proc_print(prnt,
            view = FALSE) # Set view = TRUE to see results
 
 ```
-<img src="../man/images/print1.png"/>
+<img src="../man/images/print1.png" alt = "Proc print example"/>
 
 If desired, we could print this report to the file system using 
 the `file_path` and `output_type` parameters on `proc_print()`.

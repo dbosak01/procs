@@ -129,7 +129,7 @@ test_that("stats4: CLM works with NA.", {
 test_that("stat5: chisq works no weight", {
 
 
-  res <- get_chisq(prt$enrollment, prt$internship)
+  res <- suppressWarnings(get_chisq(prt$enrollment, prt$internship))
 
   res
 
@@ -162,19 +162,21 @@ test_that("stat6: chisq works with weight", {
 })
 
 
-# test_that("stat7: chisq works with weight corrected", {
-#
-#   res <- get_chisq(prt$internship, prt$enrollment, prt$count, TRUE)
-#
-#   res
-#
-#   expect_equal(res[1, 2], 0.58989261)
-#   expect_equal(res[2, 2], 1)
-#   expect_equal(res[3, 2], 0.44246065)
-#
-#
-#
-# })
+test_that("stat7: chisq works with weight corrected", {
+
+  res <- get_chisq(prt$internship, prt$enrollment, prt$count, TRUE)
+
+  res
+
+  expect_equal(res[1, 3], 0.8189423)
+  expect_equal(res[1, 2], 1)
+  expect_equal(res[1, 4], 0.365489592)
+
+  expect_equal(res[2, 3], 0.58989261)
+  expect_equal(res[2, 2], 1)
+  expect_equal(res[2, 4], 0.44246065)
+
+})
 
 # Matches SAS!
 test_that("stat8: fisher works no weight", {

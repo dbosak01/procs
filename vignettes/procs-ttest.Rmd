@@ -80,7 +80,7 @@ Observe that the results of the function is a list of three data frames:
 "Statistics", "ConfLimits", and "TTests".  If working in RStudio and printing
 is enabled, these same three result sets will be sent to the viewer:
 
-<img src="../man/images/ttest1.png"/>
+<img src="../man/images/ttest1.png" alt="One sample t-test output"/>
 
 The interactive report allows you to quickly get a snapshot of statistical 
 values for your data, and can help you determine the next course of action.
@@ -124,7 +124,7 @@ res2
 ```
 The interactive output looks like this:
 
-<img src="../man/images/ttest2.png"/>
+<img src="../man/images/ttest2.png" alt="two sample t-test output"/>
 
 Notice that the output of the two independent variable T-Test is 
 different than the single variable T-Test.  The two variable T-Test
@@ -175,7 +175,7 @@ res3
 ```
 Here is the interactive report:
 
-<img src="../man/images/ttest3.png"/>
+<img src="../man/images/ttest3.png" alt="Paired t-test output"/>
 
 The paired analysis is used when you have some sort of natural relationship
 between the variables.  Note that the **procs** T-Test function does not support
@@ -216,7 +216,7 @@ res5
 ```
 For the interactive report, the by groups will be separated onto their own page:
 
-<img src="../man/images/ttest4.png"/>
+<img src="../man/images/ttest4.png" alt="t-test by group output"/>
 
 
 ## Output Datasets

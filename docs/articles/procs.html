@@ -38,7 +38,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">procs</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.0.7</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.0.8</span>
       </span>
     </div>
 
@@ -191,7 +191,7 @@ code yourself, remove this option or set to TRUE.</p>
 <span>                 options <span class="op">=</span> <span class="va">chisq</span>,</span>
 <span>                 titles <span class="op">=</span> <span class="st">"Hair and Eye Frequency Statistics"</span><span class="op">)</span></span></code></pre></div>
 <p>When printing is allowed, the <code><a href="../reference/proc_freq.html">proc_freq()</a></code> function will
-display the following report in the viewer:<br><img src="../man/images/freq1.png"></p>
+display the following report in the viewer:<br><img src="../man/images/freq1.png" alt="Proc freq example"></p>
 <p>The function call requested output datasets using the “report”
 option. If there is more than one output dataset, they will be returned
 in a list. The output dataset list can be seen below:</p>
@@ -256,7 +256,7 @@ nested in the by.</p>
 <span>                   options <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>maxdec <span class="op">=</span> <span class="fl">4</span><span class="op">)</span>,</span>
 <span>                   titles <span class="op">=</span> <span class="st">"Hair and Eye Summary Statistics by Sex"</span><span class="op">)</span></span></code></pre></div>
 <p>The following is sent to the viewer:</p>
-<p><img src="../man/images/means1.png"></p>
+<p><img src="../man/images/means1.png" alt="Proc means example"></p>
 <p>And here is the output dataset. Observe that the output dataset is
 not identical to the displayed report. The output dataset has been
 optimized for data manipulation, while the displayed report has been
@@ -335,7 +335,7 @@ the stimulus:</p>
 <span><span class="co">#                  VAR DF         T     PROBT</span></span>
 <span><span class="co"># 1 SBPbefore-SBPafter 11 -1.089648 0.2991635</span></span></code></pre></div>
 <p>If printing is enabled, the following is sent to the viewer:</p>
-<p><img src="../man/images/ttest.png"></p>
+<p><img src="../man/images/ttest.png" alt="Proc ttest example"></p>
 <p>The above test shows although there was a change before and after the
 stimulus, that change was not statistically significant.</p>
 </div>
@@ -417,7 +417,7 @@ steps to produce a little report:</p>
 <span><span class="fu"><a href="../reference/proc_print.html">proc_print</a></span><span class="op">(</span><span class="va">prnt</span>, </span>
 <span>           titles <span class="op">=</span> <span class="st">"Analysis of Hair and Eyes Dataset"</span>,</span>
 <span>           view <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span> <span class="co"># Set view = TRUE to see results</span></span></code></pre></div>
-<p><img src="../man/images/print1.png"></p>
+<p><img src="../man/images/print1.png" alt="Proc print example"></p>
 <p>If desired, we could print this report to the file system using the
 <code>file_path</code> and <code>output_type</code> parameters on
 <code><a href="../reference/proc_print.html">proc_print()</a></code>.</p>

@@ -38,7 +38,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">procs</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.0.7</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.0.8</span>
       </span>
     </div>
 
@@ -190,7 +190,7 @@ coefficient.</li>
 <span></span>
 <span><span class="co"># Basic operation</span></span>
 <span><span class="fu"><a href="../reference/proc_reg.html">proc_reg</a></span><span class="op">(</span><span class="va">cls</span>, <span class="va">Weight</span> <span class="op">~</span> <span class="va">Height</span><span class="op">)</span></span></code></pre></div>
-<p><img src="../man/images/reg1.png"></p>
+<p><img src="../man/images/reg1.png" alt="Basic regression output"></p>
 </div>
 <div class="section level2">
 <h2 id="statistics-options">Statistics Options<a class="anchor" aria-label="anchor" href="#statistics-options"></a>
@@ -436,13 +436,13 @@ confidence limits to the parameter estimates table:</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># View report using "clb" option</span></span>
 <span><span class="fu"><a href="../reference/proc_reg.html">proc_reg</a></span><span class="op">(</span><span class="va">cls</span>, <span class="va">Weight</span> <span class="op">~</span> <span class="va">Height</span>, stats <span class="op">=</span> <span class="va">clb</span><span class="op">)</span></span></code></pre></div>
-<p><img src="../man/images/reg2.png"></p>
+<p><img src="../man/images/reg2.png" alt="Proc reg interactive options"></p>
 <p>The “hcc” option sends heteroscedasticity consistent standard error,
 t, and p-values to the estimates table:</p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># View report using "hcc" option</span></span>
 <span><span class="fu"><a href="../reference/proc_reg.html">proc_reg</a></span><span class="op">(</span><span class="va">cls</span>, <span class="va">Weight</span> <span class="op">~</span> <span class="va">Height</span>, stats <span class="op">=</span> <span class="va">hcc</span><span class="op">)</span></span></code></pre></div>
-<p><img src="../man/images/reg3.png"></p>
+<p><img src="../man/images/reg3.png" alt="Proc reg hcc output"></p>
 <p>Finally, the “p” keyword will add 2 more tables to the interactive
 report. The first is a table of predicted and residual values for each
 term of the dependent variable. The second is a summary table for
@@ -450,7 +450,7 @@ residuals:</p>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># View report using "p" option</span></span>
 <span><span class="fu"><a href="../reference/proc_reg.html">proc_reg</a></span><span class="op">(</span><span class="va">cls</span>, <span class="va">Weight</span> <span class="op">~</span> <span class="va">Height</span>, stats <span class="op">=</span> <span class="va">p</span><span class="op">)</span></span></code></pre></div>
-<p><img src="../man/images/reg4.png"></p>
+<p><img src="../man/images/reg4.png" alt="Proc reg p option output"></p>
 </div>
 <div class="section level2">
 <h2 id="by-groups">By Groups<a class="anchor" aria-label="anchor" href="#by-groups"></a>
@@ -470,7 +470,7 @@ is an example:</p>
 <span><span class="co"># 1  F MODEL1 PARMS Weight  9.586849 -117.3698 3.424405     -1</span></span>
 <span><span class="co"># 2  M MODEL1 PARMS Weight 12.695426 -141.1010 3.912549     -1</span></span></code></pre></div>
 <p>And here is the interactive report for the by group:</p>
-<p><img src="../man/images/reg5.png"></p>
+<p><img src="../man/images/reg5.png" alt="Proc reg by parameter output"></p>
 <p>For multiple by groups, pass the variable names as a quoted vector
 using the <code><a href="https://rdrr.io/r/base/c.html" class="external-link">c()</a></code> function, or as an unquoted vector using the
 <code><a href="https://common.r-sassy.org/reference/v.html" class="external-link">v()</a></code> function.</p>
@@ -496,7 +496,7 @@ be distinguished by the model name on the “MODEL” column.</p>
 <span><span class="co"># 1 MODEL1 PARMS Weight 11.22625 -143.0269 3.899030     -1       NA</span></span>
 <span><span class="co"># 2 MODEL2 PARMS Weight 11.51114 -141.2238 3.597027     -1 1.278393</span></span></code></pre></div>
 <p>Here is the interactive display for the two models:</p>
-<p><img src="../man/images/reg6.png"></p>
+<p><img src="../man/images/reg6.png" alt="Proc reg multiple models"></p>
 </div>
 <div class="section level2">
 <h2 id="data-shaping">Data Shaping<a class="anchor" aria-label="anchor" href="#data-shaping"></a>

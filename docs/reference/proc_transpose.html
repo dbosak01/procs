@@ -22,7 +22,7 @@ accept quoted or unquoted values."><meta property="og:image" content="https://pr
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">procs</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.0.7</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.0.8</span>
       </span>
     </div>
 
@@ -241,107 +241,72 @@ are especially useful when there are multiple <code>var</code> variables.</p>
 
     <div id="ref-examples">
     <h2>Examples</h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co"># Prepare data</span></span></span>
-<span class="r-in"><span><span class="va">dat</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>CAT <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">rownames</a></span><span class="op">(</span><span class="va">USPersonalExpenditure</span><span class="op">)</span>,</span></span>
-<span class="r-in"><span>                  <span class="va">USPersonalExpenditure</span>, stringsAsFactors <span class="op">=</span> <span class="cn">FALSE</span>,</span></span>
-<span class="r-in"><span>                  row.names <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">4</span>, <span class="op">]</span></span></span>
-<span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># View data</span></span></span>
-<span class="r-in"><span><span class="va">dat</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                   CAT X1940 X1945 X1950 X1955 X1960</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1    Food and Tobacco 22.20 44.50 59.60  73.2  86.8</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2 Household Operation 10.50 15.50 29.00  36.5  46.2</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3  Medical and Health  3.53  5.76  9.71  14.0  21.1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 4       Personal Care  1.04  1.98  2.45   3.4   5.4</span>
-<span class="r-in"><span><span class="co">#                   CAT X1940 X1945 X1950 X1955 X1960</span></span></span>
-<span class="r-in"><span><span class="co"># 1    Food and Tobacco 22.20 44.50 59.60  73.2  86.8</span></span></span>
-<span class="r-in"><span><span class="co"># 2 Household Operation 10.50 15.50 29.00  36.5  46.2</span></span></span>
-<span class="r-in"><span><span class="co"># 3  Medical and Health  3.53  5.76  9.71  14.0  21.1</span></span></span>
-<span class="r-in"><span><span class="co"># 4       Personal Care  1.04  1.98  2.45   3.4   5.4</span></span></span>
-<span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># Default transpose</span></span></span>
-<span class="r-in"><span><span class="va">tdat1</span> <span class="op">&lt;-</span> <span class="fu">proc_transpose</span><span class="op">(</span><span class="va">dat</span><span class="op">)</span></span></span>
-<span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># View results</span></span></span>
-<span class="r-in"><span><span class="va">tdat1</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    NAME COL1 COL2  COL3 COL4</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1 X1940 22.2 10.5  3.53 1.04</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2 X1945 44.5 15.5  5.76 1.98</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3 X1950 59.6 29.0  9.71 2.45</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 4 X1955 73.2 36.5 14.00 3.40</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 5 X1960 86.8 46.2 21.10 5.40</span>
-<span class="r-in"><span><span class="co">#    NAME COL1 COL2  COL3 COL4</span></span></span>
-<span class="r-in"><span><span class="co"># 1 X1940 22.2 10.5  3.53 1.04</span></span></span>
-<span class="r-in"><span><span class="co"># 2 X1945 44.5 15.5  5.76 1.98</span></span></span>
-<span class="r-in"><span><span class="co"># 3 X1950 59.6 29.0  9.71 2.45</span></span></span>
-<span class="r-in"><span><span class="co"># 4 X1955 73.2 36.5 14.00 3.40</span></span></span>
-<span class="r-in"><span><span class="co"># 5 X1960 86.8 46.2 21.10 5.40</span></span></span>
-<span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># Transpose with ID and Name</span></span></span>
-<span class="r-in"><span><span class="va">tdat2</span> <span class="op">&lt;-</span>  <span class="fu">proc_transpose</span><span class="op">(</span><span class="va">dat</span>, id <span class="op">=</span> <span class="va">CAT</span>, name <span class="op">=</span> <span class="va">Year</span><span class="op">)</span></span></span>
-<span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># View results</span></span></span>
-<span class="r-in"><span><span class="va">tdat2</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    Year Food and Tobacco Household Operation Medical and Health Personal Care</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1 X1940             22.2                10.5               3.53          1.04</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2 X1945             44.5                15.5               5.76          1.98</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3 X1950             59.6                29.0               9.71          2.45</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 4 X1955             73.2                36.5              14.00          3.40</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 5 X1960             86.8                46.2              21.10          5.40</span>
-<span class="r-in"><span><span class="co">#   Year Food and Tobacco Household Operation Medical and Health Personal Care</span></span></span>
-<span class="r-in"><span><span class="co"># 1 X1940             22.2                10.5               3.53          1.04</span></span></span>
-<span class="r-in"><span><span class="co"># 2 X1945             44.5                15.5               5.76          1.98</span></span></span>
-<span class="r-in"><span><span class="co"># 3 X1950             59.6                29.0               9.71          2.45</span></span></span>
-<span class="r-in"><span><span class="co"># 4 X1955             73.2                36.5              14.00          3.40</span></span></span>
-<span class="r-in"><span><span class="co"># 5 X1960             86.8                46.2              21.10          5.40</span></span></span>
-<span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># Transpose only some of the variables</span></span></span>
-<span class="r-in"><span><span class="va">tdat3</span> <span class="op">&lt;-</span> <span class="fu">proc_transpose</span><span class="op">(</span><span class="va">dat</span>, var <span class="op">=</span> <span class="fu"><a href="https://common.r-sassy.org/reference/v.html" class="external-link">v</a></span><span class="op">(</span><span class="va">X1940</span>, <span class="va">X1950</span>, <span class="va">X1960</span><span class="op">)</span>, id <span class="op">=</span> <span class="va">CAT</span>, name <span class="op">=</span> <span class="va">Year</span><span class="op">)</span></span></span>
-<span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># View results</span></span></span>
-<span class="r-in"><span><span class="va">tdat3</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    Year Food and Tobacco Household Operation Medical and Health Personal Care</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1 X1940             22.2                10.5               3.53          1.04</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2 X1950             59.6                29.0               9.71          2.45</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3 X1960             86.8                46.2              21.10          5.40</span>
-<span class="r-in"><span><span class="co">#    Year Food and Tobacco Household Operation Medical and Health Personal Care</span></span></span>
-<span class="r-in"><span><span class="co"># 1 X1940             22.2                10.5               3.53          1.04</span></span></span>
-<span class="r-in"><span><span class="co"># 2 X1950             59.6                29.0               9.71          2.45</span></span></span>
-<span class="r-in"><span><span class="co"># 3 X1960             86.8                46.2              21.10          5.40</span></span></span>
-<span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># By with a where clause</span></span></span>
-<span class="r-in"><span><span class="va">tdat4</span> <span class="op">&lt;-</span> <span class="fu">proc_transpose</span><span class="op">(</span><span class="va">dat</span>, by <span class="op">=</span> <span class="va">CAT</span>, name <span class="op">=</span> <span class="va">Year</span>,</span></span>
-<span class="r-in"><span>                        where <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/expression.html" class="external-link">expression</a></span><span class="op">(</span><span class="va">Year</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"X1940"</span>, <span class="st">"X1950"</span>, <span class="st">"X1960"</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></span>
-<span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># View Results</span></span></span>
-<span class="r-in"><span><span class="va">tdat4</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                    CAT  Year  COL1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1     Food and Tobacco X1940 22.20</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2     Food and Tobacco X1950 59.60</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3     Food and Tobacco X1960 86.80</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 4  Household Operation X1940 10.50</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 5  Household Operation X1950 29.00</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 6  Household Operation X1960 46.20</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 7   Medical and Health X1940  3.53</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 8   Medical and Health X1950  9.71</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 9   Medical and Health X1960 21.10</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 10       Personal Care X1940  1.04</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 11       Personal Care X1950  2.45</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 12       Personal Care X1960  5.40</span>
-<span class="r-in"><span><span class="co">#                    CAT  Year  COL1</span></span></span>
-<span class="r-in"><span><span class="co"># 1     Food and Tobacco X1940 22.20</span></span></span>
-<span class="r-in"><span><span class="co"># 2     Food and Tobacco X1950 59.60</span></span></span>
-<span class="r-in"><span><span class="co"># 3     Food and Tobacco X1960 86.80</span></span></span>
-<span class="r-in"><span><span class="co"># 4  Household Operation X1940 10.50</span></span></span>
-<span class="r-in"><span><span class="co"># 5  Household Operation X1950 29.00</span></span></span>
-<span class="r-in"><span><span class="co"># 6  Household Operation X1960 46.20</span></span></span>
-<span class="r-in"><span><span class="co"># 7   Medical and Health X1940  3.53</span></span></span>
-<span class="r-in"><span><span class="co"># 8   Medical and Health X1950  9.71</span></span></span>
-<span class="r-in"><span><span class="co"># 9   Medical and Health X1960 21.10</span></span></span>
-<span class="r-in"><span><span class="co"># 10       Personal Care X1940  1.04</span></span></span>
-<span class="r-in"><span><span class="co"># 11       Personal Care X1950  2.45</span></span></span>
-<span class="r-in"><span><span class="co"># 12       Personal Care X1960  5.40</span></span></span>
-</code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="co"># Prepare data</span></span>
+<span><span class="va">dat</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>CAT <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">rownames</a></span><span class="op">(</span><span class="va">USPersonalExpenditure</span><span class="op">)</span>,</span>
+<span>                  <span class="va">USPersonalExpenditure</span>, stringsAsFactors <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>                  row.names <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">4</span>, <span class="op">]</span></span>
+<span></span>
+<span><span class="co"># View data</span></span>
+<span><span class="va">dat</span></span>
+<span><span class="co">#                   CAT X1940 X1945 X1950 X1955 X1960</span></span>
+<span><span class="co"># 1    Food and Tobacco 22.20 44.50 59.60  73.2  86.8</span></span>
+<span><span class="co"># 2 Household Operation 10.50 15.50 29.00  36.5  46.2</span></span>
+<span><span class="co"># 3  Medical and Health  3.53  5.76  9.71  14.0  21.1</span></span>
+<span><span class="co"># 4       Personal Care  1.04  1.98  2.45   3.4   5.4</span></span>
+<span></span>
+<span><span class="co"># Default transpose</span></span>
+<span><span class="va">tdat1</span> <span class="op">&lt;-</span> <span class="fu">proc_transpose</span><span class="op">(</span><span class="va">dat</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># View results</span></span>
+<span><span class="va">tdat1</span></span>
+<span><span class="co">#    NAME COL1 COL2  COL3 COL4</span></span>
+<span><span class="co"># 1 X1940 22.2 10.5  3.53 1.04</span></span>
+<span><span class="co"># 2 X1945 44.5 15.5  5.76 1.98</span></span>
+<span><span class="co"># 3 X1950 59.6 29.0  9.71 2.45</span></span>
+<span><span class="co"># 4 X1955 73.2 36.5 14.00 3.40</span></span>
+<span><span class="co"># 5 X1960 86.8 46.2 21.10 5.40</span></span>
+<span></span>
+<span><span class="co"># Transpose with ID and Name</span></span>
+<span><span class="va">tdat2</span> <span class="op">&lt;-</span>  <span class="fu">proc_transpose</span><span class="op">(</span><span class="va">dat</span>, id <span class="op">=</span> <span class="va">CAT</span>, name <span class="op">=</span> <span class="va">Year</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># View results</span></span>
+<span><span class="va">tdat2</span></span>
+<span><span class="co">#   Year Food and Tobacco Household Operation Medical and Health Personal Care</span></span>
+<span><span class="co"># 1 X1940             22.2                10.5               3.53          1.04</span></span>
+<span><span class="co"># 2 X1945             44.5                15.5               5.76          1.98</span></span>
+<span><span class="co"># 3 X1950             59.6                29.0               9.71          2.45</span></span>
+<span><span class="co"># 4 X1955             73.2                36.5              14.00          3.40</span></span>
+<span><span class="co"># 5 X1960             86.8                46.2              21.10          5.40</span></span>
+<span></span>
+<span><span class="co"># Transpose only some of the variables</span></span>
+<span><span class="va">tdat3</span> <span class="op">&lt;-</span> <span class="fu">proc_transpose</span><span class="op">(</span><span class="va">dat</span>, var <span class="op">=</span> <span class="fu"><a href="https://common.r-sassy.org/reference/v.html" class="external-link">v</a></span><span class="op">(</span><span class="va">X1940</span>, <span class="va">X1950</span>, <span class="va">X1960</span><span class="op">)</span>, id <span class="op">=</span> <span class="va">CAT</span>, name <span class="op">=</span> <span class="va">Year</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># View results</span></span>
+<span><span class="va">tdat3</span></span>
+<span><span class="co">#    Year Food and Tobacco Household Operation Medical and Health Personal Care</span></span>
+<span><span class="co"># 1 X1940             22.2                10.5               3.53          1.04</span></span>
+<span><span class="co"># 2 X1950             59.6                29.0               9.71          2.45</span></span>
+<span><span class="co"># 3 X1960             86.8                46.2              21.10          5.40</span></span>
+<span></span>
+<span><span class="co"># By with a where clause</span></span>
+<span><span class="va">tdat4</span> <span class="op">&lt;-</span> <span class="fu">proc_transpose</span><span class="op">(</span><span class="va">dat</span>, by <span class="op">=</span> <span class="va">CAT</span>, name <span class="op">=</span> <span class="va">Year</span>,</span>
+<span>                        where <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/expression.html" class="external-link">expression</a></span><span class="op">(</span><span class="va">Year</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"X1940"</span>, <span class="st">"X1950"</span>, <span class="st">"X1960"</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># View Results</span></span>
+<span><span class="va">tdat4</span></span>
+<span><span class="co">#                    CAT  Year  COL1</span></span>
+<span><span class="co"># 1     Food and Tobacco X1940 22.20</span></span>
+<span><span class="co"># 2     Food and Tobacco X1950 59.60</span></span>
+<span><span class="co"># 3     Food and Tobacco X1960 86.80</span></span>
+<span><span class="co"># 4  Household Operation X1940 10.50</span></span>
+<span><span class="co"># 5  Household Operation X1950 29.00</span></span>
+<span><span class="co"># 6  Household Operation X1960 46.20</span></span>
+<span><span class="co"># 7   Medical and Health X1940  3.53</span></span>
+<span><span class="co"># 8   Medical and Health X1950  9.71</span></span>
+<span><span class="co"># 9   Medical and Health X1960 21.10</span></span>
+<span><span class="co"># 10       Personal Care X1940  1.04</span></span>
+<span><span class="co"># 11       Personal Care X1950  2.45</span></span>
+<span><span class="co"># 12       Personal Care X1960  5.40</span></span></code></pre></div>
     </div>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">

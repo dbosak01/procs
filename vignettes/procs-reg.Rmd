@@ -74,7 +74,7 @@ options("procs.print" = FALSE)
 proc_reg(cls, Weight ~ Height)
 
 ```
-<img src="../man/images/reg1.png"/>
+<img src="../man/images/reg1.png" alt="Basic regression output"/>
 
 ## Statistics Options
 
@@ -223,7 +223,7 @@ the parameter estimates table:
 # View report using "clb" option
 proc_reg(cls, Weight ~ Height, stats = clb)
 ```
-<img src="../man/images/reg2.png"/>
+<img src="../man/images/reg2.png" alt="Proc reg interactive options"/>
 
 The "hcc" option sends heteroscedasticity consistent standard error, t, and 
 p-values to the estimates table:
@@ -232,7 +232,7 @@ p-values to the estimates table:
 # View report using "hcc" option
 proc_reg(cls, Weight ~ Height, stats = hcc)
 ```
-<img src="../man/images/reg3.png"/>
+<img src="../man/images/reg3.png" alt = "Proc reg hcc output"/>
 
 Finally, the "p" keyword will add 2 more tables to the interactive report.
 The first is a table of predicted and residual
@@ -243,7 +243,7 @@ for residuals:
 # View report using "p" option
 proc_reg(cls, Weight ~ Height, stats = p)
 ```
-<img src="../man/images/reg4.png"/>
+<img src="../man/images/reg4.png" alt="Proc reg p option output"/>
 
 ## By Groups 
 
@@ -264,7 +264,7 @@ res5
 ```
 And here is the interactive report for the by group:
 
-<img src="../man/images/reg5.png"/>
+<img src="../man/images/reg5.png" alt="Proc reg by parameter output"/>
 
 For multiple by groups, pass the variable names as a quoted vector using 
 the `c()` function, or as an
@@ -293,7 +293,7 @@ res6
 ```
 Here is the interactive display for the two models:
 
-<img src="../man/images/reg6.png"/>
+<img src="../man/images/reg6.png" alt="Proc reg multiple models"/>
 
 ## Data Shaping
 

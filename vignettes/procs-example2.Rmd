@@ -259,7 +259,7 @@ log_close()
 
 Here is the output:
 
-<img src="../man/images/ae.png"/>
+<img src="../man/images/ae.png" alt="Adverse events table"/>
 
 
 ## Log

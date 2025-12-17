@@ -392,7 +392,7 @@ log_close()
 
 Here is the output:
 
-<img src="../man/images/demog.png"/>
+<img src="../man/images/demog.png" alt="Demographics table"/>
 
 
 ## Log

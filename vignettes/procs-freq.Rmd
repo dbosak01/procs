@@ -64,7 +64,7 @@ options("procs.print" = FALSE)
 proc_freq(dat, tables = y)
 
 ```
-<img src="../man/images/freqtut1.png"/>
+<img src="../man/images/freqtut1.png" alt = "Basic frequency table"/>
 
 The above code illustrates a one-way frequency on the "y" variable.  The 
 result shows that the "A" and "C" categories appears three times, and the "B" 
@@ -82,7 +82,7 @@ you could turn off these columns with the option "nocum".
 proc_freq(dat, tables = y, options = nocum)
 
 ```
-<img src="../man/images/freqtut2.png"/>
+<img src="../man/images/freqtut2.png" alt="proc_freq() nocum option"/>
 
 Let's say you wanted only the frequency counts, and not the other columns.
 This result can be achieved with the following options.  Use the `v()` function
@@ -90,7 +90,7 @@ when you are passing multiple options:
 ```{r eval=FALSE, echo=TRUE} 
 proc_freq(dat, tables = y, options = v(nocum, nonobs, nopercent))
 ```
-<img src="../man/images/freqtut3.png"/>
+<img src="../man/images/freqtut3.png" alt="proc_freq() multiple options"/>
 
 ## Cross Tabulation
 
@@ -102,7 +102,7 @@ table by default:
 proc_freq(dat, tables = y * x)
 
 ```
-<img src="../man/images/freqtut4.png"/>
+<img src="../man/images/freqtut4.png" alt="proc_freq() cross tab"/>
 
 ## Cross Tabulation Options
 
@@ -113,7 +113,7 @@ will turn off zero-count categories, which are included by default:
 # Two-way frequency in list form
 proc_freq(dat, tables = y * x, options = v(list, nosparse))
 ```
-<img src="../man/images/freqtut5.png"/>
+<img src="../man/images/freqtut5.png" alt="proc_freq() list and nosparse options on crosstab"/>
 
 The following options turn off various features of the cross-tabulation
 table:
@@ -122,7 +122,7 @@ table:
 proc_freq(dat, tables = y * x, 
           options = v(norow, nocol, nopercent))
 ```
-<img src="../man/images/freqtut6.png"/>
+<img src="../man/images/freqtut6.png" alt = "crosstab remove some stuff"/>
 
 ## Multiple Tables
 
@@ -135,7 +135,7 @@ You must specify each cross-tab individually:
 proc_freq(dat, tables = v(y * x, y * z), 
           options = v(norow, nocol, nopercent))
 ```
-<img src="../man/images/freqtut7.png"/>
+<img src="../man/images/freqtut7.png" alt="Proc freq multiple tables"/>
 
 ## Distinct Values
 
@@ -145,7 +145,7 @@ in a categorical variable:
 # Turn on nlevels option
 proc_freq(dat, tables = y, options = nlevels)
 ```
-<img src="../man/images/freqtut8.png"/>
+<img src="../man/images/freqtut8.png", alt="nlevels option" alt = "Proc freq distinct values"/>
 
 ## Weighted Frequencies
 
@@ -156,7 +156,7 @@ variable for all frequency calculations.
 # Add weight variable
 proc_freq(dat, tables = y, weight = z)
 ```
-<img src="../man/images/freqtut9.png"/>
+<img src="../man/images/freqtut9.png" alt="Proc freq weighted frequencies"/>
 
 
 ## Statistics Options
@@ -167,7 +167,7 @@ Here is an example of the Chi-Square test:
 # Request Chi-Square and Output datasets
 res <- proc_freq(dat, tables = y * x, options = chisq)
 ```
-<img src="../man/images/freqtut10.png"/>
+<img src="../man/images/freqtut10.png" alt = "chisq option"/>
 
 ```{r eval=FALSE, echo=TRUE} 
 # View results
@@ -248,6 +248,44 @@ Notice that the way output datasets are requested from the `proc_freq()` functio
 is much simpler than the corresponding mechanism in SAS®.  With `proc_freq()`, 
 by default, all requested tables and statistics will be
 returned in a list. No other output parameters are needed.
+
+## Output Ordering
+
+The `order` parameter allows the user to control the sort order of the outputs
+from `proc_freq()`. The possible `order` values are "internal", "data",
+"freq", and "formatted". These choices align with the corresponding procedure
+from SAS.  What is different with `proc_freq()` is that the ordering applies
+to both the interactive report and the data frame output.
+
+Let's illustrate by taking the weighted frequency example from above, and 
+request an order by frequency counts.
+```
+# Order by frequency counts
+res <- proc_freq(dat, 
+                 tables = y, 
+                 weight = z,
+                 order = freq)
+
+# View return data frame
+# Ordered by frequencies
+res
+#   VAR CAT   N CNT      PCT
+# 1   y   A 506 230 45.45455
+# 2   y   C 506 199 39.32806
+# 3   y   B 506  77 15.21739
+
+```
+Notice how the output table is ordered by frequency count instead of the 
+alphabetical value of "CAT", which is the default.
+
+The interactive report shows the same ordering:
+
+<img src="../man/images/freqtut11.png" alt="Frequency order"/>
+
+The `order` parameter gives you control over the sort order of `proc_freq()`
+results, which can help streamline the processing of your data. Yet 
+`proc_freq()` contains still more capabilities to streamline the processing
+of your data.
 
 ## Data Shaping
 

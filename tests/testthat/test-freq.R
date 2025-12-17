@@ -1,4 +1,4 @@
-base_path <- "c:/packages/procs/tests/testthat"
+base_path <- file.path(getwd(), "/tests/testthat")
 data_dir <- base_path
 
 base_path <- tempdir()
@@ -1804,9 +1804,9 @@ test_that("freq58: proc_freq missing option works.", {
 
 test_that("freq59: chi sqr works without weight.", {
 
-  res <- proc_freq(prt, tables = "internship * enrollment",
+  res <- suppressWarnings(proc_freq(prt, tables = "internship * enrollment",
                    output = report,
-                   options = chisq)
+                   options = chisq))
 
   res
 
@@ -2107,7 +2107,7 @@ test_that("freq69: Param checks work.", {
 
 })
 
-test_that("freq70: Param checks work.", {
+test_that("freq70: NA handling on nlevels option.", {
 
 
 tst <- read.table(header = TRUE, text = '
@@ -2206,8 +2206,8 @@ test_that("freq72: chisquare with age group works as expected.", {
   adsl$AGECAT <- fapply(adsl$AGE, agecat)
 
 
-  proc_freq(adsl, tables = v(AGECAT * ARM),
-            options = v(chisq, nosparse)) -> ageg_chisq
+  suppressWarnings(proc_freq(adsl, tables = v(AGECAT * ARM),
+            options = v(chisq, nosparse))) -> ageg_chisq
 
   ageg_chisq
 
@@ -2217,3 +2217,818 @@ test_that("freq72: chisquare with age group works as expected.", {
   expect_equal(is.nan(ageg_chisq[[2]]$PROB[2]), FALSE)
 
 })
+
+
+test_that("freq73: Order parameter on report output works one way.", {
+
+  # Internal order
+  res <- proc_freq(dat, tables = c("Eyes"),
+                   weight = "Count",
+                   output = report,
+                   order = "internal")
+
+  res
+
+  expect_equal(as.character(res$CAT), c("blue", "brown", "green"))
+
+  # Data order
+  res <- proc_freq(dat, tables = c("Eyes"),
+                   weight = "Count",
+                   output = report,
+                   order = "data")
+
+  res
+
+  expect_equal(as.character(res$CAT), c("blue", "green", "brown"))
+
+  # Frequency order
+  res <- proc_freq(dat, tables = c("Eyes"),
+                   weight = "Count",
+                   output = report,
+                   order = "freq")
+
+  res
+
+  expect_equal(as.character(res$CAT), c("brown", "blue", "green"))
+
+  # Formatted order
+  dat2 <- dat
+
+  library(fmtr)
+
+  fmt <- value(condition(x == "green", "green"),
+               condition(x == "brown", "brown"),
+               condition(x == "blue", "blue"))
+
+
+  formats(dat2) <- list(Eyes = fmt)
+
+  res <- proc_freq(dat2, tables = c("Eyes"),
+                   weight = "Count",
+                   output = report,
+                   order = "formatted")
+
+  res
+
+  expect_equal(as.character(res$CAT), c("green", "brown", "blue"))
+
+
+})
+
+test_that("freq74: Order parameter with by groups on report output works one way.", {
+
+  # Internal order
+  res <- proc_freq(dat, tables = c("Eyes"),
+                 #  weight = "Count",
+                   output = report,
+                   by = "Region",
+                   order = "internal")
+
+  res
+
+  expect_equal(as.character(res[[1]]$CAT), c("blue", "brown", "green"))
+  expect_equal(as.character(res[[2]]$CAT), c("blue", "brown", "green"))
+
+  # Data order
+  res <- proc_freq(dat, tables = c("Eyes"),
+                  # weight = "Count",
+                   output = report,
+                   by = "Region",
+                   order = "data")
+
+  res
+
+  expect_equal(as.character(res[[1]]$CAT), c("blue", "green", "brown"))
+  expect_equal(as.character(res[[2]]$CAT), c("blue", "green", "brown"))
+
+  # Frequency order
+  res <- proc_freq(dat, tables = c("Eyes"),
+                  # weight = "Count",
+                   output = report,
+                   by = Region,
+                   order = freq)
+
+  res
+
+  expect_equal(as.character(res[[1]]$CAT), c("brown", "blue", "green"))
+  expect_equal(as.character(res[[2]]$CAT), c("blue", "brown", "green"))
+
+  # Formatted order
+  dat2 <- dat
+
+  library(fmtr)
+
+  fmt <- value(condition(x == "green", "green"),
+               condition(x == "brown", "brown"),
+               condition(x == "blue", "blue"))
+
+
+  formats(dat2) <- list(Eyes = fmt)
+
+  res <- proc_freq(dat2, tables = c("Eyes"),
+                 #  weight = "Count",
+                   output = report,
+                   by = Region,
+                   order = formatted)
+
+  res
+
+  expect_equal(as.character(res[[1]]$CAT), c("green", "brown", "blue"))
+  expect_equal(as.character(res[[2]]$CAT), c("green", "brown", "blue"))
+
+})
+
+
+test_that("freq75: Order parameter on report output works two way.", {
+
+  # Internal order
+  res <- proc_freq(dat, tables = c("Eyes * Hair"),
+                   weight = "Count",
+                   output = report,
+                   order = "internal")
+
+  res
+
+  rws <- unique(as.character(res$CAT))
+  cols <- names(res)
+  cols <- cols[!cols %in% c("CAT", "Statistic", "Total")]
+
+  expect_equal(rws, c("blue", "brown", "green", "Total"))
+  expect_equal(cols, c("black", "dark", "fair", "medium", "red"))
+
+
+  # Data order
+  res <- proc_freq(dat, tables = c("Eyes * Hair"),
+                   weight = "Count",
+                   output = report,
+                   order = "data")
+
+  res
+
+  rws <- unique(as.character(res$CAT))
+  cols <- names(res)
+  cols <- cols[!cols %in% c("CAT", "Statistic", "Total")]
+
+  expect_equal(rws, c("blue", "green", "brown", "Total"))
+  expect_equal(cols, c("fair", "dark", "medium", "red", "black"))
+
+  # Frequency order
+  res <- proc_freq(dat, tables = c("Eyes * Hair"),
+                   weight = "Count",
+                   output = report,
+                   order = "freq")
+
+  res
+
+  rws <- unique(as.character(res$CAT))
+  cols <- names(res)
+  cols <- cols[!cols %in% c("CAT", "Statistic", "Total")]
+
+  expect_equal(rws, c("brown", "blue", "green", "Total"))
+  expect_equal(cols, c("fair", "medium", "dark", "red", "black"))
+
+  # Formatted order
+  dat2 <- dat
+
+  library(fmtr)
+
+  fmt1 <- value(condition(x == "green", "green"),
+               condition(x == "brown", "brown"),
+               condition(x == "blue", "blue"))
+
+  fmt2 <- value(condition(x == "medium", "medium"),
+                condition(x == "dark", "dark"),
+                condition(x == "fair", "fair"),
+                condition(x == "black", "black"),
+                condition(x == "red", "red"))
+
+
+  formats(dat2) <- list(Eyes = fmt1,
+                        Hair = fmt2)
+
+  res <- proc_freq(dat2, tables = c("Eyes * Hair"),
+                   weight = "Count",
+                   output = report,
+                   order = "formatted")
+
+  res
+
+  rws <- unique(as.character(res$CAT))
+  cols <- names(res)
+  cols <- cols[!cols %in% c("CAT", "Statistic", "Total")]
+
+  expect_equal(rws, c("green", "brown", "blue", "Total"))
+  expect_equal(cols, c("medium", "dark", "fair", "black", "red"))
+
+})
+
+test_that("freq76: Order parameter with by groups on report output works two way.", {
+
+  # Internal order
+  res <- proc_freq(dat, tables = c("Eyes * Hair"),
+                   weight = "Count",
+                   by = "Region",
+                   output = report,
+                   order = "internal")
+
+  res
+
+  rws1 <- unique(as.character(res[[1]]$CAT))
+  cols1 <- names(res[[1]])
+  cols1 <- cols1[!cols1 %in% c("CAT", "Statistic", "Total")]
+
+  expect_equal(rws1, c("blue", "brown", "green", "Total"))
+  expect_equal(cols1, c("black", "dark", "fair", "medium", "red"))
+
+  rws2 <- unique(as.character(res[[2]]$CAT))
+  cols2 <- names(res[[2]])
+  cols2 <- cols2[!cols2 %in% c("CAT", "Statistic", "Total")]
+
+  expect_equal(rws2, c("blue", "brown", "green", "Total"))
+  expect_equal(cols2, c("black", "dark", "fair", "medium", "red"))
+
+
+  # Data order
+  res <- proc_freq(dat, tables = c("Eyes * Hair"),
+                   weight = "Count",
+                   by = "Region",
+                   output = report,
+                   order = "data")
+
+  res
+
+  rws1 <- unique(as.character(res[[1]]$CAT))
+  cols1 <- names(res[[1]])
+  cols1 <- cols1[!cols1 %in% c("CAT", "Statistic", "Total")]
+
+  expect_equal(rws1, c("blue", "green", "brown", "Total"))
+  expect_equal(cols1, c("fair", "dark", "medium", "red", "black"))
+
+  rws2 <- unique(as.character(res[[2]]$CAT))
+  cols2 <- names(res[[2]])
+  cols2 <- cols2[!cols2 %in% c("CAT", "Statistic", "Total")]
+
+  expect_equal(rws2, c("blue", "green", "brown", "Total"))
+  expect_equal(cols2, c("fair", "dark", "medium", "red", "black"))
+
+
+  # Frequency order
+  res <- proc_freq(dat, tables = c("Eyes * Hair"),
+                   weight = "Count",
+                   by = "Region",
+                   output = report,
+                   order = "freq")
+
+  res
+
+  rws1 <- unique(as.character(res[[1]]$CAT))
+  cols1 <- names(res[[1]])
+  cols1 <- cols1[!cols1 %in% c("CAT", "Statistic", "Total")]
+
+  expect_equal(rws1, c("brown", "blue", "green", "Total"))
+  expect_equal(cols1, c("medium", "fair", "dark", "red", "black"))
+
+  rws2 <- unique(as.character(res[[2]]$CAT))
+  cols2 <- names(res[[2]])
+  cols2 <- cols2[!cols2 %in% c("CAT", "Statistic", "Total")]
+
+  expect_equal(rws2, c("brown", "blue", "green", "Total"))
+  expect_equal(cols2, c("fair", "medium", "dark", "red", "black"))
+
+
+  dat2 <- dat
+
+  library(fmtr)
+
+  fmt1 <- value(condition(x == "green", "green"),
+                condition(x == "brown", "brown"),
+                condition(x == "blue", "blue"))
+
+  fmt2 <- value(condition(x == "medium", "medium"),
+                condition(x == "dark", "dark"),
+                condition(x == "fair", "fair"),
+                condition(x == "black", "black"),
+                condition(x == "red", "red"))
+
+
+  formats(dat2) <- list(Eyes = fmt1,
+                        Hair = fmt2)
+
+  res <- proc_freq(dat2, tables = c("Eyes * Hair"),
+                   weight = "Count",
+                   by = "Region",
+                   output = report,
+                   order = "formatted")
+
+  res
+
+  rws1 <- unique(as.character(res[[1]]$CAT))
+  cols1 <- names(res[[1]])
+  cols1 <- cols1[!cols1 %in% c("CAT", "Statistic", "Total")]
+
+  expect_equal(rws1, c("green", "brown", "blue", "Total"))
+  expect_equal(cols1, c("medium", "dark", "fair", "black", "red"))
+
+  rws2 <- unique(as.character(res[[2]]$CAT))
+  cols2 <- names(res[[2]])
+  cols2 <- cols2[!cols2 %in% c("CAT", "Statistic", "Total")]
+
+  expect_equal(rws2, c("green", "brown", "blue", "Total"))
+  expect_equal(cols2, c("medium", "dark", "fair", "black", "red"))
+
+
+})
+
+
+test_that("freq77: Order parameter on out output works one way.", {
+
+  # Internal order
+  res <- proc_freq(dat, tables = c("Eyes"),
+                   weight = "Count",
+                   output = out,
+                   order = "internal")
+
+  res
+
+  expect_equal(as.character(res$CAT), c("blue", "brown", "green"))
+
+  # Data order
+  res <- proc_freq(dat, tables = c("Eyes"),
+                   weight = "Count",
+                   output = out,
+                   order = "data")
+
+  res
+
+  expect_equal(as.character(res$CAT), c("blue", "green", "brown"))
+
+  # Frequency order
+  res <- proc_freq(dat, tables = c("Eyes"),
+                   weight = "Count",
+                   output = out,
+                   order = "freq")
+
+  res
+
+  expect_equal(as.character(res$CAT), c("brown", "blue", "green"))
+
+  # Formatted order
+  dat2 <- dat
+
+  library(fmtr)
+
+  fmt <- value(condition(x == "green", "green"),
+               condition(x == "brown", "brown"),
+               condition(x == "blue", "blue"))
+
+
+  formats(dat2) <- list(Eyes = fmt)
+
+  res <- proc_freq(dat2, tables = c("Eyes"),
+                   weight = "Count",
+                   output = out,
+                   order = "formatted")
+
+  res
+
+  expect_equal(as.character(res$CAT), c("green", "brown", "blue"))
+
+
+})
+
+test_that("freq78: Order parameter with by groups on out output works one way.", {
+
+  # Internal order
+  res <- proc_freq(dat, tables = c("Eyes"),
+                   #  weight = "Count",
+                   output = out,
+                   by = "Region",
+                   order = "internal")
+
+  res
+
+  r1 <- res[res$BY == 1, ]
+  r2 <- res[res$BY == 2, ]
+  expect_equal(as.character(r1$CAT), c("blue", "brown", "green"))
+  expect_equal(as.character(r2$CAT), c("blue", "brown", "green"))
+
+  # Data order
+  res <- proc_freq(dat, tables = c("Eyes"),
+                   # weight = "Count",
+                   output = out,
+                   by = "Region",
+                   order = "data")
+
+  res
+
+  r1 <- res[res$BY == 1, ]
+  r2 <- res[res$BY == 2, ]
+  expect_equal(as.character(r1$CAT), c("blue", "green", "brown"))
+  expect_equal(as.character(r2$CAT), c("blue", "green", "brown"))
+
+  # Frequency order
+  res <- proc_freq(dat, tables = c("Eyes"),
+                   # weight = "Count",
+                   output = out,
+                   by = Region,
+                   order = freq)
+
+  res
+  r1 <- res[res$BY == 1, ]
+  r2 <- res[res$BY == 2, ]
+  expect_equal(as.character(r1$CAT), c("brown", "blue", "green"))
+  expect_equal(as.character(r2$CAT), c("blue", "brown", "green"))
+
+  # Formatted order
+  dat2 <- dat
+
+  library(fmtr)
+
+  fmt <- value(condition(x == "green", "green"),
+               condition(x == "brown", "brown"),
+               condition(x == "blue", "blue"))
+
+
+  formats(dat2) <- list(Eyes = fmt)
+
+  res <- proc_freq(dat2, tables = c("Eyes"),
+                   #  weight = "Count",
+                   output = out,
+                   by = Region,
+                   order = formatted)
+
+  res
+  r1 <- res[res$BY == 1, ]
+  r2 <- res[res$BY == 2, ]
+  expect_equal(as.character(r1$CAT), c("green", "brown", "blue"))
+  expect_equal(as.character(r2$CAT), c("green", "brown", "blue"))
+
+})
+
+
+test_that("freq79: Order parameter on out output works two way.", {
+
+  # Internal order
+  res <- proc_freq(dat, tables = c("Eyes * Hair"),
+                   weight = "Count",
+                   output = out,
+                   order = "internal")
+
+  res
+
+  rws <- unique(as.character(res$CAT1))
+  cols <- unique(as.character(res$CAT2))
+
+  expect_equal(rws, c("blue", "brown", "green"))
+  expect_equal(cols, c("black", "dark", "fair", "medium", "red"))
+
+
+  # Data order
+  res <- proc_freq(dat, tables = c("Eyes * Hair"),
+                   weight = "Count",
+                   output = out,
+                   order = "data")
+
+  res
+
+  rws <- unique(as.character(res$CAT1))
+  cols <- unique(as.character(res$CAT2))
+
+  expect_equal(rws, c("blue", "green", "brown"))
+  expect_equal(cols, c("fair", "dark", "medium", "red", "black"))
+
+  # Frequency order
+  res <- proc_freq(dat, tables = c("Eyes * Hair"),
+                   weight = "Count",
+                   output = out,
+                   order = "freq")
+
+  res
+
+  rws <- unique(as.character(res$CAT1))
+  cols <- unique(as.character(res$CAT2))
+
+  expect_equal(rws, c("brown", "blue", "green"))
+  expect_equal(cols, c("fair", "medium", "dark", "red", "black"))
+
+  # Formatted order
+  dat2 <- dat
+
+  library(fmtr)
+
+  fmt1 <- value(condition(x == "green", "green"),
+                condition(x == "brown", "brown"),
+                condition(x == "blue", "blue"))
+
+  fmt2 <- value(condition(x == "medium", "medium"),
+                condition(x == "dark", "dark"),
+                condition(x == "fair", "fair"),
+                condition(x == "black", "black"),
+                condition(x == "red", "red"))
+
+
+  formats(dat2) <- list(Eyes = fmt1,
+                        Hair = fmt2)
+
+  res <- proc_freq(dat2, tables = c("Eyes * Hair"),
+                   weight = "Count",
+                   output = out,
+                   order = "formatted")
+
+  res
+
+  rws <- unique(as.character(res$CAT1))
+  cols <- unique(as.character(res$CAT2))
+
+  expect_equal(rws, c("green", "brown", "blue"))
+  expect_equal(cols, c("medium", "dark", "fair", "black", "red"))
+
+})
+
+test_that("freq80: Order parameter with by groups on out output works two way.", {
+
+  # Internal order
+  res <- proc_freq(dat, tables = c("Eyes * Hair"),
+                   weight = "Count",
+                   by = "Region",
+                   output = out,
+                   order = "internal")
+
+  res
+
+  r1 <- res[res$BY == 1, ]
+  rws1 <- unique(as.character(r1$CAT1))
+  cols1 <- unique(as.character(r1$CAT2))
+
+  expect_equal(rws1, c("blue", "brown", "green"))
+  expect_equal(cols1, c("black", "dark", "fair", "medium", "red"))
+
+  r2 <- res[res$BY == 2, ]
+  rws2 <- unique(as.character(r2$CAT1))
+  cols2 <- unique(as.character(r2$CAT2))
+
+  expect_equal(rws2, c("blue", "brown", "green"))
+  expect_equal(cols2, c("black", "dark", "fair", "medium", "red"))
+
+
+  # Data order
+  res <- proc_freq(dat, tables = c("Eyes * Hair"),
+                   weight = "Count",
+                   by = "Region",
+                   output = out,
+                   order = "data")
+
+  res
+
+  r1 <- res[res$BY == 1, ]
+  rws1 <- unique(as.character(r1$CAT1))
+  cols1 <- unique(as.character(r1$CAT2))
+
+  expect_equal(rws1, c("blue", "green", "brown"))
+  expect_equal(cols1, c("fair", "dark", "medium", "red", "black"))
+
+  r2 <- res[res$BY == 2, ]
+  rws2 <- unique(as.character(r2$CAT1))
+  cols2 <- unique(as.character(r2$CAT2))
+
+  expect_equal(rws2, c("blue", "green", "brown"))
+  expect_equal(cols2, c("fair", "dark", "medium", "red", "black"))
+
+
+  # Frequency order
+  res <- proc_freq(dat, tables = c("Eyes * Hair"),
+                   weight = "Count",
+                   by = "Region",
+                   output = out,
+                   order = "freq")
+
+  res
+
+  r1 <- res[res$BY == 1, ]
+  rws1 <- unique(as.character(r1$CAT1))
+  cols1 <- unique(as.character(r1$CAT2))
+
+  expect_equal(rws1, c("brown", "blue", "green"))
+  expect_equal(cols1, c("medium", "fair", "dark", "red", "black"))
+
+  r2 <- res[res$BY == 2, ]
+  rws2 <- unique(as.character(r2$CAT1))
+  cols2 <- unique(as.character(r2$CAT2))
+
+  expect_equal(rws2, c("brown", "blue", "green"))
+  expect_equal(cols2, c("fair", "medium", "dark", "red", "black"))
+
+
+  dat2 <- dat
+
+  library(fmtr)
+
+  fmt1 <- value(condition(x == "green", "green"),
+                condition(x == "brown", "brown"),
+                condition(x == "blue", "blue"))
+
+  fmt2 <- value(condition(x == "medium", "medium"),
+                condition(x == "dark", "dark"),
+                condition(x == "fair", "fair"),
+                condition(x == "black", "black"),
+                condition(x == "red", "red"))
+
+
+  formats(dat2) <- list(Eyes = fmt1,
+                        Hair = fmt2)
+
+  res <- proc_freq(dat2, tables = c("Eyes * Hair"),
+                   weight = "Count",
+                   by = "Region",
+                   output = out,
+                   order = "formatted")
+
+  res
+
+  r1 <- res[res$BY == 1, ]
+  rws1 <- unique(as.character(r1$CAT1))
+  cols1 <- unique(as.character(r1$CAT2))
+
+  expect_equal(rws1, c("green", "brown", "blue"))
+  expect_equal(cols1, c("medium", "dark", "fair", "black", "red"))
+
+  r2 <- res[res$BY == 2, ]
+  rws2 <- unique(as.character(r2$CAT1))
+  cols2 <- unique(as.character(r2$CAT2))
+
+  expect_equal(rws2, c("green", "brown", "blue"))
+  expect_equal(cols2, c("medium", "dark", "fair", "black", "red"))
+
+
+})
+
+test_that("freq81: Order parameter on out output works two way crosstab option.", {
+
+  # Internal order
+  res <- proc_freq(dat, tables = c("Eyes * Hair"),
+                   weight = "Count",
+                   output = out,
+                   options = crosstab,
+                   order = "internal")
+
+  res
+
+  rws <- unique(as.character(res$CAT))
+  cols <- names(res)
+  cols <- cols[!cols %in% c("CAT", "Statistic", "Total")]
+
+  expect_equal(rws, c("blue", "brown", "green", "Total"))
+  expect_equal(cols, c("black", "dark", "fair", "medium", "red"))
+
+
+  # Data order
+  res <- proc_freq(dat, tables = c("Eyes * Hair"),
+                   weight = "Count",
+                   output = out,
+                   options = crosstab,
+                   order = "data")
+
+  res
+
+  rws <- unique(as.character(res$CAT))
+  cols <- names(res)
+  cols <- cols[!cols %in% c("CAT", "Statistic", "Total")]
+
+  expect_equal(rws, c("blue", "green", "brown", "Total"))
+  expect_equal(cols, c("fair", "dark", "medium", "red", "black"))
+
+  # Frequency order
+  res <- proc_freq(dat, tables = c("Eyes * Hair"),
+                   weight = "Count",
+                   output = out,
+                   options = crosstab,
+                   order = "freq")
+
+  res
+
+  rws <- unique(as.character(res$CAT))
+  cols <- names(res)
+  cols <- cols[!cols %in% c("CAT", "Statistic", "Total")]
+
+  expect_equal(rws, c("brown", "blue", "green", "Total"))
+  expect_equal(cols, c("fair", "medium", "dark", "red", "black"))
+
+  # Formatted order
+  dat2 <- dat
+
+  library(fmtr)
+
+  fmt1 <- value(condition(x == "green", "green"),
+                condition(x == "brown", "brown"),
+                condition(x == "blue", "blue"))
+
+  fmt2 <- value(condition(x == "medium", "medium"),
+                condition(x == "dark", "dark"),
+                condition(x == "fair", "fair"),
+                condition(x == "black", "black"),
+                condition(x == "red", "red"))
+
+
+  formats(dat2) <- list(Eyes = fmt1,
+                        Hair = fmt2)
+
+  res <- proc_freq(dat2, tables = c("Eyes * Hair"),
+                   weight = "Count",
+                   output = out,
+                   options = crosstab,
+                   order = "formatted")
+
+  res
+
+  rws <- unique(as.character(res$CAT))
+  cols <- names(res)
+  cols <- cols[!cols %in% c("CAT", "Statistic", "Total")]
+
+  expect_equal(rws, c("green", "brown", "blue", "Total"))
+  expect_equal(cols, c("medium", "dark", "fair", "black", "red"))
+
+})
+
+test_that("freq82: Order parameter on report output works two way list option.", {
+
+  # Internal order
+  res <- proc_freq(dat, tables = c("Eyes * Hair"),
+                   weight = "Count",
+                   output = report,
+                   options = list,
+                   order = "internal")
+
+  res
+
+  rws <- unique(as.character(res$CAT1))
+  cols <- unique(as.character(res$CAT2))
+
+  expect_equal(rws, c("blue", "brown", "green"))
+  expect_equal(cols, c("black", "dark", "fair", "medium", "red"))
+
+
+  # Data order
+  res <- proc_freq(dat, tables = c("Eyes * Hair"),
+                   weight = "Count",
+                   output = report,
+                   options = list,
+                   order = "data")
+
+  res
+
+  rws <- unique(as.character(res$CAT1))
+  cols <- unique(as.character(res$CAT2))
+
+  expect_equal(rws, c("blue", "green", "brown"))
+  expect_equal(cols, c("fair", "dark", "medium", "red", "black"))
+
+  # Frequency order
+  res <- proc_freq(dat, tables = c("Eyes * Hair"),
+                   weight = "Count",
+                   output = report,
+                   options = list,
+                   order = "freq")
+
+  res
+
+  rws <- unique(as.character(res$CAT1))
+  cols <- unique(as.character(res$CAT2))
+
+  expect_equal(rws, c("brown", "blue", "green"))
+  expect_equal(cols, c("fair", "medium", "dark", "red", "black"))
+
+  # Formatted order
+  dat2 <- dat
+
+  library(fmtr)
+
+  fmt1 <- value(condition(x == "green", "green"),
+                condition(x == "brown", "brown"),
+                condition(x == "blue", "blue"))
+
+  fmt2 <- value(condition(x == "medium", "medium"),
+                condition(x == "dark", "dark"),
+                condition(x == "fair", "fair"),
+                condition(x == "black", "black"),
+                condition(x == "red", "red"))
+
+
+  formats(dat2) <- list(Eyes = fmt1,
+                        Hair = fmt2)
+
+  res <- proc_freq(dat2, tables = c("Eyes * Hair"),
+                   weight = "Count",
+                   output = report,
+                   options = list,
+                   order = "formatted")
+
+  res
+
+  rws <- unique(as.character(res$CAT1))
+  cols <- unique(as.character(res$CAT2))
+
+  expect_equal(rws, c("green", "brown", "blue"))
+  expect_equal(cols, c("medium", "dark", "fair", "black", "red"))
+
+})
+

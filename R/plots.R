@@ -1,5 +1,346 @@
 
 
+# SAS plot type options: agreeplot, all, cumfreqplot, deviationplot, freqplot,
+# kappaplot, mosaicplot, none, oddsratioplot, relriskplot, riskdiffplot, wtkappaplot
+# See https://documentation.sas.com/doc/en/statug/15.2/statug_freq_syntax08.htm#statug.freq.freqplots
+
+
+
+# Plot Function Definitions -----------------------------------------------
+
+
+
+# SAS freqplot options:
+# groupby = variable,
+# npanelpos = sections per panal, default = 4,
+# orient = (horizontal or vertical),
+# scale = (freq | grouppercent | log | percent |sqrt),
+# twoway = (cluster|grouphorizontal|groupvertical|stacked)
+# type = (barchart or dotplot)
+
+
+#' @export
+freqplot <- function(groupby = NULL, npanelpos = 4, orient = "vertical",
+                     scale = "freq", twoway = "groupvertical", type = "barchart") {
+
+
+  # Create object
+  ret <- structure(list(), class = c("freqplot", "list"))
+
+  ret$groupby <- groupby
+  ret$npanelpos <- npanelpos
+  ret$orient <- orient
+  ret$scale <- scale
+  ret$twoway <- twoway
+  ret$type <- type
+
+  return(ret)
+}
+
+
+
+# Plot Rendering ----------------------------------------------------------
+
+
+#' @noRd
+render_plot <- function (dat, table) {
+  UseMethod("render_plot", dat, table)
+}
+
+
+#' @importFrom stats aggregate
+#' @import graphics
+#' @noRd
+render_plot.freqplot <- function(dat, table) {
+
+
+  # Get variables
+  xvar <- cmd$var
+  yvar <- cmd$response
+
+  # Get stat
+  st <- cmd$stat
+
+  # Get titles
+  ttls <- plt$titles
+
+  # Create counter variable
+  dat$cnt. <- 1
+
+  # Get grouping variables
+  grps <- cmd$group
+
+  # Get group values
+  grpvals <- NULL
+  if (!is.null(grps)) {
+
+    grpvals <- unique(dat[[grps]])
+  }
+
+  # Colors - for now
+  if (length(grps) == 0) {
+    cols <- "grey90"
+  } else {
+    cols <- c("#7B8CC3",   # blue-ish
+              "#DC6E6C",   # red-ish
+              "#5FB7A8",   # teal
+              "#B08D52"    # brown/gold
+    )
+
+    cols <- cols[seq(1, length(grpvals))]
+  }
+
+  # Clustered display
+  bsd <- FALSE
+  if (!is.null(cmd$groupdisplay)) {
+    if (tolower(cmd$groupdisplay) == "cluster") {
+      bsd <- TRUE
+    }
+  }
+
+  # No response, use the count variable, no statistic
+  if (is.null(yvar)) {
+    yvar <- "cnt."
+  }
+
+  if (is.null(st)) {
+    st <- "sum"
+  }
+
+  byvars <- list(dat[[xvar]])
+  grpvars <- NULL
+  if (!is.null(grps)) {
+    for (grp in grps) {
+      byvars[[length(byvars) + 1]] <- dat[[grp]]
+      grpvars[[length(grpvars) + 1]] <- paste0("GRP", length(grpvars) + 1)
+    }
+    mrg <- par()$mar
+    mrg[1] <- mrg[1] + 1
+    par(mar = mrg)
+  }
+
+  # Sum by variables
+  sdat <- aggregate(dat[[yvar]], by = byvars, FUN = st)
+  names(sdat) <- c("CAT", grpvars, "FREQ")
+
+  # print("sdat")
+  # print(sdat)
+
+  # Get x names
+  xnms <- unique(sdat$CAT)
+
+  if (is.null(grps)) {
+    ynms <- ""
+    mdat <- sdat$FREQ
+  } else {
+
+    # Get y names
+    ynms <- unique(sdat$GRP1)
+
+    # Create matrix
+    mdat <- sdat$FREQ
+    dim(mdat) <- c(length(xnms), length(ynms))
+    dimnames(mdat) <- list(xnms, ynms)
+
+    # transpose
+    mdat <- t(mdat)
+  }
+
+  # Create scale
+  # yl <- c(0, max(sdat$FREQ))
+
+  # print("mdat")
+  # print(mdat)
+  # print("xnms")
+  # print(xnms)
+  # print("xvar")
+  # print(xvar)
+
+  lgnd <- FALSE
+  if (!is.null(grps)) {
+    lgnd <- TRUE
+  }
+
+  # Bar chart
+  barplot(mdat,
+          names.arg = xnms,
+          main = ttls,
+          beside = bsd,
+          xlab = xvar,
+          ylab = "Frequency",
+          #  ylim = yl,
+          col = cols,
+          border = "grey20",
+          legend.text = lgnd
+  )
+
+  # This will take some work
+  # Comment out for now
+  # Problem is getting it placed in the bottom margin
+  # R doesn't do it that way by default
+  # Will have to custom program it
+  # if (!is.null(grps)) {
+  #
+  #   legend(
+  #   )
+
+
+
+
+}
+
+
+
+#' @importFrom stats aggregate
+#' @import graphics
+#' @noRd
+render_bar <- function(dat, cmd, interactive = FALSE) {
+
+
+  # Get variables
+  xvar <- cmd$var
+  yvar <- cmd$response
+
+  # Get stat
+  st <- cmd$stat
+
+  # Get titles
+  ttls <- plt$titles
+
+  # Create counter variable
+  dat$cnt. <- 1
+
+  # Get grouping variables
+  grps <- cmd$group
+
+  # Get group values
+  grpvals <- NULL
+  if (!is.null(grps)) {
+
+    grpvals <- unique(dat[[grps]])
+  }
+
+  # Colors - for now
+  if (length(grps) == 0) {
+    cols <- "grey90"
+  } else {
+    cols <- c("#7B8CC3",   # blue-ish
+              "#DC6E6C",   # red-ish
+              "#5FB7A8",   # teal
+              "#B08D52"    # brown/gold
+    )
+
+    cols <- cols[seq(1, length(grpvals))]
+  }
+
+  # Clustered display
+  bsd <- FALSE
+  if (!is.null(cmd$groupdisplay)) {
+    if (tolower(cmd$groupdisplay) == "cluster") {
+      bsd <- TRUE
+    }
+  }
+
+  # No response, use the count variable, no statistic
+  if (is.null(yvar)) {
+    yvar <- "cnt."
+  }
+
+  if (is.null(st)) {
+    st <- "sum"
+  }
+
+  byvars <- list(dat[[xvar]])
+  grpvars <- NULL
+  if (!is.null(grps)) {
+    for (grp in grps) {
+      byvars[[length(byvars) + 1]] <- dat[[grp]]
+      grpvars[[length(grpvars) + 1]] <- paste0("GRP", length(grpvars) + 1)
+    }
+    mrg <- par()$mar
+    mrg[1] <- mrg[1] + 1
+    par(mar = mrg)
+  }
+
+  # Sum by variables
+  sdat <- aggregate(dat[[yvar]], by = byvars, FUN = st)
+  names(sdat) <- c("CAT", grpvars, "FREQ")
+
+  # print("sdat")
+  # print(sdat)
+
+  # Get x names
+  xnms <- unique(sdat$CAT)
+
+  if (is.null(grps)) {
+    ynms <- ""
+    mdat <- sdat$FREQ
+  } else {
+
+    # Get y names
+    ynms <- unique(sdat$GRP1)
+
+    # Create matrix
+    mdat <- sdat$FREQ
+    dim(mdat) <- c(length(xnms), length(ynms))
+    dimnames(mdat) <- list(xnms, ynms)
+
+    # transpose
+    mdat <- t(mdat)
+  }
+
+  # Create scale
+  # yl <- c(0, max(sdat$FREQ))
+
+  # print("mdat")
+  # print(mdat)
+  # print("xnms")
+  # print(xnms)
+  # print("xvar")
+  # print(xvar)
+
+  lgnd <- FALSE
+  if (!is.null(grps)) {
+    lgnd <- TRUE
+  }
+
+  # If no output file and not interactive, don't run.
+  # Will be necessary to pass CRAN checks.
+  if ((interactive & interactive()) |
+      !interactive) {
+
+    # Bar chart
+    barplot(mdat,
+            names.arg = xnms,
+            main = ttls,
+            beside = bsd,
+            xlab = xvar,
+            ylab = "Frequency",
+            #  ylim = yl,
+            col = cols,
+            border = "grey20",
+            legend.text = lgnd
+    )
+
+    # This will take some work
+    # Comment out for now
+    # Problem is getting it placed in the bottom margin
+    # R doesn't do it that way by default
+    # Will have to custom program it
+    # if (!is.null(grps)) {
+    #
+    #   legend(
+    #   )
+  }
+
+  # }
+
+}
+
+
+# Cumfreqplot -------------------------------------------------------------
+
+
 
 # @import ggplot2
 # @noRd
