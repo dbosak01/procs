@@ -266,9 +266,9 @@
 #' @param order Indicates how to order the function output. Options are "internal",
 #' "formatted", "freq" and "data".  Default is "internal".  See the section
 #' on "Ordering Frequency Output" for more information on this parameter.
-#' @param plots Pass the desired plot(s) on this parameter.  If only one plot
-#' is desired, you can pass it directly.  For multiple plots, pass them
-#' in a list. Default is NULL, meaning no plots are desired.
+# @param plots Pass the desired plot(s) on this parameter.  If only one plot
+# is desired, you can pass it directly.  For multiple plots, pass them
+# in a list. Default is NULL, meaning no plots are desired.
 #' @return The function will return all requested datasets by default.  This is
 #' equivalent to the \code{output = "out"} option.  To return the datasets
 #' as created for the interactive report, pass the "report" output option.  If
@@ -426,10 +426,11 @@ proc_freq <- function(data,
                       weight = NULL,
                       options = NULL,
                       titles = NULL,
-                      order = "internal",
-                      plots = NULL
+                      order = "internal" #,
+                      #plots = NULL
                       ) {
 
+  plots <- NULL
 
   # Deal with single value unquoted parameter values
   oby <- deparse(substitute(by, env = environment()))

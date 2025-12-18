@@ -44,7 +44,7 @@ freqplot <- function(groupby = NULL, npanelpos = 4, orient = "vertical",
 
 #' @noRd
 render_plot <- function (dat, table, ...) {
-  UseMethod("render_plot", dat, table)
+  UseMethod("render_plot", dat, table, ...)
 }
 
 

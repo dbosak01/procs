@@ -13,8 +13,7 @@ proc_freq(
   weight = NULL,
   options = NULL,
   titles = NULL,
-  order = "internal",
-  plots = NULL
+  order = "internal"
 )
 }
 \arguments{
@@ -64,10 +63,6 @@ the \strong{Options} section for a description of these options.}
 \item{order}{Indicates how to order the function output. Options are "internal",
 "formatted", "freq" and "data".  Default is "internal".  See the section
 on "Ordering Frequency Output" for more information on this parameter.}
-
-\item{plots}{Pass the desired plot(s) on this parameter.  If only one plot
-is desired, you can pass it directly.  For multiple plots, pass them
-in a list. Default is NULL, meaning no plots are desired.}
 }
 \value{
 The function will return all requested datasets by default.  This is
