@@ -129,7 +129,7 @@ render_freqplot.1way <- function(dat, tbl, plt) {
   # Output to image file
   # All output types accept jpeg
   # So start with that
-  jpeg(pth, width = wd, height = ht, quality = 100, antialias = "cleartype")
+  jpeg(pth, width = wd, height = ht, quality = 100)
 
   # Prepare data
   if (plt$scale == "percent") {
@@ -477,7 +477,7 @@ render_freqplot.2way <- function(dat, tbl1, tbl2, plt) {
       # Output to image file
       # All output types accept jpeg
       # So start with that
-      jpeg(pth, width = wd, height = ht, quality = 100, antialias = "cleartype")
+      jpeg(pth, width = wd, height = ht, quality = 100)
 
       # Set up for 3 charts on plot
       par(mfrow = c(3, 1), oma = cmar)

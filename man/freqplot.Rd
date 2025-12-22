@@ -39,8 +39,14 @@ The frequency plot object.
 }
 \description{
 A function to request a frequency plot on a call to
-\code{proc_freq}. The function allows you to specify the type of
-frequency plot to produce, and various layout options. Any requested
+\code{\link{proc_freq}}. The function allows you to specify the type of
+frequency plot to produce, and various layout options. Function supports
+bar charts and dot plots for one and two-way analysis.  It also supports
+vertical or horizontal orientation, by variables, and various scale options.
+}
+\details{
+Any requested
 plots will be displayed on interactive reports only. You may, however,
-output the report objects and pass to \code{\link{proc_print}}.
+output the report objects and pass to \code{\link{proc_print}}. To do this,
+set \code{output = report} on the call to \code{\link{proc_freq}}.
 }
