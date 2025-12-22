@@ -447,13 +447,23 @@ render_freqplot.2way <- function(dat, tbl1, tbl2, plt) {
 
     # Label variables
     if (var1 == "CAT1") {
-      blbl <- tbl1
-      mlbl <- tbl2
-      llbl <- slbl
+      mlbl <- tbl1
+      if (plt$orient == "vertical") {
+        blbl <- tbl2
+        llbl <- slbl
+      } else {
+        blbl <- slbl
+        llbl <- tbl2
+      }
     } else {
-      blbl <- slbl
       mlbl <- tbl2
-      llbl <- tbl1
+      if (plt$orient == "vertical") {
+        blbl <- tbl1
+        llbl <- slbl
+      } else {
+        blbl <- slbl
+        llbl <- tbl1
+      }
     }
 
     # Names for variable 2
@@ -503,7 +513,7 @@ render_freqplot.2way <- function(dat, tbl1, tbl2, plt) {
           xlim = xlm,
           ylim = scl,
           axes = FALSE,
-          xlab = tbl2,
+          # xlab = tbl2,
           ylab = slbl,
         )
 
@@ -517,7 +527,7 @@ render_freqplot.2way <- function(dat, tbl1, tbl2, plt) {
         axis(2, las = 1, col.ticks = "grey55", cex.axis = 1.2) # at = seq(0, 400, by = 100)
 
         # Tbl1 Label
-        mtext(paste(tbl1, "=", vl), side = 3, line = .3, cex = .9)
+        mtext(paste(mlbl, "=", vl), side = 3, line = .3, cex = .9)
 
 
       } else {  # Horizontal
@@ -581,7 +591,6 @@ render_freqplot.2way <- function(dat, tbl1, tbl2, plt) {
 
         # Middle Label
         mtext(paste(mlbl, "=", vl), side = 3, line = .3, cex = .9)
-        # mtext(tbl2, side = 2, line = op$mar[1] - 1)
 
         # # Create axis
         if (lastplot) {
@@ -606,7 +615,7 @@ render_freqplot.2way <- function(dat, tbl1, tbl2, plt) {
         # Create empty plot
         p1 <- barplot(
           rep(NA, length(cnt)),  # Empty data
-          xlab = tbl2,  # Lable x axis
+          xlab = blbl,  # Lable x axis
           ylab = slbl,  # Label y axis
           ylim = scl,  # y axis scale
           horiz = FALSE,
@@ -615,13 +624,13 @@ render_freqplot.2way <- function(dat, tbl1, tbl2, plt) {
 
         # Get tick marks for ablines
         # a1 <- axis(1, las = 1, col.ticks = "grey55")  # Create axis
-        a2 <- axis(2, las = 1, col.ticks = "grey55", cex.axis = 1.2)  # Create axis
+        a2 <- axis(2, las = 1, col.ticks = "grey55", cex.axis = 1.3)  # Create axis
 
         ## Add gridlines based on axis created above
         abline(h = a2, col = "grey90", lwd = 1)
 
         # Add label
-        mtext(paste(tbl1, "=", vl), side = 4, line = .25, cex = .9)
+        mtext(paste(mlbl, "=", vl), side = 4, line = .25, cex = .9)
       }
 
 
@@ -655,9 +664,9 @@ render_freqplot.2way <- function(dat, tbl1, tbl2, plt) {
       mtext(blbl, side = 1, line = cmar[1] - lbladj, outer = TRUE)
 
       # Add axis
-      if (plt$type == "barchart" & plt$orient == "vertical") {
+      if (plt$orient == "vertical") {
         axis(1, las = 1, col.ticks = "grey55", at = as.vector(p2),
-             labels = v2, col = "grey70", cex.axis = 1.2)  # Create axis
+             labels = v2, col = "grey70", cex.axis = 1.3)  # Create axis
       }
 
       # Outer border

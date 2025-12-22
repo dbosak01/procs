@@ -521,7 +521,6 @@ test_that("freqplot12: Two-way proc_freq with horizontal plots and weight works.
                    plots = freqplot(type = "dotplot", orient = "horizontal"),
                    output = report,
                    weight = Count,
-                   order = freq,
                    titles = "My first Frequency Plot")
 
   res
