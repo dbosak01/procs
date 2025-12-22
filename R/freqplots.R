@@ -359,12 +359,24 @@ render_freqplot.2way <- function(dat, tbl1, tbl2, plt) {
   ret <- list()
 
   # Assign Cat variables
+  # to get orientation correct.
+  # SAS is inconsistent.
   if (plt$type == "dotplot") {
-    var1 <- "CAT2"
-    var2 <- "CAT1"
+    if (plt$orient == "vertical") {
+      var1 <- "CAT2"
+      var2 <- "CAT1"
+    } else {
+      var1 <- "CAT2"
+      var2 <- "CAT1"
+    }
   } else {
-    var1 <- "CAT1"
-    var2 <- "CAT2"
+    if (plt$orient == "vertical") {
+      var1 <- "CAT1"
+      var2 <- "CAT2"
+    } else {
+      var1 <- "CAT2"
+      var2 <- "CAT1"
+    }
   }
 
 
@@ -399,35 +411,53 @@ render_freqplot.2way <- function(dat, tbl1, tbl2, plt) {
     # Subset data
     dt <- dat[dat[[var1]] == vl, ]
 
+    # Reverse order for dotplot.
+    # Don't know why.
+    if (plt$type == "dotplot") {
+      dt$seq <- seq(nrow(dt), 1)
+      dt <- sort(dt, by = "seq")
+    }
+
+
     # Prepare data
     if (plt$scale == "percent") {
 
       cnt <- as.numeric(dt$PCT)
-      v2nms <- as.character(dat[[var2]])
       slbl <- "Percent"
       scl <- c(0, max(as.numeric(dat$PCT)) * 1.05)
 
     } else if (plt$scale == "log") {
 
       cnt <- as.numeric(log10(dt$CNT))
-      v2nms <- as.character(dt[[var2]])
       slbl <- "Log Frequency"
       scl <- c(0, max(as.numeric(log10(dat$CNT))) * 1.05)
 
     } else if (plt$scale == "sqrt") {
 
       cnt <- as.numeric(sqrt(dt$CNT))
-      v2nms <- as.character(dt[[var2]])
       slbl <- "Sqrt Frequency"
       scl <- c(0, max(as.numeric(sqrt(dat$CNT))) * 1.05)
 
     } else {  # Default to Frequency
 
       cnt <- as.numeric(dt$CNT)
-      v2nms <- as.character(dt[[var2]])
       slbl <- "Frequency"
       scl <- c(0, max(dat$CNT) * 1.05)
     }
+
+    # Label variables
+    if (var1 == "CAT1") {
+      blbl <- tbl1
+      mlbl <- tbl2
+      llbl <- slbl
+    } else {
+      blbl <- slbl
+      mlbl <- tbl2
+      llbl <- tbl1
+    }
+
+    # Names for variable 2
+    v2nms <- as.character(dt[[var2]])
 
 
     if (firstplot) {
@@ -496,7 +526,7 @@ render_freqplot.2way <- function(dat, tbl1, tbl2, plt) {
         xlm <- c(length(cnt) + .5, .5)
 
         # Plot
-        op <- par(mar = pmar)
+        op <- par(mar = c(0.5, 2, 1, 0) + 0.1)
 
         plot(
           cnt, xdat,
@@ -508,21 +538,27 @@ render_freqplot.2way <- function(dat, tbl1, tbl2, plt) {
           xlim = scl,
           ylim = xlm,
           axes = FALSE,
-          xlab = slbl,
+          xlab = "",
           ylab = "",
         )
 
         # Plot positions
         p2 <- xdat
 
-        mtext(tbl2, side = 2, line = op$mar[1] - 1)
+        # Tbl1 Label
+        mtext(paste(mlbl, "=", vl), side = 3, line = .3, cex = .9)
 
         # Vertical dotted grid lines at each category
         abline(h = xdat, lty = "dotted", col = "gray85")
 
         # Axes
-        axis(2, at = xdat, labels = names(cnt), las = 1, col.ticks = "grey55")
-        axis(1, las = 1, col.ticks = "grey55") # at = seq(0, 400, by = 100)
+        axis(2, at = xdat, labels = v2nms, las = 1, col.ticks = "grey55", cex.axis = 1.2)
+
+        # Axis on last plot
+        if (lastplot) {
+          axis(1, las = 1, col.ticks = "grey55",
+               col = "grey70", cex.axis = 1.2)
+        }
 
       }
 
@@ -531,24 +567,33 @@ render_freqplot.2way <- function(dat, tbl1, tbl2, plt) {
       if (horz == TRUE) {  # Horizontal
 
         # Set custom margins
-        op <- par(mar = pmar)
+        op <- par(mar =  c(0.5, 2, 1, 0) + 0.1)
 
         # Create empty plot
         p1 <- barplot(
           rep(NA, length(cnt)),  # Empty data
-          xlab = slbl,  # Lable x axis
+          xlab = "",  # Lable x axis
           #  ylab = tbl,  # Label y axis
           xlim = scl,  # x axis scale
           horiz = TRUE,
           axes = FALSE  # Don't create axis yet
         )
 
+        # Middle Label
+        mtext(paste(mlbl, "=", vl), side = 3, line = .3, cex = .9)
+        # mtext(tbl2, side = 2, line = op$mar[1] - 1)
 
-        mtext(tbl2, side = 2, line = op$mar[1] - 1)
+        # # Create axis
+        if (lastplot) {
+          a1 <- axis(1, las = 1, col.ticks = "grey55",
+                     col = "grey70", cex.axis = 1.2)
+        } else {
+          a1 <- axis(1, labels = FALSE, tick = FALSE)
+        }
 
-        # Get tick marks for ablines
-        a1 <- axis(1, las = 1, col.ticks = "grey55")  # Create axis
-        # a2 <- axis(2, las = 1, col.ticks = "grey55")  # Create axis
+        # Axes
+        axis(2, at = p1, labels = v2nms, las = 1,
+             col.ticks = "grey55", cex.axis = 1.3)
 
         ## Add gridlines based on axis created above
         abline(v = a1, col = "grey90", lwd = 1)
@@ -604,12 +649,16 @@ render_freqplot.2way <- function(dat, tbl1, tbl2, plt) {
       mtext(ttl, side = 3, line = 1, outer = TRUE, font = 2, cex = 1.2)
 
       # Add labels
-      mtext(slbl, side = 2, line = cmar[2] - 2, outer = TRUE)
-      mtext(tbl2, side = 1, line = cmar[1] - 2, outer = TRUE)
+      mtext(llbl, side = 2, line = cmar[2] - 2, outer = TRUE)
+
+      lbladj <- 2 + ((3 - pltcnt) * 12)
+      mtext(blbl, side = 1, line = cmar[1] - lbladj, outer = TRUE)
 
       # Add axis
-      axis(1, las = 1, col.ticks = "grey55", at = as.vector(p2),
-           labels = v2, col = "grey70", cex.axis = 1.2)  # Create axis
+      if (plt$type == "barchart" & plt$orient == "vertical") {
+        axis(1, las = 1, col.ticks = "grey55", at = as.vector(p2),
+             labels = v2, col = "grey70", cex.axis = 1.2)  # Create axis
+      }
 
       # Outer border
       box("outer", col = "grey70", lwd = 1)
