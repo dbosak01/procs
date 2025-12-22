@@ -83,21 +83,357 @@ adsl <- read.table(header = TRUE, text = '
 options("logr.output" = FALSE)
 options("procs.print" = FALSE)
 
-test_that("freqplot1: One-way proc_freq with plots works.", {
+dev <- FALSE
 
+test_that("freqplot1: render_freqplot() works for freqplots.", {
 
-  # labels(dat) <- list(Eyes = "Eye Color",
-  #                     Hair = "Hair Color",
-  #                     Region = "Geographic Region")
-  #
-  # res <- proc_freq(dat, tables = c("Eyes"),
-  #                  plots = freqplot(),
-  #                  titles = "My first Frequency Plot")
-  #
-  # res
-  #
-  # expect_equal(is.null(res), TRUE)
+  dt <- proc_freq(dat, "Eyes")
 
-  expect_equal(TRUE, TRUE)
+  plt <- freqplot()
+
+  # Plot object
+  res <- render_freqplot(dt, "Eyes", plt = plt)
+
+  pth <- res$plot
+
+  # file.show(pth)
+
+  expect_equal(file.exists(pth), TRUE)
+
+  # Character string
+  res <- render_freqplot(dt, "Eyes", plt = "freqplot")
+
+  pth <- res$plot
+
+  # file.show(pth)
+
+  expect_equal(file.exists(pth), TRUE)
 
 })
+
+test_that("freqplot2: One-way proc_freq with plots works.", {
+
+  # Freqplot function
+  res <- proc_freq(dat, tables = c("Eyes"),
+                   plots = freqplot(),
+                   output = report,
+                   titles = "My first Frequency Plot")
+
+  res
+
+  expect_equal(is.null(res), FALSE)
+  expect_equal("data.frame" %in% class(res[[1]]), TRUE)
+  expect_equal("plot_spec" %in% class(res[[2]]), TRUE)
+
+
+  # Freqplot string
+  res <- proc_freq(dat, tables = c("Eyes"),
+                   plots = "freqplot",
+                   output = report,
+                   titles = "My first Frequency Plot")
+
+  res
+
+  expect_equal(is.null(res), FALSE)
+  expect_equal("data.frame" %in% class(res[[1]]), TRUE)
+  expect_equal("plot_spec" %in% class(res[[2]]), TRUE)
+
+  # Freqplot NSE
+  res <- proc_freq(dat, tables = c("Eyes"),
+                   plots = freqplot,
+                   output = report,
+                   titles = "My first Frequency Plot")
+
+  res
+
+  expect_equal(is.null(res), FALSE)
+
+  expect_equal("data.frame" %in% class(res[[1]]), TRUE)
+  expect_equal("plot_spec" %in% class(res[[2]]), TRUE)
+
+
+})
+
+
+
+# Have to check this visually
+test_that("freqplot3: One-way proc_freq with plots order variations work.", {
+
+  if (dev) {
+
+    # Internal order
+    res <- proc_freq(dat, tables = c("Eyes"),
+                     plots = freqplot(),
+                     output = report,
+                     order = internal,
+                     titles = "My first Frequency Plot")
+
+    res
+
+    expect_equal(is.null(res), FALSE)
+
+    expect_equal("data.frame" %in% class(res[[1]]), TRUE)
+    expect_equal("plot_spec" %in% class(res[[2]]), TRUE)
+
+    # Data order
+    res <- proc_freq(dat, tables = c("Eyes"),
+                     plots = "freqplot",
+                     output = report,
+                     order = data,
+                     titles = "My first Frequency Plot")
+
+    res
+
+    expect_equal(is.null(res), FALSE)
+
+    expect_equal("data.frame" %in% class(res[[1]]), TRUE)
+    expect_equal("plot_spec" %in% class(res[[2]]), TRUE)
+
+
+    # Frequency order
+    res <- proc_freq(dat, tables = c("Eyes"),
+                     plots = freqplot,
+                     output = report,
+                     order = freq,
+                     titles = "My first Frequency Plot")
+
+    res
+
+    expect_equal(is.null(res), FALSE)
+
+    expect_equal("data.frame" %in% class(res[[1]]), TRUE)
+    expect_equal("plot_spec" %in% class(res[[2]]), TRUE)
+
+
+    # Format order
+    library(fmtr)
+    pfmt <- value(condition(x == "green", "green"),
+                  condition(x == "brown", "brown"),
+                  condition(x == "blue", "blue"))
+    dat2 <- dat
+    formats(dat2) <- list(Eyes = pfmt)
+
+
+    res <- proc_freq(dat2, tables = c("Eyes"),
+                     plots = freqplot(),
+                     output = report,
+                     order = formatted,
+                     titles = "My first Frequency Plot")
+
+    res
+
+    expect_equal(is.null(res), FALSE)
+
+    expect_equal("data.frame" %in% class(res[[1]]), TRUE)
+    expect_equal("plot_spec" %in% class(res[[2]]), TRUE)
+
+
+  } else {
+    expect_equal(TRUE, TRUE)
+  }
+
+})
+
+# Great!
+test_that("freqplot4: One-way proc_freq with plots and weight works.", {
+
+
+  res <- proc_freq(dat, tables = c("Eyes"),
+                   plots = freqplot(),
+                   output = report,
+                   weight = Count,
+                   titles = "My first Frequency Plot")
+
+  res
+
+  expect_equal(is.null(res), FALSE)
+
+  expect_equal("data.frame" %in% class(res[[1]]), TRUE)
+  expect_equal("plot_spec" %in% class(res[[2]]), TRUE)
+
+})
+
+# Nice!
+test_that("freqplot5: One-way proc_freq with plots horizontal works.", {
+
+
+  res <- proc_freq(dat, tables = c("Eyes"),
+                   plots = freqplot(orient = "horizontal"),
+                   output = report,
+                   weight = Count,
+                   titles = "My first Frequency Plot")
+
+  res
+
+  expect_equal(is.null(res), FALSE)
+
+  expect_equal("data.frame" %in% class(res[[1]]), TRUE)
+  expect_equal("plot_spec" %in% class(res[[2]]), TRUE)
+
+})
+
+
+# Works!
+test_that("freqplot6: One-way proc_freq with plots and by works.", {
+
+
+  res <- proc_freq(dat, tables = c("Eyes"),
+                   plots = freqplot(),
+                   output = report,
+                   weight = Count,
+                   by = Region,
+                   order = freq,
+                   titles = "My first Frequency Plot")
+
+  res
+
+  expect_equal(is.null(res), FALSE)
+
+  expect_equal("data.frame" %in% class(res[[1]]), TRUE)
+  expect_equal("plot_spec" %in% class(res[[2]]), TRUE)
+
+})
+
+
+
+# Works!
+test_that("freqplot7: One-way proc_freq with plots dotplot option works.", {
+
+  # Vertical
+  res <- proc_freq(dat, tables = c("Eyes"),
+                   plots = freqplot(type = "dotplot", orient = "vertical"),
+                   output = report,
+                   weight = Count,
+                   order = freq,
+                   titles = "My first Frequency Plot")
+
+  res
+
+  expect_equal(is.null(res), FALSE)
+
+  expect_equal("data.frame" %in% class(res[[1]]), TRUE)
+  expect_equal("plot_spec" %in% class(res[[2]]), TRUE)
+
+
+  # Horizontal
+  res <- proc_freq(dat, tables = c("Eyes"),
+                   plots = freqplot(type = "dotplot", orient = "horizontal"),
+                   output = report,
+                   weight = Count,
+                   order = data,
+                   titles = "My first Frequency Plot")
+
+  res
+
+  expect_equal(is.null(res), FALSE)
+
+  expect_equal("data.frame" %in% class(res[[1]]), TRUE)
+  expect_equal("plot_spec" %in% class(res[[2]]), TRUE)
+
+})
+
+test_that("freqplot8: One-way proc_freq with plots scale options work.", {
+
+  if (dev) {
+
+    # Percent scale
+    res <- proc_freq(dat, tables = "Eyes",
+                     plots = freqplot(scale = "percent"),
+                     output = report,
+                     weight = Count,
+                     order = internal,
+                     titles = "My first Frequency Plot")
+
+    res
+
+    expect_equal(is.null(res), FALSE)
+    expect_equal("data.frame" %in% class(res[[1]]), TRUE)
+    expect_equal("plot_spec" %in% class(res[[2]]), TRUE)
+
+    # Log scale
+    res <- proc_freq(dat, tables = "Eyes",
+                     plots = freqplot(scale = "log"),
+                     output = report,
+                     weight = Count,
+                     order = internal,
+                     titles = "My first Frequency Plot")
+
+    res
+
+    expect_equal(is.null(res), FALSE)
+    expect_equal("data.frame" %in% class(res[[1]]), TRUE)
+    expect_equal("plot_spec" %in% class(res[[2]]), TRUE)
+
+    # Sqrt scale
+    res <- proc_freq(dat, tables = "Eyes",
+                     plots = freqplot(scale = "sqrt"),
+                     output = report,
+                     weight = Count,
+                     order = internal,
+                     titles = "My first Frequency Plot")
+
+    res
+
+    expect_equal(is.null(res), FALSE)
+    expect_equal("data.frame" %in% class(res[[1]]), TRUE)
+    expect_equal("plot_spec" %in% class(res[[2]]), TRUE)
+
+  } else {
+
+    expect_equal(TRUE, TRUE)
+  }
+
+})
+
+# Test with:
+# - Different data
+# - Long labels
+# - 0 values
+# - NA values
+# - Large values
+# - Many categories
+# - Real clinical data
+test_that("freqplot9: One-way proc_freq with plots edge cases.", {
+
+
+
+
+})
+
+
+test_that("freqplot10: Two-way proc_freq with plots and weight works.", {
+
+
+  res <- proc_freq(dat, tables = "Eyes * Hair",
+                   plots = freqplot(),
+                   output = report,
+                   weight = Count,
+                   titles = "My first Frequency Plot")
+
+  res
+
+  expect_equal(is.null(res), FALSE)
+
+  expect_equal("data.frame" %in% class(res[[1]]), TRUE)
+  expect_equal("plot_spec" %in% class(res[[2]]), TRUE)
+
+
+  res <- proc_freq(dat, tables = "Hair * Eyes",
+                   plots = freqplot(),
+                   output = report,
+                   weight = Count,
+                   titles = "My first Frequency Plot")
+
+  res
+
+  expect_equal(is.null(res), FALSE)
+
+  expect_equal("data.frame" %in% class(res[[1]]), TRUE)
+  expect_equal(length(res[[2]]), 2)
+  expect_equal("plot_spec" %in% class(res[[2]][[1]]), TRUE)
+  expect_equal("plot_spec" %in% class(res[[2]][[1]]), TRUE)
+
+})
+
+
+

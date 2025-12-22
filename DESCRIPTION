@@ -42,7 +42,8 @@ Suggests:
     rmarkdown,
     testthat (>= 3.0.0),
     covr,
-    logr
+    logr, 
+    ggplot2
 Imports: utils,
          fmtr,
          reporter,

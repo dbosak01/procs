@@ -47,7 +47,7 @@ prt <- read.table(header = TRUE, text = '
   7 girls        yes         no    10
   8 girls         no         no    23')
 
-
+dev <- FALSE
 
 test_that("print1: Simple proc_print text works.", {
 
@@ -201,3 +201,93 @@ test_that("print9: log_prnt() works as expected.", {
 
 })
 
+
+
+test_that("print10: printing of ggplot works as expected.", {
+
+  if (dev == TRUE) {
+
+
+    library(ggplot2)
+
+    fp <- file.path(base_path, "print/test10.docx")
+
+    res <- proc_freq(mtcars, tables = v(cyl, am))
+
+    p <- ggplot(mtcars, aes(x=cyl, y=mpg)) + geom_point()
+
+    pres <- list(res, p)
+
+
+    r1 <- proc_print(pres, fp, titles = "My Report with Plot",
+                     output_type = "DOCX")
+
+    #print(res)
+
+    expect_equal(file.exists(fp), TRUE)
+
+  } else
+    expect_equal(TRUE, TRUE)
+
+
+})
+
+test_that("print11: printing of create_plot() works as expected.", {
+
+  if (dev == TRUE) {
+
+
+    library(reporter)
+
+    fp <- file.path(base_path, "print/test11.docx")
+
+
+
+    dt <- proc_freq(dat, "Eyes")
+
+    plt <- freqplot()
+
+    # Plot object
+    res <- render_freqplot(dt, "Eyes", plt = plt)
+
+    myplt <- create_plot(res, height = 4, width = 5)
+
+
+    pres <- list(dt, myplt)
+
+
+    r1 <- proc_print(pres, fp, titles = "My Report with Plot",
+                     output_type = "DOCX")
+
+    #print(res)
+
+    expect_equal(file.exists(fp), TRUE)
+
+  } else
+    expect_equal(TRUE, TRUE)
+
+
+})
+
+test_that("print12: printing of proc_freq() with plots option works as expected.", {
+
+  fp <- file.path(base_path, "print/test12.docx")
+
+  # Freqplot function
+  res <- proc_freq(dat, tables = c("Eyes"),
+                   plots = freqplot(),
+                   output = report,
+                   titles = "My first Frequency Plot")
+
+  res
+
+  r1 <- proc_print(res, fp, titles = "My Report with Plot",
+                   output_type = "DOCX")
+
+  #print(res)
+
+  expect_equal(file.exists(fp), TRUE)
+
+
+
+})

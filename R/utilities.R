@@ -62,6 +62,7 @@ output_report <- function(lst,
 
   }
 
+
   for (j in seq_len(pages)) {
 
 
@@ -72,6 +73,9 @@ output_report <- function(lst,
       pg <- lst[[j]]
     }
 
+    # Get page item names
+    lnms <- names(pg)
+
     for (i in seq_len(length(pg))) {
 
       brk <- FALSE
@@ -80,6 +84,9 @@ output_report <- function(lst,
 
       # Assign page data
       dt <- pg[[i]]
+
+      # Get item name
+      lnm <- lnms[i]
 
       if ("data.frame" %in% class(dt)) {
         if (viewer == TRUE) {
@@ -185,7 +192,23 @@ output_report <- function(lst,
         rpt <- add_content(rpt, fig, align = 'center', page_break = brk)
 
 
+      } else if ("plot_spec" %in% class(dt)) {
+
+        # Add plot content
+        rpt <- add_content(rpt, dt, align = 'center', page_break = brk)
+
+      } else if ("list" %in% class(dt)) {
+        if ("plot_spec" %in% class(dt[[1]])) {
+
+          for (pobj in dt) {
+
+            rpt <- add_content(rpt, pobj, align = 'center', page_break = brk)
+          }
+
+        }
+
       }
+
     } # Tables
 
 

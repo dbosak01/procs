@@ -266,9 +266,9 @@
 #' @param order Indicates how to order the function output. Options are "internal",
 #' "formatted", "freq" and "data".  Default is "internal".  See the section
 #' on "Ordering Frequency Output" for more information on this parameter.
-# @param plots Pass the desired plot(s) on this parameter.  If only one plot
-# is desired, you can pass it directly.  For multiple plots, pass them
-# in a list. Default is NULL, meaning no plots are desired.
+#' @param plots Pass the desired plot(s) on this parameter.  If only one plot
+#' is desired, you can pass it directly.  For multiple plots, pass them
+#' in a list. Default is NULL, meaning no plots are desired.
 #' @return The function will return all requested datasets by default.  This is
 #' equivalent to the \code{output = "out"} option.  To return the datasets
 #' as created for the interactive report, pass the "report" output option.  If
@@ -426,11 +426,9 @@ proc_freq <- function(data,
                       weight = NULL,
                       options = NULL,
                       titles = NULL,
-                      order = "internal" #,
-                      #plots = NULL
+                      order = "internal",
+                      plots = NULL
                       ) {
-
-  plots <- NULL
 
   # Deal with single value unquoted parameter values
   oby <- deparse(substitute(by, env = environment()))
@@ -456,6 +454,10 @@ proc_freq <- function(data,
   rout <- deparse(substitute(order, env = environment()))
   order <- tryCatch({if (typeof(order) %in% c("character", "NULL")) order else rout},
                      error = function(cond) {rout})
+
+  pout <- deparse(substitute(plots, env = environment()))
+  plots <- tryCatch({if (typeof(plots) %in% c("list", "character", "NULL")) plots else pout},
+                    error = function(cond) {pout})
 
 
   # Parameter checks
@@ -744,8 +746,8 @@ freq_oneway <- function(data, tb, weight, options, out = FALSE, stats = NULL,
   }
 
   # Apply cumulative sums and percents
-  result$CUMSUM <- cumsum(frequencies)
-  result$CUMPCT <- cumsum(percentages)
+  result$CUMSUM <- cumsum(result$CNT)
+  result$CUMPCT <- cumsum(result$PCT)
 
   # Get any existing label for target variable
   lbl <- attr(data[[tb]], "label")
@@ -1829,6 +1831,7 @@ gen_report_freq <- function(data,
       chisq <- NULL
       fisher <- NULL
       nlevels <- NULL
+      plotres <- NULL
 
       # Split cross variables
       splt <- trimws(strsplit(tb, "*", fixed = TRUE)[[1]])
@@ -1868,6 +1871,12 @@ gen_report_freq <- function(data,
 
           nlevels <- get_nlevels(dt, tb, byvars = bylbls[j],
                                  missing = has_option(options, "missing"))
+        }
+
+        if (!is.null(plots)) {
+
+          plotres <- render_freqplot(result, tb, plt = plots)
+
         }
 
       } else if (length(splt) == 2) {
@@ -1937,6 +1946,12 @@ gen_report_freq <- function(data,
                                  missing = has_option(options, "missing"))
         }
 
+        if (!is.null(plots)) {
+
+          plotres <- render_freqplot(result, splt[1], splt[2], plots)
+
+        }
+
       } else {
 
         stop("Procedure does not yet support n-way frequencies.")
@@ -1990,6 +2005,11 @@ gen_report_freq <- function(data,
 
         res[[get_name("Fisher", tb, bylbls[j])]] <- fisher
       }
+
+      if (!is.null(plots)) {
+
+        res[[get_name("Plots", tb, bylbls[j])]] <- plotres
+      }
     }
 
   }
@@ -2009,11 +2029,6 @@ gen_report_freq <- function(data,
 
       if (is.null(titles)) {
         titles <- "The FREQ Function"
-      }
-
-      if (!is.null(plots)) {
-
-
       }
 
       out <- output_report(res, dir_name = dirname(vrfl),
