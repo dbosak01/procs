@@ -401,9 +401,9 @@ test_that("freqplot9: One-way proc_freq with plots edge cases.", {
 })
 
 
-test_that("freqplot10: Two-way proc_freq with plots and weight works.", {
+test_that("freqplot10: Two-way proc_freq with vertical plots and weight works.", {
 
-
+  # Single bar chart
   res <- proc_freq(dat, tables = "Eyes * Hair",
                    plots = freqplot(),
                    output = report,
@@ -417,7 +417,7 @@ test_that("freqplot10: Two-way proc_freq with plots and weight works.", {
   expect_equal("data.frame" %in% class(res[[1]]), TRUE)
   expect_equal("plot_spec" %in% class(res[[2]]), TRUE)
 
-
+  # Two bar charts
   res <- proc_freq(dat, tables = "Hair * Eyes",
                    plots = freqplot(),
                    output = report,
@@ -433,7 +433,107 @@ test_that("freqplot10: Two-way proc_freq with plots and weight works.", {
   expect_equal("plot_spec" %in% class(res[[2]][[1]]), TRUE)
   expect_equal("plot_spec" %in% class(res[[2]][[1]]), TRUE)
 
+
+  # Single dot plot
+  res <- proc_freq(dat, tables = "Hair * Eyes",
+                   plots = freqplot(type = "dotplot"),
+                   output = report,
+                   weight = Count,
+                   titles = "My first Frequency Plot")
+
+  res
+
+  expect_equal(is.null(res), FALSE)
+
+  expect_equal("data.frame" %in% class(res[[1]]), TRUE)
+  expect_equal("plot_spec" %in% class(res[[2]]), TRUE)
+
+  # Two dot plots
+  res <- proc_freq(dat, tables = "Eyes * Hair",
+                   plots = freqplot(type = "dotplot"),
+                   output = report,
+                   weight = Count,
+                   titles = "My first Frequency Plot")
+
+  res
+
+  expect_equal(is.null(res), FALSE)
+
+  expect_equal("data.frame" %in% class(res[[1]]), TRUE)
+  expect_equal(length(res[[2]]), 2)
+  expect_equal("plot_spec" %in% class(res[[2]][[1]]), TRUE)
+  expect_equal("plot_spec" %in% class(res[[2]][[1]]), TRUE)
+
+
 })
 
+test_that("freqplot10: Two-way proc_freq with vertical dotplot works.", {
+
+
+  res <- proc_freq(dat, tables = "Eyes * Hair",
+                   plots = freqplot(type = ),
+                   output = report,
+                   weight = Count,
+                   titles = "My first Frequency Plot")
+
+  res
+
+  expect_equal(is.null(res), FALSE)
+
+  expect_equal("data.frame" %in% class(res[[1]]), TRUE)
+  expect_equal("plot_spec" %in% class(res[[2]]), TRUE)
+
+
+  res <- proc_freq(dat, tables = "Hair * Eyes",
+                   plots = freqplot(orient = "horizontal"),
+                   output = report,
+                   weight = Count,
+                   titles = "My first Frequency Plot")
+
+  res
+
+  expect_equal(is.null(res), FALSE)
+
+  expect_equal("data.frame" %in% class(res[[1]]), TRUE)
+  expect_equal(length(res[[2]]), 2)
+  expect_equal("plot_spec" %in% class(res[[2]][[1]]), TRUE)
+  expect_equal("plot_spec" %in% class(res[[2]][[1]]), TRUE)
+
+})
+
+
+test_that("freqplot10: Two-way proc_freq with plots and weight works.", {
+
+
+  res <- proc_freq(dat, tables = "Eyes * Hair",
+                   plots = freqplot(orient = "horizontal"),
+                   output = report,
+                   weight = Count,
+                   titles = "My first Frequency Plot")
+
+  res
+
+  expect_equal(is.null(res), FALSE)
+
+  expect_equal("data.frame" %in% class(res[[1]]), TRUE)
+  expect_equal("plot_spec" %in% class(res[[2]]), TRUE)
+
+
+  res <- proc_freq(dat, tables = "Hair * Eyes",
+                   plots = freqplot(orient = "horizontal"),
+                   output = report,
+                   weight = Count,
+                   titles = "My first Frequency Plot")
+
+  res
+
+  expect_equal(is.null(res), FALSE)
+
+  expect_equal("data.frame" %in% class(res[[1]]), TRUE)
+  expect_equal(length(res[[2]]), 2)
+  expect_equal("plot_spec" %in% class(res[[2]][[1]]), TRUE)
+  expect_equal("plot_spec" %in% class(res[[2]][[1]]), TRUE)
+
+})
 
 

@@ -358,9 +358,19 @@ render_freqplot.2way <- function(dat, tbl1, tbl2, plt) {
   pltcnt <- 0
   ret <- list()
 
+  # Assign Cat variables
+  if (plt$type == "dotplot") {
+    var1 <- "CAT2"
+    var2 <- "CAT1"
+  } else {
+    var1 <- "CAT1"
+    var2 <- "CAT2"
+  }
+
+
   # Get distinct values
-  v1 <- unique(dat$CAT1)
-  v2 <- unique(dat$CAT2)
+  v1 <- unique(dat[[var1]])
+  v2 <- unique(dat[[var2]])
 
   # Loop on first table variable
   for (vl in v1) {
@@ -387,34 +397,34 @@ render_freqplot.2way <- function(dat, tbl1, tbl2, plt) {
     }
 
     # Subset data
-    dt <- dat[dat$CAT1 == vl, ]
+    dt <- dat[dat[[var1]] == vl, ]
 
     # Prepare data
     if (plt$scale == "percent") {
 
       cnt <- as.numeric(dt$PCT)
-      v2nms <- as.character(dat$CAT2)
+      v2nms <- as.character(dat[[var2]])
       slbl <- "Percent"
       scl <- c(0, max(as.numeric(dat$PCT)) * 1.05)
 
     } else if (plt$scale == "log") {
 
       cnt <- as.numeric(log10(dt$CNT))
-      v2nms <- as.character(dt$CAT2)
+      v2nms <- as.character(dt[[var2]])
       slbl <- "Log Frequency"
       scl <- c(0, max(as.numeric(log10(dat$CNT))) * 1.05)
 
     } else if (plt$scale == "sqrt") {
 
       cnt <- as.numeric(sqrt(dt$CNT))
-      v2nms <- as.character(dt$CAT2)
+      v2nms <- as.character(dt[[var2]])
       slbl <- "Sqrt Frequency"
       scl <- c(0, max(as.numeric(sqrt(dat$CNT))) * 1.05)
 
     } else {  # Default to Frequency
 
       cnt <- as.numeric(dt$CNT)
-      v2nms <- as.character(dt$CAT2)
+      v2nms <- as.character(dt[[var2]])
       slbl <- "Frequency"
       scl <- c(0, max(dat$CNT) * 1.05)
     }
@@ -451,7 +461,7 @@ render_freqplot.2way <- function(dat, tbl1, tbl2, plt) {
         xlm <- c(.5, length(cnt) + .5)
 
         # Plot
-        op <- par(mar = pmar)
+        op <- par(mar = c(0.5, 0, 1, 0) + 0.1)
 
         plot(
           xdat, cnt,
@@ -467,12 +477,18 @@ render_freqplot.2way <- function(dat, tbl1, tbl2, plt) {
           ylab = slbl,
         )
 
+        # Plot positions
+        p2 <- xdat
+
         # Vertical dotted grid lines at each category
         abline(v = xdat, lty = "dotted", col = "gray85")
 
         # Axes
-        axis(1, at = xdat, labels = names(cnt), col.ticks = "grey55")
-        axis(2, las = 1, col.ticks = "grey55") # at = seq(0, 400, by = 100)
+        axis(2, las = 1, col.ticks = "grey55", cex.axis = 1.2) # at = seq(0, 400, by = 100)
+
+        # Tbl1 Label
+        mtext(paste(tbl1, "=", vl), side = 3, line = .3, cex = .9)
+
 
       } else {  # Horizontal
 
@@ -496,6 +512,9 @@ render_freqplot.2way <- function(dat, tbl1, tbl2, plt) {
           ylab = "",
         )
 
+        # Plot positions
+        p2 <- xdat
+
         mtext(tbl2, side = 2, line = op$mar[1] - 1)
 
         # Vertical dotted grid lines at each category
@@ -515,7 +534,7 @@ render_freqplot.2way <- function(dat, tbl1, tbl2, plt) {
         op <- par(mar = pmar)
 
         # Create empty plot
-        b1 <- barplot(
+        p1 <- barplot(
           rep(NA, length(cnt)),  # Empty data
           xlab = slbl,  # Lable x axis
           #  ylab = tbl,  # Label y axis
@@ -540,7 +559,7 @@ render_freqplot.2way <- function(dat, tbl1, tbl2, plt) {
         op <- par(mar = pmar)
 
         # Create empty plot
-        b1 <- barplot(
+        p1 <- barplot(
           rep(NA, length(cnt)),  # Empty data
           xlab = tbl2,  # Lable x axis
           ylab = slbl,  # Label y axis
@@ -562,7 +581,7 @@ render_freqplot.2way <- function(dat, tbl1, tbl2, plt) {
 
 
       # Add barplot
-      b2 <- barplot(
+      p2 <- barplot(
         cnt,   # Data
         horiz = horz,
         col  = bgcolor, # adjustcolor("grey80", alpha.f = 0.45),
@@ -589,7 +608,7 @@ render_freqplot.2way <- function(dat, tbl1, tbl2, plt) {
       mtext(tbl2, side = 1, line = cmar[1] - 2, outer = TRUE)
 
       # Add axis
-      axis(1, las = 1, col.ticks = "grey55", at = as.vector(b2),
+      axis(1, las = 1, col.ticks = "grey55", at = as.vector(p2),
            labels = v2, col = "grey70", cex.axis = 1.2)  # Create axis
 
       # Outer border
