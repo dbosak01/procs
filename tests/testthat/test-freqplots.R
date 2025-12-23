@@ -612,7 +612,7 @@ test_that("freqplot13: Two-way proc_freq with horizontal plots and grouphorizont
                    weight = Count,
                    titles = "My first Frequency Plot")
 
-  pres
+  res
 
   expect_equal(is.null(res), FALSE)
 
