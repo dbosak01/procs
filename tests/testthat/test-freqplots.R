@@ -401,7 +401,7 @@ test_that("freqplot9: One-way proc_freq with plots edge cases.", {
 })
 
 
-test_that("freqplot10: Two-way proc_freq with vertical plots and weight works.", {
+test_that("freqplot10: Two-way proc_freq with vertical plots and groupvertical works.", {
 
   # Single bar chart
   res <- proc_freq(dat, tables = "Eyes * Hair",
@@ -469,7 +469,7 @@ test_that("freqplot10: Two-way proc_freq with vertical plots and weight works.",
 
 
 
-test_that("freqplot11: Two-way proc_freq with horizontal plots and weight works.", {
+test_that("freqplot11: Two-way proc_freq with horizontal plots and groupvertical works.", {
 
   # Single bar chart
   res <- proc_freq(dat, tables = "Hair * Eyes",
@@ -534,7 +534,7 @@ test_that("freqplot11: Two-way proc_freq with horizontal plots and weight works.
 
 })
 
-
+# ** Missing labels ***
 test_that("freqplot12: Two-way proc_freq with vertical plots and grouphorizontal works.", {
 
   # Single bar chart
@@ -607,12 +607,12 @@ test_that("freqplot13: Two-way proc_freq with horizontal plots and grouphorizont
 
   # Single bar chart
   res <- proc_freq(dat, tables = "Hair * Eyes",
-                   plots = freqplot(orient = "horizontal"),
+                   plots = freqplot(orient = "horizontal", twoway = "grouphorizontal"),
                    output = report,
                    weight = Count,
                    titles = "My first Frequency Plot")
 
-  res
+  pres
 
   expect_equal(is.null(res), FALSE)
 
@@ -621,7 +621,7 @@ test_that("freqplot13: Two-way proc_freq with horizontal plots and grouphorizont
 
   # Two bar charts
   res <- proc_freq(dat, tables = "Eyes * Hair",
-                   plots = freqplot(orient = "horizontal"),
+                   plots = freqplot(orient = "horizontal", twoway = "grouphorizontal"),
                    output = report,
                    weight = Count,
                    titles = "My first Frequency Plot")
@@ -638,7 +638,8 @@ test_that("freqplot13: Two-way proc_freq with horizontal plots and grouphorizont
 
   # Single dot plot
   res <- proc_freq(dat, tables = "Hair * Eyes",
-                   plots = freqplot(type = "dotplot", orient = "horizontal"),
+                   plots = freqplot(type = "dotplot", orient = "horizontal",
+                                    twoway = "grouphorizontal"),
                    output = report,
                    weight = Count,
                    titles = "My first Frequency Plot")
@@ -652,7 +653,8 @@ test_that("freqplot13: Two-way proc_freq with horizontal plots and grouphorizont
 
   # Two dot plots
   res <- proc_freq(dat, tables = "Eyes * Hair",
-                   plots = freqplot(type = "dotplot", orient = "horizontal"),
+                   plots = freqplot(type = "dotplot", orient = "horizontal",
+                                    twoway = "grouphorizontal"),
                    output = report,
                    weight = Count,
                    titles = "My first Frequency Plot")

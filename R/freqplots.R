@@ -411,9 +411,10 @@ render_freqplot.2way <- function(dat, tbl1, tbl2, plt) {
 
     # Reverse order for dotplot.
     # Don't know why.
-    if (plt$type == "dotplot") {
+    if (plt$type == "dotplot" & plt$orient == "horizontal") {
       dt$seq <- seq(nrow(dt), 1)
       dt <- sort(dt, by = "seq")
+      v2 <- unique(dat[[var2]])
     }
 
 
@@ -547,6 +548,14 @@ render_freqplot.2way <- function(dat, tbl1, tbl2, plt) {
         # Tbl1 Label
         mtext(paste(mlbl, "=", vl), side = 3, line = .3, cex = .9)
 
+        # Add axis
+        if (lastplot) {
+          if (plt$twoway == "groupvertical") {
+              axis(1, las = 1, col.ticks = "grey55", at = as.vector(p2),
+                   labels = v2, col = "grey70", cex.axis = 1.3)  # Create axis
+          }
+        }
+
 
       } else {  # Horizontal
 
@@ -580,13 +589,30 @@ render_freqplot.2way <- function(dat, tbl1, tbl2, plt) {
         abline(h = xdat, lty = "dotted", col = "gray85")
 
         # Axes
-        axis(2, at = xdat, labels = v2nms, las = 1, col.ticks = "grey55", cex.axis = 1.2)
+        if (plt$twoway == "groupvertical") {
 
-        # Axis on last plot
-        if (lastplot) {
+          # Left axis
+          axis(2, at = xdat, labels = v2nms, las = 1, col.ticks = "grey55", cex.axis = 1.2)
+
+          # Axis on last plot
+          if (lastplot) {
+            axis(1, las = 1, col.ticks = "grey55",
+                 col = "grey70", cex.axis = 1.2)
+          }
+
+        } else {
+
+          # Left axis
+          if (firstplot) {
+            axis(2, at = xdat, labels = v2nms, las = 1, col.ticks = "grey55", cex.axis = 1.2)
+          }
+
+          # Bottom axis
           axis(1, las = 1, col.ticks = "grey55",
                col = "grey70", cex.axis = 1.2)
         }
+
+
 
       }
 
@@ -611,19 +637,35 @@ render_freqplot.2way <- function(dat, tbl1, tbl2, plt) {
         mtext(paste(mlbl, "=", vl), side = 3, line = .3, cex = .9)
 
         # # Create axis
-        if (lastplot) {
+        if (plt$twoway == "groupvertical" & lastplot) {
+          a1 <- axis(1, las = 1, col.ticks = "grey55",
+                     col = "grey70", cex.axis = 1.2)
+        } else if (plt$twoway == "grouphorizontal") {
+
           a1 <- axis(1, las = 1, col.ticks = "grey55",
                      col = "grey70", cex.axis = 1.2)
         } else {
           a1 <- axis(1, labels = FALSE, tick = FALSE)
         }
 
-        # Axes
-        axis(2, at = p1, labels = v2nms, las = 1,
-             col.ticks = "grey55", cex.axis = 1.3)
-
         ## Add gridlines based on axis created above
         abline(v = a1, col = "grey90", lwd = 1)
+
+        # Left axis
+        if (plt$twoway == "grouphorizontal") {
+          if (firstplot) {
+            axis(2, at = p1, labels = v2nms, las = 1,
+                 col.ticks = "grey55", cex.axis = 1.3)
+          }
+        }
+
+        # Left axis
+        if (plt$twoway == "groupvertical") {
+          if (plt$orient == "horizontal") {
+            axis(2, at = p1, labels = v2nms, las = 1,
+                 col.ticks = "grey55", cex.axis = 1.3)
+          }
+        }
 
       } else {  # Vertical
 
@@ -680,6 +722,16 @@ render_freqplot.2way <- function(dat, tbl1, tbl2, plt) {
              labels = v2, col = "grey70", cex.axis = 1.3)  # Create axis
       }
 
+      # Add axis
+      if (lastplot) {
+        if (plt$twoway == "groupvertical") {
+          if (plt$orient == "vertical") {
+            axis(1, las = 1, col.ticks = "grey55", at = as.vector(p2),
+                 labels = v2, col = "grey70", cex.axis = 1.3)  # Create axis
+          }
+        }
+      }
+
     }
 
     ## Frame around each plot
@@ -691,23 +743,18 @@ render_freqplot.2way <- function(dat, tbl1, tbl2, plt) {
       # Add title
       mtext(ttl, side = 3, line = 1, outer = TRUE, font = 2, cex = 1.2)
 
-      # Add labels
+      # Left label
       mtext(llbl, side = 2, line = cmar[2] - 2, outer = TRUE)
 
+      # Adjustment if last chart is not filled up
       if (plt$twoway == "groupvertical") {
         lbladj <- 2 + ((3 - pltcnt) * 12)
       } else {
         lbladj <- 2
       }
-      mtext(blbl, side = 1, line = cmar[1] - lbladj, outer = TRUE)
 
-      # Add axis
-      if (plt$twoway == "groupvertical") {
-        if (plt$orient == "vertical") {
-          axis(1, las = 1, col.ticks = "grey55", at = as.vector(p2),
-               labels = v2, col = "grey70", cex.axis = 1.3)  # Create axis
-        }
-      }
+      # Bottom label
+      mtext(blbl, side = 1, line = cmar[1] - lbladj, outer = TRUE)
 
       # Outer border
       box("outer", col = "grey70", lwd = 1)
