@@ -345,10 +345,8 @@ render_freqplot.2way <- function(dat, tbl1, tbl2, plt) {
 
   # Assign plot margins
   if (plt$orient == "vertical") {
-    pmar <- c(0.5, 0, 0, 1) + 0.1
     cmar <- c(5, 5, 4, 2) + 0.1
   } else {
-    pmar <- c(0.5, 0, 0, 0) + 0.1
     cmar <- c(5, 6, 4, 2) + 0.1
   }
 
@@ -361,7 +359,7 @@ render_freqplot.2way <- function(dat, tbl1, tbl2, plt) {
   # Assign Cat variables
   # to get orientation correct.
   # SAS is inconsistent.
-  if (plt$type == "dotplot") {
+  if (plt$type == "dotplot" | plt$twoway == "grouphorizontal") {
     if (plt$orient == "vertical") {
       var1 <- "CAT2"
       var2 <- "CAT1"
@@ -480,7 +478,11 @@ render_freqplot.2way <- function(dat, tbl1, tbl2, plt) {
       jpeg(pth, width = wd, height = ht, quality = 100)
 
       # Set up for 3 charts on plot
-      par(mfrow = c(3, 1), oma = cmar)
+      if (plt$twoway == "groupvertical") {
+        par(mfrow = c(3, 1), oma = cmar)
+      } else {
+        par(mfrow = c(1, 3), oma = cmar)
+      }
 
       # Put plot in reporter plot object
       pret <- create_plot(pth, height = hti, width = wdi)
@@ -501,7 +503,11 @@ render_freqplot.2way <- function(dat, tbl1, tbl2, plt) {
         xlm <- c(.5, length(cnt) + .5)
 
         # Plot
-        op <- par(mar = c(0.5, 0, 1, 0) + 0.1)
+        if (plt$twoway == "groupvertical") {
+          op <- par(mar = c(0.5, 0, 1, 0) + 0.1)
+        } else {
+          op <- par(mar = c(0.5, 0, 1, .5) + 0.1)
+        }
 
         plot(
           xdat, cnt,
@@ -524,7 +530,19 @@ render_freqplot.2way <- function(dat, tbl1, tbl2, plt) {
         abline(v = xdat, lty = "dotted", col = "gray85")
 
         # Axes
-        axis(2, las = 1, col.ticks = "grey55", cex.axis = 1.2) # at = seq(0, 400, by = 100)
+        if (plt$twoway == "grouphorizontal") {
+          # Left axis
+          if (firstplot) {
+            axis(2, las = 1, col.ticks = "grey55", cex.axis = 1.2)
+          }
+          # Bottom axis
+          axis(1, las = 1, col.ticks = "grey55", at = as.vector(p2),
+               labels = v2, col = "grey70", cex.axis = 1.3)
+
+        } else if (plt$twoway == "groupvertical") {
+          # Left axis
+          axis(2, las = 1, col.ticks = "grey55", cex.axis = 1.2)
+        }
 
         # Tbl1 Label
         mtext(paste(mlbl, "=", vl), side = 3, line = .3, cex = .9)
@@ -610,7 +628,11 @@ render_freqplot.2way <- function(dat, tbl1, tbl2, plt) {
       } else {  # Vertical
 
         # Set custom margins
-        op <- par(mar = pmar)
+        if (plt$twoway == "groupvertical") {
+          op <- par(mar = c(0.5, 0, 0, 1) + 0.1)
+        } else {
+          op <- par(mar = c(0.5, 0, 1, .5) + 0.1)
+        }
 
         # Create empty plot
         p1 <- barplot(
@@ -624,13 +646,20 @@ render_freqplot.2way <- function(dat, tbl1, tbl2, plt) {
 
         # Get tick marks for ablines
         # a1 <- axis(1, las = 1, col.ticks = "grey55")  # Create axis
-        a2 <- axis(2, las = 1, col.ticks = "grey55", cex.axis = 1.3)  # Create axis
+        if (plt$twoway == "groupvertical" |
+            (plt$twoway == "grouphorizontal" & firstplot)) {
+          a2 <- axis(2, las = 1, col.ticks = "grey55", cex.axis = 1.3)  # Create axis
+        }
 
         ## Add gridlines based on axis created above
         abline(h = a2, col = "grey90", lwd = 1)
 
         # Add label
-        mtext(paste(mlbl, "=", vl), side = 4, line = .25, cex = .9)
+        if (plt$twoway == "groupvertical") {
+          mtext(paste(mlbl, "=", vl), side = 4, line = .25, cex = .9)
+        } else {
+          mtext(paste(mlbl, "=", vl), side = 3, line = .25, cex = .9)
+        }
       }
 
 
@@ -646,6 +675,11 @@ render_freqplot.2way <- function(dat, tbl1, tbl2, plt) {
         axes = FALSE  # Already created above
       )
 
+      if (plt$twoway == "grouphorizontal" & plt$orient == "vertical") {
+        axis(1, las = 1, col.ticks = "grey55", at = as.vector(p2),
+             labels = v2, col = "grey70", cex.axis = 1.3)  # Create axis
+      }
+
     }
 
     ## Frame around each plot
@@ -660,13 +694,19 @@ render_freqplot.2way <- function(dat, tbl1, tbl2, plt) {
       # Add labels
       mtext(llbl, side = 2, line = cmar[2] - 2, outer = TRUE)
 
-      lbladj <- 2 + ((3 - pltcnt) * 12)
+      if (plt$twoway == "groupvertical") {
+        lbladj <- 2 + ((3 - pltcnt) * 12)
+      } else {
+        lbladj <- 2
+      }
       mtext(blbl, side = 1, line = cmar[1] - lbladj, outer = TRUE)
 
       # Add axis
-      if (plt$orient == "vertical") {
-        axis(1, las = 1, col.ticks = "grey55", at = as.vector(p2),
-             labels = v2, col = "grey70", cex.axis = 1.3)  # Create axis
+      if (plt$twoway == "groupvertical") {
+        if (plt$orient == "vertical") {
+          axis(1, las = 1, col.ticks = "grey55", at = as.vector(p2),
+               labels = v2, col = "grey70", cex.axis = 1.3)  # Create axis
+        }
       }
 
       # Outer border

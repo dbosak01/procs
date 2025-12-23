@@ -1,6 +1,7 @@
 # procs 1.0.8
 
 * Added "order" parameter to `proc_freq()`.
+* Added "plots" parameter to `proc_freq()`, which accepts a `freqplot()` object.
 
 
 # procs 1.0.7
