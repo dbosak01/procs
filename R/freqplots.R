@@ -315,8 +315,30 @@ render_freqplot.1way <- function(dat, tbl, plt) {
 
 }
 
-#' @noRd
+
 render_freqplot.2way <- function(dat, tbl1, tbl2, plt) {
+
+  if (plt$twoway %in% c("cluster", "stacked")) {
+
+    ret <- render_freqplot.nongroup(dat, tbl1, tbl2, plt)
+
+  #   ret <- render_freqplot.cluster(dat, tbl1, tbl2, plt)
+  #
+  # } else if (plt$twoway == "stacked") {
+  #
+  #   ret <- render_freqplot.stacked(dat, tbl1, tbl2, plt)
+
+  } else {
+
+    ret <- render_freqplot.group(dat, tbl1, tbl2, plt)
+  }
+
+
+  return(ret)
+}
+
+#' @noRd
+render_freqplot.group <- function(dat, tbl1, tbl2, plt) {
 
   # Standard height and width
   hti <- 4.5  # Height in inches
@@ -775,6 +797,544 @@ render_freqplot.2way <- function(dat, tbl1, tbl2, plt) {
   return(ret)
 
 }
+
+
+#' @title Render the Frequency Plot - One Way plot
+#' @description A function to render the frequency plot.
+#' @param plt The object to render
+#' @param dat The data to render
+#' @param table The table request to render.
+#' @returns The path to the plot.
+#' @import graphics
+#' @import grDevices
+#' @import reporter
+#' @noRd
+# render_freqplot.cluster <- function(dat, tbl1, tbl2, plt) {
+#
+#   # Create temp file path
+#   pth <- tempfile(fileext = ".jpg")
+#
+#   # Standard height and width
+#   hti <- 4.5  # Height in inches
+#   wdi <- 6  # Width in inches
+#   bml <- 6  # bottom margin lines
+#
+#   # Convert inches to pixels
+#   ht <- hti * 96
+#   wd <- wdi * 96
+#
+#   # Set bar background color
+#   bgcolor <- "#E5EAF2"
+#   bgcolor <- c("royalblue3", "indianred2", "seagreen3")
+#
+#   # Set orientation
+#   horz <- FALSE  # Default to vertical
+#   if (plt$orient == "horizontal") {
+#     horz <- TRUE
+#   }
+#
+#   # Create Title
+#   ttl <- paste0("Distribution of ", tbl1, " by ", tbl2)
+#
+#   # Output to image file
+#   # All output types accept jpeg
+#   # So start with that
+#   jpeg(pth, width = wd, height = ht, quality = 100)
+#
+#   # Assign Cat variables
+#   # to get orientation correct.
+#   # SAS is inconsistent.
+#   if (plt$type == "dotplot") {
+#     if (plt$orient == "vertical") {
+#       var1 <- "CAT2"
+#       var2 <- "CAT1"
+#     } else {
+#       var1 <- "CAT2"
+#       var2 <- "CAT1"
+#     }
+#   } else {
+#     if (plt$orient == "vertical") {
+#       var1 <- "CAT1"
+#       var2 <- "CAT2"
+#     } else {
+#       var1 <- "CAT1"
+#       var2 <- "CAT2"
+#     }
+#   }
+#
+#   # Get distinct values
+#   v1 <- unique(dat[[var1]])
+#   v2 <- unique(dat[[var2]])
+#   dtm <- NULL
+#   dtna <- NULL
+#   mx <- 0
+#
+#   # Create matrix
+#   # v1 in rows and v2 in columns
+#   for (vl in v2) {
+#
+#     dt <- dat[dat[[var2]] == vl, ]
+#
+#     # Prepare data
+#     if (plt$scale == "percent") {
+#
+#       cnt <- as.numeric(dt$PCT)
+#       slbl <- "Percent"
+#
+#     } else if (plt$scale == "log") {
+#
+#       cnt <- as.numeric(log10(dt$CNT))
+#       slbl <- "Log Frequency"
+#
+#     } else if (plt$scale == "sqrt") {
+#
+#       cnt <- as.numeric(sqrt(dt$CNT))
+#       slbl <- "Sqrt Frequency"
+#
+#     } else {  # Default to Frequency
+#
+#       cnt <- as.numeric(dt$CNT)
+#       slbl <- "Frequency"
+#
+#     }
+#
+#     nas <- rep(NA, length(cnt))
+#     mx <- max(c(mx, cnt))
+#
+#     if (is.null(dtm)) {
+#       dtm <- data.frame(cnt)
+#       dtna <- data.frame(nas)
+#     } else {
+#       dtm <- cbind(dtm, cnt)
+#       dtna <- cbind(dtna, nas)
+#     }
+#   }
+#
+#   # Assign names
+#   names(dtm) <- NULL
+#   rownames(dtm) <- v1
+#
+#   # NA data names
+#   names(dtna) <- NULL
+#   rownames(dtna) <- v1
+#
+#   # Convert to matrix
+#   dtm <- as.matrix(dtm)
+#   dtna <- as.matrix(dtna)
+#
+#   # Assign labels
+#   if (plt$orient == "vertical") {
+#     blbl <- tbl2
+#     llbl <- slbl
+#   } else {
+#     blbl <- slbl
+#     llbl <- tbl2
+#   }
+#
+#   # Get scale
+#   scl <- c(0, mx * 1.05)
+#
+#   # Get original margins
+#   omar <- par()$mar
+#
+#   if (plt$type == "dotplot") {
+#     stop("Two-way cluster option is not available for dot type frequency plots.")
+#   } else {  # Bar chart
+#
+#     if (horz == TRUE) {  # Horizontal
+#
+#       # Set custom margins
+#       op <- par(mar = c(5, 6, 4, 2) + 0.1)
+#
+#       # Create empty plot
+#       b1 <- barplot(
+#         dtna,  # Empty data
+#         beside = TRUE,
+#         main = ttl,  # Title
+#         xlab = blbl,  # Lable x axis
+#         #  ylab = tbl,  # Label y axis
+#         xlim = scl,  # x axis scale
+#         horiz = TRUE,
+#         axes = FALSE  # Don't create axis yet
+#       )
+#
+#
+#       mtext(llbl, side = 2, line = op$mar[1] - 1)
+#
+#       # Get tick marks for ablines
+#       a1 <- axis(1, las = 1, col.ticks = "grey55")  # Create axis
+#       # a2 <- axis(2, las = 1, col.ticks = "grey55")  # Create axis
+#
+#       ## Add gridlines based on axis created above
+#       abline(v = a1, col = "grey90", lwd = 1)
+#
+#     } else {  # Vertical
+#
+#       # Set custom margins
+#       op <- par(mar = c(5, 5, 4, 2) + 0.1)
+#
+#       # Create empty plot.
+#       # xlim created automatically
+#       # and passed to next barplot
+#       b1 <- barplot(
+#         dtna,  # Empty data
+#         beside = TRUE,
+#         main = ttl,  # Title
+#         xlab = blbl,  # Lable x axis
+#         ylab = llbl,  # Label y axis
+#         ylim = scl,  # y axis scale
+#         horiz = FALSE,
+#         axes = FALSE  # Don't create axis yet
+#       )
+#
+#       # Get tick marks for ablines
+#       # a1 <- axis(1, las = 1, col.ticks = "grey55")  # Create axis
+#       a2 <- axis(2, las = 1, col.ticks = "grey55")  # Create axis
+#
+#       ## Add gridlines based on axis created above
+#       abline(h = a2, col = "grey90", lwd = 1)
+#     }
+#
+#
+#     # Add barplot
+#     b2 <- barplot(
+#       dtm,   # Data
+#       beside = TRUE,
+#       horiz = horz,
+#       names.arg = v2,
+#       col  = bgcolor,
+#       border = "grey55",
+#       las = 1,
+#       tick = TRUE,
+#       add = TRUE,   # Add to existing plot
+#       axes = FALSE  # Already created above
+#     )
+#
+#   }
+#
+#
+#   ## frame
+#   box(col = "grey70", lwd = 1)
+#   box("figure", col = "grey70", lwd = 1)
+#
+#   # Restore margins
+#   par(mar = omar)
+#
+#   # Close device context
+#   dev.off()
+#
+#   # Put plot in reporter plot object
+#   ret <- create_plot(pth, height = hti, width = wdi)
+#
+#   return(ret)
+#
+# }
+
+
+render_freqplot.nongroup <- function(dat, tbl1, tbl2, plt) {
+
+  # Create temp file path
+  pth <- tempfile(fileext = ".jpg")
+
+  # Standard height and width
+  hti <- 4.5  # Height in inches
+  wdi <- 6  # Width in inches
+  bml <- 6  # bottom margin lines
+
+  # Convert inches to pixels
+  ht <- hti * 96
+  wd <- wdi * 96
+
+  # Set orientation
+  horz <- FALSE  # Default to vertical
+  if (plt$orient == "horizontal") {
+    horz <- TRUE
+  }
+
+  # Set cluster flag
+  clust <- TRUE
+  if (plt$twoway == "stacked") {
+    clust <- FALSE
+  }
+
+  # Create Title
+  ttl <- paste0("Distribution of ", tbl1, " by ", tbl2)
+
+  # Output to image file
+  # All output types accept jpeg
+  # So start with that
+  jpeg(pth, width = wd, height = ht, quality = 100)
+
+  # Assign Cat variables
+  # to get orientation correct.
+  # SAS is inconsistent.
+  if (plt$type == "dotplot") {
+    if (plt$orient == "vertical") {
+      var1 <- "CAT2"
+      var2 <- "CAT1"
+    } else {
+      var1 <- "CAT2"
+      var2 <- "CAT1"
+    }
+  } else {
+    if (plt$orient == "vertical") {
+      var1 <- "CAT1"
+      var2 <- "CAT2"
+    } else {
+      var1 <- "CAT1"
+      var2 <- "CAT2"
+    }
+  }
+
+  # Get distinct values
+  v1 <- unique(dat[[var1]])
+  v2 <- unique(dat[[var2]])
+  dtm <- NULL
+  dtna <- NULL
+  mx <- 0
+
+  # Create matrix
+  # v1 in rows and v2 in columns
+  for (vl in v2) {
+
+    dt <- dat[dat[[var2]] == vl, ]
+
+    # Prepare data
+    if (plt$scale == "percent") {
+
+      cnt <- as.numeric(dt$PCT)
+      slbl <- "Percent"
+
+    } else if (plt$scale == "log") {
+
+      cnt <- as.numeric(log10(dt$CNT))
+      slbl <- "Log Frequency"
+
+    } else if (plt$scale == "sqrt") {
+
+      cnt <- as.numeric(sqrt(dt$CNT))
+      slbl <- "Sqrt Frequency"
+
+    } else {  # Default to Frequency
+
+      cnt <- as.numeric(dt$CNT)
+      slbl <- "Frequency"
+
+    }
+
+    nas <- rep(NA, length(cnt))
+    mx <- max(c(mx, cnt))
+
+    if (is.null(dtm)) {
+      dtm <- data.frame(cnt)
+      dtna <- data.frame(nas)
+    } else {
+      dtm <- cbind(dtm, cnt)
+      dtna <- cbind(dtna, nas)
+    }
+  }
+
+  # Assign names
+  names(dtm) <- NULL
+  rownames(dtm) <- v1
+
+  # NA data names
+  names(dtna) <- NULL
+  rownames(dtna) <- v1
+
+  # Get scale
+  if (clust) {
+    scl <- c(0, mx * 1.05)
+  } else {
+    mx <- sum(dtm[[1]])
+    for (idx in seq_along(v2)) {
+      tmx <- sum(dtm[[idx]])
+      if (tmx > mx) {
+        mx <- tmx
+      }
+    }
+    scl <- c(0, mx * 1.05)
+  }
+
+  # Convert to matrix
+  dtm <- as.matrix(dtm)
+  dtna <- as.matrix(dtna)
+
+  # Assign labels
+  if (plt$orient == "vertical") {
+    blbl <- tbl2
+    llbl <- slbl
+  } else {
+    blbl <- slbl
+    llbl <- tbl2
+  }
+
+  # Set bar background color
+  bgcolor <- "#E5EAF2"
+  # bgcolor <- c("royalblue3", "indianred2", "seagreen3")
+  # bgcolor <- hcl.colors(length(v1), palette  = "cold")
+  bgpalette <- c("#B7BFD9", "#E8ADAD", "#B3D2D0", "#D4C3AD", "#DBC4E6")
+  bgcolor <- bgpalette[seq(1, length(v1))]
+
+  # Get original margins
+  omar <- par()$mar
+
+  if (plt$type == "dotplot" & plt$twoway == "cluster") {
+    stop("Two-way cluster option is not available for dot type frequency plots.")
+
+  } else if (plt$type == "dotplot") {
+
+    if (horz == TRUE) {  # Horizontal
+
+      # Set custom margins
+      op <- par(mar = c(5, 6, 4, 2) + 0.1)
+
+      # Create empty plot
+      b1 <- plot(
+        dtna,  # Empty data
+        main = ttl,  # Title
+        xlab = blbl,  # Label x axis
+        xlim = scl,  # x axis scale
+        horiz = TRUE,
+        axes = FALSE  # Don't create axis yet
+      )
+
+
+      mtext(llbl, side = 2, line = op$mar[1] - 1)
+
+      # Get tick marks for ablines
+      a1 <- axis(1, las = 1, col.ticks = "grey55")  # Create axis
+      # a2 <- axis(2, las = 1, col.ticks = "grey55")  # Create axis
+
+      ## Add gridlines based on axis created above
+      abline(v = a1, col = "grey90", lwd = 1)
+
+    } else {  # Vertical
+
+      # Set custom margins
+      op <- par(mar = c(5, 5, 4, 2) + 0.1)
+
+      # Create empty plot.
+      # xlim created automatically
+      # and passed to next barplot
+      b1 <- plot(
+        dtna,  # Empty data
+        main = ttl,  # Title
+        xlab = blbl,  # Label x axis
+        ylab = llbl,  # Label y axis
+        ylim = scl,  # y axis scale
+        axes = FALSE  # Don't create axis yet
+      )
+
+      # Get tick marks for ablines
+      # a1 <- axis(1, las = 1, col.ticks = "grey55")  # Create axis
+      a2 <- axis(2, las = 1, col.ticks = "grey55")  # Create axis
+
+      ## Add gridlines based on axis created above
+      abline(h = a2, col = "grey90", lwd = 1)
+    }
+
+
+
+    # Add points
+    for (i in seq_along(v1)) {
+      points(seq_along(v2),
+             counts[i, ],
+             pch = 1,
+             col = cols[i],
+             cex = 1.2)
+    }
+
+
+  } else {  # Bar chart
+
+    if (horz == TRUE) {  # Horizontal
+
+      # Set custom margins
+      op <- par(mar = c(5, 6, 4, 2) + 0.1)
+
+      # Create empty plot
+      b1 <- barplot(
+        dtna,  # Empty data
+        beside = clust,
+        main = ttl,  # Title
+        xlab = blbl,  # Label x axis
+        xlim = scl,  # x axis scale
+        axes = FALSE  # Don't create axis yet
+      )
+
+
+      mtext(llbl, side = 2, line = op$mar[1] - 1)
+
+      # Get tick marks for ablines
+      a1 <- axis(1, las = 1, col.ticks = "grey55")  # Create axis
+      # a2 <- axis(2, las = 1, col.ticks = "grey55")  # Create axis
+
+      ## Add gridlines based on axis created above
+      abline(v = a1, col = "grey90", lwd = 1)
+
+    } else {  # Vertical
+
+      # Set custom margins
+      op <- par(mar = c(5, 5, 4, 2) + 0.1)
+
+      # Create empty plot.
+      # xlim created automatically
+      # and passed to next barplot
+      b1 <- barplot(
+        dtna,  # Empty data
+        beside = clust,
+        main = ttl,  # Title
+        xlab = blbl,  # Label x axis
+        ylab = llbl,  # Label y axis
+        ylim = scl,  # y axis scale
+        horiz = FALSE,
+        axes = FALSE  # Don't create axis yet
+      )
+
+      # Get tick marks for ablines
+      # a1 <- axis(1, las = 1, col.ticks = "grey55")  # Create axis
+      a2 <- axis(2, las = 1, col.ticks = "grey55")  # Create axis
+
+      ## Add gridlines based on axis created above
+      abline(h = a2, col = "grey90", lwd = 1)
+    }
+
+
+    # Add barplot
+    b2 <- barplot(
+      dtm,   # Data
+      beside = clust,
+      horiz = horz,
+      names.arg = v2,
+      col  = bgcolor,
+      border = "grey55",
+      las = 1,
+      tick = TRUE,
+      add = TRUE,   # Add to existing plot
+      axes = FALSE  # Already created above
+    )
+
+  }
+
+
+  ## frame
+  box(col = "grey70", lwd = 1)
+  box("figure", col = "grey70", lwd = 1)
+
+  # Restore margins
+  par(mar = omar)
+
+  # Close device context
+  dev.off()
+
+  # Put plot in reporter plot object
+  ret <- create_plot(pth, height = hti, width = wdi)
+
+  return(ret)
+
+}
+
 
 #
 #

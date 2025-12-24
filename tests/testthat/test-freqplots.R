@@ -671,4 +671,188 @@ test_that("freqplot13: Two-way proc_freq with horizontal plots and grouphorizont
 })
 
 
+# Add legend
+test_that("freqplot14: Two-way proc_freq with clustered bar chart.", {
 
+  # Vertical bar chart
+  res <- proc_freq(dat, tables = "Eyes * Hair",
+                   plots = freqplot(orient = "vertical", twoway = "cluster"),
+                   output = report,
+                   weight = Count,
+                   titles = "My first Frequency Plot")
+
+  res
+
+  expect_equal(is.null(res), FALSE)
+  expect_equal("data.frame" %in% class(res[[1]]), TRUE)
+  expect_equal("plot_spec" %in% class(res[[2]]), TRUE)
+
+
+  # Horizontal bar chart
+  res <- proc_freq(dat, tables = "Eyes * Hair",
+                   plots = freqplot(orient = "horizontal", twoway = "cluster"),
+                   output = report,
+                   weight = Count,
+                   titles = "My first Frequency Plot")
+
+  res
+
+  expect_equal(is.null(res), FALSE)
+  expect_equal("data.frame" %in% class(res[[1]]), TRUE)
+  expect_equal("plot_spec" %in% class(res[[2]]), TRUE)
+
+  # Vertical bar chart
+  res <- proc_freq(dat, tables = "Hair * Eyes",
+                   plots = freqplot(type = "barchart", orient = "vertical", twoway = "cluster"),
+                   output = report,
+                   weight = Count,
+                   titles = "My first Frequency Plot")
+
+  res
+
+  expect_equal(is.null(res), FALSE)
+  expect_equal("data.frame" %in% class(res[[1]]), TRUE)
+  expect_equal("plot_spec" %in% class(res[[2]]), TRUE)
+
+
+  # Horizontal bar chart
+  res <- proc_freq(dat, tables = "Hair * Eyes",
+                   plots = freqplot(type = "barchart", orient = "horizontal", twoway = "cluster"),
+                   output = report,
+                   weight = Count,
+                   titles = "My first Frequency Plot")
+
+  res
+
+  expect_equal(is.null(res), FALSE)
+  expect_equal("data.frame" %in% class(res[[1]]), TRUE)
+  expect_equal("plot_spec" %in% class(res[[2]]), TRUE)
+
+
+})
+
+# Add legend
+test_that("freqplot15: Two-way proc_freq with stacked bar chart.", {
+
+  # Vertical bar chart
+  res <- proc_freq(dat, tables = "Eyes * Hair",
+                   plots = freqplot(orient = "vertical", twoway = "stacked"),
+                   output = report,
+                   weight = Count,
+                   titles = "My first Frequency Plot")
+
+  res
+
+  expect_equal(is.null(res), FALSE)
+  expect_equal("data.frame" %in% class(res[[1]]), TRUE)
+  expect_equal("plot_spec" %in% class(res[[2]]), TRUE)
+
+
+  # Horizontal bar chart
+  res <- proc_freq(dat, tables = "Eyes * Hair",
+                   plots = freqplot(orient = "horizontal", twoway = "stacked"),
+                   output = report,
+                   weight = Count,
+                   titles = "My first Frequency Plot")
+
+  res
+
+  expect_equal(is.null(res), FALSE)
+  expect_equal("data.frame" %in% class(res[[1]]), TRUE)
+  expect_equal("plot_spec" %in% class(res[[2]]), TRUE)
+
+  # Vertical bar chart
+  res <- proc_freq(dat, tables = "Hair * Eyes",
+                   plots = freqplot(type = "barchart", orient = "vertical", twoway = "stacked"),
+                   output = report,
+                   weight = Count,
+                   titles = "My first Frequency Plot")
+
+  res
+
+  expect_equal(is.null(res), FALSE)
+  expect_equal("data.frame" %in% class(res[[1]]), TRUE)
+  expect_equal("plot_spec" %in% class(res[[2]]), TRUE)
+
+
+  # Horizontal bar chart
+  res <- proc_freq(dat, tables = "Hair * Eyes",
+                   plots = freqplot(type = "barchart", orient = "horizontal", twoway = "stacked"),
+                   output = report,
+                   weight = Count,
+                   titles = "My first Frequency Plot")
+
+  res
+
+  expect_equal(is.null(res), FALSE)
+  expect_equal("data.frame" %in% class(res[[1]]), TRUE)
+  expect_equal("plot_spec" %in% class(res[[2]]), TRUE)
+
+
+})
+
+
+# Add legend
+# Add dot plot
+test_that("freqplot16: Two-way proc_freq with stacked dot plot.", {
+
+  # Vertical bar chart
+  res <- proc_freq(dat, tables = "Eyes * Hair",
+                   plots = freqplot(type = "dotplot", orient = "vertical",
+                                    twoway = "stacked"),
+                   output = report,
+                   weight = Count,
+                   titles = "My first Frequency Plot")
+
+  res
+
+  expect_equal(is.null(res), FALSE)
+  expect_equal("data.frame" %in% class(res[[1]]), TRUE)
+  expect_equal("plot_spec" %in% class(res[[2]]), TRUE)
+
+
+  # Horizontal bar chart
+  res <- proc_freq(dat, tables = "Eyes * Hair",
+                   plots = freqplot(type = "dotplot", orient = "horizontal",
+                                    twoway = "stacked"),
+                   output = report,
+                   weight = Count,
+                   titles = "My first Frequency Plot")
+
+  res
+
+  expect_equal(is.null(res), FALSE)
+  expect_equal("data.frame" %in% class(res[[1]]), TRUE)
+  expect_equal("plot_spec" %in% class(res[[2]]), TRUE)
+
+  # Vertical bar chart
+  res <- proc_freq(dat, tables = "Hair * Eyes",
+                   plots = freqplot(type = "dotplot", type = "barchart",
+                                    orient = "vertical", twoway = "stacked"),
+                   output = report,
+                   weight = Count,
+                   titles = "My first Frequency Plot")
+
+  res
+
+  expect_equal(is.null(res), FALSE)
+  expect_equal("data.frame" %in% class(res[[1]]), TRUE)
+  expect_equal("plot_spec" %in% class(res[[2]]), TRUE)
+
+
+  # Horizontal bar chart
+  res <- proc_freq(dat, tables = "Hair * Eyes",
+                   plots = freqplot(type = "dotplot", type = "barchart",
+                                    orient = "horizontal", twoway = "stacked"),
+                   output = report,
+                   weight = Count,
+                   titles = "My first Frequency Plot")
+
+  res
+
+  expect_equal(is.null(res), FALSE)
+  expect_equal("data.frame" %in% class(res[[1]]), TRUE)
+  expect_equal("plot_spec" %in% class(res[[2]]), TRUE)
+
+
+})
