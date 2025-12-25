@@ -763,7 +763,8 @@ test_that("freqplot15: Two-way proc_freq with stacked bar chart.", {
 
   # Vertical bar chart
   res <- proc_freq(dat, tables = "Hair * Eyes",
-                   plots = freqplot(type = "barchart", orient = "vertical", twoway = "stacked"),
+                   plots = freqplot(type = "barchart", orient = "vertical",
+                                    twoway = "stacked"),
                    output = report,
                    weight = Count,
                    titles = "My first Frequency Plot")
@@ -777,7 +778,8 @@ test_that("freqplot15: Two-way proc_freq with stacked bar chart.", {
 
   # Horizontal bar chart
   res <- proc_freq(dat, tables = "Hair * Eyes",
-                   plots = freqplot(type = "barchart", orient = "horizontal", twoway = "stacked"),
+                   plots = freqplot(type = "barchart", orient = "horizontal",
+                                    twoway = "stacked"),
                    output = report,
                    weight = Count,
                    titles = "My first Frequency Plot")
@@ -796,7 +798,7 @@ test_that("freqplot15: Two-way proc_freq with stacked bar chart.", {
 # Add dot plot
 test_that("freqplot16: Two-way proc_freq with stacked dot plot.", {
 
-  # Vertical bar chart
+  # Vertical dot plot
   res <- proc_freq(dat, tables = "Eyes * Hair",
                    plots = freqplot(type = "dotplot", orient = "vertical",
                                     twoway = "stacked"),
@@ -811,7 +813,7 @@ test_that("freqplot16: Two-way proc_freq with stacked dot plot.", {
   expect_equal("plot_spec" %in% class(res[[2]]), TRUE)
 
 
-  # Horizontal bar chart
+  # Horizontal dot plot
   res <- proc_freq(dat, tables = "Eyes * Hair",
                    plots = freqplot(type = "dotplot", orient = "horizontal",
                                     twoway = "stacked"),
@@ -825,9 +827,9 @@ test_that("freqplot16: Two-way proc_freq with stacked dot plot.", {
   expect_equal("data.frame" %in% class(res[[1]]), TRUE)
   expect_equal("plot_spec" %in% class(res[[2]]), TRUE)
 
-  # Vertical bar chart
+  # Vertical dot plot
   res <- proc_freq(dat, tables = "Hair * Eyes",
-                   plots = freqplot(type = "dotplot", type = "barchart",
+                   plots = freqplot(type = "dotplot",
                                     orient = "vertical", twoway = "stacked"),
                    output = report,
                    weight = Count,
@@ -840,9 +842,9 @@ test_that("freqplot16: Two-way proc_freq with stacked dot plot.", {
   expect_equal("plot_spec" %in% class(res[[2]]), TRUE)
 
 
-  # Horizontal bar chart
+  # Horizontal dot plot
   res <- proc_freq(dat, tables = "Hair * Eyes",
-                   plots = freqplot(type = "dotplot", type = "barchart",
+                   plots = freqplot(type = "dotplot",
                                     orient = "horizontal", twoway = "stacked"),
                    output = report,
                    weight = Count,

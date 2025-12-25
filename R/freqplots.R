@@ -1070,11 +1070,11 @@ render_freqplot.nongroup <- function(dat, tbl1, tbl2, plt) {
   # SAS is inconsistent.
   if (plt$type == "dotplot") {
     if (plt$orient == "vertical") {
-      var1 <- "CAT2"
-      var2 <- "CAT1"
+      var1 <- "CAT1"
+      var2 <- "CAT2"
     } else {
-      var1 <- "CAT2"
-      var2 <- "CAT1"
+      var1 <- "CAT1"
+      var2 <- "CAT2"
     }
   } else {
     if (plt$orient == "vertical") {
@@ -1143,9 +1143,7 @@ render_freqplot.nongroup <- function(dat, tbl1, tbl2, plt) {
   rownames(dtna) <- v1
 
   # Get scale
-  if (clust) {
-    scl <- c(0, mx * 1.05)
-  } else {
+  if (plt$type == "barchart" & plt$twoway == "stacked") {
     mx <- sum(dtm[[1]])
     for (idx in seq_along(v2)) {
       tmx <- sum(dtm[[idx]])
@@ -1153,6 +1151,8 @@ render_freqplot.nongroup <- function(dat, tbl1, tbl2, plt) {
         mx <- tmx
       }
     }
+    scl <- c(0, mx * 1.05)
+  } else {
     scl <- c(0, mx * 1.05)
   }
 
@@ -1171,10 +1171,16 @@ render_freqplot.nongroup <- function(dat, tbl1, tbl2, plt) {
 
   # Set bar background color
   bgcolor <- "#E5EAF2"
-  # bgcolor <- c("royalblue3", "indianred2", "seagreen3")
-  # bgcolor <- hcl.colors(length(v1), palette  = "cold")
-  bgpalette <- c("#B7BFD9", "#E8ADAD", "#B3D2D0", "#D4C3AD", "#DBC4E6")
-  bgcolor <- bgpalette[seq(1, length(v1))]
+  if (plt$type == "barchart") {
+    bgpalette <- c("#B7BFD9", "#E8ADAD", "#B3D2D0", "#D4C3AD", "#DBC4E6")
+  } else {
+    bgpalette <- c("#445694", "#A23A2E", "#01665E", "#543005", "#9D3CDB")
+  }
+  if (length(v1) > 5) {
+    bgcolor <- bgpalette
+  } else {
+    bgcolor <- bgpalette[seq(1, length(v1))]
+  }
 
   # Get original margins
   omar <- par()$mar
@@ -1183,6 +1189,10 @@ render_freqplot.nongroup <- function(dat, tbl1, tbl2, plt) {
     stop("Two-way cluster option is not available for dot type frequency plots.")
 
   } else if (plt$type == "dotplot") {
+
+    # Low to high
+    xlm <- c(.5, length(v2) + .5)
+    xscl <- seq(1, length(v2))
 
     if (horz == TRUE) {  # Horizontal
 
@@ -1194,25 +1204,38 @@ render_freqplot.nongroup <- function(dat, tbl1, tbl2, plt) {
         dtna,  # Empty data
         main = ttl,  # Title
         xlab = blbl,  # Label x axis
+        ylab = "",
+        ylim = xlm,
         xlim = scl,  # x axis scale
-        horiz = TRUE,
+        # horiz = TRUE,
         axes = FALSE  # Don't create axis yet
       )
 
-
+      # Left label
       mtext(llbl, side = 2, line = op$mar[1] - 1)
 
       # Get tick marks for ablines
       a1 <- axis(1, las = 1, col.ticks = "grey55")  # Create axis
-      # a2 <- axis(2, las = 1, col.ticks = "grey55")  # Create axis
+      a2 <- axis(2, las = 1, col.ticks = "grey55", labels = v2, at = xscl)  # Create axis
 
       ## Add gridlines based on axis created above
-      abline(v = a1, col = "grey90", lwd = 1)
+      abline(h = a2, col = "grey90", lwd = 1, lty = 3)
+
+      # Add points
+      for (i in seq_along(v1)) {
+        points(dtm[ i, ],
+               seq_along(v2),
+               pch = 1,
+               col = bgcolor[i],
+               cex = 1.2)
+      }
 
     } else {  # Vertical
 
       # Set custom margins
       op <- par(mar = c(5, 5, 4, 2) + 0.1)
+
+
 
       # Create empty plot.
       # xlim created automatically
@@ -1223,27 +1246,28 @@ render_freqplot.nongroup <- function(dat, tbl1, tbl2, plt) {
         xlab = blbl,  # Label x axis
         ylab = llbl,  # Label y axis
         ylim = scl,  # y axis scale
+        xlim = xlm,
         axes = FALSE  # Don't create axis yet
       )
 
       # Get tick marks for ablines
-      # a1 <- axis(1, las = 1, col.ticks = "grey55")  # Create axis
+      a1 <- axis(1, las = 1, col.ticks = "grey55", labels = v2, at = xscl)  # Create axis
       a2 <- axis(2, las = 1, col.ticks = "grey55")  # Create axis
 
       ## Add gridlines based on axis created above
-      abline(h = a2, col = "grey90", lwd = 1)
+      abline(v = a1, col = "grey90", lwd = 1, lty = 3)
+
+
+      # Add points
+      for (i in seq_along(v1)) {
+        points(seq_along(v2),
+               dtm[i, ],
+               pch = 1,
+               col = bgcolor[i],
+               cex = 1.2)
+      }
     }
 
-
-
-    # Add points
-    for (i in seq_along(v1)) {
-      points(seq_along(v2),
-             counts[i, ],
-             pch = 1,
-             col = cols[i],
-             cex = 1.2)
-    }
 
 
   } else {  # Bar chart
