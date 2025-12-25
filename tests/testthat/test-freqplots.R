@@ -62,22 +62,22 @@ prt2 <- read.table(header = TRUE, text = '
 
 adsl <- read.table(header = TRUE, text = '
   SUBJID  ARM    SEX  RACE    AGE
-  "001"   "ARM A" "F"  "WHITE" 19
-  "002"   "ARM B" "F"  "WHITE" 21
-  "003"   "ARM C" "F"  "WHITE" 23
-  "004"   "ARM D" "F"  "BLACK" 28
-  "005"   "ARM A" "M"  "WHITE" 37
-  "006"   "ARM B" "M"  "WHITE" 34
-  "007"   "ARM C" "M"  "WHITE" 36
-  "008"   "ARM D" "M"  "WHITE" 30
-  "009"   "ARM A" "F"  "WHITE" 39
-  "010"   "ARM B" "F"  "WHITE" 31
-  "011"   "ARM C" "F"  "BLACK" 33
-  "012"   "ARM D" "F"  "WHITE" 38
-  "013"   "ARM A" "M"  "BLACK" 37
-  "014"   "ARM B" "M"  "WHITE" 34
-  "015"   "ARM C" "M"  "WHITE" 36
-  "016"   "ARM A" "M"  "WHITE" 40')
+  "001"   "Placebo" "F"  "WHITE" 19
+  "002"   "Drug A (Dose 20mg)" "F"  "WHITE" 21
+  "003"   "Drug A (Dose 40mg)" "F"  "WHITE" 23
+  "004"   "Competitor" "F"  "BLACK OR AFRICAN AMERICAN" 28
+  "005"   "Placebo" "M"  "WHITE" 37
+  "006"   "Drug A (Dose 20mg)" "M"  "WHITE" 34
+  "007"   "Drug A (Dose 40mg)" "M"  "WHITE" 36
+  "008"   "Competitor" "M"  "WHITE" 30
+  "009"   "Placebo" "F"  "WHITE" 39
+  "010"   "Drug A (Dose 20mg)" "F"  "WHITE" 31
+  "011"   "Drug A (Dose 40mg)" "F"  "BLACK OR AFRICAN AMERICAN" 33
+  "012"   "Competitor" "F"  "WHITE" 38
+  "013"   "Placebo" "M"  "BLACK OR AFRICAN AMERICAN" 37
+  "014"   "Drug A (Dose 20mg)" "M"  "WHITE" 34
+  "015"   "Drug A (Dose 40mg)" "M"  "WHITE" 36
+  "016"   "Placebo" "M"  "WHITE" 40')
 
 
 options("logr.output" = FALSE)
@@ -395,13 +395,45 @@ test_that("freqplot8: One-way proc_freq with plots scale options work.", {
 # - Real clinical data
 test_that("freqplot9: One-way proc_freq with plots edge cases.", {
 
+  # Single bar chart
+  res <- proc_freq(adsl, tables = "ARM * RACE",
+                   plots = freqplot(),
+                   output = report,
+                   weight = AGE,
+                   titles = "My first Frequency Plot")
+
+  res
+
+  expect_equal("data.frame" %in% class(res[[1]]), TRUE)
+  expect_equal("plot_spec" %in% class(res[[2]][[1]]), TRUE)
+  expect_equal("plot_spec" %in% class(res[[2]][[2]]), TRUE)
+
+
+})
+
+
+
+test_that("freqplot10: One-way proc_freq with plots more edge cases.", {
+
+  # Single bar chart
+  res <- proc_freq(adsl, tables = "ARM * RACE",
+                   plots = freqplot(),
+                   output = report,
+                   weight = AGE,
+                   titles = "My first Frequency Plot")
+
+  res
+
+  expect_equal("data.frame" %in% class(res[[1]]), TRUE)
+  expect_equal("plot_spec" %in% class(res[[2]][[1]]), TRUE)
+  expect_equal("plot_spec" %in% class(res[[2]][[2]]), TRUE)
 
 
 
 })
 
 
-test_that("freqplot10: Two-way proc_freq with vertical plots and groupvertical works.", {
+test_that("freqplot11: Two-way proc_freq with vertical plots and groupvertical works.", {
 
   # Single bar chart
   res <- proc_freq(dat, tables = "Eyes * Hair",
@@ -469,7 +501,7 @@ test_that("freqplot10: Two-way proc_freq with vertical plots and groupvertical w
 
 
 
-test_that("freqplot11: Two-way proc_freq with horizontal plots and groupvertical works.", {
+test_that("freqplot12: Two-way proc_freq with horizontal plots and groupvertical works.", {
 
   # Single bar chart
   res <- proc_freq(dat, tables = "Hair * Eyes",
@@ -535,7 +567,7 @@ test_that("freqplot11: Two-way proc_freq with horizontal plots and groupvertical
 })
 
 # ** Missing labels ***
-test_that("freqplot12: Two-way proc_freq with vertical plots and grouphorizontal works.", {
+test_that("freqplot13: Two-way proc_freq with vertical plots and grouphorizontal works.", {
 
   # Single bar chart
   res <- proc_freq(dat, tables = "Hair * Eyes",
@@ -603,7 +635,7 @@ test_that("freqplot12: Two-way proc_freq with vertical plots and grouphorizontal
 
 
 
-test_that("freqplot13: Two-way proc_freq with horizontal plots and grouphorizontal works.", {
+test_that("freqplot14: Two-way proc_freq with horizontal plots and grouphorizontal works.", {
 
   # Single bar chart
   res <- proc_freq(dat, tables = "Hair * Eyes",
@@ -672,7 +704,7 @@ test_that("freqplot13: Two-way proc_freq with horizontal plots and grouphorizont
 
 
 # Add legend
-test_that("freqplot14: Two-way proc_freq with clustered bar chart.", {
+test_that("freqplot15: Two-way proc_freq with clustered bar chart.", {
 
   # Vertical bar chart
   res <- proc_freq(dat, tables = "Eyes * Hair",
@@ -732,7 +764,7 @@ test_that("freqplot14: Two-way proc_freq with clustered bar chart.", {
 })
 
 # Add legend
-test_that("freqplot15: Two-way proc_freq with stacked bar chart.", {
+test_that("freqplot16: Two-way proc_freq with stacked bar chart.", {
 
   # Vertical bar chart
   res <- proc_freq(dat, tables = "Eyes * Hair",
@@ -796,7 +828,7 @@ test_that("freqplot15: Two-way proc_freq with stacked bar chart.", {
 
 # Add legend
 # Add dot plot
-test_that("freqplot16: Two-way proc_freq with stacked dot plot.", {
+test_that("freqplot17: Two-way proc_freq with stacked dot plot.", {
 
   # Vertical dot plot
   res <- proc_freq(dat, tables = "Eyes * Hair",

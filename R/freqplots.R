@@ -172,7 +172,7 @@ render_freqplot.1way <- function(dat, tbl, plt) {
       xlm <- c(.5, length(cnt) + .5)
 
       # Plot
-      op <- par(mar = c(5, 5, 4, 2) + 0.1)
+      op <- par(mar = c(5, 5, 2, .75) + 0.1)
 
       plot(
         xdat, cnt,
@@ -202,7 +202,7 @@ render_freqplot.1way <- function(dat, tbl, plt) {
       xlm <- c(length(cnt) + .5, .5)
 
       # Plot
-      op <- par(mar = c(5, 6, 4, 2) + 0.1)
+      op <- par(mar = c(5, 6, 2, .75) + 0.1)
 
       plot(
         cnt, xdat,
@@ -235,7 +235,7 @@ render_freqplot.1way <- function(dat, tbl, plt) {
     if (horz == TRUE) {  # Horizontal
 
       # Set custom margins
-      op <- par(mar = c(5, 6, 4, 2) + 0.1)
+      op <- par(mar = c(5, 6, 2, .75) + 0.1)
 
       # Create empty plot
       b1 <- barplot(
@@ -261,7 +261,7 @@ render_freqplot.1way <- function(dat, tbl, plt) {
     } else {  # Vertical
 
       # Set custom margins
-      op <- par(mar = c(5, 5, 4, 2) + 0.1)
+      op <- par(mar = c(5, 5, 2, .75) + 0.1)
 
     # Create empty plot
       b1 <- barplot(
@@ -344,6 +344,7 @@ render_freqplot.group <- function(dat, tbl1, tbl2, plt) {
   hti <- 4.5  # Height in inches
   wdi <- 6  # Width in inches
   bml <- 6  # bottom margin lines
+  tml <- 3  # Top margin lines
 
   # Convert inches to pixels
   ht <- hti * 96
@@ -367,9 +368,9 @@ render_freqplot.group <- function(dat, tbl1, tbl2, plt) {
 
   # Assign plot margins
   if (plt$orient == "vertical") {
-    cmar <- c(5, 5, 4, 2) + 0.1
+    cmar <- c(5, 5, tml, 2) + 0.1
   } else {
-    cmar <- c(5, 6, 4, 2) + 0.1
+    cmar <- c(5, 6, tml, 2) + 0.1
   }
 
   # Variables to control multiple plots
@@ -1040,6 +1041,7 @@ render_freqplot.nongroup <- function(dat, tbl1, tbl2, plt) {
   hti <- 4.5  # Height in inches
   wdi <- 6  # Width in inches
   bml <- 6.6  # bottom margin lines
+  tml <- 2    # Top margin lines
 
   # Convert inches to pixels
   ht <- hti * 96
@@ -1196,7 +1198,7 @@ render_freqplot.nongroup <- function(dat, tbl1, tbl2, plt) {
     if (horz == TRUE) {  # Horizontal
 
       # Set custom margins
-      op <- par(mar = c(bml, 7, 4, 2) + 0.1)
+      op <- par(mar = c(bml, 7, tml, .75) + 0.1)
 
       # Create empty plot
       b1 <- plot(
@@ -1232,7 +1234,7 @@ render_freqplot.nongroup <- function(dat, tbl1, tbl2, plt) {
     } else {  # Vertical
 
       # Set custom margins
-      op <- par(mar = c(bml, 5, 4, 2) + 0.1)
+      op <- par(mar = c(bml, 5, tml,  .75) + 0.1)
 
       # Create empty plot.
       # xlim created automatically
@@ -1269,10 +1271,14 @@ render_freqplot.nongroup <- function(dat, tbl1, tbl2, plt) {
 
   } else {  # Bar chart
 
+    # Low to high
+    xlm <- c(.5, length(v2) + .5)
+    xscl <- seq(1, length(v2))
+
     if (horz == TRUE) {  # Horizontal
 
       # Set custom margins
-      op <- par(mar = c(bml, 7, 4, 2) + 0.1)
+      op <- par(mar = c(bml, 7, tml, .75) + 0.1)
 
       # Create empty plot
       b1 <- barplot(
@@ -1280,7 +1286,9 @@ render_freqplot.nongroup <- function(dat, tbl1, tbl2, plt) {
         beside = clust,
         main = ttl,  # Title
         xlab = blbl,  # Label x axis
+        # ylim = xlm,   # Y axis scale
         xlim = scl,  # x axis scale
+        horiz = TRUE,
         axes = FALSE  # Don't create axis yet
       )
 
@@ -1289,7 +1297,7 @@ render_freqplot.nongroup <- function(dat, tbl1, tbl2, plt) {
 
       # Get tick marks for ablines
       a1 <- axis(1, las = 1, col.ticks = "grey55")  # Create axis
-      # a2 <- axis(2, las = 1, col.ticks = "grey55")  # Create axis
+      # a2 <- axis(2, las = 1, col.ticks = "grey55", labels = v2, at = xscl)
 
       ## Add gridlines based on axis created above
       abline(v = a1, col = "grey90", lwd = 1)
@@ -1297,7 +1305,7 @@ render_freqplot.nongroup <- function(dat, tbl1, tbl2, plt) {
     } else {  # Vertical
 
       # Set custom margins
-      op <- par(mar = c(bml, 5, 4, 2) + 0.1)
+      op <- par(mar = c(bml, 5, tml, .75) + 0.1)
 
       # Create empty plot.
       # xlim created automatically
