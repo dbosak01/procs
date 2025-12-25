@@ -1039,7 +1039,7 @@ render_freqplot.nongroup <- function(dat, tbl1, tbl2, plt) {
   # Standard height and width
   hti <- 4.5  # Height in inches
   wdi <- 6  # Width in inches
-  bml <- 6  # bottom margin lines
+  bml <- 6.6  # bottom margin lines
 
   # Convert inches to pixels
   ht <- hti * 96
@@ -1164,9 +1164,11 @@ render_freqplot.nongroup <- function(dat, tbl1, tbl2, plt) {
   if (plt$orient == "vertical") {
     blbl <- tbl2
     llbl <- slbl
+    glbl <- tbl1
   } else {
     blbl <- slbl
     llbl <- tbl2
+    glbl <- tbl1
   }
 
   # Set bar background color
@@ -1176,11 +1178,8 @@ render_freqplot.nongroup <- function(dat, tbl1, tbl2, plt) {
   } else {
     bgpalette <- c("#445694", "#A23A2E", "#01665E", "#543005", "#9D3CDB")
   }
-  if (length(v1) > 5) {
-    bgcolor <- bgpalette
-  } else {
-    bgcolor <- bgpalette[seq(1, length(v1))]
-  }
+  bgpalette <- rep(bgpalette, 20)
+  bgcolor <- bgpalette[seq(1, length(v1))]
 
   # Get original margins
   omar <- par()$mar
@@ -1197,7 +1196,7 @@ render_freqplot.nongroup <- function(dat, tbl1, tbl2, plt) {
     if (horz == TRUE) {  # Horizontal
 
       # Set custom margins
-      op <- par(mar = c(5, 6, 4, 2) + 0.1)
+      op <- par(mar = c(bml, 7, 4, 2) + 0.1)
 
       # Create empty plot
       b1 <- plot(
@@ -1212,7 +1211,7 @@ render_freqplot.nongroup <- function(dat, tbl1, tbl2, plt) {
       )
 
       # Left label
-      mtext(llbl, side = 2, line = op$mar[1] - 1)
+      mtext(llbl, side = 2, line = par()$mar[2] - 2)
 
       # Get tick marks for ablines
       a1 <- axis(1, las = 1, col.ticks = "grey55")  # Create axis
@@ -1227,15 +1226,13 @@ render_freqplot.nongroup <- function(dat, tbl1, tbl2, plt) {
                seq_along(v2),
                pch = 1,
                col = bgcolor[i],
-               cex = 1.2)
+               cex = 1.3)
       }
 
     } else {  # Vertical
 
       # Set custom margins
-      op <- par(mar = c(5, 5, 4, 2) + 0.1)
-
-
+      op <- par(mar = c(bml, 5, 4, 2) + 0.1)
 
       # Create empty plot.
       # xlim created automatically
@@ -1264,7 +1261,7 @@ render_freqplot.nongroup <- function(dat, tbl1, tbl2, plt) {
                dtm[i, ],
                pch = 1,
                col = bgcolor[i],
-               cex = 1.2)
+               cex = 1.3)
       }
     }
 
@@ -1275,7 +1272,7 @@ render_freqplot.nongroup <- function(dat, tbl1, tbl2, plt) {
     if (horz == TRUE) {  # Horizontal
 
       # Set custom margins
-      op <- par(mar = c(5, 6, 4, 2) + 0.1)
+      op <- par(mar = c(bml, 7, 4, 2) + 0.1)
 
       # Create empty plot
       b1 <- barplot(
@@ -1288,7 +1285,7 @@ render_freqplot.nongroup <- function(dat, tbl1, tbl2, plt) {
       )
 
 
-      mtext(llbl, side = 2, line = op$mar[1] - 1)
+      mtext(llbl, side = 2, line = par()$mar[2] - 2)
 
       # Get tick marks for ablines
       a1 <- axis(1, las = 1, col.ticks = "grey55")  # Create axis
@@ -1300,7 +1297,7 @@ render_freqplot.nongroup <- function(dat, tbl1, tbl2, plt) {
     } else {  # Vertical
 
       # Set custom margins
-      op <- par(mar = c(5, 5, 4, 2) + 0.1)
+      op <- par(mar = c(bml, 5, 4, 2) + 0.1)
 
       # Create empty plot.
       # xlim created automatically
@@ -1341,8 +1338,37 @@ render_freqplot.nongroup <- function(dat, tbl1, tbl2, plt) {
 
   }
 
+  # Calculate inset y value
+  line_height_fraction <- (par("mai")[1] / par("pin")[2])
+  ins <- - (line_height_fraction * 0.87)
 
-  ## frame
+  # Symbol type
+  if (plt$type == "barchart") {
+    syt <- 15
+    px <- 1.6
+  } else {
+    syt <- 1
+    px <- 1.3
+  }
+
+  # Draw legend
+  legend("bottom",  # Starting location is bottom of plot area
+         legend = c(glbl, paste0(v1, " ")), # Variable name and value labels
+         col    = c("black", bgcolor),  # Colors of symbols
+         pch    = c(NA, rep(syt, length(v1))),  # Don't show any symbol for variable name
+         x.intersp = c(0, rep(.9, length(v1))),  # Spacing between group label and box
+         y.intersp = 0,  # Spacing between content and borders
+         horiz  = TRUE,  # Legend orientation
+         bty    = "o",  # Single line border around legend
+         inset  = c(0, ins),  # Offset from bottom of plot area
+         box.col = "grey", # Grey border to match SAS
+         xpd    = TRUE,   # Allow legend to leave plot area and appear in margin
+         pt.cex = px,     # Make symbol bigger
+         text.width = NA  # Compute label widths dynamically
+  )
+
+
+  ## Frame
   box(col = "grey70", lwd = 1)
   box("figure", col = "grey70", lwd = 1)
 
