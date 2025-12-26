@@ -400,6 +400,12 @@ render_freqplot.group <- function(dat, tbl1, tbl2, plt) {
     }
   }
 
+  # Plots per panel
+  if (plt$npanelpos > 3) {
+    pltmax <- 3
+  } else {
+    pltmax <- plt$npanelpos
+  }
 
   # Get distinct values
   v1 <- unique(dat[[var1]])
@@ -409,7 +415,7 @@ render_freqplot.group <- function(dat, tbl1, tbl2, plt) {
   for (vl in v1) {
 
     # Increment plot counter
-    if (pltcnt >= 3) {
+    if (pltcnt >= pltmax) {
       pltcnt <- 1
     } else {
       pltcnt <- pltcnt + 1
@@ -423,7 +429,7 @@ render_freqplot.group <- function(dat, tbl1, tbl2, plt) {
     }
 
     # Set last plot flag
-    if (pltcnt == 3 | vl == v1[length(v1)]) {
+    if (pltcnt == pltmax | vl == v1[length(v1)]) {
       lastplot <- TRUE
     } else {
       lastplot <- FALSE
@@ -503,9 +509,9 @@ render_freqplot.group <- function(dat, tbl1, tbl2, plt) {
 
       # Set up for 3 charts on plot
       if (plt$twoway == "groupvertical") {
-        par(mfrow = c(3, 1), oma = cmar)
+        par(mfrow = c(pltmax, 1), oma = cmar)
       } else {
-        par(mfrow = c(1, 3), oma = cmar)
+        par(mfrow = c(1, pltmax), oma = cmar)
       }
 
       # Put plot in reporter plot object
@@ -771,7 +777,7 @@ render_freqplot.group <- function(dat, tbl1, tbl2, plt) {
 
       # Adjustment if last chart is not filled up
       if (plt$twoway == "groupvertical") {
-        lbladj <- 2 + ((3 - pltcnt) * 12)
+        lbladj <- 2 + ((pltmax - pltcnt) * 12)
       } else {
         lbladj <- 2
       }

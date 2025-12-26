@@ -890,3 +890,260 @@ test_that("freqplot17: Two-way proc_freq with stacked dot plot.", {
 
 
 })
+
+
+test_that("freqplot18: Two-way proc_freq barchart npanelpos parameter works.", {
+
+  # Freq plots
+  res <- proc_freq(dat, tables = "Eyes * Hair",
+                   plots = freqplot(twoway = "grouphorizontal", npanelpos = 1),
+                   output = report,
+                   weight = Count,
+                   titles = "My first Frequency Plot")
+
+  res
+
+  expect_equal("data.frame" %in% class(res[[1]]), TRUE)
+  expect_equal(length(res[[2]]), 5)
+
+  # Freq plots
+  res <- proc_freq(dat, tables = "Eyes * Hair",
+                   plots = freqplot(twoway = "grouphorizontal", npanelpos = 2),
+                   output = report,
+                   weight = Count,
+                   titles = "My first Frequency Plot")
+
+  res
+
+
+  expect_equal("data.frame" %in% class(res[[1]]), TRUE)
+  expect_equal(length(res[[2]]), 3)
+
+
+  # Freq plots
+  res <- proc_freq(dat, tables = "Eyes * Hair",
+                   plots = freqplot(twoway = "grouphorizontal", npanelpos = 3),
+                   output = report,
+                   weight = Count,
+                   titles = "My first Frequency Plot")
+
+  res
+
+
+  expect_equal("data.frame" %in% class(res[[1]]), TRUE)
+  expect_equal(length(res[[2]]), 2)
+
+  # Freq plots
+  res <- proc_freq(dat, tables = "Eyes * Hair",
+                   plots = freqplot(twoway = "groupvertical", npanelpos = 1),
+                   output = report,
+                   weight = Count,
+                   titles = "My first Frequency Plot")
+
+  res
+
+  expect_equal("data.frame" %in% class(res[[1]]), TRUE)
+  expect_equal(length(res[[2]]), 3)
+
+  # Freq plots
+  res <- proc_freq(dat, tables = "Eyes * Hair",
+                   plots = freqplot(twoway = "groupvertical", npanelpos = 2),
+                   output = report,
+                   weight = Count,
+                   titles = "My first Frequency Plot")
+
+  res
+
+
+  expect_equal("data.frame" %in% class(res[[1]]), TRUE)
+  expect_equal(length(res[[2]]), 2)
+
+
+  # Freq plots
+  res <- proc_freq(dat, tables = "Eyes * Hair",
+                   plots = freqplot(twoway = "groupvertical", npanelpos = 3),
+                   output = report,
+                   weight = Count,
+                   titles = "My first Frequency Plot")
+
+  res
+
+
+  expect_equal("data.frame" %in% class(res[[1]]), TRUE)
+  expect_equal("plot_spec" %in% class(res[[2]]), TRUE)
+
+
+})
+
+test_that("freqplot19: Two-way proc_freq dotplot npanelpos parameter works.", {
+
+  # Dot plots
+  res <- proc_freq(dat, tables = "Eyes * Hair",
+                   plots = freqplot(type = "dotplot", twoway = "grouphorizontal",
+                                    npanelpos = 1),
+                   output = report,
+                   weight = Count,
+                   titles = "My first Frequency Plot")
+
+  res
+
+  expect_equal("data.frame" %in% class(res[[1]]), TRUE)
+  expect_equal(length(res[[2]]), 5)
+
+  # Dot plots
+  res <- proc_freq(dat, tables = "Eyes * Hair",
+                   plots = freqplot(type = "dotplot", twoway = "grouphorizontal",
+                                    npanelpos = 2),
+                   output = report,
+                   weight = Count,
+                   titles = "My first Frequency Plot")
+
+  res
+
+
+  expect_equal("data.frame" %in% class(res[[1]]), TRUE)
+  expect_equal(length(res[[2]]), 3)
+
+
+  # Dot plots
+  res <- proc_freq(dat, tables = "Eyes * Hair",
+                   plots = freqplot(type = "dotplot", twoway = "grouphorizontal",
+                                    npanelpos = 3),
+                   output = report,
+                   weight = Count,
+                   titles = "My first Frequency Plot")
+
+  res
+
+
+  expect_equal("data.frame" %in% class(res[[1]]), TRUE)
+  expect_equal(length(res[[2]]), 2)
+
+  # Dot plots
+  res <- proc_freq(dat, tables = "Eyes * Hair",
+                   plots = freqplot(type = "dotplot", twoway = "groupvertical",
+                                    npanelpos = 1),
+                   output = report,
+                   weight = Count,
+                   titles = "My first Frequency Plot")
+
+  res
+
+  expect_equal("data.frame" %in% class(res[[1]]), TRUE)
+  expect_equal(length(res[[2]]), 5)
+
+  # Dot plots
+  res <- proc_freq(dat, tables = "Eyes * Hair",
+                   plots = freqplot(type = "dotplot", twoway = "groupvertical",
+                                    npanelpos = 2),
+                   output = report,
+                   weight = Count,
+                   titles = "My first Frequency Plot")
+
+  res
+
+
+  expect_equal("data.frame" %in% class(res[[1]]), TRUE)
+  expect_equal(length(res[[2]]), 3)
+
+
+  # Dot plots
+  res <- proc_freq(dat, tables = "Eyes * Hair",
+                   plots = freqplot(type = "dotplot", twoway = "groupvertical",
+                                    npanelpos = 3),
+                   output = report,
+                   weight = Count,
+                   titles = "My first Frequency Plot")
+
+  res
+
+
+  expect_equal("data.frame" %in% class(res[[1]]), TRUE)
+  expect_equal(length(res[[2]]), 2)
+
+
+})
+
+#
+# test_that("freqplot20: Two-way proc_freq barchart npanelpos parameter works.", {
+#
+#   # Freq plots
+#   res <- proc_freq(dat, tables = "Eyes * Hair",
+#                    plots = freqplot(twoway = "grouphorizontal", npanelpos = 1),
+#                    output = report,
+#                    weight = Count,
+#                    titles = "My first Frequency Plot")
+#
+#   res
+#
+#   expect_equal("data.frame" %in% class(res[[1]]), TRUE)
+#   expect_equal(length(res[[2]]), 5)
+#
+#   # Freq plots
+#   res <- proc_freq(dat, tables = "Eyes * Hair",
+#                    plots = freqplot(twoway = "grouphorizontal", npanelpos = 2),
+#                    output = report,
+#                    weight = Count,
+#                    titles = "My first Frequency Plot")
+#
+#   res
+#
+#
+#   expect_equal("data.frame" %in% class(res[[1]]), TRUE)
+#   expect_equal(length(res[[2]]), 3)
+#
+#
+#   # Freq plots
+#   res <- proc_freq(dat, tables = "Eyes * Hair",
+#                    plots = freqplot(twoway = "grouphorizontal", npanelpos = 3),
+#                    output = report,
+#                    weight = Count,
+#                    titles = "My first Frequency Plot")
+#
+#   res
+#
+#
+#   expect_equal("data.frame" %in% class(res[[1]]), TRUE)
+#   expect_equal(length(res[[2]]), 2)
+#
+#   # Freq plots
+#   res <- proc_freq(dat, tables = "Eyes * Hair",
+#                    plots = freqplot(twoway = "groupvertical", npanelpos = 1),
+#                    output = report,
+#                    weight = Count,
+#                    titles = "My first Frequency Plot")
+#
+#   res
+#
+#   expect_equal("data.frame" %in% class(res[[1]]), TRUE)
+#   expect_equal(length(res[[2]]), 3)
+#
+#   # Freq plots
+#   res <- proc_freq(dat, tables = "Eyes * Hair",
+#                    plots = freqplot(twoway = "groupvertical", npanelpos = 2),
+#                    output = report,
+#                    weight = Count,
+#                    titles = "My first Frequency Plot")
+#
+#   res
+#
+#
+#   expect_equal("data.frame" %in% class(res[[1]]), TRUE)
+#   expect_equal(length(res[[2]]), 2)
+#
+#
+#   # Freq plots
+#   res <- proc_freq(dat, tables = "Eyes * Hair",
+#                    plots = freqplot(twoway = "groupvertical", npanelpos = 3),
+#                    output = report,
+#                    weight = Count,
+#                    titles = "My first Frequency Plot")
+#
+#   res
+#
+#
+#   expect_equal("data.frame" %in% class(res[[1]]), TRUE)
+#   expect_equal("plot_spec" %in% class(res[[2]]), TRUE)
+#
+#
+# })
