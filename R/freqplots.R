@@ -322,12 +322,6 @@ render_freqplot.2way <- function(dat, tbl1, tbl2, plt) {
 
     ret <- render_freqplot.nongroup(dat, tbl1, tbl2, plt)
 
-  #   ret <- render_freqplot.cluster(dat, tbl1, tbl2, plt)
-  #
-  # } else if (plt$twoway == "stacked") {
-  #
-  #   ret <- render_freqplot.stacked(dat, tbl1, tbl2, plt)
-
   } else {
 
     ret <- render_freqplot.group(dat, tbl1, tbl2, plt)
@@ -357,6 +351,14 @@ render_freqplot.group <- function(dat, tbl1, tbl2, plt) {
   horz <- FALSE  # Default to vertical
   if (plt$orient == "horizontal") {
     horz <- TRUE
+  }
+
+  # Deal with groupby parameter.
+  # If groupby is "row", then flip variables
+  if (plt$groupby == "row") {
+    tmp <- tbl1
+    tbl1 <- tbl2
+    tbl2 <- tmp
   }
 
   # Create title
@@ -398,6 +400,13 @@ render_freqplot.group <- function(dat, tbl1, tbl2, plt) {
       var1 <- "CAT2"
       var2 <- "CAT1"
     }
+  }
+
+  # Also flip variables
+  if (plt$groupby == "row") {
+    tmp <- var1
+    var1 <- var2
+    var2 <- tmp
   }
 
   # Plots per panel
@@ -466,6 +475,34 @@ render_freqplot.group <- function(dat, tbl1, tbl2, plt) {
       slbl <- "Sqrt Frequency"
       scl <- c(0, max(as.numeric(sqrt(dat$CNT))) * 1.05)
 
+    } else if (plt$scale == "grouppercent") {
+
+      if (plt$type == "barchart") {
+        # Get group max
+        mx <- aggregate(dat$CNT, by = list(dat[[var2]]), FUN = max, simplify = TRUE)
+
+        # Get group totals
+        tot <- aggregate(dat$CNT, by = list(dat[[var2]]), FUN = sum, simplify = TRUE)
+
+        # Calculate group percentages
+        cnt <- as.numeric(dt$CNT) / tot$x * 100
+
+      } else {
+
+        # Get group max
+        mx <- aggregate(dat$CNT, by = list(dat[[var1]]), FUN = max, simplify = TRUE)
+
+        # Get group totals
+        tot <- aggregate(dat$CNT, by = list(dat[[var1]]), FUN = sum, simplify = TRUE)
+
+        # Calculate group percentages
+        cnt <- as.numeric(dt$CNT) / tot$x[match(vl, v1)] * 100
+      }
+
+
+      slbl <- paste0("Percent of ", tbl2, " Frequency")
+      scl <- c(0, max(mx$x / tot$x * 100) * 1.05)
+
     } else {  # Default to Frequency
 
       cnt <- as.numeric(dt$CNT)
@@ -491,6 +528,21 @@ render_freqplot.group <- function(dat, tbl1, tbl2, plt) {
       } else {
         blbl <- slbl
         llbl <- tbl1
+      }
+    }
+
+    # Not happy about this
+    # But it works
+    if (plt$groupby == "row") {
+      tmp1 <- mlbl
+      tmp2 <- blbl
+      tmp3 <- llbl
+      if (plt$orient == "vertical") {
+        mlbl <- tmp2
+        blbl <- tmp1
+      } else {
+        mlbl <- tmp3
+        llbl <- tmp1
       }
     }
 
@@ -1065,6 +1117,14 @@ render_freqplot.nongroup <- function(dat, tbl1, tbl2, plt) {
     clust <- FALSE
   }
 
+  # Deal with groupby parameter.
+  # If groupby is "row", then flip variables
+  if (plt$groupby == "row") {
+    tmp <- tbl1
+    tbl1 <- tbl2
+    tbl2 <- tmp
+  }
+
   # Create Title
   ttl <- paste0("Distribution of ", tbl1, " by ", tbl2)
 
@@ -1092,6 +1152,13 @@ render_freqplot.nongroup <- function(dat, tbl1, tbl2, plt) {
       var1 <- "CAT1"
       var2 <- "CAT2"
     }
+  }
+
+  # Reverse if groupby = row
+  if (plt$groupby == "row") {
+    tmp <- var1
+    var1 <- var2
+    var2 <- tmp
   }
 
   # Get distinct values
