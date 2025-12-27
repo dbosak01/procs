@@ -49,7 +49,8 @@ Imports: utils,
          reporter,
          stats,
          tibble, 
-         sasLM (>= 0.9.9)
+         sasLM (>= 0.9.9),
+         graphics
 VignetteBuilder: knitr
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.3

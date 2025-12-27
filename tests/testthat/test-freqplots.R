@@ -393,10 +393,11 @@ test_that("freqplot8: One-way proc_freq with plots scale options work.", {
 # - Large values
 # - Many categories
 # - Real clinical data
-test_that("freqplot9: One-way proc_freq with plots edge cases.", {
+test_that("freqplot9: One-way edge cases.", {
 
-  # Single bar chart
-  res <- proc_freq(adsl, tables = "ARM * RACE",
+
+  # Missing label
+  res <- proc_freq(adsl, tables = "ARM",
                    plots = freqplot(),
                    output = report,
                    weight = AGE,
@@ -405,15 +406,39 @@ test_that("freqplot9: One-way proc_freq with plots edge cases.", {
   res
 
   expect_equal("data.frame" %in% class(res[[1]]), TRUE)
-  expect_equal("plot_spec" %in% class(res[[2]][[1]]), TRUE)
-  expect_equal("plot_spec" %in% class(res[[2]][[2]]), TRUE)
+  expect_equal("plot_spec" %in% class(res[[2]]), TRUE)
+
+  # Adjust margin to fit labels
+  res <- proc_freq(adsl, tables = "RACE",
+                   plots = freqplot(orient = "horizontal"),
+                   output = report,
+                   weight = AGE,
+                   titles = "My first Frequency Plot")
+
+  res
+
+
+  expect_equal("data.frame" %in% class(res[[1]]), TRUE)
+  expect_equal("plot_spec" %in% class(res[[2]]), TRUE)
+
+  # Dot plot
+  res <- proc_freq(adsl, tables = "ARM",
+                   plots = freqplot(type = "dotplot", orient = "vertical"),
+                   output = report,
+                   weight = AGE,
+                   titles = "My first Frequency Plot")
+
+  res
+
+  expect_equal("data.frame" %in% class(res[[1]]), TRUE)
+  expect_equal("plot_spec" %in% class(res[[2]]), TRUE)
 
 
 })
 
 
 
-test_that("freqplot10: One-way proc_freq with plots more edge cases.", {
+test_that("freqplot10: One-way more edge cases.", {
 
   # Single bar chart
   res <- proc_freq(adsl, tables = "ARM * RACE",
@@ -1318,3 +1343,52 @@ test_that("freqplot22: Two-way proc_freq with grouppercent scale.", {
   expect_equal("plot_spec" %in% class(res[[2]]), TRUE)
 
 })
+
+# Fix all these
+test_that("freqplot23: Two-way edge cases.", {
+
+  # Need ... on long labels
+  # Put 4 charts instead of 3.  Not sure why.
+  res <- proc_freq(adsl, tables = "ARM * RACE",
+                   plots = freqplot(),
+                   output = report,
+                   weight = AGE,
+                   titles = "My first Frequency Plot")
+
+  res
+
+  expect_equal("data.frame" %in% class(res[[1]]), TRUE)
+  expect_equal("plot_spec" %in% class(res[[2]]), TRUE)
+  # expect_equal("plot_spec" %in% class(res[[2]][[2]]), TRUE)
+
+  # Adjust margin to fit labels
+  # If only two charts, split plot in two instead of 3
+  res <- proc_freq(adsl, tables = "ARM * RACE",
+                   plots = freqplot(orient = "horizontal"),
+                   output = report,
+                   weight = AGE,
+                   titles = "My first Frequency Plot")
+
+  res
+
+
+  expect_equal("data.frame" %in% class(res[[1]]), TRUE)
+  expect_equal("plot_spec" %in% class(res[[2]]), TRUE)
+
+  # Dot plot
+  # Only two sections,
+  res <- proc_freq(adsl, tables = "ARM * RACE",
+                   plots = freqplot(type = "dotplot", orient = "vertical"),
+                   output = report,
+                   weight = AGE,
+                   titles = "My first Frequency Plot")
+
+  res
+
+  expect_equal("data.frame" %in% class(res[[1]]), TRUE)
+  expect_equal("plot_spec" %in% class(res[[2]]), TRUE)
+
+
+})
+
+

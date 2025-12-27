@@ -781,3 +781,50 @@ test_that("utils23: get_valid_obs() works as expected.", {
   expect_equal(nrow(res1), 16)
 
 })
+
+
+test_that("utils24: get_text_width() works as expected.", {
+
+
+  v1 <- c("Hello", "Hello My Baby!", "Looks like I'll be late for the train!")
+
+
+  res <- get_text_width(v1)
+
+
+  expect_equal(length(res), 3)
+  expect_equal(res[3] > res[2], TRUE)
+  expect_equal(res[2] > res[1], TRUE)
+
+})
+
+
+test_that("utils25: get_line_width() works as expected.", {
+
+
+  v1 <- c("Hello", "Hello My Baby!", "Looks like I'll be late for the train!")
+
+
+  res <- get_line_count(v1)
+
+
+  expect_equal(length(res), 3)
+  expect_equal(res[3] > res[2], TRUE)
+  expect_equal(res[2] > res[1], TRUE)
+
+})
+
+test_that("utils26: fit_width() works as expected.", {
+
+  v1 <- c("Hello", "Hello My Baby!", "Looks like I'll be late for the train!")
+
+  res <- get_text_width(v1, font_size = 12, multiplier = .9)
+
+  res2 <- fit_width(v1, 1.2)
+
+  expect_equal(length(res2), 3)
+  expect_equal(v1[1] == res2[1], TRUE)
+  expect_equal(v1[2] == res2[2], TRUE)
+  expect_equal(v1[3] != res2[3], TRUE)
+
+})

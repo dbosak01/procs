@@ -158,6 +158,9 @@ render_freqplot.1way <- function(dat, tbl, plt) {
 
   }
 
+  # Get number of lines needed to show labels
+  minlns <- get_line_count(names(cnt))
+
   # Get original margins
   omar <- par()$mar
 
@@ -234,8 +237,15 @@ render_freqplot.1way <- function(dat, tbl, plt) {
 
     if (horz == TRUE) {  # Horizontal
 
+      # Calculate left margin lines
+      if (minlns > 6) {
+        lml <- minlns + 3
+      } else {
+        lml <- 6
+      }
+
       # Set custom margins
-      op <- par(mar = c(5, 6, 2, .75) + 0.1)
+      op <- par(mar = c(5, lml, 2, .75) + 0.1)
 
       # Create empty plot
       b1 <- barplot(
@@ -249,7 +259,7 @@ render_freqplot.1way <- function(dat, tbl, plt) {
       )
 
 
-      mtext(tbl, side = 2, line = op$mar[1] - 1)
+      mtext(tbl, side = 2, line = par()$mar[2] - 2)
 
       # Get tick marks for ablines
       a1 <- axis(1, las = 1, col.ticks = "grey55")  # Create axis
@@ -280,6 +290,12 @@ render_freqplot.1way <- function(dat, tbl, plt) {
 
       ## Add gridlines based on axis created above
       abline(h = a2, col = "grey90", lwd = 1)
+
+      # Adjust label on vertical, since there is no room
+      if (length(b1) > 1) {
+        twdth <- b1[2] - b1[1]
+        names(cnt) <- fit_width(names(cnt), twdth)
+      }
     }
 
 
@@ -409,16 +425,17 @@ render_freqplot.group <- function(dat, tbl1, tbl2, plt) {
     var2 <- tmp
   }
 
-  # Plots per panel
-  if (plt$npanelpos > 3) {
-    pltmax <- 3
-  } else {
-    pltmax <- plt$npanelpos
-  }
-
   # Get distinct values
   v1 <- unique(dat[[var1]])
   v2 <- unique(dat[[var2]])
+
+  # Plots per panel
+  if (length(v1) <= plt$npanelpos) {
+    pltmax <- length(v1)
+  } else {
+    pnls <- ceiling(length(v1) / plt$npanelpos)
+    pltmax <-   ceiling(length(v1) / pnls)
+  }
 
   # Loop on first table variable
   for (vl in v1) {

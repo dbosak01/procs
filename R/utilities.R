@@ -588,27 +588,9 @@ has_report<- function(outpt) {
 
 }
 
-# Other Utilities ---------------------------------------------------------
+# Logging Utilities ---------------------------------------------------------
 
 
-fill_missing <- function(ds, num) {
-
-  nas <- rep(NA, num - 1)
-  nw <- list()
-
-  for (nm in names(ds)) {
-
-    nw[[nm]] <- nas
-  }
-
-  dfn <- as.data.frame(nw, stringsAsFactors = FALSE)
-
-  ret <- rbind(ds, nw)
-
-
-  return(ret)
-
-}
 
 # get_by_ds <- function(byvals) {
 #
@@ -656,6 +638,28 @@ log_output <- function() {
 #
 # }
 
+# Other Utilities ---------------------------------------------------------
+
+
+
+fill_missing <- function(ds, num) {
+
+  nas <- rep(NA, num - 1)
+  nw <- list()
+
+  for (nm in names(ds)) {
+
+    nw[[nm]] <- nas
+  }
+
+  dfn <- as.data.frame(nw, stringsAsFactors = FALSE)
+
+  ret <- rbind(ds, nw)
+
+
+  return(ret)
+
+}
 
 get_alpha <- function(opts) {
 
@@ -1086,3 +1090,132 @@ get_valid_obs <- function(data, formula) {
   return(ret)
 
 }
+
+
+
+# Text Functions ----------------------------------------------------------
+
+
+
+#' @description Estimate number of wraps based on text, width, and a font.
+#' @import graphics
+#' @noRd
+get_text_width <- function(txt, font = "arial", font_size = 12,
+                           multiplier = .975) {
+
+
+  f <- "mono"
+  if (tolower(font) == "arial")
+    f <- "sans"
+  else if (tolower(font) == "times")
+    f <- "serif"
+
+  un <- "inches"
+
+
+  pdf(NULL)
+  par(family = f, ps = font_size)
+  if (length(txt) > 0) {
+    ret <- strwdth(txt, un) * multiplier
+  } else {
+
+    ret <- 0
+  }
+  dev.off()
+
+
+  return(ret)
+}
+
+
+strwdth <- Vectorize(function(wrd, un) {
+
+  if (is.na(wrd)) {
+    ret <- 0
+  } else {
+
+    ret <- tryCatch({
+
+      suppressWarnings(strwidth(wrd, units = un))
+
+
+
+    }, error = function(cond) {
+
+      suppressWarnings(strwidth("a", units = un)) * nchar(wrd)
+
+    })
+  }
+
+  return(ret)
+}, USE.NAMES = FALSE, SIMPLIFY = TRUE)
+
+
+
+get_line_count <- function(vct, fs = 12) {
+
+  # Get widths of each item in vector
+  wdths <- get_text_width(vct, font_size = fs, multiplier = 1)
+
+  # Get max width
+  mxwdth <- max(wdths)
+
+  # Estimate number of lines needed
+  ret <- mxwdth * 5
+
+  return(ret)
+
+}
+
+fit_width <- function(str, wdth) {
+
+  # Split every character
+  spl <- strsplit(str, "", fixed = TRUE)
+
+  # Return vector
+  ret <- c()
+
+  for (idx in seq_along(spl)) {
+
+    # Get characters for one vector item
+    chrs <- spl[[idx]]
+
+    # Get width of each character
+    wdths <- get_text_width(chrs, font_size = 12, multiplier = .9)
+
+    # Get cumulative sum
+    cwdths <- cumsum(wdths)
+
+    # Figure what which characters are in bounds
+    ib <- cwdths <= wdth
+
+    # Determine if string needs truncating
+    if (all(ib == TRUE)) {
+      ret <- append(ret, str[idx])
+    } else {
+
+      # Filter out characters
+      tmp1 <- chrs[ib]
+
+      # Remove last three characters
+      tmp2 <- tmp1[seq(1, length(tmp1) - 3)]
+
+      # Collapse into single string
+      tmp3 <- paste0(tmp2, collapse = "")
+
+      # Add dots
+      tmp4 <- paste0(tmp3, "...")
+
+      # Append to return vector
+      ret <- append(ret, tmp4)
+
+    }
+
+  }
+
+
+  return(ret)
+}
+
+
+
