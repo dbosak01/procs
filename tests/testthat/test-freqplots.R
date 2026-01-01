@@ -396,7 +396,7 @@ test_that("freqplot8: One-way proc_freq with plots scale options work.", {
 test_that("freqplot9: One-way edge cases.", {
 
 
-  # Missing label
+  # Long bottom label
   res <- proc_freq(adsl, tables = "ARM",
                    plots = freqplot(),
                    output = report,
@@ -408,7 +408,7 @@ test_that("freqplot9: One-way edge cases.", {
   expect_equal("data.frame" %in% class(res[[1]]), TRUE)
   expect_equal("plot_spec" %in% class(res[[2]]), TRUE)
 
-  # Adjust margin to fit labels
+  # Long left label
   res <- proc_freq(adsl, tables = "RACE",
                    plots = freqplot(orient = "horizontal"),
                    output = report,
@@ -421,9 +421,21 @@ test_that("freqplot9: One-way edge cases.", {
   expect_equal("data.frame" %in% class(res[[1]]), TRUE)
   expect_equal("plot_spec" %in% class(res[[2]]), TRUE)
 
-  # Dot plot
+  # Dot plot - Long bottom label
   res <- proc_freq(adsl, tables = "ARM",
                    plots = freqplot(type = "dotplot", orient = "vertical"),
+                   output = report,
+                   weight = AGE,
+                   titles = "My first Frequency Plot")
+
+  res
+
+  expect_equal("data.frame" %in% class(res[[1]]), TRUE)
+  expect_equal("plot_spec" %in% class(res[[2]]), TRUE)
+
+  # Dot plot - Long left label
+  res <- proc_freq(adsl, tables = "ARM",
+                   plots = freqplot(type = "dotplot", orient = "horizontal"),
                    output = report,
                    weight = AGE,
                    titles = "My first Frequency Plot")
@@ -440,8 +452,16 @@ test_that("freqplot9: One-way edge cases.", {
 
 test_that("freqplot10: One-way more edge cases.", {
 
-  # Single bar chart
-  res <- proc_freq(adsl, tables = "ARM * RACE",
+  dt <- adsl
+  dt$ARM <- ifelse(dt$ARM == "Drug A (Dose 20mg)",
+                    "Drug A\n(Dose 20mg)", dt$ARM)
+  dt$ARM <- ifelse(dt$ARM == "Drug A (Dose 40mg)",
+                    "Drug A\n(Dose 40mg)", dt$ARM)
+  dt$RACE <- ifelse(dt$RACE == "BLACK OR AFRICAN AMERICAN",
+                     "BLACK\nOR\nAFRICAN\nAMERICAN", dt$RACE)
+
+  # Handles forced line breaks - Vertical
+  res <- proc_freq(dt, tables = "RACE",
                    plots = freqplot(),
                    output = report,
                    weight = AGE,
@@ -450,9 +470,45 @@ test_that("freqplot10: One-way more edge cases.", {
   res
 
   expect_equal("data.frame" %in% class(res[[1]]), TRUE)
-  expect_equal("plot_spec" %in% class(res[[2]][[1]]), TRUE)
-  expect_equal("plot_spec" %in% class(res[[2]][[2]]), TRUE)
+  expect_equal("plot_spec" %in% class(res[[2]]), TRUE)
 
+
+  # Handles forced line breaks - Horizontal
+  res <- proc_freq(dt, tables = "RACE",
+                   plots = freqplot(orient = "horizontal"),
+                   output = report,
+                   weight = AGE,
+                   titles = "My first Frequency Plot")
+
+  res
+
+  expect_equal("data.frame" %in% class(res[[1]]), TRUE)
+  expect_equal("plot_spec" %in% class(res[[2]]), TRUE)
+
+  # Dotplot handles forced line breaks - Vertical
+  res <- proc_freq(dt, tables = "RACE",
+                   plots = freqplot(type = "dotplot"),
+                   output = report,
+                   weight = AGE,
+                   titles = "My first Frequency Plot")
+
+  res
+
+  expect_equal("data.frame" %in% class(res[[1]]), TRUE)
+  expect_equal("plot_spec" %in% class(res[[2]]), TRUE)
+
+
+  # Dotplot handles forced line breaks - Horizontal
+  res <- proc_freq(dt, tables = "RACE",
+                   plots = freqplot(type = "dotplot", orient = "horizontal"),
+                   output = report,
+                   weight = AGE,
+                   titles = "My first Frequency Plot")
+
+  res
+
+  expect_equal("data.frame" %in% class(res[[1]]), TRUE)
+  expect_equal("plot_spec" %in% class(res[[2]]), TRUE)
 
 
 })

@@ -1154,20 +1154,169 @@ strwdth <- Vectorize(function(wrd, un) {
 
 get_line_count <- function(vct, fs = 12) {
 
-  # Get widths of each item in vector
-  wdths <- get_text_width(vct, font_size = fs, multiplier = 1)
+  mxwdth <- 0
 
-  # Get max width
-  mxwdth <- max(wdths)
+  # Break by user-defined line feeds
+  spl <- strsplit(vct, "\n", fixed = TRUE)
+
+  for (idx in seq_along(spl)) {
+
+    ln <- spl[[idx]]
+
+    # Get widths of each item in vector
+    wdths <- get_text_width(ln, font_size = fs, multiplier = 1)
+
+    # Get max width
+    if (max(wdths) > mxwdth) {
+      mxwdth <- max(wdths)
+    }
+  }
 
   # Estimate number of lines needed
+  # 5 is approximate number of lines per inch
   ret <- mxwdth * 5
 
   return(ret)
 
 }
 
+
+
+# Fit string to specified width, break lines as needed,
+# and return how many lines are required.
+# Also account for user-defined line breaks, and single words
+# that are too big to fit in available width.
+#' @noRd
 fit_width <- function(str, wdth) {
+
+  # browser()
+
+  # Return vector and line count
+  lst <- list()
+  mxlns <- 0
+
+  # Width of space. Needed below.
+  spc <- get_text_width(" ", font_size = 12, multiplier = .9)
+
+  # Get User-split sections
+  spl <- strsplit(str, "\n", fixed = TRUE)
+
+  # Vector loop
+  for (idx1 in seq_along(spl)) {
+
+    # Get segment
+    seg <- spl[[idx1]]
+
+    # Get width of segment
+    wseg <- get_text_width(seg, font_size = 12, multiplier = .9)
+
+    # One line of input vector
+    ln <- c()
+
+    # User-split loop
+    for (idx2 in seq_along(seg)) {
+
+      # If segment width is in bounds, just add it
+      if (wseg[idx2] <= wdth) {
+
+        ln <- append(ln, seg[idx2])
+      } else {
+
+        # browser()
+
+        # Break into words
+        wrds <- strsplit(seg[idx2], " ", fixed = TRUE)[[1]]
+
+        # Width of words.
+        wwrds <- get_text_width(wrds, font_size = 12, multiplier = .9)
+
+        ln2 <- c()
+        pos <- 1
+
+        for (idx3 in seq_along(wrds)) {
+
+          # Proposed sequence
+          psq <- seq(pos, idx3)
+
+          # Proposed width
+          tw <- sum(wwrds[psq]) + ((length(psq) - 1) * spc)
+
+          # Check proposed width
+          if (tw > wdth) {
+
+            # Even one word too big
+            if (idx3 - pos == 0) {
+
+              ln2 <- c(ln2, force_width(wrds[idx3], wdth))
+              pos <- idx3
+
+            } else {
+
+              ln2 <- c(ln2, paste(wrds[seq(pos, idx3 - 1)], collapse = " "))
+              pos <- idx3
+
+              if (idx3 == length(wrds)) {
+
+                # Append last section
+                if (wwrds[idx3] > wdth) {
+                  ln2 <- c(ln2, force_width(wrds[idx3], wdth))
+                } else {
+                  ln2 <- c(ln2, wrds[idx3])
+                }
+              }
+            }
+
+
+          } else if (idx3 == length(wrds)) {
+
+            # Append last section
+            ln2 <- c(ln2, paste(wrds[seq(pos, idx3)], collapse = " "))
+          }
+        }
+
+        ln <- append(ln, ln2)
+
+      }
+    }
+
+    # Update max lines
+    if (length(ln) > mxlns) {
+      mxlns <- length(ln)
+    }
+
+    # Append to return vector
+    lst[[length(lst) + 1]] <- ln
+
+  }
+
+  # Collapse list of vectors into single vector
+  vct <- c()
+  for (idx4 in seq_along(lst)) {
+
+    # Get vector
+    mvct <- lst[[idx4]]
+
+    # Add empty strings if needed
+    if (length(mvct) < mxlns) {
+      mvct <- append(mvct, rep("", mxlns - length(mvct)))
+    }
+
+    # Collapse to one string
+    ln <- paste0(mvct, collapse = "\n")
+    vct <- append(vct, ln)
+  }
+
+
+  ret <- list(Vector = vct, Lines = mxlns)
+
+
+  return(ret)
+}
+
+
+# Fit string to specified width, put ... if needed
+#' @noRd
+force_width <- function(str, wdth) {
 
   # Split every character
   spl <- strsplit(str, "", fixed = TRUE)
@@ -1186,7 +1335,7 @@ fit_width <- function(str, wdth) {
     # Get cumulative sum
     cwdths <- cumsum(wdths)
 
-    # Figure what which characters are in bounds
+    # Figure out which characters are in bounds
     ib <- cwdths <= wdth
 
     # Determine if string needs truncating

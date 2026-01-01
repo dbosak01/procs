@@ -799,7 +799,7 @@ test_that("utils24: get_text_width() works as expected.", {
 })
 
 
-test_that("utils25: get_line_width() works as expected.", {
+test_that("utils25: get_line_count() works as expected.", {
 
 
   v1 <- c("Hello", "Hello My Baby!", "Looks like I'll be late for the train!")
@@ -808,19 +808,18 @@ test_that("utils25: get_line_width() works as expected.", {
   res <- get_line_count(v1)
 
 
-  expect_equal(length(res), 3)
-  expect_equal(res[3] > res[2], TRUE)
-  expect_equal(res[2] > res[1], TRUE)
+  expect_equal(length(res), 1)
+  expect_equal(res > 10, TRUE)
 
 })
 
-test_that("utils26: fit_width() works as expected.", {
+test_that("utils26: force_width() works as expected.", {
 
   v1 <- c("Hello", "Hello My Baby!", "Looks like I'll be late for the train!")
 
   res <- get_text_width(v1, font_size = 12, multiplier = .9)
 
-  res2 <- fit_width(v1, 1.2)
+  res2 <- force_width(v1, 1.2)
 
   expect_equal(length(res2), 3)
   expect_equal(v1[1] == res2[1], TRUE)
@@ -828,3 +827,55 @@ test_that("utils26: fit_width() works as expected.", {
   expect_equal(v1[3] != res2[3], TRUE)
 
 })
+
+test_that("utils27: fit_width() works as expected.", {
+
+  v1 <- c("Hello", "Hello\nMy Baby!", "Looks like I'll be late for the train!",
+          "supercalifragilisticexpialidotious")
+
+  res <- get_text_width(v1, font_size = 12, multiplier = .9)
+
+  res2 <- fit_width(v1, 1.2)
+
+  res2
+
+  expect_equal(length(res2), 2)
+  expect_equal(length(res2$Vector), 4)
+  expect_equal(res2$Lines, 2)
+
+})
+
+test_that("utils28: fit_width() works as expected.", {
+
+  v1 <- c("Competitor", "Drug A (Dose 10mg)", "Drug A (Dose 20mg)",
+          "Placebo")
+
+  res <- get_text_width(v1, font_size = 12, multiplier = .9)
+
+  res2 <- fit_width(v1, 1.2)
+
+  res2
+
+  expect_equal(length(res2), 2)
+  expect_equal(length(res2$Vector), 4)
+  expect_equal(res2$Lines, 2)
+
+})
+
+test_that("utils29: get_line_count() works as expected.", {
+
+
+  res1 <- get_line_count("Hello my baby!")
+
+  res2 <- get_line_count("Hello\nmy baby of mine!")
+
+  res3 <- get_line_count("Hello my\nbaby of mine!")
+
+  res4 <- get_line_count("baby of mine!")
+
+  expect_equal(res1 < res2, TRUE)
+  expect_equal(res3 < res2, TRUE)
+  expect_equal(res3 == res4, TRUE)
+
+})
+

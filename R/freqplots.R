@@ -159,12 +159,14 @@ render_freqplot.1way <- function(dat, tbl, plt) {
   }
 
   # Get number of lines needed to show labels
-  minlns <- get_line_count(names(cnt))
+  minlns <- get_line_count(names(cnt)) + 1
 
   # Get original margins
   omar <- par()$mar
 
   if (plt$type == "dotplot") {  # Dot plot
+
+    blbllns <- 1
 
     # X positions for categories
     xdat <- seq_along(cnt)
@@ -177,6 +179,30 @@ render_freqplot.1way <- function(dat, tbl, plt) {
       # Plot
       op <- par(mar = c(5, 5, 2, .75) + 0.1)
 
+      # Estimate width of plot
+      twdth <- wdi - (par()$mai[2] + par()$mai[4])
+
+      # Estimate width of bars
+      bwdth <- twdth / length(cnt)
+
+      # Process labels
+      fw <- fit_width(names(cnt), bwdth)
+
+      # Update labels
+      names(cnt) <- fw$Vector
+
+      # Calculate bottom width
+      if (fw$Lines > 1) {
+        bmg <- 4 + fw$Lines
+        blbllns <- fw$Lines
+      } else {
+        bmg <- 5
+      }
+
+      # Set custom margins
+      op <- par(mar = c(bmg, 5, 2, .75) + 0.1)
+
+
       plot(
         xdat, cnt,
         type = "p",
@@ -187,25 +213,36 @@ render_freqplot.1way <- function(dat, tbl, plt) {
         xlim = xlm,
         ylim = c(0, max(cnt) * 1.05),
         axes = FALSE,
-        xlab = tbl,
+        xlab = "",
         ylab = slbl,
+        ps = 11,
         main = paste0("Distribution of ", tbl)
       )
+
+      # X Axis label
+      mtext(tbl, side = 1, line = par()$mar[1] - 2)
 
       # Vertical dotted grid lines at each category
       abline(v = xdat, lty = "dotted", col = "gray85")
 
       # Axes
-      axis(1, at = xdat, labels = names(cnt), col.ticks = "grey55")
+      axis(1, at = xdat, labels = names(cnt), col.ticks = "grey55", mgp = c(3, blbllns, 0))
       axis(2, las = 1, col.ticks = "grey55") # at = seq(0, 400, by = 100)
 
     } else {  # Horizontal
+
+      # Calculate left margin lines
+      if (minlns > 3) {
+        lml <- minlns + 3
+      } else {
+        lml <- 6
+      }
 
       # High to Low
       xlm <- c(length(cnt) + .5, .5)
 
       # Plot
-      op <- par(mar = c(5, 6, 2, .75) + 0.1)
+      op <- par(mar = c(5, lml, 2, .75) + 0.1)
 
       plot(
         cnt, xdat,
@@ -219,10 +256,11 @@ render_freqplot.1way <- function(dat, tbl, plt) {
         axes = FALSE,
         xlab = slbl,
         ylab = "",
+        ps = 11,
         main = paste0("Distribution of ", tbl)
       )
 
-      mtext(tbl, side = 2, line = op$mar[1] - 1)
+      mtext(tbl, side = 2, line = par()$mar[2] - 2)
 
       # Vertical dotted grid lines at each category
       abline(h = xdat, lty = "dotted", col = "gray85")
@@ -235,10 +273,12 @@ render_freqplot.1way <- function(dat, tbl, plt) {
 
   } else {  # Bar chart
 
+    blbllns <- 1
+
     if (horz == TRUE) {  # Horizontal
 
       # Calculate left margin lines
-      if (minlns > 6) {
+      if (minlns > 3) {
         lml <- minlns + 3
       } else {
         lml <- 6
@@ -255,6 +295,7 @@ render_freqplot.1way <- function(dat, tbl, plt) {
       #  ylab = tbl,  # Label y axis
         xlim = c(0, max(cnt) * 1.05),  # x axis scale
         horiz = TRUE,
+        ps = 11,
         axes = FALSE  # Don't create axis yet
       )
 
@@ -270,19 +311,47 @@ render_freqplot.1way <- function(dat, tbl, plt) {
 
     } else {  # Vertical
 
-      # Set custom margins
+      # Set margins to get estimated space for bars
       op <- par(mar = c(5, 5, 2, .75) + 0.1)
+
+      # Estimate width of plot
+      twdth <- wdi - (par()$mai[2] + par()$mai[4])
+
+      # Estimate width of bars
+      bwdth <- twdth / length(cnt)
+
+      # Process labels
+      fw <- fit_width(names(cnt), bwdth)
+
+      # Update labels
+      names(cnt) <- fw$Vector
+
+      # Calculate bottom width
+      if (fw$Lines > 1) {
+        bmg <- 4 + fw$Lines
+        blbllns <- fw$Lines
+      } else {
+        bmg <- 5
+      }
+
+      # Set custom margins
+      op <- par(mar = c(bmg, 5, 2, .75) + 0.1)
+
 
     # Create empty plot
       b1 <- barplot(
         rep(NA, length(cnt)),  # Empty data
         main = paste0("Distribution of ", tbl),  # Title
-        xlab = tbl,  # Lable x axis
+        xlab = "",  # Lable x axis
         ylab = slbl,  # Label y axis
         ylim = c(0, max(cnt) * 1.05),  # y axis scale
         horiz = FALSE,
+        ps = 11,
         axes = FALSE  # Don't create axis yet
       )
+
+      # X Axis label
+      mtext(tbl, side = 1, line = par()$mar[1] - 2)
 
       # Get tick marks for ablines
       # a1 <- axis(1, las = 1, col.ticks = "grey55")  # Create axis
@@ -291,11 +360,6 @@ render_freqplot.1way <- function(dat, tbl, plt) {
       ## Add gridlines based on axis created above
       abline(h = a2, col = "grey90", lwd = 1)
 
-      # Adjust label on vertical, since there is no room
-      if (length(b1) > 1) {
-        twdth <- b1[2] - b1[1]
-        names(cnt) <- fit_width(names(cnt), twdth)
-      }
     }
 
 
@@ -307,6 +371,8 @@ render_freqplot.1way <- function(dat, tbl, plt) {
       border = "grey55",
       las = 1,
       tick = TRUE,
+      mgp = c(3, blbllns, 0),
+      ps = 11,
       add = TRUE,   # Add to existing plot
       axes = FALSE  # Already created above
     )
