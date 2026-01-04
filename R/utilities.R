@@ -493,7 +493,7 @@ get_option <- function(options, name, default = NULL) {
 
 }
 
-get_name <- function(nm = NULL, var = NULL, bylbl = NULL) {
+get_name <- function(nm = NULL, var = NULL, bylbl = NULL, addvar = FALSE) {
 
   vnm <- ""
 
@@ -501,6 +501,8 @@ get_name <- function(nm = NULL, var = NULL, bylbl = NULL) {
     vnm <- var
   else if (nchar(nm) == 0)
     vnm <- var
+  else if (addvar)
+    vnm <- paste0(nm, ": ", var)
   else
     vnm <- nm
 
@@ -1099,6 +1101,7 @@ get_valid_obs <- function(data, formula) {
 
 #' @description Estimate number of wraps based on text, width, and a font.
 #' @import graphics
+#' @import withr
 #' @noRd
 get_text_width <- function(txt, font = "arial", font_size = 12,
                            multiplier = .975) {
@@ -1112,16 +1115,14 @@ get_text_width <- function(txt, font = "arial", font_size = 12,
 
   un <- "inches"
 
+  ret <- 0
 
-  pdf(NULL)
+  withr::with_pdf(NULL, {
   par(family = f, ps = font_size)
   if (length(txt) > 0) {
     ret <- strwdth(txt, un) * multiplier
-  } else {
-
-    ret <- 0
   }
-  dev.off()
+  dev.off()})
 
 
   return(ret)
@@ -1347,13 +1348,21 @@ force_width <- function(str, wdth) {
       tmp1 <- chrs[ib]
 
       # Remove last three characters
-      tmp2 <- tmp1[seq(1, length(tmp1) - 3)]
+      if (length(tmp1) > 3) {
+        tmp2 <- tmp1[seq(1, length(tmp1) - 3)]
+      } else {
+        tmp2 <- tmp1
+      }
 
       # Collapse into single string
       tmp3 <- paste0(tmp2, collapse = "")
 
       # Add dots
-      tmp4 <- paste0(tmp3, "...")
+      if (length(tmp1) > 3) {
+        tmp4 <- paste0(tmp3, "...")
+      } else {
+        tmp4 <- tmp3
+      }
 
       # Append to return vector
       ret <- append(ret, tmp4)

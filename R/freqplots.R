@@ -21,13 +21,19 @@
 #' @title Request a Frequency Plot
 #' @description A function to request a frequency plot on a call to
 #' \code{\link{proc_freq}}. The function allows you to specify the type of
-#' frequency plot to produce, and various layout options. Function supports
+#' frequency plot to produce, and various layout options. It supports
 #' bar charts and dot plots for one and two-way analysis.  It also supports
 #' vertical or horizontal orientation, by variables, and various scale options.
 #' @details Any requested
-#' plots will be displayed on interactive reports only. You may, however,
+#' plots will be displayed on interactive reports only.
+#' Plots are created as jpeg files, and stored in a temp directory.  Those
+#' temporary files are then referenced by the interactive report to display
+#' the graphic.
+#'
+#' If desired, you may
 #' output the report objects and pass to \code{\link{proc_print}}. To do this,
-#' set \code{output = report} on the call to \code{\link{proc_freq}}.
+#' set \code{output = report} on the call to \code{\link{proc_freq}}, and pass
+#' the entire list to \code{\link{proc_print}}.
 #' @param type The type of plot to create. Valid values are "barchart" or
 #' "dotplot".  Default is "barchart".
 #' @param orient The orientation of the plot.  Valid values are "vertical"
@@ -38,21 +44,108 @@
 #' @param twoway Options for two-way layouts. Valid values are
 #' "cluster", "grouphorizontal", "groupvertical", or "stacked". Default
 #' is "groupvertical".  This parameter applies to two-way tables only.
-#' @param groupby The variable to group by. Valid values are "column" or "row".
-#' Default is "column". This parameter applies to two-way tables only.
-#' @param npanelpos The number of sections per panel. Default is 4. This
+#' @param groupby The variable configuration for two-way charts.
+#' Valid values are "column" or "row". Default is "column". The "row" option
+#' effectively reverses the variable configuration.
+#' @param npanelpos The number of charts per panel. Default is 4. This
 #' parameter applies to two-way tables only.
-#' @returns The frequency plot object.
+#' @returns The frequency plot object.  This object is then passed to
+#' \code{\link{proc_freq}} for evaluation and rendering. Data from the
+#' frequency plot comes directly from the \code{\link{proc_freq}} reporting
+#' data frame.
+#' @examples
+#' library(procs)
+#'
+#' # Turn off printing for CRAN checks
+#' # Set to TRUE to run in local environment
+#' options("procs.print" = FALSE)
+#'
+#' # Prepare sample data
+#' dt <- as.data.frame(HairEyeColor, stringsAsFactors = FALSE)
+#'
+#' # Example 1: Frequency statistics with default plots
+#' res <- proc_freq(dt, tables = v(Hair, Eye, Hair * Eye),
+#'                  weight = Freq,
+#'                  output = report,
+#'                  plots = freqplot,
+#'                  titles = "Hair and Eye Frequency Statistics")
+#'
+#' # View results
+#' res
+#'
+#' # Example 2: Frequency statistics with custom plots
+#' res <- proc_freq(dt, tables = v(Hair, Eye, Hair * Eye),
+#'                  weight = Freq,
+#'                  output = report,
+#'                  plots = list(freqplot(type = "barchart",
+#'                                        orient = "horizontal"),
+#'                               freqplot(type = "dotplot",
+#'                                        scale = "percent"),
+#'                               freqplot(type = "barchart",
+#'                                        twoway = "cluster"),
+#'                  titles = "Hair and Eye Frequency Statistics"))
+#'
+#' # View results
+#' res
+#'
 #' @export
 freqplot <- function(type = "barchart", orient = "vertical", scale = "freq",
                      twoway = "groupvertical", groupby = "column", npanelpos = 4) {
 
+  # Non-standard evaluation
+
+  otype <- deparse(substitute(type, env = environment()))
+  type <- tryCatch({if (typeof(type) %in% c("character", "NULL")) type else otype},
+                     error = function(cond) {otype})
+
+  oorient <- deparse(substitute(orient, env = environment()))
+  orient <- tryCatch({if (typeof(orient) %in% c("character", "NULL")) orient else oorient},
+                     error = function(cond) {oorient})
+
+  oscale <- deparse(substitute(scale, env = environment()))
+  scale <- tryCatch({if (typeof(scale) %in% c("character", "NULL")) scale else oscale},
+                     error = function(cond) {oscale})
+
+  otwoway <- deparse(substitute(twoway, env = environment()))
+  twoway <- tryCatch({if (typeof(twoway) %in% c("character", "NULL")) twoway else otwoway},
+                    error = function(cond) {otwoway})
+
+  ogroupby <- deparse(substitute(groupby, env = environment()))
+  groupby <- tryCatch({if (typeof(groupby) %in% c("character", "NULL")) groupby else ogroupby},
+                     error = function(cond) {ogroupby})
+
+  # Parameter Checks
+  if (!type %in% c("barchart", "dotplot")) {
+    stop("Parameter value for 'type' invalid. Valid values are 'barchart' or 'dotplot'.")
+  }
+
+  if (!orient %in% c("vertical", "horizontal")) {
+    stop("Parameter value for 'orient' invalid. Valid values are 'vertical' or 'horizontal'.")
+  }
+
+  if (!scale %in% c("freq", "percent", "log", "sqrt", "grouppercent")) {
+    stop(paste0("Parameter value for 'scale' invalid. Valid values are 'freq' ",
+        "'percent', 'log', 'sqrt', or 'grouppercent'."))
+  }
+
+  if (!twoway %in% c("grouphorizontal", "groupvertical", "stacked", "cluster")) {
+    stop(paste0("Parameter value for 'type' invalid. Valid values are 'groupvertical', ",
+    "'grouphorizontal', 'stacked', or 'cluster'."))
+  }
+
+  if (!groupby %in% c("column", "row")) {
+    stop("Parameter value for 'groupby' invalid. Valid values are 'column' or 'row'.")
+  }
+
+  if (!is.numeric(npanelpos)) {
+    stop("Parameter value for 'npanelpos' invalid. Value must be an integer.")
+  }
 
   # Create object
   ret <- structure(list(), class = c("freqplot", "list"))
 
-  ret$groupby <- groupby
-  ret$npanelpos <- npanelpos
+  ret$groupby <- tolower(groupby)
+  ret$npanelpos <- as.integer(npanelpos)
   ret$orient <- tolower(orient)
   ret$scale <- tolower(scale)
   ret$twoway <- tolower(twoway)
@@ -93,17 +186,10 @@ render_freqplot <- function (dat, tbl1, tbl2 = NULL, plt) {
 }
 
 
-#' @title Render the Frequency Plot - One Way plot
-#' @description A function to render the frequency plot.
-#' @param plt The object to render
-#' @param dat The data to render
-#' @param table The table request to render.
-#' @returns The path to the plot.
-#' @import graphics
-#' @import grDevices
-#' @import reporter
-#' @noRd
+
 render_freqplot.1way <- function(dat, tbl, plt) {
+
+  op <- par("mar")
 
   # Create temp file path
   pth <- tempfile(fileext = ".jpg")
@@ -129,7 +215,7 @@ render_freqplot.1way <- function(dat, tbl, plt) {
   # Output to image file
   # All output types accept jpeg
   # So start with that
-  jpeg(pth, width = wd, height = ht, quality = 100)
+  jpeg(pth, width = wd, height = ht, quality = 100, units = "px")
 
   # Prepare data
   if (plt$scale == "percent") {
@@ -161,9 +247,6 @@ render_freqplot.1way <- function(dat, tbl, plt) {
   # Get number of lines needed to show labels
   minlns <- get_line_count(names(cnt)) + 1
 
-  # Get original margins
-  omar <- par()$mar
-
   if (plt$type == "dotplot") {  # Dot plot
 
     blbllns <- 1
@@ -177,10 +260,10 @@ render_freqplot.1way <- function(dat, tbl, plt) {
       xlm <- c(.5, length(cnt) + .5)
 
       # Plot
-      op <- par(mar = c(5, 5, 2, .75) + 0.1)
+      par(mar = c(5, 5, 2, .75) + 0.1)
 
       # Estimate width of plot
-      twdth <- wdi - (par()$mai[2] + par()$mai[4])
+      twdth <- wdi - (par("mai")[2] + par("mai")[4])
 
       # Estimate width of bars
       bwdth <- twdth / length(cnt)
@@ -200,7 +283,7 @@ render_freqplot.1way <- function(dat, tbl, plt) {
       }
 
       # Set custom margins
-      op <- par(mar = c(bmg, 5, 2, .75) + 0.1)
+      par(mar = c(bmg, 5, 2, .75) + 0.1)
 
 
       plot(
@@ -227,7 +310,7 @@ render_freqplot.1way <- function(dat, tbl, plt) {
 
       # Axes
       axis(1, at = xdat, labels = names(cnt), col.ticks = "grey55", mgp = c(3, blbllns, 0))
-      axis(2, las = 1, col.ticks = "grey55") # at = seq(0, 400, by = 100)
+      axis(2, las = 1, col.ticks = "grey55")
 
     } else {  # Horizontal
 
@@ -242,7 +325,7 @@ render_freqplot.1way <- function(dat, tbl, plt) {
       xlm <- c(length(cnt) + .5, .5)
 
       # Plot
-      op <- par(mar = c(5, lml, 2, .75) + 0.1)
+      par(mar = c(5, lml, 2, .75) + 0.1)
 
       plot(
         cnt, xdat,
@@ -267,7 +350,7 @@ render_freqplot.1way <- function(dat, tbl, plt) {
 
       # Axes
       axis(2, at = xdat, labels = names(cnt), las = 1, col.ticks = "grey55")
-      axis(1, las = 1, col.ticks = "grey55") # at = seq(0, 400, by = 100)
+      axis(1, las = 1, col.ticks = "grey55")
 
     }
 
@@ -285,14 +368,14 @@ render_freqplot.1way <- function(dat, tbl, plt) {
       }
 
       # Set custom margins
-      op <- par(mar = c(5, lml, 2, .75) + 0.1)
+      par(mar = c(5, lml, 2, .75) + 0.1)
 
       # Create empty plot
       b1 <- barplot(
         rep(NA, length(cnt)),  # Empty data
         main = paste0("Distribution of ", tbl),  # Title
         xlab = slbl,  # Lable x axis
-      #  ylab = tbl,  # Label y axis
+        #  ylab = tbl,  # Label y axis
         xlim = c(0, max(cnt) * 1.05),  # x axis scale
         horiz = TRUE,
         ps = 11,
@@ -312,7 +395,7 @@ render_freqplot.1way <- function(dat, tbl, plt) {
     } else {  # Vertical
 
       # Set margins to get estimated space for bars
-      op <- par(mar = c(5, 5, 2, .75) + 0.1)
+      par(mar = c(5, 5, 2, .75) + 0.1)
 
       # Estimate width of plot
       twdth <- wdi - (par()$mai[2] + par()$mai[4])
@@ -335,10 +418,10 @@ render_freqplot.1way <- function(dat, tbl, plt) {
       }
 
       # Set custom margins
-      op <- par(mar = c(bmg, 5, 2, .75) + 0.1)
+      par(mar = c(bmg, 5, 2, .75) + 0.1)
 
 
-    # Create empty plot
+      # Create empty plot
       b1 <- barplot(
         rep(NA, length(cnt)),  # Empty data
         main = paste0("Distribution of ", tbl),  # Title
@@ -370,7 +453,7 @@ render_freqplot.1way <- function(dat, tbl, plt) {
       col  = bgcolor, # adjustcolor("grey80", alpha.f = 0.45),
       border = "grey55",
       las = 1,
-      tick = TRUE,
+     # tick = TRUE,
       mgp = c(3, blbllns, 0),
       ps = 11,
       add = TRUE,   # Add to existing plot
@@ -380,12 +463,12 @@ render_freqplot.1way <- function(dat, tbl, plt) {
   }
 
 
-  ## frame
+  # frame
   box(col = "grey70", lwd = 1)
   box("figure", col = "grey70", lwd = 1)
 
   # Restore margins
-  par(mar = omar)
+  par(mar = op)
 
   # Close device context
   dev.off()
@@ -396,7 +479,6 @@ render_freqplot.1way <- function(dat, tbl, plt) {
   return(ret)
 
 }
-
 
 render_freqplot.2way <- function(dat, tbl1, tbl2, plt) {
 
@@ -447,8 +529,7 @@ render_freqplot.group <- function(dat, tbl1, tbl2, plt) {
   ttl <- paste0("Distribution of ", tbl1, " by ", tbl2)
 
   # Get original margins
-  omar <- par()$mar
-  oma <- par()$oma
+  opar <- par(no.readonly = TRUE)
 
   # Assign plot margins
   if (plt$orient == "vertical") {
@@ -632,6 +713,9 @@ render_freqplot.group <- function(dat, tbl1, tbl2, plt) {
     # Names for variable 2
     v2nms <- as.character(dt[[var2]])
 
+    # Get number of lines needed to show labels
+    minlns <- get_line_count(v2nms) + 1
+
 
     if (firstplot) {
       # Create temp file path
@@ -698,25 +782,46 @@ render_freqplot.group <- function(dat, tbl1, tbl2, plt) {
         if (plt$twoway == "grouphorizontal") {
           # Left axis
           if (firstplot) {
-            axis(2, las = 1, col.ticks = "grey55", cex.axis = 1.2)
+            axis(2, las = 1, col.ticks = "grey55")
           }
           # Bottom axis
           axis(1, las = 1, col.ticks = "grey55", at = as.vector(p2),
-               labels = v2, col = "grey70", cex.axis = 1.3)
+               labels = v2, col = "grey70")
 
         } else if (plt$twoway == "groupvertical") {
           # Left axis
-          axis(2, las = 1, col.ticks = "grey55", cex.axis = 1.2)
+          axis(2, las = 1, col.ticks = "grey55")
         }
 
         # Tbl1 Label
-        mtext(paste(mlbl, "=", vl), side = 3, line = .3, cex = .9)
+        mtext(paste(mlbl, "=", vl), side = 3, line = .3)
 
         # Add axis
         if (lastplot) {
           if (plt$twoway == "groupvertical") {
+
+            # Estimate width of plot
+            twdth <- wdi - par()$omi[2] - par()$omi[4] - par()$mai[2] - par()$mai[4]
+
+            # Estimate width of bars
+            bwdth <- twdth / length(v2)
+
+            # Process labels
+            fw <- fit_width(v2, bwdth)
+
+            # Update labels
+            nlbls <- fw$Vector
+
+            # Calculate bottom width
+            blbllns <- 1
+            if (fw$Lines > 1) {
+              blbllns <- fw$Lines
+            }
+
+            # Set custom margins
+            #op <- par(mar = c(5, 5, 2, .75) + 0.1)
               axis(1, las = 1, col.ticks = "grey55", at = as.vector(p2),
-                   labels = v2, col = "grey70", cex.axis = 1.3)  # Create axis
+                   labels = nlbls, col = "grey70", mgp = c(3, blbllns, 0))  # Create axis
           }
         }
 
@@ -726,8 +831,13 @@ render_freqplot.group <- function(dat, tbl1, tbl2, plt) {
         # High to Low
         xlm <- c(length(cnt) + .5, .5)
 
+        lmg <- 2
+        if (minlns > 4) {
+          lmg <- minlns - 3
+        }
+
         # Plot
-        op <- par(mar = c(0.5, 2, 1, 0) + 0.1)
+        op <- par(mar = c(0.5, lmg, 1, 0) + 0.1)
 
         plot(
           cnt, xdat,
@@ -747,7 +857,7 @@ render_freqplot.group <- function(dat, tbl1, tbl2, plt) {
         p2 <- xdat
 
         # Tbl1 Label
-        mtext(paste(mlbl, "=", vl), side = 3, line = .3, cex = .9)
+        mtext(paste(mlbl, "=", vl), side = 3, line = .3)
 
         # Vertical dotted grid lines at each category
         abline(h = xdat, lty = "dotted", col = "gray85")
@@ -756,24 +866,24 @@ render_freqplot.group <- function(dat, tbl1, tbl2, plt) {
         if (plt$twoway == "groupvertical") {
 
           # Left axis
-          axis(2, at = xdat, labels = v2nms, las = 1, col.ticks = "grey55", cex.axis = 1.2)
+          axis(2, at = xdat, labels = v2nms, las = 1, col.ticks = "grey55")
 
           # Axis on last plot
           if (lastplot) {
             axis(1, las = 1, col.ticks = "grey55",
-                 col = "grey70", cex.axis = 1.2)
+                 col = "grey70")
           }
 
         } else {
 
           # Left axis
           if (firstplot) {
-            axis(2, at = xdat, labels = v2nms, las = 1, col.ticks = "grey55", cex.axis = 1.2)
+            axis(2, at = xdat, labels = v2nms, las = 1, col.ticks = "grey55")
           }
 
           # Bottom axis
           axis(1, las = 1, col.ticks = "grey55",
-               col = "grey70", cex.axis = 1.2)
+               col = "grey70")
         }
 
 
@@ -784,8 +894,13 @@ render_freqplot.group <- function(dat, tbl1, tbl2, plt) {
 
       if (horz == TRUE) {  # Horizontal
 
+        lmg <- 2
+        if (minlns > 4) {
+          lmg <- minlns - 3
+        }
+
         # Set custom margins
-        op <- par(mar =  c(0.5, 2, 1, 0) + 0.1)
+        op <- par(mar =  c(0.5, lmg, 1, 0) + 0.1)
 
         # Create empty plot
         p1 <- barplot(
@@ -797,17 +912,14 @@ render_freqplot.group <- function(dat, tbl1, tbl2, plt) {
           axes = FALSE  # Don't create axis yet
         )
 
-        # Middle Label
-        mtext(paste(mlbl, "=", vl), side = 3, line = .3, cex = .9)
-
         # # Create axis
         if (plt$twoway == "groupvertical" & lastplot) {
           a1 <- axis(1, las = 1, col.ticks = "grey55",
-                     col = "grey70", cex.axis = 1.2)
+                     col = "grey70")
         } else if (plt$twoway == "grouphorizontal") {
 
           a1 <- axis(1, las = 1, col.ticks = "grey55",
-                     col = "grey70", cex.axis = 1.2)
+                     col = "grey70")
         } else {
           a1 <- axis(1, labels = FALSE, tick = FALSE)
         }
@@ -815,35 +927,43 @@ render_freqplot.group <- function(dat, tbl1, tbl2, plt) {
         ## Add gridlines based on axis created above
         abline(v = a1, col = "grey90", lwd = 1)
 
+        # Middle Label
+        mtext(paste(mlbl, "=", vl), side = 3, line = .3)
+
         # Left axis
         if (plt$twoway == "grouphorizontal") {
           if (firstplot) {
+            axcex <- 1 + (1 - par("cex"))
             axis(2, at = p1, labels = v2nms, las = 1,
-                 col.ticks = "grey55", cex.axis = 1.3)
+                 col.ticks = "grey55", cex.axis = axcex)
           }
         }
 
         # Left axis
         if (plt$twoway == "groupvertical") {
           if (plt$orient == "horizontal") {
+            axcex <- 1 + (1 - par("cex"))
             axis(2, at = p1, labels = v2nms, las = 1,
-                 col.ticks = "grey55", cex.axis = 1.3)
+                 col.ticks = "grey55", cex.axis = axcex)
           }
         }
 
       } else {  # Vertical
 
+        lblwdth <- 0
+
         # Set custom margins
         if (plt$twoway == "groupvertical") {
-          op <- par(mar = c(0.5, 0, 0, 1) + 0.1)
+          op <- par(mar = c(0.75, 1, 0, 1) + 0.1)
         } else {
-          op <- par(mar = c(0.5, 0, 1, .5) + 0.1)
+          op <- par(mar = c(0.75, 1, 1, .5) + 0.1)
         }
+
 
         # Create empty plot
         p1 <- barplot(
           rep(NA, length(cnt)),  # Empty data
-          xlab = blbl,  # Lable x axis
+          xlab = blbl,  # Label x axis
           ylab = slbl,  # Label y axis
           ylim = scl,  # y axis scale
           horiz = FALSE,
@@ -854,7 +974,7 @@ render_freqplot.group <- function(dat, tbl1, tbl2, plt) {
         # a1 <- axis(1, las = 1, col.ticks = "grey55")  # Create axis
         if (plt$twoway == "groupvertical" |
             (plt$twoway == "grouphorizontal" & firstplot)) {
-          a2 <- axis(2, las = 1, col.ticks = "grey55", cex.axis = 1.3)  # Create axis
+          a2 <- axis(2, las = 1, col.ticks = "grey55")  # Create axis
         }
 
         ## Add gridlines based on axis created above
@@ -862,10 +982,21 @@ render_freqplot.group <- function(dat, tbl1, tbl2, plt) {
 
         # Add label
         if (plt$twoway == "groupvertical") {
-          mtext(paste(mlbl, "=", vl), side = 4, line = .25, cex = .9)
+
+          lblwdth <- (hti - par("omi")[1] - par("omi")[3]) / pltmax
+
+          lbl <- force_width(paste(mlbl, "=", vl), lblwdth * 1.2)
+
+          mtext(lbl, side = 4, line = .25)
         } else {
-          mtext(paste(mlbl, "=", vl), side = 3, line = .25, cex = .9)
+
+          lblwdth <- (wdi - par("omi")[2] - par("omi")[4]) / pltmax
+
+          lbl <- force_width(paste(mlbl, "=", vl), lblwdth * 1.2)
+
+          mtext(lbl, side = 3, line = .25)
         }
+
       }
 
 
@@ -883,19 +1014,20 @@ render_freqplot.group <- function(dat, tbl1, tbl2, plt) {
 
       if (plt$twoway == "grouphorizontal" & plt$orient == "vertical") {
         axis(1, las = 1, col.ticks = "grey55", at = as.vector(p2),
-             labels = v2, col = "grey70", cex.axis = 1.3)  # Create axis
+             labels = v2, col = "grey70")  # Create axis
       }
 
       # Add axis
       if (lastplot) {
         if (plt$twoway == "groupvertical") {
           if (plt$orient == "vertical") {
+            axcex <- 1 + (1 - par("cex"))
             axis(1, las = 1, col.ticks = "grey55", at = as.vector(p2),
-                 labels = v2, col = "grey70", cex.axis = 1.3)  # Create axis
+                 labels = v2, col = "grey70",
+                 cex.axis = axcex)  # Create axis
           }
         }
       }
-
     }
 
     ## Frame around each plot
@@ -905,7 +1037,7 @@ render_freqplot.group <- function(dat, tbl1, tbl2, plt) {
     if (lastplot) {
 
       # Add title
-      mtext(ttl, side = 3, line = 1, outer = TRUE, font = 2, cex = 1.2)
+      mtext(ttl, side = 3, line = 1, outer = TRUE, font = 2)
 
       # Left label
       mtext(llbl, side = 2, line = cmar[2] - 2, outer = TRUE)
@@ -929,7 +1061,7 @@ render_freqplot.group <- function(dat, tbl1, tbl2, plt) {
   } # v1 loop
 
   # Restore margins
-  par(mar = omar, mfrow = c(1, 1), oma = oma)
+  par(mar = opar$mar, mfrow = opar$mfrow, oma = opar$oma)
 
   # Take out list if only one
   if (length(ret) == 1) {
@@ -1188,6 +1320,9 @@ render_freqplot.nongroup <- function(dat, tbl1, tbl2, plt) {
   ht <- hti * 96
   wd <- wdi * 96
 
+  # Capture original par settings
+  opar <- par(no.readonly = TRUE)
+
   # Set orientation
   horz <- FALSE  # Default to vertical
   if (plt$orient == "horizontal") {
@@ -1250,6 +1385,9 @@ render_freqplot.nongroup <- function(dat, tbl1, tbl2, plt) {
   dtm <- NULL
   dtna <- NULL
   mx <- 0
+
+  # Get number of lines needed to show labels
+  minlns <- get_line_count(v2) + 1
 
   # Create matrix
   # v1 in rows and v2 in columns
@@ -1339,9 +1477,6 @@ render_freqplot.nongroup <- function(dat, tbl1, tbl2, plt) {
   bgpalette <- rep(bgpalette, 20)
   bgcolor <- bgpalette[seq(1, length(v1))]
 
-  # Get original margins
-  omar <- par()$mar
-
   if (plt$type == "dotplot" & plt$twoway == "cluster") {
     stop("Two-way cluster option is not available for dot type frequency plots.")
 
@@ -1353,8 +1488,15 @@ render_freqplot.nongroup <- function(dat, tbl1, tbl2, plt) {
 
     if (horz == TRUE) {  # Horizontal
 
+      # Calculate left margin lines
+      if (minlns > 3) {
+        lml <- minlns + 3
+      } else {
+        lml <- 7
+      }
+
       # Set custom margins
-      op <- par(mar = c(bml, 7, tml, .75) + 0.1)
+      par(mar = c(bml, lml, tml, .75) + 0.1)
 
       # Create empty plot
       b1 <- plot(
@@ -1390,7 +1532,7 @@ render_freqplot.nongroup <- function(dat, tbl1, tbl2, plt) {
     } else {  # Vertical
 
       # Set custom margins
-      op <- par(mar = c(bml, 5, tml,  .75) + 0.1)
+      par(mar = c(bml, 5, tml,  .75) + 0.1)
 
       # Create empty plot.
       # xlim created automatically
@@ -1433,8 +1575,15 @@ render_freqplot.nongroup <- function(dat, tbl1, tbl2, plt) {
 
     if (horz == TRUE) {  # Horizontal
 
+      # Calculate left margin lines
+      if (minlns > 3) {
+        lml <- minlns + 3
+      } else {
+        lml <- 7
+      }
+
       # Set custom margins
-      op <- par(mar = c(bml, 7, tml, .75) + 0.1)
+      par(mar = c(bml, lml, tml, .75) + 0.1)
 
       # Create empty plot
       b1 <- barplot(
@@ -1461,7 +1610,7 @@ render_freqplot.nongroup <- function(dat, tbl1, tbl2, plt) {
     } else {  # Vertical
 
       # Set custom margins
-      op <- par(mar = c(bml, 5, tml, .75) + 0.1)
+      par(mar = c(bml, 5, tml, .75) + 0.1)
 
       # Create empty plot.
       # xlim created automatically
@@ -1537,7 +1686,7 @@ render_freqplot.nongroup <- function(dat, tbl1, tbl2, plt) {
   box("figure", col = "grey70", lwd = 1)
 
   # Restore margins
-  par(mar = omar)
+  par(mar = opar$mar)
 
   # Close device context
   dev.off()

@@ -266,9 +266,11 @@
 #' @param order Indicates how to order the function output. Options are "internal",
 #' "formatted", "freq" and "data".  Default is "internal".  See the section
 #' on "Ordering Frequency Output" for more information on this parameter.
-#' @param plots Pass the desired plot on this parameter. Valid values are "freqplot",
+#' @param plots Pass the desired plot(s) on this parameter. Valid values are "freqplot",
 #' or a call to the \code{\link{freqplot}} function.  Default is NULL, meaning no
-#' plots are desired.
+#' plots are desired.  If there are multiple table requests, you can pass a single
+#' plot request which will apply to all tables, or a list of plot requests that
+#' align one-to-one for each table request.
 #' @return The function will return all requested datasets by default.  This is
 #' equivalent to the \code{output = "out"} option.  To return the datasets
 #' as created for the interactive report, pass the "report" output option.  If
@@ -537,6 +539,19 @@ proc_freq <- function(data,
     if (!order %in% c("data", "internal", "formatted", "freq")) {
       stop(paste0("Invalid value for 'order' parameter: '", order, "'\n",
            "Valid values are: 'internal', 'freq', 'formatted', and 'data'"))
+    }
+  }
+
+  # Prepare plots for easier processing
+  if (!is.null(plots)) {
+    if ("freqplot" %in% class(plots) |
+        "character" %in% class(plots)) {
+      tplots <- list()
+      for (idx in seq_along(tables)) {
+
+        tplots[[idx]] <- plots
+      }
+      plots <- tplots
     }
   }
 
@@ -1875,7 +1890,7 @@ gen_report_freq <- function(data,
 
         if (!is.null(plots)) {
 
-          plotres <- render_freqplot(result, tb, plt = plots)
+          plotres <- render_freqplot(result, tb, plt = plots[[i]])
 
         }
 
@@ -1948,7 +1963,7 @@ gen_report_freq <- function(data,
 
         if (!is.null(plots)) {
 
-          plotres <- render_freqplot(result, splt[1], splt[2], plots)
+          plotres <- render_freqplot(result, splt[1], splt[2], plots[[i]])
 
         }
 
@@ -2008,7 +2023,7 @@ gen_report_freq <- function(data,
 
       if (!is.null(plots)) {
 
-        res[[get_name("Plots", tb, bylbls[j])]] <- plotres
+        res[[get_name("Plots", tb, bylbls[j], addvar = TRUE)]] <- plotres
       }
     }
 

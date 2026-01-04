@@ -28,25 +28,71 @@ the value "grouppercent" is also valid.}
 "cluster", "grouphorizontal", "groupvertical", or "stacked". Default
 is "groupvertical".  This parameter applies to two-way tables only.}
 
-\item{groupby}{The variable to group by. Valid values are "column" or "row".
-Default is "column". This parameter applies to two-way tables only.}
+\item{groupby}{The variable configuration for two-way charts.
+Valid values are "column" or "row". Default is "column". The "row" option
+effectively reverses the variable configuration.}
 
-\item{npanelpos}{The number of sections per panel. Default is 4. This
+\item{npanelpos}{The number of charts per panel. Default is 4. This
 parameter applies to two-way tables only.}
 }
 \value{
-The frequency plot object.
+The frequency plot object.  This object is then passed to
+\code{\link{proc_freq}} for evaluation and rendering. Data from the
+frequency plot comes directly from the \code{\link{proc_freq}} reporting
+data frame.
 }
 \description{
 A function to request a frequency plot on a call to
 \code{\link{proc_freq}}. The function allows you to specify the type of
-frequency plot to produce, and various layout options. Function supports
+frequency plot to produce, and various layout options. It supports
 bar charts and dot plots for one and two-way analysis.  It also supports
 vertical or horizontal orientation, by variables, and various scale options.
 }
 \details{
 Any requested
-plots will be displayed on interactive reports only. You may, however,
+plots will be displayed on interactive reports only.
+Plots are created as jpeg files, and stored in a temp directory.  Those
+temporary files are then referenced by the interactive report to display
+the graphic.
+
+If desired, you may
 output the report objects and pass to \code{\link{proc_print}}. To do this,
-set \code{output = report} on the call to \code{\link{proc_freq}}.
+set \code{output = report} on the call to \code{\link{proc_freq}}, and pass
+the entire list to \code{\link{proc_print}}.
+}
+\examples{
+library(procs)
+
+# Turn off printing for CRAN checks
+# Set to TRUE to run in local environment
+options("procs.print" = FALSE)
+
+# Prepare sample data
+dt <- as.data.frame(HairEyeColor, stringsAsFactors = FALSE)
+
+# Example 1: Frequency statistics with default plots
+res <- proc_freq(dt, tables = v(Hair, Eye, Hair * Eye),
+                 weight = Freq,
+                 output = report,
+                 plots = freqplot,
+                 titles = "Hair and Eye Frequency Statistics")
+
+# View results
+res
+
+# Example 2: Frequency statistics with custom plots
+res <- proc_freq(dt, tables = v(Hair, Eye, Hair * Eye),
+                 weight = Freq,
+                 output = report,
+                 plots = list(freqplot(type = "barchart",
+                                       orient = "horizontal"),
+                              freqplot(type = "dotplot",
+                                       scale = "percent"),
+                              freqplot(type = "barchart",
+                                       twoway = "cluster"),
+                 titles = "Hair and Eye Frequency Statistics"))
+
+# View results
+res
+
 }

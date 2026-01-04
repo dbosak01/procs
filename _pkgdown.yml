@@ -34,7 +34,7 @@ reference:
   contents:
   - proc_print
 
-  - title: Plotting
+- title: Plotting
   desc: Functions to request plots.
   contents:
   - freqplot

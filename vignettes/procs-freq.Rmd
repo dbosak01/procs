@@ -343,4 +343,41 @@ These shaping options reduce some of the manipulation needed to get your
 data in the desired form. These options were added for convenience during
 the development of the **procs** package, and have no equivalent in SAS®.
 
+## Frequency Plots
+
+To better understand your data, it is important to visualize it.  The 
+`proc_freq()` function offers basic plotting of frequencies via the 
+"plots" parameter and the `freqplot()` function.  Here is a simple example 
+demonstrating how to get frequency plots for a selection of tables
+using the sample data from above:
+```
+proc_freq(dat, tables = v(x, y, x * y),
+          weight = z,
+          plots = freqplot)
+
+```
+The generated report will look like this:
+
+<img src="../man/images/freqtut12.png" alt="Default frequency plots"/>
+
+The report now shows a bar chart for each of the table requests. The style 
+of plot can be modified using the parameters on the `freqplot()` function,
+like this:
+
+```
+proc_freq(dat, tables = v(x, y, x * y),
+          weight = z,
+          plots = list(freqplot(type = "dotplot"),
+                       freqplot(orient = "horizontal"),
+                       freqplot(twoway = "stacked")))
+                       
+
+```
+
+<img src="../man/images/freqtut13.png" alt="Frequency plot options"/>
+
+Modifying the `freqplot()` parameters can help improve the quality of the 
+chart, and make it easier to understand what is happening with your data.
+
+
 Next: [The Means Function](procs-means.html)

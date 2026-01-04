@@ -113,7 +113,8 @@ requested tables in a named list.</p>
 <span>  weight <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  options <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  titles <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  order <span class="op">=</span> <span class="st">"internal"</span></span>
+<span>  order <span class="op">=</span> <span class="st">"internal"</span>,</span>
+<span>  plots <span class="op">=</span> <span class="cn">NULL</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -182,6 +183,14 @@ the <strong>Options</strong> section for a description of these options.</p></dd
 <dd><p>Indicates how to order the function output. Options are "internal",
 "formatted", "freq" and "data".  Default is "internal".  See the section
 on "Ordering Frequency Output" for more information on this parameter.</p></dd>
+
+
+<dt id="arg-plots">plots<a class="anchor" aria-label="anchor" href="#arg-plots"></a></dt>
+<dd><p>Pass the desired plot(s) on this parameter. Valid values are "freqplot",
+or a call to the <code><a href="freqplot.html">freqplot</a></code> function.  Default is NULL, meaning no
+plots are desired.  If there are multiple table requests, you can pass a single
+plot request which will apply to all tables, or a list of plot requests that
+align one-to-one for each table request.</p></dd>
 
 </dl></div>
     <div id="value">

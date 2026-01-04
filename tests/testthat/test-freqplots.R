@@ -518,7 +518,7 @@ test_that("freqplot11: Two-way proc_freq with vertical plots and groupvertical w
 
   # Single bar chart
   res <- proc_freq(dat, tables = "Eyes * Hair",
-                   plots = freqplot(),
+                   plots = freqplot(npanelpos = 3),
                    output = report,
                    weight = Count,
                    titles = "My first Frequency Plot")
@@ -1400,13 +1400,31 @@ test_that("freqplot22: Two-way proc_freq with grouppercent scale.", {
 
 })
 
-# Fix all these
-test_that("freqplot23: Two-way edge cases.", {
+test_that("freqplot23: Two-way with by variable.", {
 
-  # Need ... on long labels
-  # Put 4 charts instead of 3.  Not sure why.
+  # Single bar chart
+  res <- proc_freq(dat, tables = "Hair * Eyes",
+                   plots = freqplot(orient = "horizontal",
+                                    twoway = "grouphorizontal"),
+                   output = report,
+                   by = Region,
+                   weight = Count,
+                   titles = "My first Frequency Plot")
+
+  expect_equal(length(res), 4)
+  expect_equal("data.frame" %in% class(res[[1]]), TRUE)
+  expect_equal("plot_spec" %in% class(res[[2]]), TRUE)
+  expect_equal("data.frame" %in% class(res[[3]]), TRUE)
+  expect_equal("plot_spec" %in% class(res[[4]]), TRUE)
+
+})
+
+
+test_that("freqplot24: Two-way edge cases grouped.", {
+
+  # Long right labels
   res <- proc_freq(adsl, tables = "ARM * RACE",
-                   plots = freqplot(),
+                   plots = freqplot(npanelpos = 2),
                    output = report,
                    weight = AGE,
                    titles = "My first Frequency Plot")
@@ -1414,11 +1432,10 @@ test_that("freqplot23: Two-way edge cases.", {
   res
 
   expect_equal("data.frame" %in% class(res[[1]]), TRUE)
-  expect_equal("plot_spec" %in% class(res[[2]]), TRUE)
-  # expect_equal("plot_spec" %in% class(res[[2]][[2]]), TRUE)
+  expect_equal("plot_spec" %in% class(res[[2]][[1]]), TRUE)
+  expect_equal("plot_spec" %in% class(res[[2]][[2]]), TRUE)
 
-  # Adjust margin to fit labels
-  # If only two charts, split plot in two instead of 3
+  # Long left labels - horizontal
   res <- proc_freq(adsl, tables = "ARM * RACE",
                    plots = freqplot(orient = "horizontal"),
                    output = report,
@@ -1432,7 +1449,7 @@ test_that("freqplot23: Two-way edge cases.", {
   expect_equal("plot_spec" %in% class(res[[2]]), TRUE)
 
   # Dot plot
-  # Only two sections,
+  # Long bottom labels -  vertical
   res <- proc_freq(adsl, tables = "ARM * RACE",
                    plots = freqplot(type = "dotplot", orient = "vertical"),
                    output = report,
@@ -1444,6 +1461,307 @@ test_that("freqplot23: Two-way edge cases.", {
   expect_equal("data.frame" %in% class(res[[1]]), TRUE)
   expect_equal("plot_spec" %in% class(res[[2]]), TRUE)
 
+  # Dot plot
+  # Long left labels - horizontal
+  res <- proc_freq(adsl, tables = "ARM * RACE",
+                   plots = freqplot(type = "dotplot", orient = "horizontal"),
+                   output = report,
+                   weight = AGE,
+                   titles = "My first Frequency Plot")
+
+  res
+
+  expect_equal("data.frame" %in% class(res[[1]]), TRUE)
+  expect_equal("plot_spec" %in% class(res[[2]]), TRUE)
+
+
+})
+
+
+
+# Fix all these
+test_that("freqplot25: Two-way more edge cases grouped.", {
+
+  dt <- adsl
+  dt$ARM <- ifelse(dt$ARM == "Drug A (Dose 20mg)",
+                   "Drug A\n(Dose 20mg)", dt$ARM)
+  dt$ARM <- ifelse(dt$ARM == "Drug A (Dose 40mg)",
+                   "Drug A\n(Dose 40mg)", dt$ARM)
+  dt$RACE <- ifelse(dt$RACE == "BLACK OR AFRICAN AMERICAN",
+                    "BLACK\nOR\nAFRICAN\nAMERICAN", dt$RACE)
+
+  # Handles forced line breaks - Vertical
+  res <- proc_freq(dt, tables = "ARM * RACE",
+                   plots = freqplot(),
+                   output = report,
+                   weight = AGE,
+                   titles = "My first Frequency Plot")
+
+  res
+
+  expect_equal("data.frame" %in% class(res[[1]]), TRUE)
+  expect_equal("plot_spec" %in% class(res[[2]]), TRUE)
+
+
+  # Handles forced line breaks - Horizontal
+  res <- proc_freq(dt, tables = "ARM * RACE",
+                   plots = freqplot(orient = "horizontal"),
+                   output = report,
+                   weight = AGE,
+                   titles = "My first Frequency Plot")
+
+  res
+
+  expect_equal("data.frame" %in% class(res[[1]]), TRUE)
+  expect_equal("plot_spec" %in% class(res[[2]]), TRUE)
+
+  # Dotplot handles forced line breaks - Vertical
+  res <- proc_freq(dt, tables = "ARM * RACE",
+                   plots = freqplot(type = "dotplot"),
+                   output = report,
+                   weight = AGE,
+                   titles = "My first Frequency Plot")
+
+  res
+
+  expect_equal("data.frame" %in% class(res[[1]]), TRUE)
+  expect_equal("plot_spec" %in% class(res[[2]]), TRUE)
+
+
+  # Dotplot handles forced line breaks - Horizontal
+  res <- proc_freq(dt, tables = "ARM * RACE",
+                   plots = freqplot(type = "dotplot", orient = "horizontal"),
+                   output = report,
+                   weight = AGE,
+                   titles = "My first Frequency Plot")
+
+  res
+
+  expect_equal("data.frame" %in% class(res[[1]]), TRUE)
+  expect_equal("plot_spec" %in% class(res[[2]]), TRUE)
+
+  # Dotplot handles forced line breaks - Horizontal
+  res <- proc_freq(dt, tables = "ARM * RACE",
+                   plots = freqplot(type = "dotplot", orient = "horizontal",
+                                    groupby = "row"),
+                   output = report,
+                   weight = AGE,
+                   titles = "My first Frequency Plot")
+
+  res
+
+  expect_equal("data.frame" %in% class(res[[1]]), TRUE)
+  expect_equal("plot_spec" %in% class(res[[2]]), TRUE)
+
+
+  # Barchart handles forced line breaks - Horizontal
+  res <- proc_freq(dt, tables = "ARM * RACE",
+                   plots = freqplot(type = "barchart", orient = "vertical",
+                                    groupby = "row"),
+                   output = report,
+                   weight = AGE,
+                   titles = "My first Frequency Plot")
+
+  res
+
+  expect_equal("data.frame" %in% class(res[[1]]), TRUE)
+  expect_equal("plot_spec" %in% class(res[[2]]), TRUE)
+
+})
+
+test_that("freqplot26: Two-way edge cases ungrouped.", {
+
+  # Long bottom labels
+  res <- proc_freq(adsl, tables = "ARM * RACE",
+                   plots = freqplot(twoway= "cluster"),
+                   output = report,
+                   weight = AGE,
+                   titles = "My first Frequency Plot")
+
+  res
+
+  expect_equal("data.frame" %in% class(res[[1]]), TRUE)
+  expect_equal("plot_spec" %in% class(res[[2]]), TRUE)
+  # expect_equal("plot_spec" %in% class(res[[2]][[2]]), TRUE)
+
+  # Long left labels - horizontal
+  res <- proc_freq(adsl, tables = "ARM * RACE",
+                   plots = freqplot(twoway = "cluster", orient = "horizontal"),
+                   output = report,
+                   weight = AGE,
+                   titles = "My first Frequency Plot")
+
+  res
+
+  # Long bottom labels
+  res <- proc_freq(adsl, tables = "ARM * RACE",
+                   plots = freqplot(twoway= "stacked"),
+                   output = report,
+                   weight = AGE,
+                   titles = "My first Frequency Plot")
+
+  res
+
+  expect_equal("data.frame" %in% class(res[[1]]), TRUE)
+  expect_equal("plot_spec" %in% class(res[[2]]), TRUE)
+  # expect_equal("plot_spec" %in% class(res[[2]][[2]]), TRUE)
+
+  # Long left labels - horizontal
+  res <- proc_freq(adsl, tables = "ARM * RACE",
+                   plots = freqplot(twoway = "stacked", orient = "horizontal"),
+                   output = report,
+                   weight = AGE,
+                   titles = "My first Frequency Plot")
+
+  res
+
+
+  expect_equal("data.frame" %in% class(res[[1]]), TRUE)
+  expect_equal("plot_spec" %in% class(res[[2]]), TRUE)
+
+  # Dot plot
+  # Long bottom labels -  vertical
+  res <- proc_freq(adsl, tables = "ARM * RACE",
+                   plots = freqplot(type = "dotplot", twoway = "stacked", orient = "vertical"),
+                   output = report,
+                   weight = AGE,
+                   titles = "My first Frequency Plot")
+
+  res
+
+  expect_equal("data.frame" %in% class(res[[1]]), TRUE)
+  expect_equal("plot_spec" %in% class(res[[2]]), TRUE)
+
+  # Dot plot
+  # Long left labels - horizontal
+  res <- proc_freq(adsl, tables = "ARM * RACE",
+                   plots = freqplot(type = "dotplot", twoway = "stacked", orient = "horizontal"),
+                   output = report,
+                   weight = AGE,
+                   titles = "My first Frequency Plot")
+
+  res
+
+  expect_equal("data.frame" %in% class(res[[1]]), TRUE)
+  expect_equal("plot_spec" %in% class(res[[2]]), TRUE)
+
+
+})
+
+test_that("freqplot27: Multiple table requests work as expected", {
+
+  res <- proc_freq(dat, tables = v(Hair, Eyes, Hair * Eyes),
+                    weight = Count,
+                    output = report,
+                    plots = freqplot,
+                    titles = "Hair and Eye Frequency Statistics")
+
+  expect_equal(length(res), 6)
+  expect_equal("data.frame" %in% class(res[[1]]), TRUE)
+  expect_equal("plot_spec" %in% class(res[[2]]), TRUE)
+  expect_equal("data.frame" %in% class(res[[3]]), TRUE)
+  expect_equal("plot_spec" %in% class(res[[4]]), TRUE)
+  expect_equal("data.frame" %in% class(res[[5]]), TRUE)
+  expect_equal("plot_spec" %in% class(res[[6]][[1]]), TRUE)
+  expect_equal("plot_spec" %in% class(res[[6]][[2]]), TRUE)
+
+  # Example 2: Frequency statistics with custom plots
+  res <- proc_freq(dat, tables = v(Hair, Eyes, Hair * Eyes),
+                   weight = Count,
+                   output = report,
+                   plots = list(freqplot(type = "barchart",
+                                         orient = "horizontal"),
+                                freqplot(type = "dotplot",
+                                         scale = "percent"),
+                                freqplot(type = "barchart",
+                                         twoway = "cluster")),
+                   titles = "Hair and Eye Frequency Statistics")
+
+
+  expect_equal(length(res), 6)
+  expect_equal("data.frame" %in% class(res[[1]]), TRUE)
+  expect_equal("plot_spec" %in% class(res[[2]]), TRUE)
+  expect_equal("data.frame" %in% class(res[[3]]), TRUE)
+  expect_equal("plot_spec" %in% class(res[[4]]), TRUE)
+  expect_equal("data.frame" %in% class(res[[5]]), TRUE)
+  expect_equal("plot_spec" %in% class(res[[6]]), TRUE)
+  expect_equal("plot_spec" %in% class(res[[6]]), TRUE)
+
+
+  res <- proc_freq(dat, tables = v(Hair, Eyes, Hair * Eyes),
+                   weight = Count,
+                   output = report,
+                   plots = freqplot(type = "dotplot"),
+                   titles = "Hair and Eye Frequency Statistics")
+
+  expect_equal(length(res), 6)
+  expect_equal("data.frame" %in% class(res[[1]]), TRUE)
+  expect_equal("plot_spec" %in% class(res[[2]]), TRUE)
+  expect_equal("data.frame" %in% class(res[[3]]), TRUE)
+  expect_equal("plot_spec" %in% class(res[[4]]), TRUE)
+  expect_equal("data.frame" %in% class(res[[5]]), TRUE)
+  expect_equal("plot_spec" %in% class(res[[6]]), TRUE)
+
+})
+
+test_that("freqplot28: Two Way only works as expected.", {
+
+
+  res <- proc_freq(mtcars, tables = c("cyl"),
+                   plots = freqplot,
+                   output = report)
+
+  expect_equal("data.frame" %in% class(res[[1]]), TRUE)
+  expect_equal("plot_spec" %in% class(res[[2]]), TRUE)
+
+
+  res <- proc_freq(mtcars, tables = c("cyl * am"),
+            plots = freqplot,
+            output = report)
+
+
+  expect_equal("data.frame" %in% class(res[[1]]), TRUE)
+  expect_equal("plot_spec" %in% class(res[[2]]), TRUE)
+
+
+
+})
+
+test_that("freqplot29: Report with plot can be printed with proc_print.", {
+
+  pth <- file.path(base_path, "print/test13.pdf")
+
+  res <- proc_freq(mtcars, tables = c("cyl * am"),
+                   plots = freqplot,
+                   output = report)
+
+  proc_print(res, pth, output_type = "PDF", view = FALSE)
+
+
+  expect_equal(file.exists(pth), TRUE)
+  expect_equal("data.frame" %in% class(res[[1]]), TRUE)
+  expect_equal("plot_spec" %in% class(res[[2]]), TRUE)
+
+})
+
+test_that("freqplot30: Parameter checks.", {
+
+  res <- freqplot(type = dotplot, orient = horizontal, scale = percent,
+                  twoway = cluster, groupby = row, npanelpos = 5)
+
+  expect_equal(res$groupby, "row")
+  expect_equal(res$npanelpos, 5)
+  expect_equal(res$orient, "horizontal")
+  expect_equal(res$scale, "percent")
+  expect_equal(res$twoway, "cluster")
+  expect_equal(res$type, "dotplot")
+
+  expect_error(freqplot(type = "fork"))
+  expect_error(freqplot(orient = "fork"))
+  expect_error(freqplot(scale = "fork"))
+  expect_error(freqplot(twoway = "fork"))
+  expect_error(freqplot(groupby = "fork"))
+  expect_error(freqplot(npanelpos = "fork"))
 
 })
 
