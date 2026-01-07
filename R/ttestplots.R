@@ -2,37 +2,44 @@
 
 # histogram, boxplot, interval qq, kernel densities, box plot, confidence bands,
 
+
+# No
 # unpack: TRUE or FALSE
-summaryplot <- function(unpack = FALSE) {
+render_summary <- function(unpack = FALSE) {
 
 
 
 }
 
+# Yes
+render_boxplot <- function() {
 
 
+}
+
+# No
 # type: pergroup or period
-intervalplot <- function(type = "pergroup", showh0 = FALSE) {
+render_interval <- function(type = "pergroup", showh0 = FALSE) {
 
 
 
 }
 
-
-qqplot <- function() {
-
-
-}
-
-
-profilesplot <- function() {
-
+# Yes
+render_qq <- function() {
 
 
 }
 
+# No
+render_profiles <- function() {
 
-agreementplot <- function() {
+
+
+}
+
+# Yes
+render_agreement <- function() {
 
 
 

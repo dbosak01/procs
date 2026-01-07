@@ -38,6 +38,7 @@ reference:
   desc: Functions to request plots.
   contents:
   - freqplot
+  - regplot
 
 news:
   cran_dates: false

@@ -220,27 +220,49 @@ render_freqplot.1way <- function(dat, tbl, plt) {
   # Prepare data
   if (plt$scale == "percent") {
 
-    cnt <- as.numeric(dat$PCT)
-    names(cnt) <- as.character(dat$CAT)
-    slbl <- "Percent"
+    if (!"PCT" %in% names(dat)) {
+      stop("Percentages are required for a percent scale.")
+
+    } else {
+
+      cnt <- as.numeric(dat$PCT)
+      names(cnt) <- as.character(dat$CAT)
+      slbl <- "Percent"
+
+    }
 
   } else if (plt$scale == "log") {
 
-    cnt <- as.numeric(log10(dat$CNT))
-    names(cnt) <- as.character(dat$CAT)
-    slbl <- "Log Frequency"
+    if (!"CNT" %in% names(dat)) {
+      stop("Frequencies are required for a log scale.")
+
+    } else {
+      cnt <- as.numeric(log10(dat$CNT))
+      names(cnt) <- as.character(dat$CAT)
+      slbl <- "Log Frequency"
+    }
 
   } else if (plt$scale == "sqrt") {
 
-    cnt <- as.numeric(sqrt(dat$CNT))
-    names(cnt) <- as.character(dat$CAT)
-    slbl <- "Sqrt Frequency"
+    if (!"CNT" %in% names(dat)) {
+      stop("Frequencies are required for a sqrt scale.")
+
+    } else {
+      cnt <- as.numeric(sqrt(dat$CNT))
+      names(cnt) <- as.character(dat$CAT)
+      slbl <- "Sqrt Frequency"
+    }
 
   } else {  # Default to Frequency
 
-    cnt <- as.numeric(dat$CNT)
-    names(cnt) <- as.character(dat$CAT)
-    slbl <- "Frequency"
+    if (!"CNT" %in% names(dat)) {
+      stop("Frequencies are required for a frequency scale.")
+
+    } else {
+      cnt <- as.numeric(dat$CNT)
+      names(cnt) <- as.character(dat$CAT)
+      slbl <- "Frequency"
+    }
 
   }
 

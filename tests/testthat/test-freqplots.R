@@ -1766,3 +1766,40 @@ test_that("freqplot30: Parameter checks.", {
 })
 
 
+test_that("freqplot31: Odd cases with plots.", {
+
+  if (dev) {
+
+    # Error because of nofreq option
+    res <- proc_freq(mtcars, tables = c("cyl"),
+                     plots = freqplot,
+                     output = report,
+                     options = nofreq)
+
+
+    # Works because scale = percent
+    res <- proc_freq(mtcars, tables = c("cyl"),
+                     plots = freqplot(scale = percent),
+                     output = report,
+                     options = nofreq)
+
+
+    # Lots of bars works
+    res <- proc_freq(mtcars, tables = c("disp"),
+                     plots = freqplot,
+                     output = report)
+
+
+
+
+  } else {
+
+    expect_equal(TRUE, TRUE)
+
+  }
+
+})
+
+
+
+

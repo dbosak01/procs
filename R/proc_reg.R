@@ -222,6 +222,11 @@
 #' The "noprint" option turns off the interactive report. For other options,
 #' see the \strong{Options} section for explanations of each.
 #' @param titles A vector of one or more titles to use for the report output.
+#' @param plots Pass the desired plot(s) on this parameter. Valid values are "regplot",
+#' or a call to the \code{\link{regplot}} function.  Default is NULL, meaning no
+#' plots are desired.  If there are multiple model requests, you can pass a single
+#' plot request which will apply to all tables, or a list of plot requests that
+#' align one-to-one for each model formula.
 #' @return Normally, the requested regression statistics are shown interactively
 #' in the viewer, and output results are returned as a data frame.
 #' If you request "report" datasets, they will be returned as a list.
@@ -329,7 +334,8 @@ proc_reg <- function(data,
                      # where = NULL, ?
                      weight = NULL,
                      options = NULL,
-                     titles = NULL
+                     titles = NULL,
+                     plots = NULL
 ) {
 
   # SAS seems to always ignore these
@@ -388,6 +394,19 @@ proc_reg <- function(data,
       stop(paste("Invalid output keyword: ", output[!tolower(output) %in% outs], "\n"))
     }
 
+  }
+
+  # Prepare plots for easier processing
+  if (!is.null(plots)) {
+    if ("regplot" %in% class(plots) |
+        "character" %in% class(plots)) {
+      tplots <- list()
+      for (idx in seq_along(model)) {
+
+        tplots[[idx]] <- plots
+      }
+      plots <- tplots
+    }
   }
 
   # https://documentation.sas.com/doc/en/pgmsascdc/9.4_3.4/statug/statug_reg_syntax01.htm
@@ -479,7 +498,8 @@ proc_reg <- function(data,
                              titles = titles,
                              opts = options,
                              output = output,
-                             weight = weight)
+                             weight = weight,
+                             plots = plots)
   }
 
   # Get output datasets if requested
@@ -688,7 +708,8 @@ get_output_specs_reg <- function(model, opts, output,
 #' @import sasLM
 #' @import common
 #' @import fmtr
-get_reg_report <- function(data, var, model, opts = NULL, weight = NULL, stats = NULL) {
+get_reg_report <- function(data, var, model, opts = NULL, weight = NULL,
+                           stats = NULL, plt = NULL) {
 
   ret <- list()
 
@@ -704,12 +725,17 @@ get_reg_report <- function(data, var, model, opts = NULL, weight = NULL, stats =
     hasP <- TRUE
   }
 
+  hasPlots <- FALSE
+  if (!is.null(plt)) {
+    hasPlots <- TRUE
+  }
+
   if (!is.null(weight)) {
     reg <- REG(Formula = model, Data = data, conf.level = alph, summarize = TRUE,
-               Weights = data[[weight]], HC = hasHC, Resid = hasP)
+               Weights = data[[weight]], HC = hasHC, Resid = hasP | hasPlots)
   } else {
     reg <- REG(Formula = model, Data = data, conf.level = alph, summarize = TRUE,
-               HC = hasHC, Resid = hasP)
+               HC = hasHC, Resid = hasP | hasPlots)
   }
 
   # NObs
@@ -733,7 +759,7 @@ get_reg_report <- function(data, var, model, opts = NULL, weight = NULL, stats =
   hc0reg <- NULL
   hc3reg <- NULL
   wreg <- NULL
-  if (hasHC) {
+  if (hasHC | hasPlots) {
     hc0reg <- as.data.frame(unclass(reg$HC0), stringsAsFactors = FALSE)
     hc3reg <- as.data.frame(unclass(reg$HC3), stringsAsFactors = FALSE)
     wreg <- as.data.frame(unclass(reg$`White Test`), stringsAsFactors = FALSE)
@@ -741,7 +767,7 @@ get_reg_report <- function(data, var, model, opts = NULL, weight = NULL, stats =
 
   rreg <- NULL
   preg <- NULL
-  if (hasP) {
+  if (hasP | hasPlots) {
      rreg <- reg$Residual
      preg <- reg$Fitted
   }
@@ -886,7 +912,7 @@ get_reg_report <- function(data, var, model, opts = NULL, weight = NULL, stats =
                                             PCHISQ = pfmt)
   }
 
-  if (hasP) {
+  if (hasP | hasPlots) {
 
     idcol <- seq(1, length(preg))
     vdat <- get_valid_obs(data, model)
@@ -932,6 +958,17 @@ get_reg_report <- function(data, var, model, opts = NULL, weight = NULL, stats =
     } else {
 
       warning("There was a problem creating the statistics and residuals.  Invalid row counts.")
+    }
+  }
+
+  if (hasPlots) {
+
+    # data, var, model, opts = NULL, weight = NULL, stats = NULL, plots = plts
+    ret[["Plots"]] <- render_regplot(data, ret, model, plt)
+
+    if (!hasP) {
+      ret[["OutputStatistics"]] <- NULL
+      ret[["ResidualStatistics"]] <- NULL
     }
   }
 
@@ -1290,7 +1327,8 @@ gen_report_reg <- function(data,
                            output = NULL,
                            view = TRUE,
                            titles = NULL,
-                           weight = NULL) {
+                           weight = NULL,
+                           plots = NULL) {
 
 
   spcs <- get_output_specs_reg(model, opts, output, report = TRUE)
@@ -1303,7 +1341,6 @@ gen_report_reg <- function(data,
 
   # Assign CL Percentage on Labels
   alph <- (1 - get_alpha(opts)) * 100
-
 
   #browser()
 
@@ -1340,11 +1377,14 @@ gen_report_reg <- function(data,
     dtlst <- list(data)
   }
 
+  mnum <- 0
+
   # Loop through models
   for (nm in nms) {
 
     outp <- spcs[[nm]]
     vnm <- outp$var
+    mnum <- mnum + 1
 
     # Loop through by groups
     for (j in seq_len(length(dtlst))) {
@@ -1359,7 +1399,8 @@ gen_report_reg <- function(data,
 
       # data, var, model, report = TRUE, opts = NULL,
       byres[[bynm]] <- get_reg_report(dt, vnm, outp$formula, opts = opts,
-                                      weight = weight, stats = stats)
+                                      weight = weight, stats = stats,
+                                      plt = plots[[mnum]])
 
       # Assign titles
       ttls <- c()
