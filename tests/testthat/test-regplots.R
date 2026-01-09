@@ -72,8 +72,7 @@ test_that("regplot2: proc_reg() works for residuals", {
 
 })
 
-
-
+# Needs option to change confidence interval
 test_that("regplot3: proc_reg() works for fitplot.", {
 
 
@@ -85,7 +84,10 @@ test_that("regplot3: proc_reg() works for fitplot.", {
   expect_equal(length(res), 5)
   expect_equal("plot_spec" %in% class(res[[5]][[1]]), TRUE)
 
-
+proc_reg(cls,
+         model = "Weight = Height",
+         output = report,
+         plots = regplot(type = "fitplot"))
 
   res <- proc_reg(cls,
                   model = "Weight = Height Age",
@@ -99,7 +101,7 @@ test_that("regplot3: proc_reg() works for fitplot.", {
 })
 
 
-test_that("regplot3: proc_reg() works for multiple plots.", {
+test_that("regplot4: proc_reg() works for multiple plots.", {
 
 
   res <- proc_reg(cls,
@@ -117,4 +119,50 @@ test_that("regplot3: proc_reg() works for multiple plots.", {
 
 })
 
+
+# Dots not lining up exactly with SAS.  Close but not perfect.
+test_that("regplot5: proc_reg() works for qqplot", {
+
+
+  res <- proc_reg(cls,
+                  model = "Weight = Height",
+                  output = report,
+                  plots = regplot(type = "qqplot"),
+                  stats = p)
+
+  expect_equal(length(res), 5)
+  expect_equal("plot_spec" %in% class(res[[5]][[1]]), TRUE)
+
+
+})
+
+
+#
+test_that("regplot6: proc_reg() works for spread plot", {
+
+
+  res <- proc_reg(cls,
+                  model = "Weight = Height",
+                  output = report,
+                  plots = regplot(type = "spreadplot"))
+
+  expect_equal(length(res), 5)
+  expect_equal("plot_spec" %in% class(res[[5]][[1]]), TRUE)
+
+
+})
+
+test_that("regplot6: proc_reg() panel = FALSE works", {
+
+
+  res <- proc_reg(cls,
+                  model = "Weight = Height",
+                  output = report,
+                  plots = regplot(type = "diagnostics", panel = FALSE))
+
+  expect_equal(length(res), 5)
+  expect_equal("plot_spec" %in% class(res[[5]][[1]]), TRUE)
+
+
+})
 
