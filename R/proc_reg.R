@@ -964,7 +964,7 @@ get_reg_report <- function(data, var, model, opts = NULL, weight = NULL,
   if (hasPlots) {
 
     # data, var, model, opts = NULL, weight = NULL, stats = NULL, plots = plts
-    ret[["Plots"]] <- render_regplot(data, ret, model, plt)
+    ret[["Plots"]] <- render_regplot(data, ret, model, plt, get_alpha(opts))
 
     if (!hasP) {
       ret[["OutputStatistics"]] <- NULL

@@ -72,10 +72,10 @@ test_that("regplot2: proc_reg() works for residuals", {
 
 })
 
-# Needs option to change confidence interval
+# Need to control statistics.  Otherwise, good.
 test_that("regplot3: proc_reg() works for fitplot.", {
 
-
+  # 95% Confidence
   res <- proc_reg(cls,
                   model = "Weight = Height",
                   output = report,
@@ -84,19 +84,23 @@ test_that("regplot3: proc_reg() works for fitplot.", {
   expect_equal(length(res), 5)
   expect_equal("plot_spec" %in% class(res[[5]][[1]]), TRUE)
 
-proc_reg(cls,
-         model = "Weight = Height",
-         output = report,
-         plots = regplot(type = "fitplot"))
+  # 90% Confidence
+  proc_reg(cls,
+           model = "Weight = Height",
+           output = report,
+           plots = regplot(type = "fitplot"),
+           options = v(alpha = .1))
 
+  expect_equal(length(res), 5)
+  expect_equal("plot_spec" %in% class(res[[5]][[1]]), TRUE)
+
+  # Should produce no plot because of two independent variables
   res <- proc_reg(cls,
                   model = "Weight = Height Age",
                   output = report,
                   plots = regplot(type = "fitplot"))
 
   expect_equal(length(res), 4)
-
-
 
 })
 
@@ -112,15 +116,11 @@ test_that("regplot4: proc_reg() works for multiple plots.", {
   expect_equal(length(res), 5)
   expect_equal("plot_spec" %in% class(res[[5]][[1]]), TRUE)
 
-
-
-
-
-
 })
 
 
 # Dots not lining up exactly with SAS.  Close but not perfect.
+# Try putting the line from corner to corner, instead of calculating
 test_that("regplot5: proc_reg() works for qqplot", {
 
 
@@ -137,14 +137,14 @@ test_that("regplot5: proc_reg() works for qqplot", {
 })
 
 
-#
-test_that("regplot6: proc_reg() works for spread plot", {
+# OK
+test_that("regplot6: proc_reg() works for rfplot plot", {
 
 
   res <- proc_reg(cls,
                   model = "Weight = Height",
                   output = report,
-                  plots = regplot(type = "spreadplot"))
+                  plots = regplot(type = "rfplot"))
 
   expect_equal(length(res), 5)
   expect_equal("plot_spec" %in% class(res[[5]][[1]]), TRUE)
@@ -152,13 +152,246 @@ test_that("regplot6: proc_reg() works for spread plot", {
 
 })
 
-test_that("regplot6: proc_reg() panel = FALSE works", {
+# Works
+test_that("regplot7: proc_reg() panel = FALSE works", {
 
 
   res <- proc_reg(cls,
                   model = "Weight = Height",
                   output = report,
                   plots = regplot(type = "diagnostics", panel = FALSE))
+
+  expect_equal(length(res), 5)
+  expect_equal("plot_spec" %in% class(res[[5]][[1]]), TRUE)
+  expect_equal(length(res[[5]]) > 1, TRUE)
+
+})
+
+# Good
+test_that("regplot8: proc_reg() works for cooksd plot", {
+
+
+  res <- proc_reg(cls,
+                  model = "Weight = Height",
+                  output = report,
+                  plots = regplot(type = "cooksd"))
+
+  expect_equal(length(res), 5)
+  expect_equal("plot_spec" %in% class(res[[5]][[1]]), TRUE)
+
+
+  # Labels
+  res2 <- proc_reg(cls,
+                  model = "Weight = Height",
+                  output = report,
+                  plots = regplot(type = "cooksd",
+                                  label = TRUE, id = "Name"))
+
+  expect_equal(length(res2), 5)
+  expect_equal("plot_spec" %in% class(res2[[5]][[1]]), TRUE)
+
+
+})
+
+
+# Good
+test_that("regplot9: proc_reg() works for residualbypredicted", {
+
+
+  res <- proc_reg(cls,
+                  model = "Weight = Height",
+                  output = report,
+                  plots = regplot(type = "residualbypredicted"))
+
+  expect_equal(length(res), 5)
+  expect_equal("plot_spec" %in% class(res[[5]][[1]]), TRUE)
+
+
+
+})
+
+
+# Seems good.  Worry about whether it is always +2 and -2 for boundary lines.
+# +2 and -2 appears to be standard deviation. It can be changed on the rstudent
+# function, but no obvious parameter on SAS chart.  So probably OK.
+test_that("regplot10: proc_reg() works for rstudentbypredicted", {
+
+
+  res <- proc_reg(cls,
+                  model = "Weight = Height",
+                  output = report,
+                  plots = regplot(type = "rstudentbypredicted"))
+
+  expect_equal(length(res), 5)
+  expect_equal("plot_spec" %in% class(res[[5]][[1]]), TRUE)
+
+
+  # Labels for outliers - Works!
+  res2 <- proc_reg(iris,
+                  model =  Sepal.Length ~ Petal.Length,
+                  output = report,
+                  plots = regplot(type = "rstudentbypredicted",
+                                  label = TRUE))
+
+  expect_equal(length(res2), 5)
+  expect_equal("plot_spec" %in% class(res2[[5]][[1]]), TRUE)
+
+
+  # Error check
+  expect_error(proc_reg(iris,
+                   model =  Sepal.Length ~ Petal.Length,
+                   output = report,
+                   plots = regplot(type = "rstudentbypredicted",
+                                   label = TRUE, id = "fork")))
+
+})
+
+# Looks good.
+test_that("regplot11: proc_reg() works for rstudentbyleverage", {
+
+  # Class data
+  res <- proc_reg(cls,
+                  model = "Weight = Height",
+                  output = report,
+                  plots = regplot(type = "rstudentbyleverage"))
+
+  expect_equal(length(res), 5)
+  expect_equal("plot_spec" %in% class(res[[5]][[1]]), TRUE)
+
+  # More data points  - Wow, great!
+  res2 <- proc_reg(iris, model = Sepal.Length ~ Petal.Length,
+                   output = report,
+                   stats = p,
+                   plots = regplot(type = "rstudentbyleverage"))
+
+
+  expect_equal(length(res), 5)
+  expect_equal("plot_spec" %in% class(res[[5]][[1]]), TRUE)
+
+  # More data
+  res3 <- proc_reg(mtcars, model = mpg ~ disp,
+                   output = report,
+                   plots = regplot(type = "rstudentbyleverage"))
+
+
+  expect_equal(length(res3), 5)
+  expect_equal("plot_spec" %in% class(res3[[5]][[1]]), TRUE)
+
+
+  # Two independent variables - Still works!
+  res3 <- proc_reg(mtcars, model = mpg ~ hp + disp,
+                   output = report,
+                   plots = regplot(type = "rstudentbyleverage"))
+
+
+  expect_equal(length(res3), 5)
+  expect_equal("plot_spec" %in% class(res3[[5]][[1]]), TRUE)
+
+
+})
+
+
+test_that("regplot12: proc_reg() works for rstudentbyleverage with labels and id", {
+
+  # Assigned label - Awesome!
+  res <- proc_reg(cls,
+                  model = "Weight = Height",
+                  output = report,
+                  plots = regplot(type = "rstudentbyleverage",
+                                  label = TRUE, id = "Name"))
+
+  expect_equal(length(res), 5)
+  expect_equal("plot_spec" %in% class(res[[5]][[1]]), TRUE)
+
+  # Default label
+  res2 <- proc_reg(iris, model = Sepal.Length ~ Petal.Length,
+                   output = report,
+                   plots = regplot(type = "rstudentbyleverage",
+                                   label = TRUE))
+
+
+  expect_equal(length(res2), 5)
+  expect_equal("plot_spec" %in% class(res2[[5]][[1]]), TRUE)
+
+  # Big labels
+  cdt <- mtcars
+  cdt$name <- rownames(mtcars)
+
+  res3 <- proc_reg(cdt, model = mpg ~ disp,
+                   output = report,
+                   plots = regplot(type = "rstudentbyleverage",
+                                   label = TRUE, id = "name"))
+
+
+  expect_equal(length(res3), 5)
+  expect_equal("plot_spec" %in% class(res3[[5]][[1]]), TRUE)
+
+
+  # Two independent variables - Still works!
+  res4 <- proc_reg(cdt, model = mpg ~ hp + disp,
+                   output = report,
+                   plots = regplot(type = "rstudentbyleverage",
+                                   label = TRUE, id = "name"))
+
+
+  expect_equal(length(res4), 5)
+  expect_equal("plot_spec" %in% class(res4[[5]][[1]]), TRUE)
+
+
+})
+
+
+# X and Y Scales have to be the same.
+# Margins also matter. Margins can change slope of line.
+test_that("regplot13: proc_reg() works for observedbypredicted", {
+
+  # OK
+  res <- proc_reg(cls,
+                  model = "Weight = Height",
+                  output = report,
+                  plots = regplot(type = "observedbypredicted"))
+
+  expect_equal(length(res), 5)
+  expect_equal("plot_spec" %in% class(res[[5]][[1]]), TRUE)
+
+  # OK
+  res <- proc_reg(cls,
+                  model = "Weight = Height Age",
+                  output = report,
+                  plots = regplot(type = "observedbypredicted"))
+
+  expect_equal(length(res), 5)
+  expect_equal("plot_spec" %in% class(res[[5]][[1]]), TRUE)
+
+
+  # OK
+  res <- proc_reg(cls,
+                  model = "Age = Weight",
+                  output = report,
+                  plots = regplot(type = "observedbypredicted"))
+
+  expect_equal(length(res), 5)
+  expect_equal("plot_spec" %in% class(res[[5]][[1]]), TRUE)
+
+  # OK
+  res <- proc_reg(cls,
+                  model = "Age = Height",
+                  output = report,
+                  plots = regplot(type = "observedbypredicted"))
+
+  expect_equal(length(res), 5)
+  expect_equal("plot_spec" %in% class(res[[5]][[1]]), TRUE)
+
+
+})
+
+test_that("regplot14: proc_reg() works for residualhistogram", {
+
+  # OK
+  res <- proc_reg(cls,
+                  model = "Weight = Height",
+                  output = report,
+                  plots = regplot(type = "residualhistogram"))
 
   expect_equal(length(res), 5)
   expect_equal("plot_spec" %in% class(res[[5]][[1]]), TRUE)

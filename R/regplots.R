@@ -19,7 +19,8 @@
 
 
 # panel = TRUE/FALSE
-# type = diagnostics/panel,  residuals, RStudent, leverage, quantile, qqplot, cooksd, distribution, proportion/spread, stats, fitplot
+# type = diagnostics,  residualbypredicted, RStudentbypredicted, rstudentbyleverage,
+# qq/qqplot, observedbypredicted, cooksd, residualhistogram, rfplot, residuals/residualplot, fitplot
 # stats = default aic sbc
 # all = obs, edf, rsquare, sse, coefvar, bic, gmsep, pc, sp, parms, mse, adjrsquare, depmean, aic, cp, jp, sbc
 
@@ -42,19 +43,31 @@
 #' set \code{output = report} on the call to \code{\link{proc_freq}}, and pass
 #' the entire list to \code{\link{proc_print}}.
 #' @param type The type(s) of plot to create. Multiple types should be passed
-#' as a vector of strings.  Valid values are "diagnostics", "residuals",
-#' "rstudent", "leverage", "quantile", "qqplot", "cooksd", "distribution",
-#' "proportion", "fitplot".  The default value is
+#' as a vector of strings.  Valid values are "diagnostics", "residualbypredicted",
+#' "rstudentbypredicted", "rstudentbyleverage", "qqplot", "observedbypredicted",
+#' "cooksd", "residualhistogram",
+#' "rfplot", "residuals", and "fitplot".  The default value is
 #' a vector with "diagnostics", "residuals", and "fitplot".  The "diagnostics"
 #' keyword produces a single combined chart with 8 different plots and a
-#' selection of statistics in a small table.
+#' selection of statistics in a small table.  The statistics can be controlled
+#' by the \code{stats} parameter.
 #' @param panel Whether or not to display the diagnostics plots combined into
 #' in a single panel.  Default is TRUE.  A value of FALSE will create
 #' individual plots instead.  This parameter is equivalent to the
 #' "unpack" keyword in SAS.
-#' @param stats The statistics to display on the diagnostics panel.  The
+#' @param stats The statistics to display on the diagnostics panel. Valid values
+#' are: "obs", "edf", "rsquare", "sse", "coefvar", "bic", "gmsep", "pc", "sp",
+#' "parms", "mse",
+#' "adjrsquare", "depmean", "aic", "cp", "jp", "sbc", and "default". The
 #' default value is "default", which produces the following statistics:
-#'
+#' "obs", "parms", "edf", "mse", "rsquare", and "adjrsquare".
+#' @param label Whether or not to label values automatically. Valid values
+#' are TRUE or FALSE.  Default is FALSE. If TRUE, this options will assign
+#' labels to outlier values on some charts.
+#' @param id If the \code{label} parameter is TRUE, this parameter determines
+#' which value is assigned to the label.  By default, the row number will
+#' be assigned.  You may also assign a column name from the input dataset
+#' to use as the label value.
 #' @examples
 #' library(procs)
 #'
@@ -91,7 +104,8 @@
 #' res
 #'
 #' @export
-regplot <- function(type = c("diagnostics", "residuals", "fitplot"), panel = TRUE, stats = "default") {
+regplot <- function(type = c("diagnostics", "residuals", "fitplot"), panel = TRUE,
+                    stats = "default", label = FALSE, id = NULL) {
 
   # Non-standard evaluation
 
@@ -105,9 +119,14 @@ regplot <- function(type = c("diagnostics", "residuals", "fitplot"), panel = TRU
 
 
   # Parameter Checks
-  if (!all(type %in% c("diagnostics", "residuals", "fitplot", 'qqplot', 'spreadplot'))) {
-    stop(paste0("Parameter value for 'type' invalid. Valid values are ",
-                "'diagnostics', 'residuals', 'fitplot', 'qqplot', 'spreadplot'."))
+  if (!all(type %in% c("diagnostics", "residuals", "fitplot", 'qqplot', 'rfplot',
+                       "residualbypredicted", "rstudentbypredicted", "rstudentbyleverage",
+                       "cooksd", "residualhistogram", "observedbypredicted"))) {
+    stop(paste0("Parameter value for 'type' invalid. Valid values are: ",
+                "'diagnostics', 'residuals', 'fitplot', 'qqplot', 'rfplot', ",
+                "'residualbypredicted', 'rstudentbypredicted', 'rstudentbyleverage'",
+                "'cooksd', 'residualhistogram', 'observedbypredicted'."
+                ))
   }
 
   if (!panel %in% c(TRUE, FALSE)) {
@@ -125,6 +144,8 @@ regplot <- function(type = c("diagnostics", "residuals", "fitplot"), panel = TRU
   ret$stats <- tolower(stats)
   ret$panel <- panel
   ret$type <- tolower(type)
+  ret$label <- label
+  ret$id <- id
 
   return(ret)
 }
@@ -135,7 +156,7 @@ regplot <- function(type = c("diagnostics", "residuals", "fitplot"), panel = TRU
 
 
 #' @noRd
-render_regplot <- function (dat, res, mdl, plt) {
+render_regplot <- function (dat, res, mdl, plt, alph) {
 
   ret <- NULL
 
@@ -155,7 +176,8 @@ render_regplot <- function (dat, res, mdl, plt) {
 
       pos <- match("diagnostics", typs)
 
-      vins <- c("residuals", "qqplot", "spreadplot")
+      vins <- c("residualbypredicted", "rstudentbypredicted", "rstudentbyleverage",
+                "qqplot", "observedbypredicted", "cooksd", "residualhistogram", "rfplot")
 
       nv <- append(typs, vins, after = pos)
 
@@ -164,6 +186,10 @@ render_regplot <- function (dat, res, mdl, plt) {
 
     ret <- list()
 
+    # "diagnostics", "residuals", "fitplot", 'qqplot', 'rfplot',
+    # "residualbypredicted", "rstudentbypredicted", "rstudentbyleverage",
+    # "cooksd", "residualhistogram", "observedbypredicted"
+
     for (tp in typs) {
 
       if (tp == "diagnostics") {
@@ -171,11 +197,23 @@ render_regplot <- function (dat, res, mdl, plt) {
       } else if (tp == "residuals") {
         ret[["residuals"]] <- render_residuals(dat, res, mdl)
       } else if (tp == "fitplot") {
-        ret[["fitplot"]] <- render_fitplot(dat, res, mdl, plt)
+        ret[["fitplot"]] <- render_fitplot(dat, res, mdl, plt, alph)
       } else if (tp == "qqplot") {
         ret[["qqplot"]] <- render_qqplot(dat, res, mdl)
-      } else if (tp == "spreadplot") {
-        ret[["spreadplot"]] <- render_spreadplot(dat, res, mdl)
+      } else if (tp == "rfplot") {
+        ret[["rfplot"]] <- render_rfplot(dat, res, mdl)
+      } else if (tp == "cooksd") {
+        ret[["cooksd"]] <- render_cooksd(dat, res, mdl, plt)
+      } else if (tp == "residualbypredicted") {
+        ret[["residualbypredicted"]] <- render_residualbypredicted(dat, res, mdl)
+      } else if (tp == "rstudentbypredicted") {
+        ret[["rstudentbypredicted"]] <- render_rstudentbypredicted(dat, res, mdl, plt)
+      } else if (tp == "rstudentbyleverage") {
+        ret[["rstudentbyleverage"]] <- render_rstudentbyleverage(dat, res, mdl, plt)
+      } else if (tp == "observedbypredicted") {
+        ret[["observedbypredicted"]] <- render_observedbypredicted(dat, res, mdl, plt)
+      } else if (tp == "residualhistogram") {
+        ret[["residualhistogram"]] <- render_residualhistogram(dat, res, mdl, plt)
       }
     }
 
@@ -188,6 +226,9 @@ render_regplot <- function (dat, res, mdl, plt) {
 }
 
 
+
+# Diagnostics Panel -------------------------------------------------------
+
 #' @noRd
 render_diagnostics <- function(dat, res, mdl) {
 
@@ -195,7 +236,14 @@ render_diagnostics <- function(dat, res, mdl) {
 }
 
 
-# What is there are multiple independent variables?
+
+# Individual Plots --------------------------------------------------------
+
+
+
+
+
+# What if there are multiple independent variables?
 #' @noRd
 render_residuals <- function(dat, res, mdl) {
 
@@ -272,10 +320,337 @@ render_residuals <- function(dat, res, mdl) {
 
 }
 
+render_residualbypredicted <- function(dat, res, mdl) {
+
+  op <- par("mar")
+
+  # Create temp file path
+  pth <- tempfile(fileext = ".jpg")
+
+  # Standard height and width
+  hti <- 4.5  # Height in inches
+  wdi <- 6  # Width in inches
+  bml <- 6  # bottom margin lines
+
+  # Convert inches to pixels
+  ht <- hti * 96
+  wd <- wdi * 96
+
+  # Output to image file
+  # All output types accept jpeg
+  # So start with that
+  jpeg(pth, width = wd, height = ht, quality = 100, units = "px")
+
+  # Get analysis variables
+  vrs <- get_vars(mdl)
+  dvr <- vrs$dvar
+  ivr <- vrs$ivar
+
+  # Prepare data
+  rdt <- res$OutputStatistics$RESID
+  pdt <- res$OutputStatistics$PREVAL
+
+  # Set margins
+  par(mar = c(4, 5, 2, .75) + 0.1)
+
+  # Get scales
+  xscl <- get_scale(pdt, .05)
+  yscl <- get_zero_scale(rdt, .05)
+
+  # Generate plot
+  plot(pdt, rdt,
+       main = paste0("Residual by Predicted for ", dvr),
+       xlab = "",
+       ylab = "Residual",
+       pch  = 1,          # open circles
+       cex = 1.3,
+       col  = "#05379B",
+       xlim = xscl,
+       ylim = yscl,
+       axes = FALSE
+  )
+
+  # Add custom axes
+  axis(side = 1, col.ticks = "grey55", mgp = c(3, .5, 0))
+  axis(side = 2, las = 1, col.ticks = "grey55", mgp = c(3, .5, 0))
+
+  # Generate zero line
+  abline(h = 0, col = "grey60", lwd = 1)
+
+  # Add bottom label
+  mtext("Predicted Value", side = 1, line = par("mar")[1] - 2)
+
+  # # frame
+  box(col = "grey70", lwd = 1)
+  box("figure", col = "grey70", lwd = 1)
+
+  # Restore margins
+  par(mar = op)
+
+  # Close device context
+  dev.off()
+
+  # Put plot in reporter plot object
+  ret <- create_plot(pth, height = hti, width = wdi)
+
+  return(ret)
+
+}
+
+
+render_rstudentbypredicted <- function(dat, res, mdl, plt) {
+
+  op <- par("mar")
+
+  # Create temp file path
+  pth <- tempfile(fileext = ".jpg")
+
+  # Standard height and width
+  hti <- 4.5  # Height in inches
+  wdi <- 6  # Width in inches
+  bml <- 6  # bottom margin lines
+
+  # Convert inches to pixels
+  ht <- hti * 96
+  wd <- wdi * 96
+
+  # Output to image file
+  # All output types accept jpeg
+  # So start with that
+  jpeg(pth, width = wd, height = ht, quality = 100, units = "px")
+
+  # Get analysis variables
+  vrs <- get_vars(mdl)
+  dvr <- vrs$dvar
+  ivr <- vrs$ivar
+
+  # Prepare data
+  fit <- lm(mdl, data = dat)
+  rdt <- rstudent(fit)
+  pdt <- fitted(fit)
+
+  # Set margins
+  par(mar = c(4, 5, 2, .75) + 0.1)
+
+  # Get scales
+  xscl <- get_scale(pdt, .05)
+  yscl <- get_zero_scale(rdt, .1)
+
+  # Generate plot
+  plot(pdt, rdt,
+       main = paste0("RStudent by Predicted for ", dvr),
+       xlab = "",
+       ylab = "RStudent",
+       pch  = 1,          # open circles
+       cex = 1.3,
+       col  = "#05379B",
+       xlim = xscl,
+       ylim = yscl,
+       axes = FALSE
+  )
+
+  # Add custom axes
+  axis(side = 1, col.ticks = "grey55", mgp = c(3, .5, 0))
+  axis(side = 2, las = 1, col.ticks = "grey55", mgp = c(3, .5, 0))
+
+  # Generate reference lines
+  abline(h =  2, col = "grey60", lwd = 1)
+  abline(h = -2, col = "grey60", lwd = 1)
+
+  # Add bottom label
+  mtext("Predicted Value", side = 1, line = par("mar")[1] - 2)
+
+  # # frame
+  box(col = "grey70", lwd = 1)
+  box("figure", col = "grey70", lwd = 1)
+
+  # Add labels
+  if (plt$label) {
+
+    # Identify points that need labels
+    lblids <- ifelse(rdt > 2 | rdt < -2, TRUE, FALSE)
+    if (!is.null(plt$id)) {
+      if (!plt$id %in% names(dat)) {
+        stop("Label ID variable '", plt$id, "' not found in input dataset.")
+      }
+
+      lbls <- dat[[plt$id]][lblids]
+    } else {
+      lbls <- seq(1, length(rdt))[lblids]
+    }
+
+    # Filter data
+    lrdt <- rdt[lblids]
+    lpdt <- pdt[lblids]
+
+    # Filter colors
+    # lcol <- cols[cols != nc]
+
+    # Assign labels
+    text(lpdt, lrdt, labels = lbls, pos = 3)
+  }
+
+  # Restore margins
+  par(mar = op)
+
+  # Close device context
+  dev.off()
+
+  # Put plot in reporter plot object
+  ret <- create_plot(pth, height = hti, width = wdi)
+
+  return(ret)
+
+}
+
+
+
+render_rstudentbyleverage <- function(dat, res, mdl, plt) {
+
+  op <- par("mar")
+
+  # Create temp file path
+  pth <- tempfile(fileext = ".jpg")
+
+  # Standard height and width
+  hti <- 4.5  # Height in inches
+  wdi <- 6  # Width in inches
+  bml <- 6  # bottom margin lines
+
+  # Convert inches to pixels
+  ht <- hti * 96
+  wd <- wdi * 96
+
+  # Output to image file
+  # All output types accept jpeg
+  # So start with that
+  jpeg(pth, width = wd, height = ht, quality = 100, units = "px")
+
+  # Get analysis variables
+  vrs <- get_vars(mdl)
+  dvr <- vrs$dvar
+  ivr <- vrs$ivar
+
+  # Prepare data
+  fit <- lm(mdl, data = dat)
+  rdt <- rstudent(fit)
+  ldt <- hatvalues(fit)
+
+  n <- length(ldt)
+  p <- length(coef(fit))      # includes intercept
+
+  # PROC REG-style cutoff
+  cut <- 2 * p / n
+
+  # Set margins
+  par(mar = c(6, 5, 2, .75) + 0.1)
+
+  # Get scales
+  xscl <- c(min(ldt) * .9, max(ldt, cut) * 1.10)
+  yscl <- get_zero_scale(rdt, .1)
+
+  # Define colors
+  nc <- "#05379B"   # Normal color
+  lvc <- "#01665E"  # Leverage color
+  otc <- "#A23A2E"  # Outlier color
+  olc <- "#543005"  # Outlier and leverage
+
+  # Assign colors
+  cols <- rep(nc, length(ldt))
+  cols <- ifelse(ldt > cut, lvc, cols)
+  cols <- ifelse(rdt > 2 | rdt < -2, otc, cols)
+  cols <- ifelse((rdt > 2 | rdt < -2) & ldt > cut, olc, cols)
+
+  # Generate plot
+  plot(ldt, rdt,
+       main = paste0("Outlier and Leverage Diagnostics for ", dvr),
+       xlab = "",
+       ylab = "RStudent",
+       pch  = 1,          # open circles
+       cex = 1.3,
+       col  = cols,
+       xlim = xscl,
+       ylim = yscl,
+       axes = FALSE
+  )
+
+  # Add custom axes
+  axis(side = 1, col.ticks = "grey55", mgp = c(3, .5, 0), tck = -0.015)
+  axis(side = 2, las = 1, col.ticks = "grey55", mgp = c(3, .5, 0), tck = -0.015)
+
+  # Generate reference lines
+  abline(h =  2, col = "grey60", lwd = 1)
+  abline(h = -2, col = "grey60", lwd = 1)
+  abline(v = cut, col = "grey60", lwd = 1)  # Cutoff
+
+  # Add bottom label
+  mtext("Leverage", side = 1, line = par("mar")[1] - 4)
+
+  # Add labels
+  if (plt$label) {
+
+    # Identify points that need labels
+    lblids <- ifelse((rdt > 2 | rdt < -2) | ldt > cut, TRUE, FALSE)
+    if (!is.null(plt$id)) {
+      if (!plt$id %in% names(dat)) {
+        stop("Label ID variable '", plt$id, "' not found in input dataset.")
+      }
+
+      lbls <- dat[[plt$id]][lblids]
+    } else {
+      lbls <- seq(1, length(rdt))[lblids]
+    }
+
+    # Filter data
+    lrdt <- rdt[lblids]
+    lldt <- ldt[lblids]
+
+    # Filter colors
+    lcol <- cols[cols != nc]
+
+    # Assign labels
+    text(lldt, lrdt, labels = lbls, pos = 3, col = lcol)
+  }
+
+  # # frame
+  box(col = "grey70", lwd = 1)
+  box("figure", col = "grey70", lwd = 1)
+
+  # Legend (bottom, SAS-style)
+  legend("bottom",
+         legend = c("Outlier ",
+                    "Leverage",
+                    "Outlier and Leverage"),
+         pch = c(1, 1, 1),
+         pt.cex = 1.3,
+         col = c(otc,
+                 lvc,
+                 olc),
+         horiz = TRUE,
+         bty = "o",
+         box.col = "grey", # Grey border to match SAS
+         x.intersp = 1,  # Spacing between group label and box
+         y.intersp = 0,  # Spacing between content and borders
+         text.width = NA,  # Compute label widths dynamically
+         inset = c(0, -0.23),
+         xpd = TRUE)
+
+  # Restore margins
+  par(mar = op)
+
+  # Close device context
+  dev.off()
+
+  # Put plot in reporter plot object
+  ret <- create_plot(pth, height = hti, width = wdi)
+
+  return(ret)
+
+}
 
 # Kill if more than 1 independent variable
 #' @noRd
-render_fitplot <- function(dat, res, mdl, plt) {
+render_fitplot <- function(dat, res, mdl, plt, alph) {
 
   op <- par("mar")
 
@@ -303,6 +678,10 @@ render_fitplot <- function(dat, res, mdl, plt) {
     # So start with that
     jpeg(pth, width = wd, height = ht, quality = 100,  units = "px")
 
+    # Set Confidence limits
+    alph1 <- 1 - alph
+    alph2 <- alph1 * 100
+
     # Fit model
     fit <- lm(mdl, data = dat)
 
@@ -315,11 +694,11 @@ render_fitplot <- function(dat, res, mdl, plt) {
 
     conf <- predict(fit,
                     newdata = df1,
-                    interval = "confidence")
+                    interval = "confidence", level = alph1)
 
     pred <- predict(fit,
                     newdata = df1,
-                    interval = "prediction")
+                    interval = "prediction", level = alph1)
 
     # Plot
     par(mar = c(5, 4.5, 2, 8.5) + 0.1)
@@ -364,8 +743,8 @@ render_fitplot <- function(dat, res, mdl, plt) {
     # Legend (bottom, SAS-style)
     legend("bottom",
            legend = c("Fit ",
-                      "95% Confidence Limits  ",
-                      "95% Prediction Limits"),
+                      paste0(alph2, "% Confidence Limits  "),
+                      paste0(alph2, "% Prediction Limits")),
            lwd = c(2, NA, 1),
            lty = c(1, NA, 2),
            pch = c(NA, 15, NA),
@@ -411,114 +790,80 @@ render_fitplot <- function(dat, res, mdl, plt) {
 }
 
 #' @noRd
-collect_stats <- function(res, plt) {
+render_residualhistogram <- function() {
 
+  op <- par("mar")
 
-  # mres <- proc_reg(cls, Weight ~ Height, stats = "clb", output = report)
+  # Create temp file path
+  pth <- tempfile(fileext = ".jpg")
 
-  ret <- c()
+  # Standard height and width
+  hti <- 4.5  # Height in inches
+  wdi <- 6  # Width in inches
+  bml <- 6  # bottom margin lines
 
-  if ("default" %in% plt$stats) {
-    ret <- c(
-      "Observations"  = res$NObs$NOBS[1],
-      "Parameters"    = nrow(res$ParameterEstimates),
-      "Error DF"      = res$ANOVA$DF[2],
-      "MSE"           = roundup(res$ANOVA$MEANSQ[2], 2),
-      "R-Square"      = roundup(res$FitStatistics$RSQ[1], 4),
-      "Adj R-Square"  = roundup(res$FitStatistics$ADJRSQ[1], 4)
-    )
+  # Convert inches to pixels
+  ht <- hti * 96
+  wd <- wdi * 96
 
-  }
+  # Output to image file
+  # All output types accept jpeg
+  # So start with that
+  jpeg(pth, width = wd, height = ht, quality = 100, units = "px")
+
+  # Get analysis variables
+  vrs <- get_vars(mdl)
+  dvr <- vrs$dvar
+  ivr <- vrs$ivar
+
+  # Prepare data
+  rdt <- res$OutputStatistics$RESID
+  dt <- dat[[ivr]]
+
+  # Set margins
+  par(mar = c(5, 5, 2, .75) + 0.1)
+
+  # Get y scale
+  # mx <- max(rdt) * 1.05
+  # scl <- c(-mx, mx)
+  scl <- range(rdt) * 1.1
+
+  # Generate plot
+  plot(dt, rdt,
+       main = paste("Residuals for ", dvr),
+       xlab = ivr,
+       ylab = "Residual",
+
+       pch  = 1,          # open circles
+       cex = 1.3,
+       col  = "#05379B",
+       ylim = scl,
+       axes = FALSE
+  )
+
+  # Add custom axes
+  axis(side = 1, col.ticks = "grey55")
+  axis(side = 2, las = 1, col.ticks = "grey55")
+
+  # Generate zero line
+  abline(h = 0, col = "grey60", lwd = 1)
+
+  # # frame
+  box(col = "grey70", lwd = 1)
+  box("figure", col = "grey70", lwd = 1)
+
+  # Restore margins
+  par(mar = op)
+
+  # Close device context
+  dev.off()
+
+  # Put plot in reporter plot object
+  ret <- create_plot(pth, height = hti, width = wdi)
 
   return(ret)
-}
-
-#' @noRd
-draw_stats_box <- function(stats,
-                           x_frac = c(0.03, 0.30),   # from right edge of plot (in x-range fractions)
-                           cex = 0.85,
-                           family = "sans",
-                           box_col = "white",
-                           border_col = "grey70",
-                           pad_y = 0.01,            # vertical padding as fraction of y-range
-                           pad_x = 0.01) {           # horizontal padding as fraction of x-range
-  stopifnot(is.numeric(stats), !is.null(names(stats)))
-
-  # allow drawing in the margin
-  op <- par(xpd = NA)
-  on.exit(par(op), add = TRUE)
-
-  usr <- par("usr")  # c(x1, x2, y1, y2)
-  x_rng <- diff(usr[1:2])
-  y_rng <- diff(usr[3:4])
-
-  # x positions (user sets; relative to right edge)
-  x_left  <- usr[2] + x_frac[1] * x_rng
-  x_right <- usr[2] + x_frac[2] * x_rng
-
-  # compute line height in user units (based on current cex)
-  old_cex <- par("cex")
-  old_family <- par("family")
-  par(cex = cex, family = family)
-  on.exit(par(cex = old_cex, family = old_family), add = TRUE)
-
-  line_h <- strheight("Mg")         # approx line height in user units
-  gap_h  <- 0.35 * line_h           # gap between lines
-  inner_h <- length(stats) * line_h + (length(stats) - 1) * gap_h
-
-  # box padding in user units
-  py <- pad_y * y_rng
-  px <- pad_x * x_rng
-
-  box_h <- inner_h + 2 * py
-
-  # center vertically in plot area
-  y_mid <- mean(usr[3:4])
-  y_bot <- y_mid - box_h / 2
-  y_top <- y_mid + box_h / 2
-
-  # draw box
-  rect(x_left, y_bot, x_right, y_top, col = box_col, border = border_col)
-
-  # y positions for each row (top to bottom)
-  y_start <- y_top - py - line_h / 2
-  y_pos <- y_start - (seq_along(stats) - 1) * (line_h + gap_h)
-
-  # left column: names
-  text(x_left + px, y_pos,
-       labels = names(stats),
-       adj = c(0, 0.5))
-
-  # right column: values
-  text(x_right - px, y_pos,
-       labels = unname(stats),
-       adj = c(1, 0.5))
-}
-
-#' @noRd
-render_distribution <- function() {
-
 
 }
-
-#' @noRd
-render_rstudent <- function() {
-
-
-}
-
-#' @noRd
-render_leverage <- function() {
-
-
-}
-
-#' @noRd
-render_quantile <- function() {
-
-
-}
-
 
 #' @noRd
 render_qqplot <- function(dat, res, mdl) {
@@ -615,7 +960,7 @@ render_qqplot <- function(dat, res, mdl) {
 }
 
 
-render_spreadplot <- function(dat, res, mdl) {
+render_rfplot <- function(dat, res, mdl) {
 
   # res <- proc_reg(cls,
   #                 model = "Weight = Height",
@@ -753,4 +1098,322 @@ render_spreadplot <- function(dat, res, mdl) {
 }
 
 
+#' @noRd
+render_cooksd <- function(dat, res, mdl, plt) {
 
+  op <- par("mar")
+
+  # Create temp file path
+  pth <- tempfile(fileext = ".jpg")
+
+  # Standard height and width
+  hti <- 4.5  # Height in inches
+  wdi <- 6  # Width in inches
+  bml <- 6  # bottom margin lines
+
+  # Convert inches to pixels
+  ht <- hti * 96
+  wd <- wdi * 96
+
+  # Output to image file
+  # All output types accept jpeg
+  # So start with that
+  jpeg(pth, width = wd, height = ht, quality = 100, units = "px")
+
+  # Get analysis variables
+  vrs <- get_vars(mdl)
+  dvr <- vrs$dvar
+  ivr <- vrs$ivar
+
+  # Set margins
+  par(mar = c(4, 5, 2, .75) + 0.1)
+
+  # Calculate statistics
+  fit <- lm(mdl, data = dat)
+  cd <- cooks.distance(fit)
+  xcd <- seq_along(cd)
+  n  <- length(cd)
+  p  <- length(coef(fit))   # includes intercept
+
+  ## Calculate cutoff
+  cutoff <- 4 / n
+
+  plot(xcd, cd,
+       type = "h",            # vertical spikes
+       lwd  = 1,
+       col  = "#05379B",
+       xlab = "",
+       ylab = "Cook's D",
+       main = paste0("Cook's D for ", dvr),
+       ylim = c(0, max(cd, cutoff) * 1.10),
+       axes = FALSE)
+
+  ## Open circles at the top of each spike
+  points(seq_along(cd), cd,
+         pch = 1,
+         col = "#05379B", cex = 1.25)
+
+  ## Reference line (PROC REG default)
+  abline(h = cutoff, col = "grey60", lwd = 1)
+
+
+  # Add custom axes
+  axis(side = 1, col.ticks = "grey55",
+       mgp = c(3, .5, 0), tck = -0.015)
+  axis(side = 2, las = 1, col.ticks = "grey55",
+       mgp = c(3, .5, 0), tck = -0.015)
+
+  # Generate zero line
+  abline(h = 0, col = "#05379B", lwd = 1)
+
+  mtext("Observation", side = 1, line = par("mar")[1] - 2)
+
+  # # frame
+  box(col = "grey70", lwd = 1)
+  box("figure", col = "grey70", lwd = 1)
+
+  # Add labels
+  if (plt$label) {
+
+    # Identify points that need labels
+    lblids <- ifelse(cd > cutoff, TRUE, FALSE)
+    if (!is.null(plt$id)) {
+      if (!plt$id %in% names(dat)) {
+        stop("Label ID variable '", plt$id, "' not found in input dataset.")
+      }
+
+      lbls <- dat[[plt$id]][lblids]
+    } else {
+      lbls <- seq(1, length(cd))[lblids]
+    }
+
+    # Filter data
+    lcd <- cd[lblids]
+    lxcd <- xcd[lblids]
+
+    # Filter colors
+    # lcol <- cols[cols != nc]
+
+    # Assign labels
+    text(lxcd, lcd, labels = lbls, pos = 3)
+  }
+
+  # Restore margins
+  par(mar = op)
+
+  # Close device context
+  dev.off()
+
+  # Put plot in reporter plot object
+  ret <- create_plot(pth, height = hti, width = wdi)
+
+  return(ret)
+
+}
+
+
+render_observedbypredicted <- function(dat, res, mdl, plt) {
+
+  op <- par("mar")
+
+  # Create temp file path
+  pth <- tempfile(fileext = ".jpg")
+
+  # Standard height and width
+  hti <- 4.5  # Height in inches
+  wdi <- 4.5   # Width in inches
+  bml <- 6  # bottom margin lines
+
+  # Convert inches to pixels
+  ht <- hti * 96
+  wd <- wdi * 96
+
+  # Output to image file
+  # All output types accept jpeg
+  # So start with that
+  jpeg(pth, width = wd, height = ht, quality = 100, units = "px")
+
+  # Get analysis variables
+  vrs <- get_vars(mdl)
+  dvr <- vrs$dvar
+  ivr <- vrs$ivar
+
+  # Prepare data
+  odt <- dat[[dvr]]
+  pdt <- res$OutputStatistics$PREVAL
+
+  # Set margins
+  par(mar = c(4, 5, 2, 1.05) + 0.1)
+
+  # Get scales
+  # Appears to take min of predicted and observed
+  # and max of predicted and observed, and uses
+  # those for both x and y scales.  Scales have to be the same
+  # or the dots won't line up properly.  Much trial and error
+  # to figure this out.
+  xscl <- get_scale(pdt, 0)
+  yscl <- get_scale(odt, 0)
+  scl <- c(min(xscl[1], yscl[1]), max(xscl[2], yscl[2]))
+
+  # Generate plot
+  plot(pdt, odt,
+       main = paste0("Observed by Predicted for ", dvr),
+       xlab = "",
+       ylab = dvr,
+       pch  = 1,          # open circles
+       cex = 1.3,
+       col  = "#05379B",
+       xlim = scl,
+       ylim = scl,
+       axes = FALSE
+  )
+
+  # Add custom axes
+  axis(side = 1, col.ticks = "grey55", tck = -0.015, mgp = c(3, .5, 0))
+  axis(side = 2, las = 1, col.ticks = "grey55", tck = -0.015, mgp = c(3, .5, 0))
+
+  # Generate diagonal line
+  # abline() doesn't work at all. Not sure why. Have to use segments().
+  usr <- par("usr")
+  segments(usr[1], usr[3], usr[2], usr[4], col = "grey60")
+
+  # Add bottom label
+  mtext("Predicted Value", side = 1, line = par("mar")[1] - 2)
+
+  # # frame
+  box(col = "grey70", lwd = 1)
+  box("figure", col = "grey70", lwd = 1)
+
+  # Would be nice to get outlier labels in here,
+  # but I don't know how they are identified.
+  # There are no limits on this chart.
+
+  # Restore margins
+  par(mar = op)
+
+  # Close device context
+  dev.off()
+
+  # Put plot in reporter plot object
+  ret <- create_plot(pth, height = hti, width = wdi)
+
+  return(ret)
+
+}
+
+
+# Utilities ---------------------------------------------------------------
+
+
+#' @noRd
+collect_stats <- function(res, plt) {
+
+
+  # mres <- proc_reg(cls, Weight ~ Height, stats = "clb", output = report)
+
+  ret <- c()
+
+  if ("default" %in% plt$stats) {
+    ret <- c(
+      "Observations"  = res$NObs$NOBS[1],
+      "Parameters"    = nrow(res$ParameterEstimates),
+      "Error DF"      = res$ANOVA$DF[2],
+      "MSE"           = roundup(res$ANOVA$MEANSQ[2], 2),
+      "R-Square"      = roundup(res$FitStatistics$RSQ[1], 4),
+      "Adj R-Square"  = roundup(res$FitStatistics$ADJRSQ[1], 4)
+    )
+
+  }
+
+  return(ret)
+}
+
+#' @noRd
+draw_stats_box <- function(stats,
+                           x_frac = c(0.03, 0.30),   # from right edge of plot (in x-range fractions)
+                           cex = 0.85,
+                           family = "sans",
+                           box_col = "white",
+                           border_col = "grey70",
+                           pad_y = 0.01,            # vertical padding as fraction of y-range
+                           pad_x = 0.01) {           # horizontal padding as fraction of x-range
+  stopifnot(is.numeric(stats), !is.null(names(stats)))
+
+  # allow drawing in the margin
+  op <- par(xpd = NA)
+  on.exit(par(op), add = TRUE)
+
+  usr <- par("usr")  # c(x1, x2, y1, y2)
+  x_rng <- diff(usr[1:2])
+  y_rng <- diff(usr[3:4])
+
+  # x positions (user sets; relative to right edge)
+  x_left  <- usr[2] + x_frac[1] * x_rng
+  x_right <- usr[2] + x_frac[2] * x_rng
+
+  # compute line height in user units (based on current cex)
+  old_cex <- par("cex")
+  old_family <- par("family")
+  par(cex = cex, family = family)
+  on.exit(par(cex = old_cex, family = old_family), add = TRUE)
+
+  line_h <- strheight("Mg")         # approx line height in user units
+  gap_h  <- 0.35 * line_h           # gap between lines
+  inner_h <- length(stats) * line_h + (length(stats) - 1) * gap_h
+
+  # box padding in user units
+  py <- pad_y * y_rng
+  px <- pad_x * x_rng
+
+  box_h <- inner_h + 2 * py
+
+  # center vertically in plot area
+  y_mid <- mean(usr[3:4])
+  y_bot <- y_mid - box_h / 2
+  y_top <- y_mid + box_h / 2
+
+  # draw box
+  rect(x_left, y_bot, x_right, y_top, col = box_col, border = border_col)
+
+  # y positions for each row (top to bottom)
+  y_start <- y_top - py - line_h / 2
+  y_pos <- y_start - (seq_along(stats) - 1) * (line_h + gap_h)
+
+  # left column: names
+  text(x_left + px, y_pos,
+       labels = names(stats),
+       adj = c(0, 0.5))
+
+  # right column: values
+  text(x_right - px, y_pos,
+       labels = unname(stats),
+       adj = c(1, 0.5))
+}
+
+get_scale <- function(vct, pct = .1) {
+
+  rng <- range(vct)
+
+  mn <- rng[1] * (1 - pct)
+  mx <- rng[2] * (1 + pct)
+
+  ret <- c(mn, mx)
+
+  return(ret)
+
+}
+
+
+get_zero_scale <- function(vct, pct = .1) {
+
+  rng <- range(vct)
+
+  mn <- abs(rng[1] * (1 + pct))
+  mx <- abs(rng[2] * (1 + pct))
+
+  tmx <- max(mn, mx)
+
+  ret <- c(-tmx, tmx)
+
+  return(ret)
+}

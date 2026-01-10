@@ -116,8 +116,7 @@ test_that("freqplot2: One-way proc_freq with plots works.", {
   # Freqplot function
   res <- proc_freq(dat, tables = c("Eyes"),
                    plots = freqplot(),
-                   output = report,
-                   titles = "My first Frequency Plot")
+                   output = report)
 
   res
 
