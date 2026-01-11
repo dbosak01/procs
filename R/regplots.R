@@ -161,11 +161,12 @@ render_regplot <- function (dat, res, mdl, plt, alph) {
   ret <- NULL
 
   if (is.character(plt)) {
-    if (plt == "regplot") {
+    if (all(plt == "regplot")) {
       plt <- regplot()
+    } else {
+      plt <- regplot(type = plt)
     }
   }
-
 
   if ("regplot" %in% class(plt)) {
 
@@ -790,7 +791,7 @@ render_fitplot <- function(dat, res, mdl, plt, alph) {
 }
 
 #' @noRd
-render_residualhistogram <- function() {
+render_residualhistogram <- function(dat, res, mdl, plt) {
 
   op <- par("mar")
 
@@ -821,36 +822,80 @@ render_residualhistogram <- function() {
   dt <- dat[[ivr]]
 
   # Set margins
-  par(mar = c(5, 5, 2, .75) + 0.1)
+  par(mar = c(4, 5, 2, .75) + 0.1)
 
-  # Get y scale
-  # mx <- max(rdt) * 1.05
-  # scl <- c(-mx, mx)
-  scl <- range(rdt) * 1.1
+  # Calculate stats
+  n   <- length(rdt)
+  mu  <- mean(rdt)
+  sdx <- sd(rdt)
 
-  # Generate plot
-  plot(dt, rdt,
-       main = paste("Residuals for ", dvr),
-       xlab = ivr,
-       ylab = "Residual",
+  # Get x scale
+  scl <- c(-45, 45) # Can this be fixed?  #get_scale(rdt, 2)
 
-       pch  = 1,          # open circles
-       cex = 1.3,
-       col  = "#05379B",
-       ylim = scl,
-       axes = FALSE
-  )
+  # Histogram (Percent scale)
+  h <- hist(rdt,
+            breaks = "Sturges",
+            plot = FALSE)
+
+  # Convert counts to percent
+  h$counts <- h$counts / sum(h$counts) * 100
+
+  # Create plot using histogram values
+  plot(h,
+       col = "#CAD5E5", #"grey85",
+       border = "grey20",
+       main = paste0("Distribution of Residuals for ", dvr),
+       xlab = "",
+       ylab = "Percent",
+       xlim = scl,
+       ylim = c(0, max(h$counts) * 1.2),
+       axes = FALSE)
+
+  # Normal curve overlay (scaled to percent)
+  x <- seq(min(rdt) * 2, max(rdt) * 2, length.out = 300)
+
+  y_norm <- dnorm(x, mean = mu, sd = sdx)
+  y_norm <- y_norm / max(y_norm) * max(h$counts)
+
+  lines(x, y_norm, col = "steelblue4", lwd = 2)
+
+  # Kernel density overlay (scaled to percent)
+  dens <- density(rdt)
+
+  y_kern <- dens$y / max(dens$y) * max(h$counts)
+
+  lines(dens$x, y_kern, col = "orangered2", lwd = 2)
+
+  # Add x axis label
+  mtext("Residual", side = 1, line = par("mar")[1] - 2)
 
   # Add custom axes
-  axis(side = 1, col.ticks = "grey55")
-  axis(side = 2, las = 1, col.ticks = "grey55")
-
-  # Generate zero line
-  abline(h = 0, col = "grey60", lwd = 1)
+  axis(side = 1, col.ticks = "grey55",
+       mgp = c(3, .5, 0), tck = -0.015)
+  axis(side = 2, las = 1, col.ticks = "grey55",
+       mgp = c(3, .5, 0), tck = -0.015)
 
   # # frame
   box(col = "grey70", lwd = 1)
   box("figure", col = "grey70", lwd = 1)
+
+  # Legend
+  mpos <- legend("topright",
+         legend = c("Normal", "Kernel"),
+         col = c("steelblue4", "orangered2"),
+         lwd = 2,
+         box.col = "grey80",
+         bty = "n",
+         cex = .8,
+         inset = c(.01, .01),
+         x.intersp = .5,
+         y.intersp = c(0.5, 1.8)
+         )
+
+  rect(mpos$rect$left, mpos$rect$top - (mpos$rect$h - .5),
+       mpos$rect$left + mpos$rect$w, mpos$rect$top,
+       border = "grey80"
+       )
 
   # Restore margins
   par(mar = op)

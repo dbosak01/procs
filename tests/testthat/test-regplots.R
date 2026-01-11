@@ -385,9 +385,10 @@ test_that("regplot13: proc_reg() works for observedbypredicted", {
 
 })
 
+# Bins are going to be a problem.
 test_that("regplot14: proc_reg() works for residualhistogram", {
 
-  # OK
+  #
   res <- proc_reg(cls,
                   model = "Weight = Height",
                   output = report,
@@ -398,4 +399,49 @@ test_that("regplot14: proc_reg() works for residualhistogram", {
 
 
 })
+
+
+test_that("regplot15: proc_reg() passing type strings works.", {
+
+  # Pass quoted string type
+  res <- proc_reg(cls,
+                  model = "Weight = Height",
+                  output = report,
+                  plots = "residualhistogram")
+
+  expect_equal(length(res), 5)
+  expect_equal("plot_spec" %in% class(res[[5]][[1]]), TRUE)
+
+
+  # Unquoted string
+  res <- proc_reg(cls,
+                  model = "Weight = Height",
+                  output = report,
+                  plots = residualhistogram)
+
+  expect_equal(length(res), 5)
+  expect_equal("plot_spec" %in% class(res[[5]][[1]]), TRUE)
+
+
+  # v function
+  res <- proc_reg(cls,
+                  model = "Weight = Height",
+                  output = report,
+                  plots = v(fitplot, residuals, residualhistogram))
+
+  expect_equal(length(res), 5)
+  expect_equal("plot_spec" %in% class(res[[5]][[1]]), TRUE)
+
+  # Vector of strings
+  res <- proc_reg(cls,
+                  model = "Weight = Height",
+                  output = report,
+                  plots = c("fitplot", "residuals", "residualhistogram"))
+
+  expect_equal(length(res), 5)
+  expect_equal("plot_spec" %in% class(res[[5]][[1]]), TRUE)
+
+
+})
+
 

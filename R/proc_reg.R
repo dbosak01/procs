@@ -364,6 +364,14 @@ proc_reg <- function(data,
   output <- tryCatch({if (typeof(output) %in% c("character", "NULL")) output else oout},
                      error = function(cond) {oout})
 
+  oplots <- deparse(substitute(plots, env = environment()))
+  if (any(grepl("regplot", oplots, fixed = TRUE) == FALSE)) {
+    plots <- tryCatch({if (typeof(plots) %in% c("character", "NULL")) plots else oplots},
+                       error = function(cond) {oplots})
+
+  }
+
+
   # Parameter checks
 
   if (!"data.frame" %in% class(data)) {
