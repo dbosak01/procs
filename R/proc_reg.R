@@ -1,5 +1,5 @@
 
-# TTest Procedure ---------------------------------------------------------
+# Reg Procedure ---------------------------------------------------------
 
 
 
@@ -176,6 +176,45 @@
 #' These shaping options are passed on the \code{output} parameter.  For example,
 #' to return the data in "long" form, use \code{output = "long"}.
 #'
+#' @section Plots:
+#' The \code{plots} parameter allows you to request several types of regression
+#' plots. Below are the types of plots that are supported.  The list shows
+#' the plot type keyword needed to request the plot, and a brief description:
+#' \itemize{
+#' \item{\strong{diagnostics}:  A fit diagnostics panel that contains 8 different
+#' types of plots and a table of statistics.
+#' }
+#' \item{\strong{residuals}: Produces a panel of residual plots against
+#'  each independent variable in the model.
+#' }
+#' \item{\strong{fitplot}:  Produces a scatter plot of the dependent variable
+#' against the regressor, including the fitted line and confidence/prediction bands.
+#' This is only available for models with a single regressor.
+#' }
+#' \item{\strong{qqplot}: Normal Quantile-Quantile (Q-Q) plot of residuals.
+#' }
+#' \item{\strong{rfplot}: Residual-Fit (RF) spread plot.
+#' }
+#' \item{\strong{residualbypredicted}: Residuals vs. Predicted values.
+#' }
+#' \item{\strong{rstudentbypredicted}: Externally Studentized Residuals (RStudent) vs. Predicted values.
+#' }
+#' \item{\strong{rstudentbyleverage}: Externally Studentized Residuals vs. Leverage.
+#' }
+#' \item{\strong{cooksd}: Cook’s D statistic vs. Observation number.
+#' }
+#' \item{\strong{residualhistogram}: Histogram of residuals,
+#' with a normal and kernel curve overlay.
+#' }
+#' \item{\strong{observedbypredicted}: Dependent variable (Observed) vs. Predicted values.
+#' }
+#' }
+#' The above plots may be requested in different ways: as a vector of keywords,
+#' or as a call to the \code{\link{regplot}} function.  The keyword approach will
+#' produce plots with default parameters. A call to \code{\link{regplot}} will
+#' give you control over some parameters to the charts.  See the \code{\link{regplot}}
+#' function for further details.
+#'
 #' @param data The input data frame for which to perform the regression analysis.
 #' This parameter is required.
 #' @param model A model for the regression to be performed.  The model can be
@@ -190,8 +229,8 @@
 #'  data will be subset on the by variable(s) prior to performing the regression.
 #'  For multiple by variables, pass them as a quoted vector of variable names.
 #'  You may also pass them unquoted using the \code{\link[common]{v}} function.
-#' @param stats Optional statistics keywords.  Valid values are "adjrsq", "clb",
-#' "est", "edf", "hcc", "hccmethod", "mse", "p", "press", "rsquare",
+#' @param stats Optional statistics keywords.  Valid values are "adjrsq", "aic",
+#' "clb", "est", "edf", "hcc", "hccmethod", "mse", "p", "press", "rsquare",
 #' "sse", "spec", "seb", and "table".  A single keyword may be passed with or
 #' without quotes. Pass multiple keywords either as a quoted vector, or unquoted
 #' vector using the \code{v()} function.  These statistics keywords largely
@@ -365,8 +404,8 @@ proc_reg <- function(data,
                      error = function(cond) {oout})
 
   oplots <- deparse(substitute(plots, env = environment()))
-  if (any(grepl("regplot", oplots, fixed = TRUE) == FALSE)) {
-    plots <- tryCatch({if (typeof(plots) %in% c("character", "NULL")) plots else oplots},
+  if (all(grepl("regplot(", oplots, fixed = TRUE) == FALSE)) {
+    plots <- tryCatch({if (typeof(plots) %in% c("character", "list", "NULL")) plots else oplots},
                        error = function(cond) {oplots})
 
   }
@@ -451,7 +490,7 @@ proc_reg <- function(data,
 
     sopts <- c("seb", "table", "est", "press",
                "rsquare", "edf", "adjrsq", "mse", "sse", "spec",
-               "clb", "hcc", "hccmethod", "p")
+               "clb", "hcc", "hccmethod", "p", "aic")
 
     nsopts <- names(stats)
 
@@ -1044,7 +1083,7 @@ get_reg_output<- function(data, var, model, modelname, opts = NULL, stats = NULL
            "Std..Error" = "STDERR", "Lower.CL" = "LCLM", "Upper.CL" = "UCLM",
            "t.value" = "T", "Pr...t.." = "PROBT")
 
-  # Add dependtant mean
+  # Add dependent mean
   lkp[paste0(var, ".Mean")] = "DEPMEAN"
 
   # Translate names
@@ -1115,6 +1154,12 @@ get_reg_output<- function(data, var, model, modelname, opts = NULL, stats = NULL
     if (has_option(stats, "SBC"))
       ret[["SBC"]] <- freg$ADJRSQ
 
+  }
+
+  if (has_option(stats, "AIC")) {
+    fit <- lm(model, data)
+    aicv <- extractAIC(fit)
+    ret[["AIC"]] <- aicv[2]
   }
 
   # Convert to data frame

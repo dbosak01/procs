@@ -13,7 +13,8 @@ proc_reg(
   output = NULL,
   weight = NULL,
   options = NULL,
-  titles = NULL
+  titles = NULL,
+  plots = NULL
 )
 }
 \arguments{
@@ -34,8 +35,8 @@ data will be subset on the by variable(s) prior to performing the regression.
 For multiple by variables, pass them as a quoted vector of variable names.
 You may also pass them unquoted using the \code{\link[common]{v}} function.}
 
-\item{stats}{Optional statistics keywords.  Valid values are "adjrsq", "clb",
-"est", "edf", "hcc", "hccmethod", "mse", "p", "press", "rsquare",
+\item{stats}{Optional statistics keywords.  Valid values are "adjrsq", "aic",
+"clb", "est", "edf", "hcc", "hccmethod", "mse", "p", "press", "rsquare",
 "sse", "spec", "seb", and "table".  A single keyword may be passed with or
 without quotes. Pass multiple keywords either as a quoted vector, or unquoted
 vector using the \code{v()} function.  These statistics keywords largely
@@ -70,6 +71,12 @@ The "noprint" option turns off the interactive report. For other options,
 see the \strong{Options} section for explanations of each.}
 
 \item{titles}{A vector of one or more titles to use for the report output.}
+
+\item{plots}{Pass the desired plot(s) on this parameter. Valid values are "regplot",
+or a call to the \code{\link{regplot}} function.  Default is NULL, meaning no
+plots are desired.  If there are multiple model requests, you can pass a single
+plot request which will apply to all tables, or a list of plot requests that
+align one-to-one for each model formula.}
 }
 \value{
 Normally, the requested regression statistics are shown interactively
@@ -264,6 +271,47 @@ columns, and variables are in rows. This shaping option is the default.
 }
 These shaping options are passed on the \code{output} parameter.  For example,
 to return the data in "long" form, use \code{output = "long"}.
+}
+
+\section{Plots}{
+
+The \code{plots} parameter allows you to request several types of regression
+plots. Below are the types of plots that are supported.  The list shows
+the plot type keyword needed to request the plot, and a brief description:
+\itemize{
+\item{\strong{diagnostics}:  A fit diagnostics panel that contains 8 different
+types of plots and a table of statistics.
+}
+\item{\strong{residuals}: Produces a panel of residual plots against
+each independent variable in the model.
+}
+\item{\strong{fitplot}:  Produces a scatter plot of the dependent variable
+against the regressor, including the fitted line and confidence/prediction bands.
+This is only available for models with a single regressor.
+}
+\item{\strong{qqplot}: Normal Quantile-Quantile (Q-Q) plot of residuals.
+}
+\item{\strong{rfplot}: Residual-Fit (RF) spread plot.
+}
+\item{\strong{residualbypredicted}: Residuals vs. Predicted values.
+}
+\item{\strong{rstudentbypredicted}: Externally Studentized Residuals (RStudent) vs. Predicted values.
+}
+\item{\strong{rstudentbyleverage}: Externally Studentized Residuals vs. Leverage.
+}
+\item{\strong{cooksd}: Cook’s D statistic vs. Observation number.
+}
+\item{\strong{residualhistogram}: Histogram of residuals,
+with a normal and kernel curve overlay.
+}
+\item{\strong{observedbypredicted}: Dependent variable (Observed) vs. Predicted values.
+}
+}
+The above plots may be requested in different ways: as a vector of keywords,
+or as a call to the \code{\link{regplot}} function.  The keyword approach will
+produce plots with default parameters. A call to \code{\link{regplot}} will
+give you control over some parameters to the charts.  See the \code{\link{regplot}}
+function for further details.
 }
 
 \examples{

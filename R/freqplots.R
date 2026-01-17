@@ -748,7 +748,7 @@ render_freqplot.group <- function(dat, tbl1, tbl2, plt) {
       # So start with that
       jpeg(pth, width = wd, height = ht, quality = 100)
 
-      # Set up for 3 charts on plot
+      # Set up for correct number of charts per plot
       if (plt$twoway == "groupvertical") {
         par(mfrow = c(pltmax, 1), oma = cmar)
       } else {

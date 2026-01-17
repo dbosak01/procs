@@ -117,7 +117,8 @@ additional customization of the results.</p>
 <span>  output <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  weight <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  options <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  titles <span class="op">=</span> <span class="cn">NULL</span></span>
+<span>  titles <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  plots <span class="op">=</span> <span class="cn">NULL</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -149,8 +150,8 @@ You may also pass them unquoted using the <code><a href="https://common.r-sassy.
 
 
 <dt id="arg-stats">stats<a class="anchor" aria-label="anchor" href="#arg-stats"></a></dt>
-<dd><p>Optional statistics keywords.  Valid values are "adjrsq", "clb",
-"est", "edf", "hcc", "hccmethod", "mse", "p", "press", "rsquare",
+<dd><p>Optional statistics keywords.  Valid values are "adjrsq", "aic",
+"clb", "est", "edf", "hcc", "hccmethod", "mse", "p", "press", "rsquare",
 "sse", "spec", "seb", and "table".  A single keyword may be passed with or
 without quotes. Pass multiple keywords either as a quoted vector, or unquoted
 vector using the <code><a href="https://common.r-sassy.org/reference/v.html" class="external-link">v()</a></code> function.  These statistics keywords largely
@@ -193,6 +194,14 @@ see the <strong>Options</strong> section for explanations of each.</p></dd>
 
 <dt id="arg-titles">titles<a class="anchor" aria-label="anchor" href="#arg-titles"></a></dt>
 <dd><p>A vector of one or more titles to use for the report output.</p></dd>
+
+
+<dt id="arg-plots">plots<a class="anchor" aria-label="anchor" href="#arg-plots"></a></dt>
+<dd><p>Pass the desired plot(s) on this parameter. Valid values are "regplot",
+or a call to the <code><a href="regplot.html">regplot</a></code> function.  Default is NULL, meaning no
+plots are desired.  If there are multiple model requests, you can pass a single
+plot request which will apply to all tables, or a list of plot requests that
+align one-to-one for each model formula.</p></dd>
 
 </dl></div>
     <div id="value">
@@ -359,6 +368,34 @@ be returned in "wide" form, such that statistics are across the top in
 columns, and variables are in rows. This shaping option is the default.</p></li>
 </ul><p>These shaping options are passed on the <code>output</code> parameter.  For example,
 to return the data in "long" form, use <code>output = "long"</code>.</p>
+    </div>
+    <div id="plots">
+    <h2>Plots</h2>
+
+
+<p>The <code>plots</code> parameter allows you to request several types of regression
+plots. Below are the types of plots that are supported.  The list shows
+the plot type keyword needed to request the plot, and a brief description:</p><ul><li><p><strong>diagnostics</strong>:  A fit diagnostics panel that contains 8 different
+types of plots and a table of statistics.</p></li>
+<li><p><strong>residuals</strong>: Produces a panel of residual plots against
+each independent variable in the model.</p></li>
+<li><p><strong>fitplot</strong>:  Produces a scatter plot of the dependent variable
+against the regressor, including the fitted line and confidence/prediction bands.
+This is only available for models with a single regressor.</p></li>
+<li><p><strong>qqplot</strong>: Normal Quantile-Quantile (Q-Q) plot of residuals.</p></li>
+<li><p><strong>rfplot</strong>: Residual-Fit (RF) spread plot.</p></li>
+<li><p><strong>residualbypredicted</strong>: Residuals vs. Predicted values.</p></li>
+<li><p><strong>rstudentbypredicted</strong>: Externally Studentized Residuals (RStudent) vs. Predicted values.</p></li>
+<li><p><strong>rstudentbyleverage</strong>: Externally Studentized Residuals vs. Leverage.</p></li>
+<li><p><strong>cooksd</strong>: Cook’s D statistic vs. Observation number.</p></li>
+<li><p><strong>residualhistogram</strong>: Histogram of residuals,
+with a normal and kernel curve overlay.</p></li>
+<li><p><strong>observedbypredicted</strong>: Dependent variable (Observed) vs. Predicted values.</p></li>
+</ul><p>The above plots may be requested in different ways: as a vector of keywords,
+or as a call to the <code><a href="regplot.html">regplot</a></code> function.  The keyword approach will
+produce plots with default parameters. A call to <code><a href="regplot.html">regplot</a></code> will
+give you control over some parameters to the charts.  See the <code><a href="regplot.html">regplot</a></code>
+function for further details.</p>
     </div>
 
     <div id="ref-examples">

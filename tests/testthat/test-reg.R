@@ -846,28 +846,29 @@ test_that("reg25: by parameter with output options works.", {
 
 })
 
+test_that("reg26: Additional stats parameters.", {
 
-# Testing plots
+  mdls <- list(formula(Weight ~ Height),
+               formula(Weight ~ Age),
+               formula(Weight ~ Height + Age))
 
-# library(ggplot2)
-#
-# ggplot(res2$Statistics, aes(x = PREVAL, y = RESID)) +
-#   geom_point() +
-#   geom_hline(yintercept = 0) +
-#   geom_smooth(se = FALSE, color = "red") +
-#   labs(title='Residual vs. Fitted Values Plot', x='Fitted Values', y='Residuals')
-#
+  # outest
+  res8 <- proc_reg(cls, mdls,
+                   options = OUTEST,
+                   stats = aic
+                   )
 
+  res8
 
-# res1 <- proc_reg(cars, dist ~ speed, output = report, stats = p)
-# cars |>
-# ggplot(aes(speed, dist))+
-#   geom_point(aes(size = abs(res1$Statistics$RESID)))+
-#   geom_point(aes(y=res1$Statistics$PREVAL), color="green")+
-#   geom_smooth(method = "lm")+
-#   geom_smooth(se = FALSE, color="blue")+
-#   geom_segment(aes(xend = speed, yend = res1$Statistics$PREVAL), color="red")
-#pltcar
+  expect_equal(nrow(res8), 3)
+  expect_equal("AIC" %in% names(res8), TRUE)
+
+  # Below AIC values taken from SAS
+  expect_equal(res8$AIC[1], 93.780394884)
+  expect_equal(res8$AIC[2], 106.62042125)
+  expect_equal(res8$AIC[3], 95.580809248)
+})
+
 
 
 
