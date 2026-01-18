@@ -1117,12 +1117,12 @@ get_text_width <- function(txt, font = "arial", font_size = 12,
 
   ret <- 0
 
-  withr::with_pdf(NULL, {
-  par(family = f, ps = font_size)
-  if (length(txt) > 0) {
-    ret <- strwdth(txt, un) * multiplier
-  }
-  dev.off()})
+ withr::with_pdf(NULL, {
+   par(family = f, ps = font_size)
+   if (length(txt) > 0) {
+     ret <- strwdth(txt, un) * multiplier
+   }
+ })
 
 
   return(ret)

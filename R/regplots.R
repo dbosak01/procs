@@ -74,6 +74,8 @@
 #' }
 #' \item{\strong{observedbypredicted}: Dependent variable (Observed) vs. Predicted values.
 #' }
+#' \item{\strong{residualboxplot}: A boxplot of residuals.
+#' }
 #' }
 #' The above plots may be requested in different ways: as a vector of keywords,
 #' or as a call to the \code{\link{regplot}} function.  The keyword approach will
@@ -110,7 +112,7 @@
 #' @param type The type(s) of plot to create. Multiple types should be passed
 #' as a vector of strings.  Valid values are "diagnostics", "residualbypredicted",
 #' "rstudentbypredicted", "rstudentbyleverage", "qqplot", "observedbypredicted",
-#' "cooksd", "residualhistogram",
+#' "cooksd", "residualhistogram", "residualboxplot",
 #' "rfplot", "residuals", and "fitplot".  The default value is
 #' a vector with "diagnostics", "residuals", and "fitplot".  The "diagnostics"
 #' keyword produces a single combined chart with 8 different plots and a
@@ -124,7 +126,8 @@
 #' are: "adjrsq", "aic", "coeffvar", "depmean", "default", "edf", "mse", "nobs",
 #' "nparm", "rsquare", and "sse".  The
 #' default value is "default", which produces the following statistics:
-#' "nobs", "nparm", "edf", "mse", "rsquare", and "adjrsq".
+#' "nobs", "nparm", "edf", "mse", "rsquare", and "adjrsq". You may also pass
+#' the value "none" if you do not want any statistics shown on the chart.
 #' @param label Whether or not to label values automatically. Valid values
 #' are TRUE or FALSE.  Default is FALSE. If TRUE, this options will assign
 #' labels to outlier values on some charts. Only some individual charts are labelled,
@@ -217,7 +220,7 @@ regplot <- function(type = c("diagnostics", "residuals", "fitplot"), panel = TRU
   # Parameter Checks
   vldvals <- c("diagnostics", "residuals", "fitplot", 'qqplot', 'rfplot',
                "residualbypredicted", "rstudentbypredicted", "rstudentbyleverage",
-               "cooksd", "residualhistogram", "observedbypredicted")
+               "cooksd", "residualhistogram", "observedbypredicted", "residualboxplot")
   if (any(!type %in% vldvals)) {
 
     ivd <- type[!type %in% vldvals]
@@ -225,7 +228,7 @@ regplot <- function(type = c("diagnostics", "residuals", "fitplot"), panel = TRU
                 "\nValid values are: ",
                 "'diagnostics', 'residuals', 'fitplot', 'qqplot', 'rfplot', ",
                 "'residualbypredicted', 'rstudentbypredicted', 'rstudentbyleverage', ",
-                "'cooksd', 'residualhistogram', 'observedbypredicted'."
+                "'cooksd', 'residualhistogram', 'observedbypredicted', 'residualboxplot'."
                 ))
   }
 
@@ -235,7 +238,7 @@ regplot <- function(type = c("diagnostics", "residuals", "fitplot"), panel = TRU
 
   # sse, bic, gmsep, pc, sp, aic, cp, jp, sbc
   statlst <-  c("adjrsq", "aic", "coeffvar", "depmean", "default", "edf", "mse",
-                "nobs", "nparm", "rsquare", "sse")
+                "nobs", "none", "nparm", "rsquare", "sse")
   if (!all(stats %in% statlst)) {
     stop(paste0("Parameter value for 'stats' invalid. Valid values are ",
                 paste0("'", statlst, "'", collapse = ", "), "."))
@@ -325,6 +328,8 @@ render_regplot <- function (dat, res, mdl, plt, alph) {
         ret[["observedbypredicted"]] <- render_observedbypredicted(dat, res, mdl, plt)
       } else if (tp == "residualhistogram") {
         ret[["residualhistogram"]] <- render_residualhistogram(dat, res, mdl, plt)
+      }else if (tp == "residualboxplot") {
+        ret[["residualboxplot"]] <- render_residualboxplot(dat, res, mdl, plt)
       }
     }
 
@@ -340,6 +345,7 @@ render_regplot <- function (dat, res, mdl, plt, alph) {
 
 # Diagnostics Panel -------------------------------------------------------
 
+# Deal with "none" stats parameter.  Adding extra box plot.
 #' @noRd
 render_diagnostics <- function(dat, res, mdl, plt, alph) {
 
@@ -403,8 +409,8 @@ render_diagnostics <- function(dat, res, mdl, plt, alph) {
   )
 
   # Add custom axes
-  axis(side = 1, col.ticks = "grey55", mgp = c(3, .5, 0))
-  axis(side = 2, las = 1, col.ticks = "grey55", mgp = c(3, .5, 0))
+  axis(side = 1, col.ticks = "grey55", mgp = c(3, .5, 0), tck = -0.015)
+  axis(side = 2, las = 1, col.ticks = "grey55", mgp = c(3, .5, 0), tck = -0.015)
 
   # Generate zero line
   abline(h = 0, col = "grey60", lwd = 1)
@@ -447,8 +453,8 @@ render_diagnostics <- function(dat, res, mdl, plt, alph) {
   )
 
   # Add custom axes
-  axis(side = 1, col.ticks = "grey55", mgp = c(3, .5, 0))
-  axis(side = 2, las = 1, col.ticks = "grey55", mgp = c(3, .5, 0))
+  axis(side = 1, col.ticks = "grey55", mgp = c(3, .5, 0), tck = -0.015)
+  axis(side = 2, las = 1, col.ticks = "grey55", mgp = c(3, .5, 0), tck = -0.015)
 
   # Generate reference lines
   abline(h =  2, col = "grey60", lwd = 1)
@@ -546,7 +552,7 @@ render_diagnostics <- function(dat, res, mdl, plt, alph) {
 
   # Add custom axes
   axis(side = 1, col.ticks = "grey55", mgp = c(3, .5, 0), tck = -0.015)
-  axis(side = 2, las = 1, col.ticks = "grey55")
+  axis(side = 2, las = 1, col.ticks = "grey55", mgp = c(3, .5, 0), tck = -0.015)
 
   # X Axis label
   mtext("Quantile", side = 1, line = par("mar")[1] - 2, cex = .9)
@@ -810,73 +816,133 @@ render_diagnostics <- function(dat, res, mdl, plt, alph) {
         line = par("oma")[1] - 2, cex = .9)
 
   #******************************
-  # 9) Statistics
+  # 9) Statistics or Boxplot
   #******************************
 
-  # Set margins and figure placement
-  par(mar = c(4, 5, 0, 2) + 0.1,
-      fig = c(.667, 1, 0, .334), new = TRUE)
+  if (!"none" %in% plt$stats) {
 
-  # Initialize empty plot
-  # to create drawing area.
-  plot.new()
+    # Set margins and figure placement
+    par(mar = c(4, 5, 0, 2) + 0.1,
+        fig = c(.667, 1, 0, .334), new = TRUE)
 
-  # Get needed statistics as named vector
-  stats <- collect_stats(res, plt)
+    # Initialize empty plot
+    # to create drawing area.
+    plot.new()
 
-  if ("aic" %in% plt$stats) {
-    aicv <- round(extractAIC(fit)[2], 4)
-    stats <- append(stats, aicv)
-    names(stats)[length(stats)] <- "AIC"
+    # Get needed statistics as named vector
+    stats <- collect_stats(res, plt)
+
+    if ("aic" %in% plt$stats) {
+      aicv <- round(extractAIC(fit)[2], 4)
+      stats <- append(stats, aicv)
+      names(stats)[length(stats)] <- "AIC"
+    }
+
+    # Set parameters
+    box_col = "white"
+    border_col = "grey70"
+    pad_y = 0.03            # vertical padding as fraction of y-range
+    pad_x = 0.03
+
+    # Get environment settings
+    usr <- par("usr")  # c(x1, x2, y1, y2)
+    x_rng <- diff(usr[1:2])
+    y_rng <- diff(usr[3:4])
+
+    # x positions (user sets; relative to right edge)
+    x_left  <- 0
+    x_right <- 1
+
+    # Determine line spacing
+    line_h <- strheight("Mg")         # approx line height in user units
+    gap_h  <- 0.8 * line_h           # gap between lines
+    inner_h <- length(stats) * line_h + (length(stats) - 1) * gap_h
+
+    # box padding in user units
+    py <- pad_y * y_rng
+    px <- pad_x * x_rng
+
+    box_h <- inner_h + 2 * py
+
+    # center vertically in plot area
+    y_mid <- mean(usr[3:4])
+    y_bot <- y_mid - box_h / 2
+    y_top <- y_mid + box_h / 2
+
+    # draw box
+    rect(x_left, y_bot - (py/2), x_right, y_top, col = box_col, border = border_col)
+
+    # y positions for each row (top to bottom)
+    y_start <- y_top - py - line_h / 2
+    y_pos <- y_start - (seq_along(stats) - 1) * (line_h + gap_h)
+
+    # left column: names
+    text(x_left + px, y_pos,
+         labels = names(stats),
+         adj = c(0, 0.5), cex= 1.25)
+
+    # right column: values
+    text(x_right - px, y_pos,
+         labels = unname(stats),
+         adj = c(1, 0.5), cex= 1.25)
+
+  } else {  # Boxplot
+
+    # Prepare data
+    rdt <- res$OutputStatistics$RESID
+
+    # Set margins
+    par(mar = c(4, 5, 0, 0) + 0.1,
+        fig = c(.667, 1, 0, .334), new = TRUE)
+
+    # Get scales
+    yscl <- get_zero_scale(rdt, .05)
+
+    # Calculate SAS compatible quantile
+    q <- quantile(rdt, probs = c(0, .25, .5, .75, 1), type = 2)
+
+    # Prepare to pass data
+    bp <- list(
+      stats = matrix(q, ncol = 1),
+      n = length(rdt),
+      conf = NULL,
+      out = numeric(0)
+    )
+
+    # Box plot
+    bxp(bp,
+        main = "",
+        ylab = "",
+        boxfill = "#CAD5E5",
+        border = "grey40",
+        outline = FALSE,
+        lty = 1,
+        ylim = yscl,
+        whiskcol = "#05379B",
+        staplecol = "#05379B",
+        medcol = "#05379B",
+        medlwd = 1,
+        boxwex = .65,
+        axes = FALSE)
+
+
+    # Mean diamond
+    points(1, mean(rdt),
+           pch = 5,          # diamond
+           col = "#05379B",
+           cex = 1.4)
+
+    # Add custom axis
+    aval <- axis(side = 2, las = 1, col.ticks = "grey55",
+                 mgp = c(3, .5, 0), tck = -0.015)
+
+    # Label
+    mtext("Residual", side = 2, line = par("mar")[1] - 1, cex = .9)
+
+    # Frame
+    box(col = "grey70", lwd = 1)
+
   }
-
-  # Set parameters
-  box_col = "white"
-  border_col = "grey70"
-  pad_y = 0.03            # vertical padding as fraction of y-range
-  pad_x = 0.03
-
-  # Get environment settings
-  usr <- par("usr")  # c(x1, x2, y1, y2)
-  x_rng <- diff(usr[1:2])
-  y_rng <- diff(usr[3:4])
-
-  # x positions (user sets; relative to right edge)
-  x_left  <- 0
-  x_right <- 1
-
-  # Determine line spacing
-  line_h <- strheight("Mg")         # approx line height in user units
-  gap_h  <- 0.8 * line_h           # gap between lines
-  inner_h <- length(stats) * line_h + (length(stats) - 1) * gap_h
-
-  # box padding in user units
-  py <- pad_y * y_rng
-  px <- pad_x * x_rng
-
-  box_h <- inner_h + 2 * py
-
-  # center vertically in plot area
-  y_mid <- mean(usr[3:4])
-  y_bot <- y_mid - box_h / 2
-  y_top <- y_mid + box_h / 2
-
-  # draw box
-  rect(x_left, y_bot - (py/2), x_right, y_top, col = box_col, border = border_col)
-
-  # y positions for each row (top to bottom)
-  y_start <- y_top - py - line_h / 2
-  y_pos <- y_start - (seq_along(stats) - 1) * (line_h + gap_h)
-
-  # left column: names
-  text(x_left + px, y_pos,
-       labels = names(stats),
-       adj = c(0, 0.5), cex= 1.25)
-
-  # right column: values
-  text(x_right - px, y_pos,
-       labels = unname(stats),
-       adj = c(1, 0.5), cex= 1.25)
 
 
   #******************************
@@ -1022,9 +1088,9 @@ render_residuals <- function(dat, res, mdl) {
            )
 
       # Add custom axes
-      axis(side = 1, col.ticks = "grey55")
+      axis(side = 1, col.ticks = "grey55", mgp = c(3, .5, 0), tck = -0.015)
       if (firstChart) {
-        axis(side = 2, las = 1, col.ticks = "grey55")
+        axis(side = 2, las = 1, col.ticks = "grey55", mgp = c(3, .5, 0), tck = -0.015)
       }
 
       # Put x axis label
@@ -1070,82 +1136,6 @@ render_residuals <- function(dat, res, mdl) {
   if (length(ret) == 1) {
     ret <- ret[[1]]
   }
-
-  return(ret)
-
-}
-
-#' @noRd
-render_residuals_back <- function(dat, res, mdl) {
-
-  op <- par("mar")
-
-  # Create temp file path
-  pth <- tempfile(fileext = ".jpg")
-
-  # Standard height and width
-  hti <- 4.5  # Height in inches
-  wdi <- 6  # Width in inches
-  bml <- 6  # bottom margin lines
-
-  # Convert inches to pixels
-  ht <- hti * 96
-  wd <- wdi * 96
-
-  # Output to image file
-  # All output types accept jpeg
-  # So start with that
-  jpeg(pth, width = wd, height = ht, quality = 100, units = "px")
-
-  # Get analysis variables
-  vrs <- get_vars(mdl)
-  dvr <- vrs$dvar
-  ivr <- vrs$ivar
-
-  # Prepare data
-  rdt <- res$OutputStatistics$RESID
-  dt <- dat[[ivr]]
-
-  # Set margins
-  par(mar = c(5, 5, 2, .75) + 0.1)
-
-  # Get y scale
-  # mx <- max(rdt) * 1.05
-  # scl <- c(-mx, mx)
-  scl <- range(rdt) * 1.1  # Doesn't work right
-
-  # Generate plot
-  plot(dt, rdt,
-       main = paste0("Residuals for ", dvr),
-       xlab = ivr,
-       ylab = "Residual",
-
-       pch  = 1,          # open circles
-       cex = 1.3,
-       col  = "#05379B",
-       ylim = scl,
-       axes = FALSE
-  )
-
-  # Add custom axes
-  axis(side = 1, col.ticks = "grey55")
-  axis(side = 2, las = 1, col.ticks = "grey55")
-
-  # Generate zero line
-  abline(h = 0, col = "grey60", lwd = 1)
-
-  # Frame
-  box(col = "grey70", lwd = 1)
-  box("figure", col = "grey70", lwd = 1)
-
-  # Restore margins
-  par(mar = op)
-
-  # Close device context
-  dev.off()
-
-  # Put plot in reporter plot object
-  ret <- create_plot(pth, height = hti, width = wdi)
 
   return(ret)
 
@@ -1203,8 +1193,8 @@ render_residualbypredicted <- function(dat, res, mdl) {
   )
 
   # Add custom axes
-  axis(side = 1, col.ticks = "grey55", mgp = c(3, .5, 0))
-  axis(side = 2, las = 1, col.ticks = "grey55", mgp = c(3, .5, 0))
+  axis(side = 1, col.ticks = "grey55", mgp = c(3, .5, 0), tck = -0.015)
+  axis(side = 2, las = 1, col.ticks = "grey55", mgp = c(3, .5, 0), tck = -0.015)
 
   # Generate zero line
   abline(h = 0, col = "grey60", lwd = 1)
@@ -1282,8 +1272,8 @@ render_rstudentbypredicted <- function(dat, res, mdl, plt) {
   )
 
   # Add custom axes
-  axis(side = 1, col.ticks = "grey55", mgp = c(3, .5, 0))
-  axis(side = 2, las = 1, col.ticks = "grey55", mgp = c(3, .5, 0))
+  axis(side = 1, col.ticks = "grey55", mgp = c(3, .5, 0), tck = -0.015)
+  axis(side = 2, las = 1, col.ticks = "grey55", mgp = c(3, .5, 0), tck = -0.015)
 
   # Generate reference lines
   abline(h =  2, col = "grey60", lwd = 1)
@@ -1480,7 +1470,8 @@ render_rstudentbyleverage <- function(dat, res, mdl, plt) {
 
 }
 
-# Kill if more than 1 independent variable
+# Kill if more than 1 independent variable.
+# Kill stats if "none" parameter is passed.
 #' @noRd
 render_fitplot <- function(dat, res, mdl, plt, alph) {
 
@@ -1532,9 +1523,14 @@ render_fitplot <- function(dat, res, mdl, plt, alph) {
                     newdata = df1,
                     interval = "prediction", level = alph1)
 
-    # Plot
-    par(mar = c(5, 4.5, 2, 8.5) + 0.1)
+    # Set margins
+    if ("none" %in% plt$stats) {
+      par(mar = c(5, 4.5, 2, .75) + 0.1)
+    } else {
+      par(mar = c(5, 4.5, 2, 8.5) + 0.1)
+    }
 
+    # Plot
     plot(dat[[ivr]], dat[[dvr]],
          main = paste0("Fit Plot for ", dvr),
          xlab = "",
@@ -1597,17 +1593,19 @@ render_fitplot <- function(dat, res, mdl, plt, alph) {
     box(col = "grey70", lwd = 1)
     box("figure", col = "grey70", lwd = 1)
 
-    # Gather statistics for box
-    sts <- collect_stats(res, plt)
+    if (!"none" %in% plt$stats) {
+      # Gather statistics for box
+      sts <- collect_stats(res, plt)
 
-    if ("aic" %in% plt$stats) {
-      aicv <- round(extractAIC(fit)[2], 4)
-      sts <- append(sts, aicv)
-      names(sts)[length(sts)] <- "AIC"
+      if ("aic" %in% plt$stats) {
+        aicv <- round(extractAIC(fit)[2], 4)
+        sts <- append(sts, aicv)
+        names(sts)[length(sts)] <- "AIC"
+      }
+
+      # Create box
+      draw_stats_box(sts, x_frac = c(0.015, 0.3))
     }
-
-    # Create box
-    draw_stats_box(sts, x_frac = c(0.015, 0.3))
 
     # Restore margins
     par(mar = op)
@@ -1773,8 +1771,6 @@ render_qqplot <- function(dat, res, mdl) {
   wd <- wdi * 96
 
   # Output to image file
-  # All output types accept jpeg
-  # So start with that
   jpeg(pth, width = wd, height = ht, quality = 100, units = "px")
 
   # Get analysis variables
@@ -1809,7 +1805,7 @@ render_qqplot <- function(dat, res, mdl) {
 
   # Add custom axes
   axis(side = 1, col.ticks = "grey55", mgp = c(3, .5, 0), tck = -0.015)
-  axis(side = 2, las = 1, col.ticks = "grey55")
+  axis(side = 2, las = 1, col.ticks = "grey55", mgp = c(3, .5, 0), tck = -0.015)
 
   # X Axis label
   mtext("Quantile", side = 1, line = par("mar")[1] - 2)
@@ -1818,7 +1814,6 @@ render_qqplot <- function(dat, res, mdl) {
   box(col = "grey70", lwd = 1)
   box("figure", col = "grey70", lwd = 1)
 
-  # Restore margins
   par(mar = op)
 
   # Close device context
@@ -2165,6 +2160,101 @@ render_observedbypredicted <- function(dat, res, mdl, plt) {
   return(ret)
 
 }
+
+render_residualboxplot <- function(dat, res, mdl, plt) {
+
+  op <- par("mar")
+
+  # Create temp file path
+  pth <- tempfile(fileext = ".jpg")
+
+  # Standard height and width
+  hti <- 4.5  # Height in inches
+  wdi <- 6  # Width in inches
+  bml <- 6  # bottom margin lines
+
+  # Convert inches to pixels
+  ht <- hti * 96
+  wd <- wdi * 96
+
+  # Output to image file
+  # All output types accept jpeg
+  # So start with that
+  jpeg(pth, width = wd, height = ht, quality = 100, units = "px")
+
+  # Get analysis variables
+  vrs <- get_vars(mdl)
+  dvr <- vrs$dvar
+  ivr <- vrs$ivar
+
+  # Prepare data
+  rdt <- res$OutputStatistics$RESID
+  pdt <- res$OutputStatistics$PREVAL
+
+  # Set margins
+  par(mar = c(.75, 5, 2, .75) + 0.1)
+
+  # Get scales
+  yscl <- get_zero_scale(rdt, .05)
+
+  # Calculate SAS compatible quantile
+  q <- quantile(rdt, probs = c(0, .25, .5, .75, 1), type = 2)
+
+  # Prepare to pass data
+  bp <- list(
+    stats = matrix(q, ncol = 1),
+    n = length(rdt),
+    conf = NULL,
+    out = numeric(0)
+  )
+
+  # Box plot
+  bxp(bp,
+      main = paste0("Residuals for ", dvr),
+      ylab = "Residual",
+      boxfill = "#CAD5E5",
+      border = "grey40",
+      outline = FALSE,
+      lty = 1,
+      ylim = yscl,
+      whiskcol = "#05379B",
+      staplecol = "#05379B",
+      medcol = "#05379B",
+      medlwd = 1,
+      boxwex = .65,
+      axes = FALSE)
+
+
+  # Mean diamond
+  points(1, mean(rdt),
+         pch = 5,          # diamond
+         col = "#05379B",
+         cex = 1.3)
+
+  # Add custom axis
+  aval <- axis(side = 2, las = 1, col.ticks = "grey55",
+               mgp = c(3, .5, 0), tck = -0.015)
+
+  ## Optional: horizontal gridlines
+  abline(h = aval, col = "grey90", lwd = 1)
+
+  # Frame
+  box(col = "grey70", lwd = 1)
+  box("figure", col = "grey70", lwd = 1)
+
+  # Restore margins
+  par(mar = op)
+
+  # Close device context
+  dev.off()
+
+  # Put plot in reporter plot object
+  ret <- create_plot(pth, height = hti, width = wdi)
+
+  return(ret)
+
+}
+
 
 
 # Utilities ---------------------------------------------------------------

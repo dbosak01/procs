@@ -796,6 +796,8 @@ test_that("utils24: get_text_width() works as expected.", {
   expect_equal(res[3] > res[2], TRUE)
   expect_equal(res[2] > res[1], TRUE)
 
+  # expect_equal(TRUE, TRUE)
+
 })
 
 

@@ -16,7 +16,7 @@ regplot(
 \item{type}{The type(s) of plot to create. Multiple types should be passed
 as a vector of strings.  Valid values are "diagnostics", "residualbypredicted",
 "rstudentbypredicted", "rstudentbyleverage", "qqplot", "observedbypredicted",
-"cooksd", "residualhistogram",
+"cooksd", "residualhistogram", "residualboxplot",
 "rfplot", "residuals", and "fitplot".  The default value is
 a vector with "diagnostics", "residuals", and "fitplot".  The "diagnostics"
 keyword produces a single combined chart with 8 different plots and a
@@ -32,7 +32,8 @@ individual plots instead.  This parameter is equivalent to the
 are: "adjrsq", "aic", "coeffvar", "depmean", "default", "edf", "mse", "nobs",
 "nparm", "rsquare", and "sse".  The
 default value is "default", which produces the following statistics:
-"nobs", "nparm", "edf", "mse", "rsquare", and "adjrsq".}
+"nobs", "nparm", "edf", "mse", "rsquare", and "adjrsq". You may also pass
+the value "none" if you do not want any statistics shown on the chart.}
 
 \item{label}{Whether or not to label values automatically. Valid values
 are TRUE or FALSE.  Default is FALSE. If TRUE, this options will assign
@@ -96,6 +97,8 @@ This is only available for models with a single regressor.
 with a normal and kernel curve overlay.
 }
 \item{\strong{observedbypredicted}: Dependent variable (Observed) vs. Predicted values.
+}
+\item{\strong{residualboxplot}: A boxplot of residuals.
 }
 }
 The above plots may be requested in different ways: as a vector of keywords,

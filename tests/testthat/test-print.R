@@ -288,6 +288,4 @@ test_that("print12: printing of proc_freq() with plots option works as expected.
 
   expect_equal(file.exists(fp), TRUE)
 
-
-
 })

@@ -87,7 +87,7 @@ test_that("regplot1: regplot() object works as expected.", {
 })
 
 
-# Uh Oh. This plot gets split if there are multiple independent variables.
+#   This plot gets split if there are multiple independent variables.
 test_that("regplot2: proc_reg() works for residuals", {
 
   # One independant variable
@@ -166,7 +166,7 @@ test_that("regplot2: proc_reg() works for residuals", {
 
 })
 
-# Need to control statistics.  Otherwise, good.
+# Good.
 test_that("regplot3: proc_reg() works for fitplot.", {
 
   # 95% Confidence
@@ -195,6 +195,26 @@ test_that("regplot3: proc_reg() works for fitplot.", {
                   plots = regplot(type = "fitplot"))
 
   expect_equal(length(res), 4)
+
+  # Custom statistics
+  res <- proc_reg(cls,
+           model = "Weight = Height",
+           output = report,
+           plots = regplot(type = "fitplot", stats =
+                             c("nobs", "aic", "rsquare")),
+           options = v(alpha = .1))
+
+  expect_equal(length(res), 5)
+  expect_equal("plot_spec" %in% class(res[[5]][[1]]), TRUE)
+
+  # No statistics
+  res <- proc_reg(cls,
+           model = "Weight = Height",
+           output = report,
+           plots = regplot(type = "fitplot", stats = "none"))
+
+  expect_equal(length(res), 5)
+  expect_equal("plot_spec" %in% class(res[[5]][[1]]), TRUE)
 
 })
 
@@ -632,7 +652,7 @@ test_that("regplot15: proc_reg() passing type strings works.", {
 # This is amazing
 test_that("regplot16: proc_reg() works for diagnostics", {
 
-
+  # One variable
   res <- proc_reg(cls,
                   model = "Weight = Height",
                   output = report,
@@ -641,6 +661,7 @@ test_that("regplot16: proc_reg() works for diagnostics", {
   expect_equal(length(res), 5)
   expect_equal("plot_spec" %in% class(res[[5]][[1]]), TRUE)
 
+  # Two independent variables
   res <- proc_reg(cls,
                   model = "Weight = Height Age",
                   output = report,
@@ -649,30 +670,26 @@ test_that("regplot16: proc_reg() works for diagnostics", {
   expect_equal(length(res), 5)
   expect_equal("plot_spec" %in% class(res[[5]][[1]]), TRUE)
 
-
+  # Control stats
   res <- proc_reg(cls,
                   model = "Weight = Height",
                   output = report,
-                  plots = regplot(type = "diagnostics"))
+                  plots = regplot(type = "diagnostics",
+                                  stats = c("default", "aic")))
 
   expect_equal(length(res), 5)
   expect_equal("plot_spec" %in% class(res[[5]][[1]]), TRUE)
 
-
+  # No stats
   res <- proc_reg(cls,
                   model = "Weight = Height",
                   output = report,
-                  plots = regplot(type = "diagnostics"))
+                  plots = regplot(type = "diagnostics",
+                                  stats = "none"))
 
   expect_equal(length(res), 5)
   expect_equal("plot_spec" %in% class(res[[5]][[1]]), TRUE)
 
-
-  # res <- proc_reg(cls,
-  #                 model = "Weight = Height",
-  #                 output = report,
-  #                 plots = regplot("residuals", panel = FALSE))
-  # proc_print(res, file_path = "./output/myfile.rtf", output_type = "RTF")
 
 })
 
@@ -769,3 +786,29 @@ test_that("regplot18: regplot() statistics work as expected.", {
 
 
 })
+
+
+# Works
+test_that("regplot19: proc_reg() works for residualboxplot", {
+
+
+  res <- proc_reg(cls,
+                  model = "Weight = Height",
+                  output = report,
+                  plots = regplot(type = "residualboxplot"))
+
+  expect_equal(length(res), 5)
+  expect_equal("plot_spec" %in% class(res[[5]][[1]]), TRUE)
+
+  res <- proc_reg(cls,
+                  model = "Weight = Height Age",
+                  output = report,
+                  plots = regplot(type = "residualboxplot"))
+
+  expect_equal(length(res), 5)
+  expect_equal("plot_spec" %in% class(res[[5]][[1]]), TRUE)
+
+})
+
+
+
