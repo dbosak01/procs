@@ -58,8 +58,6 @@ options("procs.print" = FALSE)
 
 dev <- FALSE
 
-
-
 test_that("regplot1: regplot() object works as expected.", {
 
   res <- regplot()

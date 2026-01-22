@@ -329,7 +329,10 @@ proc_ttest <- function(data,
                        # freq = NULL, ?
                        # weight = NULL, ?
                        options = NULL,
-                       titles = NULL
+                       titles = NULL,
+                       # sides = NULL, ?  Maybe put in options
+                       # order = NULL, ?*
+                       plots = NULL
 ) {
 
   # SAS seems to always ignore these
@@ -362,6 +365,13 @@ proc_ttest <- function(data,
   opaired <- deparse(substitute(paired, env = environment()))
   paired <- tryCatch({if (typeof(paired) %in% c("character", "NULL")) paired else opaired},
                      error = function(cond) {opaired})
+
+  oplots <- deparse(substitute(plots, env = environment()))
+  if (all(grepl("regplot(", oplots, fixed = TRUE) == FALSE)) {
+    plots <- tryCatch({if (typeof(plots) %in% c("character", "list", "NULL")) plots else oplots},
+                      error = function(cond) {oplots})
+
+  }
 
   # Parameter checks
   if (!"data.frame" %in% class(data)) {
@@ -448,6 +458,19 @@ proc_ttest <- function(data,
     }
   }
 
+  # Prepare plots for easier processing
+  if (!is.null(plots)) {
+    if ("ttestplot" %in% class(plots) |
+        "character" %in% class(plots)) {
+      tplots <- list()
+      for (idx in seq_along(var)) {
+
+        tplots[[idx]] <- plots
+      }
+      plots <- tplots
+    }
+  }
+
 
   rptflg <- FALSE
   rptnm <- ""
@@ -473,7 +496,7 @@ proc_ttest <- function(data,
     rptres <- gen_report_ttest(data, by = by, var = var, class = class,
                                paired = paired, view = view,
                                titles = titles, #weight = weight,
-                               opts = options, output = output)
+                               opts = options, output = output, plots = plots)
   }
 
   # Get output datasets if requested
@@ -857,7 +880,7 @@ get_output_specs_ttest <- function(data, var, paired, class, opts, output,
 #' @import sasLM
 #' @import common
 get_class_ttest <- function(data, var, class, report = TRUE, opts = NULL,
-                            byvar = NULL, byval = NULL, shape = NULL) {
+                            byvar = NULL, byval = NULL, shape = NULL, plt = NULL) {
 
   ret <- list()
 
@@ -1078,9 +1101,10 @@ gen_report_ttest <- function(data,
                              opts = NULL,
                              output = NULL,
                              view = TRUE,
-                             titles = NULL) {
+                             titles = NULL,
+                             plots = NULL) {
 
-
+  # browser()
   spcs <- get_output_specs_ttest(data, var, paired, class,
                                  opts, output, report = TRUE)
 
@@ -1098,6 +1122,13 @@ gen_report_ttest <- function(data,
   tlbls[["LCLM"]] <- sprintf(tlbls[["LCLM"]], alph)
   tlbls[["UCLMSTD"]] <- sprintf(tlbls[["UCLMSTD"]], alph)
   tlbls[["LCLMSTD"]] <- sprintf(tlbls[["LCLMSTD"]], alph)
+
+  # Assign alpha value
+  # in case it is needed for plots
+  if (!is.null(plots)) {
+    plots$alph <- alph
+    plots$h0 <- get_option(opts, "h0", 0)
+  }
 
   #browser()
 
@@ -1153,7 +1184,7 @@ gen_report_ttest <- function(data,
         # Get class-level t-tests
         if (!is.null(class)) {
 
-          ctbl <- get_class_ttest(dt, outp$var, class, TRUE, opts)
+          ctbl <- get_class_ttest(dt, outp$var, class, TRUE, opts, plots)
         }
 
         if (is.null(class) ||
@@ -1259,13 +1290,21 @@ gen_report_ttest <- function(data,
           res[[nm]] <- smtbl
         }
 
+        if (i == length(outreq)) {
+          if (!is.null(plots)) {
+
+            vnm <- match(outp$varlbl, var)
+
+            # Add plots: dat, res, var, plt, alph
+            res[["Plots"]] <- render_ttestplot(data, outp$varlbl, plots[[vnm]])
+
+          }
+        }
+
       }
 
       byres[[bynm]] <- res
     }
-
-    # Add summary plot  - Commented for now because I can't get it to match SAS.
-    # res[["SummaryPanel"]] <- gen_summarypanel(dt, var, confidence = alph)
 
   }
 
