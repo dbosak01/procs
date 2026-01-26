@@ -40,7 +40,7 @@ out_spec <- function(stats = NULL,
                 shape = NULL, report = FALSE, where = NULL,
                 drop = NULL, keep = NULL, rename = NULL,
                 format = NULL, label = NULL, table = NULL, var = NULL, varlbl = NULL,
-                formula = NULL,
+                formula = NULL, plots = NULL, class = NULL,
                 ...) {
 
   ret <- structure(list(), class = c("out_req", "list"))
@@ -77,6 +77,8 @@ out_spec <- function(stats = NULL,
   ret$var <- var
   ret$varlbl <- varlbl
   ret$formula <- formula
+  ret$plots <- plots
+  ret$class <- class
 
   return(ret)
 }

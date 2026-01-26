@@ -13,7 +13,8 @@ proc_ttest(
   by = NULL,
   class = NULL,
   options = NULL,
-  titles = NULL
+  titles = NULL,
+  plots = NULL
 )
 }
 \arguments{
@@ -72,6 +73,10 @@ The "h0 = " option sets the baseline hypothesis value for single-variable
 hypothesis testing.  The "noprint" option turns off the interactive report.}
 
 \item{titles}{A vector of one or more titles to use for the report output.}
+
+\item{plots}{A plot request. The request may be made as a vector of
+plot names, or a \code{\link{ttestplot}} object. If there are multiple
+variables to test, you may pass multiple plot requests in a list.}
 }
 \value{
 Normally, the requested T-Test statistics are shown interactively

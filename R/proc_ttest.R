@@ -176,6 +176,9 @@
 #' The "h0 = " option sets the baseline hypothesis value for single-variable
 #' hypothesis testing.  The "noprint" option turns off the interactive report.
 #' @param titles A vector of one or more titles to use for the report output.
+#' @param plots A plot request. The request may be made as a vector of
+#' plot names, or a \code{\link{ttestplot}} object. If there are multiple
+#' variables to test, you may pass multiple plot requests in a list.
 #' @return Normally, the requested T-Test statistics are shown interactively
 #' in the viewer, and output results are returned as a list of data frames.
 #' You may then access individual datasets from the list using dollar sign ($)
@@ -618,7 +621,7 @@ ttest_fc <- fcat(N = "%d", MEAN = "%.4f", STD = "%.4f", STDERR = "%.4f",
                  log = FALSE)
 
 get_output_specs_ttest <- function(data, var, paired, class, opts, output,
-                                   report = FALSE) {
+                                   report = FALSE, plots = NULL) {
 
   dat <- data
   spcs <- list()
@@ -638,14 +641,16 @@ get_output_specs_ttest <- function(data, var, paired, class, opts, output,
 
       stop("Specify either the 'var' or 'paired' parameter, but not both.")
 
-  } else if (!is.null(class)) {
+  } else if (!is.null(class)) {    # Two-Sample T-Test
 
 
     if (report == TRUE) {
 
       stats <- c("n", "mean", "std", "stderr", "min", "max")
 
+      cnt <- 1
       for (vr in var) {
+
 
         vlbl <- ""
         if (length(var) > 1)
@@ -664,6 +669,20 @@ get_output_specs_ttest <- function(data, var, paired, class, opts, output,
 
         spcs[[paste0(vlbl, "Equality")]] <- out_spec(stats = "dummy", var = vr, types = FALSE, freq = FALSE)
 
+
+        if (!is.null(plots)) {
+
+          # Assign alpha value
+          # in case it is needed for plots
+          plt <- plots[[cnt]]
+          plt$alph <- get_alpha(opts)
+          plt$h0 <- get_option(opts, "h0", 0)
+
+          spcs[[paste0(vlbl, "Plots")]] <- out_spec(stats = "dummy", var = vr, plots = plt, class = class)
+        }
+
+
+        cnt <- cnt + 1
       }
 
     } else {
@@ -693,11 +712,10 @@ get_output_specs_ttest <- function(data, var, paired, class, opts, output,
 
       spcs[["Equality"]] <- out_spec(stats = "dummy", var = var, types = FALSE, freq = FALSE, shape = shp)
 
-
     }
 
 
-  } else if (is.null(paired) & !is.null(var) & is.null(class)) {
+  } else if (is.null(paired) & !is.null(var) & is.null(class)) {  # 1 Sample T-Test
 
 
     h0 <- get_option(opts, "h0", 0)
@@ -738,6 +756,7 @@ get_output_specs_ttest <- function(data, var, paired, class, opts, output,
 
     } else {
 
+      cnt <- 1
       for (vr in var) {
 
         vn <- ""
@@ -760,6 +779,19 @@ get_output_specs_ttest <- function(data, var, paired, class, opts, output,
                                      type = FALSE, freq = FALSE,
                                      var = paste0("..", vr), report = report, varlbl = vr)
 
+        if (!is.null(plots)) {
+
+          # Assign alpha value
+          # in case it is needed for plots
+          plt <- plots[[cnt]]
+          plt$alph <- get_alpha(opts)
+          plt$h0 <- get_option(opts, "h0", 0)
+
+          spcs[[paste0(vn, "Plots")]] <- out_spec(stats = "dummy", var = vr, plots = plt)
+        }
+
+        cnt <- cnt + 1
+
       }
 
     }
@@ -767,9 +799,11 @@ get_output_specs_ttest <- function(data, var, paired, class, opts, output,
 
 
 
-  } else if (!is.null(paired)) {
+  } else if (!is.null(paired)) {   # Paired T-Test
 
     if (report == TRUE) {
+
+      cnt <- 1
       for (i in seq_len(length(paired))) {
 
         pr <- paired[i]
@@ -804,6 +838,19 @@ get_output_specs_ttest <- function(data, var, paired, class, opts, output,
                                      type = FALSE, freq = FALSE,
                                      var = vnm, varlbl = vr,
                                      report = report)
+
+        if (!is.null(plots)) {
+
+          # Assign alpha value
+          # in case it is needed for plots
+          plt <- plots[[cnt]]
+          plt$alph <- get_alpha(opts)
+          plt$h0 <- get_option(opts, "h0", 0)
+
+          spcs[[paste0(lnm, "Plots")]] <- out_spec(stats = "dummy", var = vr, plots = plt)
+        }
+
+        cnt <- cnt + 1
 
       }
 
@@ -1106,7 +1153,7 @@ gen_report_ttest <- function(data,
 
   # browser()
   spcs <- get_output_specs_ttest(data, var, paired, class,
-                                 opts, output, report = TRUE)
+                                 opts, output, report = TRUE, plots = plots)
 
   data <- spcs$data
   outreq <- spcs$outreq
@@ -1122,13 +1169,6 @@ gen_report_ttest <- function(data,
   tlbls[["LCLM"]] <- sprintf(tlbls[["LCLM"]], alph)
   tlbls[["UCLMSTD"]] <- sprintf(tlbls[["UCLMSTD"]], alph)
   tlbls[["LCLMSTD"]] <- sprintf(tlbls[["LCLMSTD"]], alph)
-
-  # Assign alpha value
-  # in case it is needed for plots
-  if (!is.null(plots)) {
-    plots$alph <- alph
-    plots$h0 <- get_option(opts, "h0", 0)
-  }
 
   #browser()
 
@@ -1224,80 +1264,71 @@ gen_report_ttest <- function(data,
           }
         }
 
+        if (tnm == "Plots") {
 
-        # Add spanning headers if there are by groups
-        if (!is.null(by) & !is.null(smtbl)) {
+          if (!is.null(plots)) {
 
-          # Add spanning headers
-          # spn <- span(1, ncol(smtbl), label = bylbls[j], level = 1)
-          # attr(smtbl, "spans") <- list(spn)
-
-          bynm <-  bylbls[j]
-
-          if (tnm == "Statistics") {
-
-            attr(smtbl, "ttls") <- c(attr(smtbl, "ttls"), bynm)
+            # Add plots: dat, res, var, plt, alph
+            res[[nm]] <- render_ttestplot(dt, outp$var, outp$plot, class)
 
           }
 
-        }
-
-        # Add default formats
-        # fmt <- "%.4f"
-        formats(smtbl) <- ttest_fc
-        # for (cnm in names(smtbl)) {
-        #
-        #   if (typeof(smtbl[[cnm]]) %in% c("double")) {
-        #
-        #     attr(smtbl[[cnm]], "format") <- fmt
-        #   }
-        #
-        # }
-
-
-        # Assign labels
-        if (is.null(class))
-          labels(smtbl) <- tlbls
-        else {
-
-          cv <- class
-          if (length(class) == 1)
-            cnms <- "CLASS"
-          else
-            cnms <- paste0("CLASS", seq(1, length(class)))
-
-          names(cv) <- cnms
-
-          labels(smtbl) <- append(as.list(cv), tlbls)
-
-        }
-
-        # Kill var variable for reports
-        if ("VAR" %in% names(smtbl)) {
-
-          smtbl[["VAR"]] <- NULL
-
         } else {
 
-          if (!is.null(outp$varlbl))
-            smtbl[["VAR"]] <- outp$varlbl
-        }
 
-        # Convert to tibble if incoming data is a tibble
-        if ("tbl_df" %in% class(data)) {
-          res[[nm]] <- as_tibble(smtbl)
-        } else {
-          res[[nm]] <- smtbl
-        }
+          # Add spanning headers if there are by groups
+          if (!is.null(by) & !is.null(smtbl)) {
 
-        if (i == length(outreq)) {
-          if (!is.null(plots)) {
+            # Add spanning headers
+            # spn <- span(1, ncol(smtbl), label = bylbls[j], level = 1)
+            # attr(smtbl, "spans") <- list(spn)
 
-            vnm <- match(outp$varlbl, var)
+            bynm <-  bylbls[j]
 
-            # Add plots: dat, res, var, plt, alph
-            res[["Plots"]] <- render_ttestplot(data, outp$varlbl, plots[[vnm]])
+            if (tnm == "Statistics") {
 
+              attr(smtbl, "ttls") <- c(attr(smtbl, "ttls"), bynm)
+
+            }
+
+          }
+
+          # Add default formats
+          formats(smtbl) <- ttest_fc
+
+          # Assign labels
+          if (is.null(class))
+            labels(smtbl) <- tlbls
+          else {
+
+            cv <- class
+            if (length(class) == 1)
+              cnms <- "CLASS"
+            else
+              cnms <- paste0("CLASS", seq(1, length(class)))
+
+            names(cv) <- cnms
+
+            labels(smtbl) <- append(as.list(cv), tlbls)
+
+          }
+
+          # Kill var variable for reports
+          if ("VAR" %in% names(smtbl)) {
+
+            smtbl[["VAR"]] <- NULL
+
+          } else {
+
+            if (!is.null(outp$varlbl))
+              smtbl[["VAR"]] <- outp$varlbl
+          }
+
+          # Convert to tibble if incoming data is a tibble
+          if ("tbl_df" %in% class(data)) {
+            res[[nm]] <- as_tibble(smtbl)
+          } else {
+            res[[nm]] <- smtbl
           }
         }
 

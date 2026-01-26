@@ -83,7 +83,7 @@ test_that("ttestplot2: ttestplot() basic plot types.", {
 
   expect_equal(is.null(res), FALSE)
   expect_equal(length(res), 4)
-  expect_equal("ttestplot" %in% class(res[[4]]), TRUE)
+  expect_equal("plot_spec" %in% class(res[[4]][[1]]), TRUE)
 
 
   # Boxplot - OK
@@ -95,7 +95,7 @@ test_that("ttestplot2: ttestplot() basic plot types.", {
                     plots = ttestplot("boxplot"))
 
   expect_equal(length(res), 4)
-  expect_equal("ttestplot" %in% class(res[[4]]), TRUE)
+  expect_equal("plot_spec" %in% class(res[[4]][[1]]), TRUE)
 
 
   # Interval - OK
@@ -107,7 +107,7 @@ test_that("ttestplot2: ttestplot() basic plot types.", {
                     plots = ttestplot("interval"))
 
   expect_equal(length(res), 4)
-  expect_equal("ttestplot" %in% class(res[[4]]), TRUE)
+  expect_equal("plot_spec" %in% class(res[[4]][[1]]), TRUE)
 
   # QQPlot - Line not correct.  Dots look good.
   res <- proc_ttest(cls,
@@ -118,10 +118,182 @@ test_that("ttestplot2: ttestplot() basic plot types.", {
                     plots = ttestplot("qqplot"))
 
   expect_equal(length(res), 4)
-  expect_equal("ttestplot" %in% class(res[[4]]), TRUE)
+  expect_equal("plot_spec" %in% class(res[[4]][[1]]), TRUE)
 
 
 })
 
 
+
+# Nice!
+test_that("ttestplot3: ttestplot() multiple plot types.", {
+
+  # Combined
+  res <- proc_ttest(cls,
+                    var = c("Height"),
+                    options = c("h0" = 65, "alpha" = 0.05),
+                    titles = "My first Frequency Table",
+                    output = report,
+                    plots = ttestplot(c("histogram", "boxplot", "interval", "qqplot")))
+
+  res
+
+  expect_equal(is.null(res), FALSE)
+  expect_equal(length(res), 4)
+  expect_equal("plot_spec" %in% class(res[[4]][[1]]), TRUE)
+
+
+})
+
+# OK
+test_that("ttestplot4: ttestplot() summary plot type.", {
+
+  # Summary
+  res <- proc_ttest(cls,
+                    var = c("Height"),
+                    options = c("h0" = 65, "alpha" = 0.05),
+                    titles = "My first Frequency Table",
+                    output = report,
+                    plots = ttestplot("summary"))
+
+  res
+
+  expect_equal(is.null(res), FALSE)
+  expect_equal(length(res), 4)
+  expect_equal("plot_spec" %in% class(res[[4]][[1]]), TRUE)
+
+
+
+  # Summary - 90% Confidence
+  res <- proc_ttest(cls,
+                    var = c("Height"),
+                    options = c("h0" = 65, "alpha" = 0.1),
+                    titles = "My first Frequency Table",
+                    output = report,
+                    plots = ttestplot("summary"))
+
+  res
+
+  expect_equal(is.null(res), FALSE)
+  expect_equal(length(res), 4)
+  expect_equal("plot_spec" %in% class(res[[4]][[1]]), TRUE)
+
+
+  # Summary "unpacked"
+  res <- proc_ttest(cls,
+                    var = c("Height"),
+                    options = c("h0" = 65, "alpha" = 0.05),
+                    titles = "My first Frequency Table",
+                    output = report,
+                    plots = ttestplot("summary", panel = FALSE))
+
+  res
+
+  expect_equal(is.null(res), FALSE)
+  expect_equal(length(res), 4)
+  expect_equal("plot_spec" %in% class(res[[4]][[1]]), TRUE)
+  expect_equal("plot_spec" %in% class(res[[4]][[2]]), TRUE)
+
+
+
+})
+
+# OK
+test_that("ttestplot5: ttestplot() summary plot type by groups.", {
+
+  # Summary
+  res <- proc_ttest(cls,
+                    var = c("Height"),
+                    options = c("h0" = 65, "alpha" = 0.05),
+                    titles = "My first Frequency Table",
+                    output = report,
+                    by = Sex,
+                    plots = ttestplot("summary"))
+
+  res
+
+  expect_equal(is.null(res), FALSE)
+  expect_equal(length(res), 2)
+  expect_equal("plot_spec" %in% class(res[[1]][[4]][[1]]), TRUE)
+
+
+})
+
+
+# OK
+test_that("ttestplot6: ttestplot() multiple variables.", {
+
+  # Summary
+  res <- proc_ttest(cls,
+                    var = c("Height", "Weight"),
+                    options = c("h0" = 65, "alpha" = 0.05),
+                    titles = "My first Frequency Table",
+                    output = report,
+                 #   by = Sex,
+                    plots = ttestplot("summary"))
+
+  res
+
+  expect_equal(is.null(res), FALSE)
+  expect_equal(length(res), 8)
+  expect_equal("plot_spec" %in% class(res[[4]][[1]]), TRUE)
+  expect_equal("plot_spec" %in% class(res[[8]][[1]]), TRUE)
+
+
+  # Multiple vars with by
+  res <- proc_ttest(cls,
+                    var = c("Height", "Weight"),
+                    options = c("h0" = 65, "alpha" = 0.05),
+                    titles = "My first Frequency Table",
+                    output = report,
+                    by = Sex,
+                    plots = ttestplot("summary"))
+
+  res
+
+  expect_equal(is.null(res), FALSE)
+  expect_equal(length(res), 2)
+  expect_equal("plot_spec" %in% class(res[[1]][[4]][[1]]), TRUE)
+  expect_equal("plot_spec" %in% class(res[[2]][[4]][[1]]), TRUE)
+
+
+})
+
+
+
+# OK
+test_that("ttestplot7: ttestplot() class analysis.", {
+
+  # Boxplot with class
+  res <- proc_ttest(cls,
+                    var = c("Height"),
+                    options = c("h0" = 65, "alpha" = 0.05),
+                    titles = "My first Frequency Table",
+                    output = report,
+                    class = Sex,
+                    plots = ttestplot("boxplot"))
+
+  res
+
+  expect_equal(is.null(res), FALSE)
+  expect_equal(length(res), 5)
+  expect_equal("plot_spec" %in% class(res[[5]][[1]]), TRUE)
+
+
+  # Boxplot with class and outlier
+  res <- proc_ttest(cls,
+                    var = c("Weight"),
+                    options = c("h0" = 65, "alpha" = 0.05),
+                    titles = "My first Frequency Table",
+                    output = report,
+                    class = Sex,
+                    plots = ttestplot("boxplot"))
+
+  res
+
+  expect_equal(is.null(res), FALSE)
+  expect_equal(length(res), 5)
+  expect_equal("plot_spec" %in% class(res[[5]][[1]]), TRUE)
+
+})
 
