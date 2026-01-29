@@ -1269,7 +1269,7 @@ gen_report_ttest <- function(data,
           if (!is.null(plots)) {
 
             # Add plots: dat, res, var, plt, alph
-            res[[nm]] <- render_ttestplot(dt, outp$var, outp$plot, class)
+            res[[nm]] <- render_ttestplot(dt, outp$var, outp$plot, class, res)
 
           }
 

@@ -155,7 +155,7 @@ ttestplot <- function(type = c("summary", "qqplot"), panel = TRUE, showh0 = FALS
 
 
 #' @noRd
-render_ttestplot <- function (dat, var, plt, class) {
+render_ttestplot <- function (dat, var, plt, class, res) {
 
   ret <- NULL
 
@@ -191,9 +191,18 @@ render_ttestplot <- function (dat, var, plt, class) {
     for (tp in typs) {
 
       if (tp == "summary") {
-        ret[["summary"]] <- render_summary(dat, var, plt)
+        if (is.null(class)) {
+          ret[["summary"]] <- render_summary1(dat, var, plt)
+        } else {
+          ret[["summary"]] <- render_summary2(dat, var, plt, class)
+        }
       } else if (tp == "histogram") {
-        ret[["histogram"]] <- render_histogram(dat, var, plt)
+        if (is.null(class)) {
+          ret[["histogram"]] <- render_histogram1(dat, var, plt)
+        } else {
+
+          ret[["histogram"]] <- render_histogram2(dat, var, plt, class)
+        }
       } else if (tp == "boxplot") {
         if (is.null(class)) {
           ret[["boxplot"]] <- render_boxplot1(dat, var, plt)
@@ -201,9 +210,17 @@ render_ttestplot <- function (dat, var, plt, class) {
           ret[["boxplot"]] <- render_boxplot2(dat, var, plt, class)
         }
       } else if (tp == "qqplot") {
-        ret[["qqplot"]] <- render_tqqplot(dat, var, plt)
+        if (is.null(class)) {
+          ret[["qqplot"]] <- render_tqqplot1(dat, var, plt)
+        } else {
+          ret[["qqplot"]] <- render_tqqplot2(dat, var, plt, class)
+        }
       } else if (tp == "interval") {
-        ret[["interval"]] <- render_interval(dat, var, plt)
+        if (is.null(class)) {
+          ret[["interval"]] <- render_interval1(dat, var, plt)
+        } else {
+          ret[["interval"]] <- render_interval2(dat, var, plt, res)
+        }
       } else if (tp == "profiles") {
         ret[["profiles"]] <- render_profiles(dat, var, plt)
       } else if (tp == "agreement") {
@@ -225,7 +242,7 @@ render_ttestplot <- function (dat, var, plt, class) {
 
 # unpack: TRUE or FALSE
 #' @noRd
-render_summary <- function(dat, var, plt) {
+render_summary1 <- function(dat, var, plt) {
 
 
   op <- par("mar")
@@ -491,12 +508,278 @@ render_summary <- function(dat, var, plt) {
 }
 
 
+#' @noRd
+render_summary2 <- function(dat, var, plt, class) {
+
+
+  op <- par("mar")
+  of <- par("fig")
+
+  # Create temp file path
+  pth <- tempfile(fileext = ".jpg")
+
+  # Standard height and width
+  hti <- 4.5  # Height in inches
+  wdi <- 6  # Width in inches
+  bml <- 6  # bottom margin lines
+  alph <- (1 - plt$alph) * 100  # Percentage
+  alpha <- plt$alph             # Actual value
+
+  # Convert inches to pixels
+  ht <- hti * 96
+  wd <- wdi * 96
+
+  # Output to image file
+  # All output types accept jpeg
+  # So start with that
+  jpeg(pth, width = wd, height = ht, quality = 100, units = "px")
+
+  # Get analysis variables
+  # vrs <- get_vars(mdl)
+  # dvr <- vrs$dvar
+  # ivr <- vrs$ivar
+
+  # Prepare data
+  rdt <- dat[[var]]
+  # dt <- dat[[ivr]]
+
+  #**********************************
+  #* Histogram
+  #**********************************
+
+  # Set margins
+  par(mar = c(0, 5, 3, .75) + 0.1,
+      fig = c(0, 1, .3, 1))
+
+  # Calculate stats
+  n   <- length(rdt)
+  mu  <- mean(rdt)
+  sdx <- sd(rdt)
+
+  # Use calculated breaks to get scale
+  scl <- range(rdt)
+  scl <- c(scl[1] * .8, scl[2] * 1.2)
+
+  # Calculate breaks and y scale
+  h <- hist(rdt,
+            breaks = "Sturges",
+            plot = FALSE)
+
+  # Convert counts to percent
+  h$counts <- h$counts / sum(h$counts) * 100
+
+  # Initial chart to draw vertical lines
+  hist(rdt,
+       breaks = "Sturges",
+       main = "",
+       ylab = "",
+       xlim = scl,
+       ylim = c(0, max(h$counts) * 1.05),
+       plot = TRUE,
+       axes = FALSE)
+
+  # Get axis tick marks
+  aval <- axTicks(side = 1)
+
+  # Orientation lines
+  abline(v = aval, col = "grey90", lwd = 1)
+
+  # Create plot using histogram values
+  plot(h,
+       col = "#CAD5E5", #"grey85",
+       border = "grey20",
+       main = "",
+       xlab = "",
+       ylab = "",
+       xlim = scl,
+       ylim = c(0, max(h$counts) * 1.05),
+       axes = FALSE,
+       add = TRUE)
+
+  # Title
+  mtext(paste0("Distribution of ", var), side = 3,
+        line = par("oma")[3] - 1.5,
+        font = 2, cex = 1.25, outer = TRUE)
+
+  # Subtitle
+  mtext(paste0("With ", alph, "% Confidence Interval for Mean"), side = 3,
+        line = par("oma")[3] - 2.5,
+        font = 1, outer = TRUE)
+
+  # Y Label
+  mtext("Percent", side = 2, line = par("oma")[2] - 2, outer = TRUE)
+
+
+  # Normal curve overlay (scaled to percent)
+  x <- seq(min(rdt) * 2, max(rdt) * 2, length.out = 300)
+  x <- seq(scl[1], scl[2], length.out = 300)
+
+  y_norm <- dnorm(x, mean = mu, sd = sdx)
+  y_norm <- y_norm / max(y_norm) * max(h$counts)
+
+  lines(x, y_norm, col = "steelblue4", lwd = 2)
+
+  # Kernel density overlay (scaled to percent)
+  dens <- density(rdt)
+
+  y_kern <- dens$y / max(dens$y) * max(h$counts)
+
+  lines(dens$x, y_kern, col = "orangered2", lwd = 2)
+
+
+  # Add custom Y axis
+  axis(side = 2, las = 1, col.ticks = "grey55",
+       mgp = c(3, .5, 0), tck = -0.015)
+
+  # Frame
+  box(col = "grey70", lwd = 1)
+  box("outer", col = "grey70", lwd = 1)
+
+  # Legend
+  mpos <- legend("topright",
+                 legend = c("Normal", "Kernel"),
+                 col = c("steelblue4", "orangered2"),
+                 lwd = 2,
+                 box.col = "grey80",
+                 bty = "n",
+                 cex = .9,
+                 inset = c(.01, .01),
+                 x.intersp = .5,
+                 y.intersp = c(0.5, 1.8)
+  )
+
+  # Custom Legend border
+  rect(mpos$rect$left, mpos$rect$top - (mpos$rect$h - .5),
+       mpos$rect$left + mpos$rect$w, mpos$rect$top,
+       border = "grey80"
+  )
+
+  #**********************************
+  #* Boxplot
+  #**********************************
+
+  par(mar = c(4, 5, 0, .75) + 0.1,
+      fig = c(0, 1, 0, .3), new = TRUE)
+
+  # Get data
+  dt <- dat[[var]]
+
+  # Get scales
+  xscl <- get_scale(dt, .05)  # Not used?
+
+  # Calculations
+  n  <- length(dt)
+  mu <- mean(dt)
+  sdx <- sd(dt)
+
+  ## 95% CI for mean (SAS uses t-based CI)
+  tcrit <- qt(1 - alpha / 2, df = n - 1)
+
+  # Calculate confidence interval
+  ci <- mu + c(-1, 1) * tcrit * sdx / sqrt(n)
+
+
+  ## Draw empty plot first (for layering)
+  plot(dt, rep(1, n),
+       type = "n",
+       xlab = "",
+       ylab = "",
+       yaxt = "n",
+       xlim = scl,
+       main = "",
+       axes = FALSE) #With 95% Confidence Interval for Mean")
+
+
+  # X Label
+  mtext(var, side = 1,
+        line = par("mar")[1] - 2,
+        font = 1)
+
+  ## Shaded CI band
+  usr <- par("usr")
+  rect(ci[1], usr[3], ci[2], usr[4],
+       col = "#B3D2D0",
+       border = NA)
+
+  # Draw axis
+  aval <- axis(side = 1, las = 1, col.ticks = "grey55",
+               mgp = c(3, .5, 0), tck = -0.015)
+
+  # Orientation lines
+  abline(v = aval, col = "grey90", lwd = 1)
+
+  # Calculate SAS compatible quantile
+  q <- quantile(dt, probs = c(0, .25, .5, .75, 1), type = 2)
+
+  # Prepare to pass data
+  bp <- list(
+    stats = matrix(q, ncol = 1),
+    n = length(dt),
+    conf = NULL,
+    out = numeric(0)
+  )
+
+  # Boxplot (horizontal)
+  bxp(bp,
+      horizontal = TRUE,
+      add = TRUE,
+      boxfill = "#CAD5E5",
+      border = "grey40",
+      lty = 1,
+      whiskcol = "#05379B",
+      staplecol = "#05379B",
+      medcol = "#05379B",
+      medlwd = 1,
+      boxwex = .65,
+      outline = FALSE,
+      axes = FALSE)  # Already drawn above
+
+  ## Mean diamond
+  points(mu, 1,
+         pch = 5,
+         col = "#05379B",
+         lwd = 1,
+         cex = 1.25)
+
+  # Create legend
+  legend("topright",
+         legend = paste0(alph, "% Confidence"),
+         fill = "#B3D2D0",
+         border = "grey60",
+         box.col = "grey80",
+         inset = c(.01, .02),
+         x.intersp = .5,
+         y.intersp = c(0.5, 1.8),
+         cex = .9,
+         bty = "o")
+
+  # Frame
+  box(col = "grey70", lwd = 1)
+
+  #**********************************
+  #* Clean up
+  #**********************************
+
+  # Restore margins
+  par(mar = op, fig = of)
+
+  # Close device context
+  dev.off()
+
+  # Put plot in reporter plot object
+  ret <- create_plot(pth, height = hti, width = wdi)
+
+  return(ret)
+
+
+}
+
 # Individual Plots --------------------------------------------------------
 
 # agreement, boxplot, histogram, interval, profiles, qqplot, summary
 
 #' @noRd
-render_histogram <- function(dat, var, plt) {
+render_histogram1 <- function(dat, var, plt) {
 
 
   op <- par("mar")
@@ -628,7 +911,222 @@ render_histogram <- function(dat, var, plt) {
 }
 
 
-# Need to deal with outliers
+#' @noRd
+render_histogram2 <- function(dat, var, plt, class) {
+
+  op <- par("mar")
+  om <- par("oma")
+
+  # Create temp file path
+  pth <- tempfile(fileext = ".jpg")
+
+  # Standard height and width
+  hti <- 4.5  # Height in inches
+  wdi <- 6  # Width in inches
+  bml <- 6  # bottom margin lines
+
+  # Convert inches to pixels
+  ht <- hti * 96
+  wd <- wdi * 96
+
+  # Convert to data frame
+  dat <- as.data.frame(dat)
+  dat <- sort(dat, by = class)
+
+  # Get analysis variables
+  cvls <- unique(dat[[class]])
+  vl1 <- cvls[1]
+  vl2 <- cvls[2]
+
+  # Prepare data
+  dt1 <- dat[dat[[class]] == vl1, var]
+  dt2 <- dat[dat[[class]] == vl2, var]
+
+  # Use calculated breaks to get scale
+  scl <- range(dat[[var]])
+  scl <- c(scl[1] * .8, scl[2] * 1.2)
+
+  # Output to image file
+  jpeg(pth, width = wd, height = ht, quality = 100, units = "px")
+
+  # Set margins
+  par(oma = c(5, 1, 2, .75) + 0.1,
+      mar = c(0, 3, 0, 0) + 0.1,
+      mfrow = c(2, 1))
+
+
+  #******************************
+  #*  Histogram 1
+  #******************************
+
+  # Calculate stats
+  n   <- length(dt1)
+  mu  <- mean(dt1)
+  sdx <- sd(dt1)
+
+  # Histogram (Percent scale)
+  h <- hist(dt1,
+            breaks = "Sturges",
+            plot = FALSE)
+
+  # Convert counts to percent
+  h$counts <- h$counts / sum(h$counts) * 100
+
+
+
+  # Create plot using histogram values
+  plot(h,
+       col = "#CAD5E5", #"grey85",
+       border = "grey20",
+       main = "",
+       xlab = "",
+       ylab = "Percent",
+       xlim = scl,
+       ylim = c(0, max(h$counts) * 1.05),
+       axes = FALSE)
+
+  # Normal curve overlay (scaled to percent)
+  x <- seq(min(dt1) * 2, max(dt1) * 2, length.out = 300)
+  x <- seq(scl[1], scl[2], length.out = 300)
+
+  y_norm <- dnorm(x, mean = mu, sd = sdx)
+  y_norm <- y_norm / max(y_norm) * max(h$counts)
+
+  lines(x, y_norm, col = "steelblue4", lwd = 2)
+
+  # Kernel density overlay (scaled to percent)
+  dens <- density(dt1)
+
+  y_kern <- dens$y / max(dens$y) * max(h$counts)
+
+  lines(dens$x, y_kern, col = "orangered2", lwd = 2)
+
+  # Add custom axes
+  axis(side = 2, las = 1, col.ticks = "grey55",
+       mgp = c(3, .5, 0), tck = -0.015)
+
+  # Add y label
+  mtext("Percent", side = 2, line = 2.5)
+
+  # Add class label
+  legend("topleft", legend = vl1, bty = "n",
+         x.intersp = 0,  # Spacing between group label and box
+         y.intersp = 0,  # Spacing between content and borders
+         cex = .9
+  )
+
+  # Frame
+  box(col = "grey70", lwd = 1)
+
+  #******************************
+  #*  Histogram 2
+  #******************************
+
+  # Calculate stats
+  n   <- length(dt2)
+  mu  <- mean(dt2)
+  sdx <- sd(dt2)
+
+  # Histogram (Percent scale)
+  h <- hist(dt2,
+            breaks = "Sturges",
+            plot = FALSE)
+
+  # Convert counts to percent
+  h$counts <- h$counts / sum(h$counts) * 100
+
+  # Create plot using histogram values
+  plot(h,
+       col = "#CAD5E5", #"grey85",
+       border = "grey20",
+       main = "",
+       xlab = "",
+       ylab = "Percent",
+       xlim = scl,
+       ylim = c(0, max(h$counts) * 1.05),
+       axes = FALSE)
+
+  # Normal curve overlay (scaled to percent)
+  x <- seq(min(dt2) * 2, max(dt2) * 2, length.out = 300)
+  x <- seq(scl[1], scl[2], length.out = 300)
+
+  y_norm <- dnorm(x, mean = mu, sd = sdx)
+  y_norm <- y_norm / max(y_norm) * max(h$counts)
+
+  lines(x, y_norm, col = "steelblue4", lwd = 2)
+
+  # Kernel density overlay (scaled to percent)
+  dens <- density(dt2)
+
+  y_kern <- dens$y / max(dens$y) * max(h$counts)
+
+  lines(dens$x, y_kern, col = "orangered2", lwd = 2)
+
+  # Add custom axes
+  axis(side = 1, col.ticks = "grey55", # at = xtks, labels = TRUE,
+       mgp = c(3, .5, 0), tck = -0.015, cex.axis = .75)
+  axis(side = 2, las = 1, col.ticks = "grey55",
+       mgp = c(3, .5, 0), tck = -0.015)
+
+  # Add y label
+  mtext("Percent", side = 2, line = 2.5)
+
+  # Add class label
+  legend("topleft", legend = vl2, bty = "n",
+         x.intersp = 0,  # Spacing between group label and box
+         y.intersp = 0,  # Spacing between content and borders
+         cex = .9
+         )
+
+  # Frame
+  box(col = "grey70", lwd = 1)
+
+
+  #******************************
+  #*  Clean up
+  #******************************
+
+  box("outer", col = "grey70", lwd = 1)
+
+  # Add titles
+  mtext(paste0("Distribution of ", var), side = 3, line = par("oma")[3] - 1.75,
+        outer = TRUE, font = 2, cex = 1.25)
+
+  # Add x axis label
+  mtext(var, side = 1, line = par("oma")[1] - 3.5, outer = TRUE)
+
+  # Add legend
+  mpos <- legend("bottom",
+         legend = c("Normal ",
+                    "Kernel"),
+         col = c("steelblue4", "orangered2"),
+         lwd = 2,
+         cex = .9,
+         horiz = TRUE,
+         bty = "o",
+         box.col = "grey", # Grey border to match SAS
+         x.intersp = 1,  # Spacing between group label and box
+         y.intersp = 0,  # Spacing between content and borders
+         text.width = NA,  # Compute label widths dynamically
+         inset = c(0, -.38),
+         xpd = NA)
+
+  # Restore margins
+  par(mar = op,  mfrow = c(1, 1), oma = om)
+
+  # Close device context
+  dev.off()
+
+  # Put plot in reporter plot object
+  ret <- create_plot(pth, height = hti, width = wdi)
+
+  return(ret)
+
+}
+
+
+
+# Legend moves to left if mean too far to the right
 #' @noRd
 render_boxplot1 <- function(dat, var, plt) {
 
@@ -642,8 +1140,8 @@ render_boxplot1 <- function(dat, var, plt) {
   hti <- 2.25 # 4.5  # Height in inches
   wdi <- 6  # Width in inches
   bml <- 6  # bottom margin lines
-  alph <- plt$alph * 100
-  alpha <- 1 - plt$alph
+  alph <- (1 - plt$alph) * 100  # Percentage
+  alpha <- plt$alph             # Actual value
 
   # Convert inches to pixels
   ht <- hti * 96
@@ -661,7 +1159,7 @@ render_boxplot1 <- function(dat, var, plt) {
   # Get scales
   xscl <- get_scale(dt, .05)
 
-
+  # Get stats
   n  <- length(dt)
   mu <- mean(dt)
   sdx <- sd(dt)
@@ -710,16 +1208,8 @@ render_boxplot1 <- function(dat, var, plt) {
   # Orientation lines
   abline(v = aval, col = "grey90", lwd = 1)
 
-  # Calculate SAS compatible quantile
-  q <- quantile(dt, probs = c(0, .25, .5, .75, 1), type = 2)
-
-  # Prepare to pass data
-  bp <- list(
-    stats = matrix(q, ncol = 1),
-    n = length(dt),
-    conf = NULL,
-    out = numeric(0)
-  )
+  # Get boxplot stats
+  bp <- boxplot_stats1(dt)
 
   # Boxplot (horizontal)
   bxp(bp,
@@ -743,8 +1233,32 @@ render_boxplot1 <- function(dat, var, plt) {
          lwd = 1,
          cex = 1.25)
 
+  # Display outliers
+  if (length(bp$out) > 0) {
+
+    points(bp$out, rep(1, length(bp$out)),
+           pch = 1,
+           col = "grey20",
+           lwd = 1.6,
+           cex = 1.25)
+
+    # Add labels
+    text(bp$out, rep(1, length(bp$out)),
+         labels = bp$onm,
+         cex = .9,
+         pos = 1)
+
+  }
+
+  # Legend location - Move to left side if needed
+  lgnd <- "topright"
+  llim <- (range(aval)[1] - range(aval)[2]) * .75
+  if (bp$stats[4] > llim) {
+    lgnd <- "topleft"
+  }
+
   # Create legend
-  legend("topright",
+  legend(lgnd,
          legend = paste0(alph, "% Confidence"),
          fill = "#B3D2D0",
          border = "grey60",
@@ -789,8 +1303,8 @@ render_boxplot2 <- function(dat, var, plt, class) {
   hti <- 3.25 # 4.5  # Height in inches
   wdi <- 6  # Width in inches
   bml <- 6  # bottom margin lines
-  alph <- plt$alph * 100
-  alpha <- 1 - plt$alph
+  alph <- (1 - plt$alph) * 100  # Percentage
+  alpha <- plt$alph             # Actual value
 
   # Convert inches to pixels
   ht <- hti * 96
@@ -877,58 +1391,9 @@ render_boxplot2 <- function(dat, var, plt, class) {
   # Orientation lines
   abline(v = aval, col = "grey90", lwd = 1)
 
-  # Boxplot.stats(data1) can prepare the boxplot data more easily,
-  # but has no parameter to use SAS-style quantiles. So need to calculate
-  # everything manually.
+  # Get boxplot stats for 2 plots
+  bp <- boxplot_stats2(dt1, dt2, nms1, nms2, fvls)
 
-  # bp <- boxplot_stats2(dt1, dt2, fvls)
-
-  # Calculate quantile
-  q1 <- quantile(dt1, probs = c(0, .25, .5, .75, 1), type = 2, na.rm = TRUE)
-  q2 <- quantile(dt2, probs = c(0, .25, .5, .75, 1), type = 2, na.rm = TRUE)
-
-  # Calculate Inter-Quartile Range
-  iqr1 <- IQR(dt1, type = 2, na.rm = TRUE) * 1.5
-  iqr2 <- IQR(dt2, type = 2, na.rm = TRUE) * 1.5
-
-  # Calculate outlier limits
-  lm1 <- c(q1[2] - iqr1, q1[4] + iqr1)
-  lm2 <- c(q2[2] - iqr2, q2[4] + iqr2)
-
-  # Determine if there are outliers
-  ol1 <- dt1 <= lm1[1] | dt1 >= lm1[2]
-  out1 <- dt1[ol1]
-  ol2 <- dt2 <= lm2[1] | dt2 >= lm2[2]
-  out2 <- dt2[ol2]
-
-  # Change min and max to remove outliers
-  if (length(out1) > 0) {
-    mn1 <- min(dt1[dt1 > lm1[1]])
-    mx1 <- max(dt1[dt1 < lm1[2]])
-    q1[1] <- mn1
-    q1[5] <- mx1
-    onm1 <- seq(1, length(dt1))[ol1]   # Obs within class: This matches SAS
-    # onm1 <- nms1[ol1]                # Original obs #: This seems more correct
-  }
-
-  # Change min and max to remove outliers
-  if (length(out2) > 0) {
-    mn2 <- min(dt1[dt2 > lm2[1]])
-    mx2 <- max(dt1[dt2 < lm2[2]])
-    q2[1] <- mn2
-    q2[5] <- mx2
-    onm2 <- seq(1, length(dt2))[ol2]   # Obs within class: This matches SAS
-    # onm2 <- nms2[ol2]                # Original obs #: This seems more correct
-  }
-
-  # Prepare to pass data
-  bp <- list(
-    stats = cbind(q2, q1),
-    n = cbind(length(dt), length(dt)),
-    conf = NULL,
-    out = numeric(0),
-    names = fvls
-  )
 
   # Boxplot (horizontal)
   bxp(bp,
@@ -954,22 +1419,22 @@ render_boxplot2 <- function(dat, var, plt, class) {
          cex = 1.25)
 
   # Outliers for first class value
-  if (length(out1) > 0) {
-    points(out1, rep(2, length(out1)),
+  if (length(bp$out1) > 0) {
+    points(bp$out1, rep(2, length(bp$out1)),
            pch = 1,
            col = "grey20",
            lwd = 1.6,
            cex = 1.25)
 
     # Add labels
-    text(out1, rep(2, length(out1)),
-         labels = onm1,
+    text(bp$out1, rep(2, length(bp$out1)),
+         labels = bp$onm1,
          cex = .9,
          pos = 1)
   }
 
   # Outliers for second class value
-  if (length(out2) > 0) {
+  if (length(bp$out2) > 0) {
     # Plot outlier points
     points(out2, rep(1, length(out2)),
            pch = 1,
@@ -977,8 +1442,8 @@ render_boxplot2 <- function(dat, var, plt, class) {
            lwd = 1.6,
            cex = 1.25)
     # Add labels
-    text(out2, rep(1, length(out2)),
-         labels = onm2,
+    text(bp$out2, rep(1, length(bp$out2)),
+         labels = bp$onm2,
          cex = .9,
          pos = 1)
   }
@@ -1003,7 +1468,7 @@ render_boxplot2 <- function(dat, var, plt, class) {
 
 # type: pergroup or period
 #' @noRd
-render_interval <- function(dat, var, plt) {
+render_interval1 <- function(dat, var, plt) {
 
 
   op <- par("mar")
@@ -1015,8 +1480,8 @@ render_interval <- function(dat, var, plt) {
   hti <- 2.75 # 4.5  # Height in inches
   wdi <- 6  # Width in inches
   bml <- 6  # bottom margin lines
-  alph <- plt$alph * 100
-  alpha <- 1 - plt$alph
+  alph <- (1 - plt$alph) * 100  # Percentage
+  alpha <- plt$alph             # Actual value
 
   # Convert inches to pixels
   ht <- hti * 96
@@ -1126,8 +1591,206 @@ render_interval <- function(dat, var, plt) {
 
 }
 
+render_interval2 <- function(dat, var, plt, res) {
+
+
+  op <- par("mar")
+
+  # Create temp file path
+  pth <- tempfile(fileext = ".jpg")
+
+  # Standard height and width
+  hti <- 2.75 # 4.5  # Height in inches
+  wdi <- 6  # Width in inches
+  bml <- 6  # bottom margin lines
+  alph <- (1 - plt$alph) * 100  # Percentage
+  alpha <- plt$alph             # Actual value
+
+  # Convert inches to pixels
+  ht <- hti * 96
+  wd <- wdi * 96
+
+  # Output to image file
+  # All output types accept jpeg
+  # So start with that
+  jpeg(pth, width = wd, height = ht, quality = 100, units = "px")
+
+  # Prepare data
+  dt <- res$ConfLimits
+
+  # Set margins
+  par(mar = c(4, 1, 3, .75) + 0.1)
+
+  # Get class label
+  clslbl <- paste0("(", dt$CLASS[1], " - ", dt$CLASS[2], ")")
+
+  # Get labels for means
+  labels <- c("Satterthwaite", "Pooled")
+
+  # Pull off data values
+  mean_diff <- c(dt$MEAN[4], dt$MEAN[3])
+  lower_ci  <- c(dt$LCLM[4], dt$LCLM[3])
+  upper_ci  <- c(dt$UCLM[4],  dt$UCLM[3])
+
+  # Create y values
+  y <- c(2, 1)  # vertical positions
+
+  # Create base plot
+  plot(mean_diff, y,
+       xlim = range(lower_ci, upper_ci),
+       ylim = c(0.5, 2.5),
+       xlab = "",
+       ylab = "",
+       yaxt = "n",
+       pch  = NA,
+       main = "",
+       axes = FALSE)
+
+
+  # Title
+  mtext(paste("Mean of ", var, " Difference ", clslbl), side = 3,
+              line = 1.5, cex = 1.25, font = 2)
+
+  ## Subtitle
+  mtext(paste("With ", alph, "% Confidence Intervals"), side = 3,
+        line = .5, cex = 1)
+
+  # X axis label
+  mtext("Difference", side = 1, line = 2)
+
+  # Draw axis
+  aval <- axis(side = 1, las = 1, col.ticks = "grey55",
+               mgp = c(3, .5, 0), tck = -0.015)
+
+  ## Confidence interval lines
+  segments(lower_ci, y, upper_ci, y,
+           col = "brown3", lwd = 3)
+
+  ## CI end caps
+  segments(lower_ci, y - 0.08, lower_ci, y + 0.08,
+           col = "brown3", lwd = 3)
+
+  segments(upper_ci, y - 0.08, upper_ci, y + 0.08,
+           col = "brown3", lwd = 3)
+
+  ## Mean diamonds
+  points(mean_diff, y,
+         pch = 5,           # diamond
+         col = "#05379B",
+         cex = 1.25)
+
+  ## Labels above lines
+  text(mean_diff, y + 0.15, labels,
+       cex = 0.9)
+
+  legend("topright",
+         legend = "Mean",
+         pch = 5,
+         col = "#05379B",
+         box.col = "grey80",
+         inset = c(.01, .02),
+         x.intersp = .5,
+         y.intersp = c(0.5, 1.8),
+         cex = .9,
+         bty = "o")
+
+
+
+  # # Calculate basic parameters
+  # n  <- length(dt)
+  # mu <- mean(dt)
+  # sdx <- sd(dt)
+  #
+  # ## 95% CI for mean (SAS uses t-based CI)
+  # tcrit <- qt(1 - alpha / 2, df = n - 1)
+  #
+  # # Calculate confidence interval
+  # ci <- mu + c(-1, 1) * tcrit * sdx / sqrt(n)
+  #
+  # # Get scales
+  # xscl <- get_scale(ci, .001)
+  #
+  # # Create plot
+  # plot(ci, rep(1, length(ci)),
+  #      type = "n",
+  #      yaxt = "n",
+  #      ylab = "",
+  #      xlab = "",
+  #      xlim = xscl,
+  #      main = "",
+  #      axes = FALSE)
+  #
+  # # Title
+  # mtext(paste0("Mean of ", var), side = 3,
+  #       line = par("mar")[3] - 1.5,
+  #       font = 2, cex = 1.25)
+  #
+  # # Subtitle
+  # mtext(paste0("With ", alph, "% Confidence Interval"), side = 3,
+  #       line = par("mar")[3] - 2.5,
+  #       font = 1)
+  #
+  # # X Label
+  # mtext(var, side = 1,
+  #       line = par("mar")[1] - 1.5,
+  #       font = 1)
+  #
+  # # Draw axis
+  # aval <- axis(side = 1, las = 1, col.ticks = "grey55",
+  #              mgp = c(3, .5, 0), tck = -0.015)
+  #
+  # ## CI line
+  # segments(ci[1], 1, ci[2], 1,
+  #          col = "firebrick3",
+  #          lwd = 2)
+  #
+  # ## CI end caps
+  # segments(ci[1], 0.95, ci[1], 1.05,
+  #          col = "firebrick3",
+  #          lwd = 2)
+  #
+  # segments(ci[2], 0.95, ci[2], 1.05,
+  #          col = "firebrick3",
+  #          lwd = 2)
+  #
+  # ## Mean diamond
+  # points(mu, 1,
+  #        pch = 5,
+  #        col = "#05379B",
+  #        cex = 1.25)
+  #
+  # # Create legend
+  # legend("topright",
+  #        legend = "Mean",
+  #        pch = 5,
+  #        col = "#05379B",
+  #        box.col = "grey80",
+  #        inset = c(.01, .02),
+  #        x.intersp = .5,
+  #        y.intersp = c(0.5, 1.8),
+  #        cex = .9,
+  #        bty = "o")
+
+  # Frame
+  box(col = "grey70", lwd = 1)
+  box("figure", col = "grey70", lwd = 1)
+
+  # Restore margins
+  par(mar = op)
+
+  # Close device context
+  dev.off()
+
+  # Put plot in reporter plot object
+  ret <- create_plot(pth, height = hti, width = wdi)
+
+  return(ret)
+
+
+}
+
 #' @noRd
-render_tqqplot <- function(dat, var, plt) {
+render_tqqplot1 <- function(dat, var, plt) {
 
 
   op <- par("mar")
@@ -1204,6 +1867,161 @@ render_tqqplot <- function(dat, var, plt) {
 
 }
 
+
+#' @noRd
+render_tqqplot2 <- function(dat, var, plt, class) {
+
+
+  op <- par("mar")
+  om <- par("oma")
+
+  # Create temp file path
+  pth <- tempfile(fileext = ".jpg")
+
+  # Standard height and width
+  hti <- 3.25  # Height in inches
+  wdi <- 6  # Width in inches
+  bml <- 6  # bottom margin lines
+
+  # Convert inches to pixels
+  ht <- hti * 96
+  wd <- wdi * 96
+
+  # Prepare data
+  dat <- as.data.frame(dat)
+  dat <- sort(dat, by = class)
+
+  # Subset
+  cvls <-  unique(dat[[class]])
+  dt1 <- dat[dat[[class]] == cvls[1], var]
+  dt2 <- dat[dat[[class]] == cvls[2], var]
+
+  # Output to image file
+  jpeg(pth, width = wd, height = ht, quality = 100, units = "px")
+
+
+  # Set margins
+  par(oma = c(0, 0, 2, .75) + 0.1,
+      mar = c(4, 4, 0, .0) + 0.1,
+      mfrow = c(1, 2))
+
+
+  #*******************************
+  #* QQPlot 1
+  #*******************************
+
+  # Get y scale
+  # mx <- max(abs(rdt)) * 1.125  #1.0025
+  # scl <- c(-mx, mx)
+
+  # Draw plot
+  qqnorm(dt1,
+         main = "",
+         xlab = "",
+         ylab = "",
+         pch  = 1,          # open circles
+         col  = "#05379B",
+         cex = 1,
+         # ylim = scl,
+         axes = FALSE)
+
+  # Add diagonal line
+  # This line is a problem.  Right now just putting it diagonal
+  # between the corners.  All qqline() functions are worse.
+  usr <- par("usr")
+  segments(usr[1], usr[3], usr[2], usr[4], col = "grey60")
+  # qqline(dt1, col = "grey60", lwd = 1, qtype = 3)
+
+  # Add custom axes
+  axis(side = 1, col.ticks = "grey55", mgp = c(3, .5, 0), tck = -0.015)
+  axis(side = 2, las = 1, col.ticks = "grey55", mgp = c(3, .5, 0), tck = -0.015)
+
+  # X Axis label
+  mtext("Quantile", side = 1, line = par("mar")[1] - 2)
+
+  # Y Axis label
+  mtext(var, side = 2, line = par("mar")[2] - 1.5)
+
+  # Add class label
+  legend("topleft", legend = cvls[1], bty = "n",
+         x.intersp = 0,  # Spacing between group label and box
+         y.intersp = 0,  # Spacing between content and borders
+         cex = .9
+  )
+
+  # Frame
+  box(col = "grey70", lwd = 1)
+
+  #*******************************
+  #* QQPlot 2
+  #*******************************
+
+  # Get y scale
+  # mx <- max(abs(rdt)) * 1.125  #1.0025
+  # scl <- c(-mx, mx)
+
+  # Draw plot
+  qqnorm(dt2,
+         main = "",
+         xlab = "",
+         ylab = "",
+         pch  = 1,          # open circles
+         col  = "#05379B",
+         cex = 1,
+         # ylim = scl,
+         axes = FALSE)
+
+  # Add diagonal line
+  # This line is a problem.  Right now just putting it diagonal
+  # between the corners.  All qqline() functions are worse.
+  usr <- par("usr")
+  segments(usr[1], usr[3], usr[2], usr[4], col = "grey60")
+  # qqline(dt1, col = "grey60", lwd = 1, qtype = 3)
+
+  # Add custom axes
+  axis(side = 1, col.ticks = "grey55", mgp = c(3, .5, 0), tck = -0.015)
+  axis(side = 2, las = 1, col.ticks = "grey55", mgp = c(3, .5, 0), tck = -0.015)
+
+  # X Axis label
+  mtext("Quantile", side = 1, line = par("mar")[1] - 2)
+
+  # Y Axis label
+  mtext(var, side = 2, line = par("mar")[2] - 1.5)
+
+  # Add class label
+  legend("topleft", legend = cvls[2], bty = "n",
+         x.intersp = 0,  # Spacing between group label and box
+         y.intersp = 0,  # Spacing between content and borders
+         cex = .9
+  )
+
+  # Frame
+  box(col = "grey70", lwd = 1)
+
+  #*******************************
+  #* Clean up
+  #*******************************
+
+
+  # Title
+  mtext(paste0("Q-Q Plots of ", var), side = 3, outer = TRUE,
+        line = par("oma")[3] - 1.75, font = 2, cex = 1.25)
+
+  box("outer", col = "grey70", lwd = 1)
+
+  par(mar = op, oma = om, mfrow = c(1, 1))
+
+  # Close device context
+  dev.off()
+
+  # Put plot in reporter plot object
+  ret <- create_plot(pth, height = hti, width = wdi)
+
+  return(ret)
+
+
+}
+
 #' @noRd
 render_profiles <- function(dat, var, plt) {
 
@@ -1222,28 +2040,27 @@ render_agreement <- function(dat, var, plt) {
 
 # Utilities ---------------------------------------------------------------
 
-
-boxplot_stats1 <- function(dt1, dt2, fvls) {
+# Boxplot.stats(data1) can prepare the boxplot data more easily,
+# but has no parameter to use SAS-style quantiles. So need to calculate
+# everything manually.
+#' @noRd
+boxplot_stats1 <- function(dt1) {
 
   # Calculate quantile
   q1 <- quantile(dt1, probs = c(0, .25, .5, .75, 1), type = 2, na.rm = TRUE)
-  q2 <- quantile(dt2, probs = c(0, .25, .5, .75, 1), type = 2, na.rm = TRUE)
 
   # Calculate Inter-Quartile Range
   iqr1 <- IQR(dt1, type = 2, na.rm = TRUE) * 1.5
-  iqr2 <- IQR(dt2, type = 2, na.rm = TRUE) * 1.5
 
   # Calculate outlier limits
   lm1 <- c(q1[2] - iqr1, q1[4] + iqr1)
-  lm2 <- c(q2[2] - iqr2, q2[4] + iqr2)
 
   # Determine if there are outliers
   ol1 <- dt1 <= lm1[1] | dt1 >= lm1[2]
   out1 <- dt1[ol1]
-  ol2 <- dt2 <= lm2[1] | dt2 >= lm2[2]
-  out2 <- dt2[ol2]
 
   # Change min and max to remove outliers
+  onm1 <- c()
   if (length(out1) > 0) {
     mn1 <- min(dt1[dt1 > lm1[1]])
     mx1 <- max(dt1[dt1 < lm1[2]])
@@ -1253,33 +2070,28 @@ boxplot_stats1 <- function(dt1, dt2, fvls) {
     # onm1 <- nms1[ol1]                # Original obs #: This seems more correct
   }
 
-  # Change min and max to remove outliers
-  if (length(out2) > 0) {
-    mn2 <- min(dt1[dt2 > lm2[1]])
-    mx2 <- max(dt1[dt2 < lm2[2]])
-    q2[1] <- mn2
-    q2[5] <- mx2
-    onm2 <- seq(1, length(dt2))[ol2]   # Obs within class: This matches SAS
-    # onm2 <- nms2[ol2]                # Original obs #: This seems more correct
-  }
-
   # Get length
-  lndt <- length(dt1) + length(dt2)
+  lndt <- length(dt1)
 
   # Prepare to pass data
   bp <- list(
-    stats = cbind(q2, q1),
-    n = cbind(lndt, lndt),
+    stats = matrix(q1, ncol = 1),
+    n = lndt,
     conf = NULL,
     out = out1,
-    names = fvls
+    onm = onm1
   )
 
   return(bp)
 
 }
 
-boxplot_stats2 <- function(dt1, dt2, fvls) {
+
+# Boxplot.stats(data1) can prepare the boxplot data more easily,
+# but has no parameter to use SAS-style quantiles. So need to calculate
+# everything manually.
+#' @noRd
+boxplot_stats2 <- function(dt1, dt2, nms1, nms2, fvls) {
 
   # Calculate quantile
   q1 <- quantile(dt1, probs = c(0, .25, .5, .75, 1), type = 2, na.rm = TRUE)
@@ -1300,23 +2112,23 @@ boxplot_stats2 <- function(dt1, dt2, fvls) {
   out2 <- dt2[ol2]
 
   # Change min and max to remove outliers
+  onm1 <- c()
   if (length(out1) > 0) {
     mn1 <- min(dt1[dt1 > lm1[1]])
     mx1 <- max(dt1[dt1 < lm1[2]])
     q1[1] <- mn1
     q1[5] <- mx1
-    onm1 <- seq(1, length(dt1))[ol1]   # Obs within class: This matches SAS
-    # onm1 <- nms1[ol1]                # Original obs #: This seems more correct
+    onm1 <- nms1[ol1]                # Original obs #: This seems more correct
   }
 
   # Change min and max to remove outliers
+  onm2 <- c()
   if (length(out2) > 0) {
     mn2 <- min(dt1[dt2 > lm2[1]])
     mx2 <- max(dt1[dt2 < lm2[2]])
     q2[1] <- mn2
     q2[5] <- mx2
-    onm2 <- seq(1, length(dt2))[ol2]   # Obs within class: This matches SAS
-    # onm2 <- nms2[ol2]                # Original obs #: This seems more correct
+    onm2 <- nms2[ol2]                # Original obs #: This seems more correct
   }
 
   # Get length
@@ -1329,8 +2141,10 @@ boxplot_stats2 <- function(dt1, dt2, fvls) {
     conf = NULL,
     out = numeric(0),
     names = fvls,
-    out1 = out1,
-    out2 = out2
+    "out1" = out1,
+    "out2" = out2,
+    "onm1" = onm1,
+    "onm2" = onm2
   )
 
   return(bp)

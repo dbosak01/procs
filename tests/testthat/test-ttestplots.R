@@ -69,7 +69,7 @@ test_that("ttestplot1: ttestplot() object works as expected.", {
 })
 
 
-test_that("ttestplot2: ttestplot() basic plot types.", {
+test_that("ttestplot2: basic plot types.", {
 
   # Histogram - OK
   res <- proc_ttest(cls,
@@ -126,7 +126,7 @@ test_that("ttestplot2: ttestplot() basic plot types.", {
 
 
 # Nice!
-test_that("ttestplot3: ttestplot() multiple plot types.", {
+test_that("ttestplot3: multiple plot types.", {
 
   # Combined
   res <- proc_ttest(cls,
@@ -146,7 +146,7 @@ test_that("ttestplot3: ttestplot() multiple plot types.", {
 })
 
 # OK
-test_that("ttestplot4: ttestplot() summary plot type.", {
+test_that("ttestplot4: summary plot type.", {
 
   # Summary
   res <- proc_ttest(cls,
@@ -199,7 +199,7 @@ test_that("ttestplot4: ttestplot() summary plot type.", {
 })
 
 # OK
-test_that("ttestplot5: ttestplot() summary plot type by groups.", {
+test_that("ttestplot5: summary plot type by groups.", {
 
   # Summary
   res <- proc_ttest(cls,
@@ -221,7 +221,7 @@ test_that("ttestplot5: ttestplot() summary plot type by groups.", {
 
 
 # OK
-test_that("ttestplot6: ttestplot() multiple variables.", {
+test_that("ttestplot6: multiple variables.", {
 
   # Summary
   res <- proc_ttest(cls,
@@ -262,7 +262,7 @@ test_that("ttestplot6: ttestplot() multiple variables.", {
 
 
 # OK
-test_that("ttestplot7: ttestplot() class analysis.", {
+test_that("ttestplot7: class analysis.", {
 
   # Boxplot with class
   res <- proc_ttest(cls,
@@ -280,20 +280,117 @@ test_that("ttestplot7: ttestplot() class analysis.", {
   expect_equal("plot_spec" %in% class(res[[5]][[1]]), TRUE)
 
 
-  # Boxplot with class and outlier
+
+  # Interval with class - Mean of Difference
   res <- proc_ttest(cls,
-                    var = c("Weight"),
-                    options = c("h0" = 65, "alpha" = 0.05),
+                    var = c("Height"),
+                    options = c("h0" = 65, "alpha" = 0.1),
                     titles = "My first Frequency Table",
                     output = report,
                     class = Sex,
-                    plots = ttestplot("boxplot"))
+                    plots = ttestplot("interval"))
 
   res
 
   expect_equal(is.null(res), FALSE)
   expect_equal(length(res), 5)
   expect_equal("plot_spec" %in% class(res[[5]][[1]]), TRUE)
+
+
+  # Histogram with class
+  res <- proc_ttest(cls,
+                    var = c("Height"),
+                    options = c("h0" = 65, "alpha" = 0.05),
+                    titles = "My first Frequency Table",
+                    output = report,
+                    class = Sex,
+                    plots = ttestplot("histogram"))
+
+  res
+
+  expect_equal(is.null(res), FALSE)
+  expect_equal(length(res), 5)
+  expect_equal("plot_spec" %in% class(res[[5]][[1]]), TRUE)
+
+
+  # QQPlot with class
+  res <- proc_ttest(cls,
+                    var = c("Height"),
+                    options = c("h0" = 65, "alpha" = 0.05),
+                    titles = "My first Frequency Table",
+                    output = report,
+                    class = Sex,
+                    plots = ttestplot("qqplot"))
+
+  res
+
+  expect_equal(is.null(res), FALSE)
+  expect_equal(length(res), 5)
+  expect_equal("plot_spec" %in% class(res[[5]][[1]]), TRUE)
+
+
+  # Summary with class
+  res <- proc_ttest(cls,
+                    var = c("Height"),
+                    options = c("h0" = 65, "alpha" = 0.05),
+                    output = report,
+                    class = Sex,
+                    plots = ttestplot("summary"))
+
+  res
+
+  expect_equal(is.null(res), FALSE)
+  expect_equal(length(res), 5)
+  expect_equal("plot_spec" %in% class(res[[5]][[1]]), TRUE)
+
+
+})
+
+test_that("ttestplot8: boxplot outliers are working as expected.", {
+
+
+  dt1 <- cls[cls$Sex == "F", ]
+
+  # Single chart outliers
+  res <- proc_ttest(dt1,
+                    var = c("Weight"),
+                    options = c("h0" = 65, "alpha" = 0.1),
+                    titles = "My first Frequency Table",
+                    output = report,
+                    plots = ttestplot("boxplot"))
+
+  expect_equal(length(res), 4)
+  expect_equal("plot_spec" %in% class(res[[4]][[1]]), TRUE)
+
+
+
+  # Double chart outliers
+  res <- proc_ttest(cls,
+                    var = c("Weight"),
+                    options = c("h0" = 65, "alpha" = 0.1),
+                    titles = "My first Frequency Table",
+                    class = "Sex",
+                    output = report,
+                    plots = ttestplot("boxplot"))
+
+  expect_equal(length(res), 5)
+  expect_equal("plot_spec" %in% class(res[[5]][[1]]), TRUE)
+
+})
+
+test_that("ttestplot8: edge cases.", {
+
+  # Boxplot - 90% confidence, and possibly outliers
+  res <- proc_ttest(cls,
+                    var = c("Weight"),
+                    options = c("h0" = 65, "alpha" = 0.1),
+                    titles = "My first Frequency Table",
+                    output = report,
+                    plots = ttestplot("boxplot"))
+
+  expect_equal(length(res), 4)
+  expect_equal("plot_spec" %in% class(res[[4]][[1]]), TRUE)
+
 
 })
 
