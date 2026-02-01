@@ -85,6 +85,20 @@ test_that("ttestplot2: basic plot types.", {
   expect_equal(length(res), 4)
   expect_equal("plot_spec" %in% class(res[[4]][[1]]), TRUE)
 
+  # Histogram - OK
+  res <- proc_ttest(cls,
+                    var = c("Weight"),
+                    options = c("h0" = 65, "alpha" = 0.05),
+                    titles = "My first Frequency Table",
+                    output = report,
+                    plots = ttestplot("histogram"))
+
+  res
+
+  expect_equal(is.null(res), FALSE)
+  expect_equal(length(res), 4)
+  expect_equal("plot_spec" %in% class(res[[4]][[1]]), TRUE)
+
 
   # Boxplot - OK
   res <- proc_ttest(cls,
@@ -280,7 +294,6 @@ test_that("ttestplot7: class analysis.", {
   expect_equal("plot_spec" %in% class(res[[5]][[1]]), TRUE)
 
 
-
   # Interval with class - Mean of Difference
   res <- proc_ttest(cls,
                     var = c("Height"),
@@ -299,7 +312,7 @@ test_that("ttestplot7: class analysis.", {
 
   # Histogram with class
   res <- proc_ttest(cls,
-                    var = c("Height"),
+                    var = c("Weight"),
                     options = c("h0" = 65, "alpha" = 0.05),
                     titles = "My first Frequency Table",
                     output = report,
@@ -312,6 +325,20 @@ test_that("ttestplot7: class analysis.", {
   expect_equal(length(res), 5)
   expect_equal("plot_spec" %in% class(res[[5]][[1]]), TRUE)
 
+  # Boxplot with class
+  res <- proc_ttest(cls,
+                    var = c("Weight"),
+                    options = c("h0" = 65, "alpha" = 0.05),
+                    titles = "My first Frequency Table",
+                    output = report,
+                    class = Sex,
+                    plots = ttestplot("histogram"))
+
+  res
+
+  expect_equal(is.null(res), FALSE)
+  expect_equal(length(res), 5)
+  expect_equal("plot_spec" %in% class(res[[5]][[1]]), TRUE)
 
   # QQPlot with class
   res <- proc_ttest(cls,
@@ -393,4 +420,88 @@ test_that("ttestplot8: edge cases.", {
 
 
 })
+
+
+test_that("ttestplot9: Paired analysis.", {
+
+
+  # Profiles
+  res <- proc_ttest(cls,
+                    paired = "Weight * Height",
+                    output = report,
+                    plots = ttestplot("profiles"))
+
+  expect_equal(length(res), 4)
+  expect_equal("plot_spec" %in% class(res[[4]][[1]]), TRUE)
+
+
+  # Agreement
+  res <- proc_ttest(cls,
+                    paired = "Weight * Height",
+                    output = report,
+                    plots = ttestplot("agreement"))
+
+  expect_equal(length(res), 4)
+  expect_equal("plot_spec" %in% class(res[[4]][[1]]), TRUE)
+
+
+  # Profiles - with by variables and multiple plot types
+  res <- proc_ttest(cls,
+                    paired = "Weight * Height",
+                    output = report,
+                    by = "Sex",
+                    plots = ttestplot(c("profiles", "agreement")))
+
+  expect_equal(length(res), 2)
+  expect_equal("plot_spec" %in% class(res[[1]][[4]][[1]]), TRUE)
+
+
+  # Summary
+  res <- proc_ttest(cls,
+                    paired = "Weight * Height",
+                    output = report,
+                    plots = ttestplot("summary"))
+
+  expect_equal(length(res), 4)
+  expect_equal("plot_spec" %in% class(res[[4]][[1]]), TRUE)
+
+
+  # Histogram
+  res <- proc_ttest(cls,
+                    paired = "Weight * Height",
+                    output = report,
+                    plots = ttestplot("histogram"))
+
+  expect_equal(length(res), 4)
+  expect_equal("plot_spec" %in% class(res[[4]][[1]]), TRUE)
+
+  # Boxplot
+  res <- proc_ttest(cls,
+                    paired = "Weight * Height",
+                    output = report,
+                    plots = ttestplot("boxplot"))
+
+  expect_equal(length(res), 4)
+  expect_equal("plot_spec" %in% class(res[[4]][[1]]), TRUE)
+
+  # Interval
+  res <- proc_ttest(cls,
+                    paired = "Weight * Height",
+                    output = report,
+                    plots = ttestplot("interval"))
+
+  expect_equal(length(res), 4)
+  expect_equal("plot_spec" %in% class(res[[4]][[1]]), TRUE)
+
+  # QQPlot
+  res <- proc_ttest(cls,
+                    paired = "Weight * Height",
+                    output = report,
+                    plots = ttestplot("qqplot"))
+
+  expect_equal(length(res), 4)
+  expect_equal("plot_spec" %in% class(res[[4]][[1]]), TRUE)
+
+})
+
 

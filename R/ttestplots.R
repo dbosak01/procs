@@ -276,6 +276,14 @@ render_summary1 <- function(dat, var, plt) {
   rdt <- dat[[var]]
   # dt <- dat[[ivr]]
 
+  # Assign labels
+  xlbl <- var
+  tlbl <- paste(" ", var)
+  if (!is.null(plt$varlbl)) {
+    xlbl <- "Difference"
+    tlbl <- paste0(" Difference: ", plt$varlbl)
+  }
+
   #**********************************
   #* Histogram
   #**********************************
@@ -290,16 +298,30 @@ render_summary1 <- function(dat, var, plt) {
   sdx <- sd(rdt)
 
   # Use calculated breaks to get scale
-  scl <- range(rdt)
-  scl <- c(scl[1] * .8, scl[2] * 1.2)
+  # scl <- range(rdt)
+  # scl <- c(scl[1] * .8, scl[2] * 1.2)
+  # Calculate breaks - Closer to SAS algorithm
+  brks <- pretty(range(rdt), n = nclass.Sturges(rdt),
+                 min.n = 1, high.u.bias = 3)
 
   # Calculate breaks and y scale
   h <- hist(rdt,
-            breaks = "Sturges",
+            breaks = brks,
             plot = FALSE)
 
   # Convert counts to percent
   h$counts <- h$counts / sum(h$counts) * 100
+
+  # Use calculated breaks to get scale
+  w <- diff(h$breaks)[1] # bin width
+  xmin <- min(h$breaks) - w
+  xmax <- max(h$breaks) + w
+  scl <- c(xmin, xmax)
+
+  # Use calculated break to get normal curve
+  grid <- seq(scl[1] , scl[2], length.out = 300)
+  y_norm_percent <- 100 * w * dnorm(grid, mean = mu, sd = sdx)
+  y_mx <- max(max(y_norm_percent), max(h$counts))
 
   # Initial chart to draw vertical lines
   hist(rdt,
@@ -307,7 +329,7 @@ render_summary1 <- function(dat, var, plt) {
        main = "",
        ylab = "",
        xlim = scl,
-       ylim = c(0, max(h$counts) * 1.05),
+       ylim = c(0, y_mx * 1.025),
        plot = TRUE,
        axes = FALSE)
 
@@ -325,12 +347,12 @@ render_summary1 <- function(dat, var, plt) {
        xlab = "",
        ylab = "",
        xlim = scl,
-       ylim = c(0, max(h$counts) * 1.05),
+       ylim = c(0, y_mx * 1.025),
        axes = FALSE,
        add = TRUE)
 
   # Title
-  mtext(paste0("Distribution of ", var), side = 3,
+  mtext(paste0("Distribution of", tlbl), side = 3,
         line = par("mar")[3] - 1.5,
         font = 2, cex = 1.25)
 
@@ -344,21 +366,37 @@ render_summary1 <- function(dat, var, plt) {
 
 
   # Normal curve overlay (scaled to percent)
-  x <- seq(min(rdt) * 2, max(rdt) * 2, length.out = 300)
-  x <- seq(scl[1], scl[2], length.out = 300)
+  # x <- seq(min(rdt) * 2, max(rdt) * 2, length.out = 300)
+  # x <- seq(scl[1], scl[2], length.out = 300)
+  #
+  # y_norm <- dnorm(x, mean = mu, sd = sdx)
+  # y_norm <- y_norm / max(y_norm) * max(h$counts)
+  #
+  # lines(x, y_norm, col = "steelblue4", lwd = 2)
 
-  y_norm <- dnorm(x, mean = mu, sd = sdx)
-  y_norm <- y_norm / max(y_norm) * max(h$counts)
+  # Normal curve overlay (scaled to percent)
+  lines(grid, y_norm_percent, col = "steelblue4", lwd = 2)
 
-  lines(x, y_norm, col = "steelblue4", lwd = 2)
+  # # Kernel density overlay (scaled to percent)
+  # dens <- density(rdt)
+  #
+  # y_kern <- dens$y / max(dens$y) * max(h$counts)
+  #
+  # lines(dens$x, y_kern, col = "orangered2", lwd = 2)
 
-  # Kernel density overlay (scaled to percent)
-  dens <- density(rdt)
+  # Bandwidth (Silverman / SAS)
+  bw <- 1.06 * sdx * n^(-1/5)
 
-  y_kern <- dens$y / max(dens$y) * max(h$counts)
+  # Kernel density estimate
+  dens <- density(rdt, kernel = "gaussian", bw = bw, n = 512)
 
-  lines(dens$x, y_kern, col = "orangered2", lwd = 2)
+  # Scale KDE to Percent axis
+  y_kernel_percent <- 100 * w * dens$y
 
+  yscl <- seq(50, length(y_kernel_percent) - 25)
+
+  # Overlay density on histogram
+  lines(dens$x[yscl], y_kernel_percent[yscl], col = "orangered2", lwd = 2)
 
   # Add custom Y axis
   axis(side = 2, las = 1, col.ticks = "grey55",
@@ -424,7 +462,7 @@ render_summary1 <- function(dat, var, plt) {
 
 
   # X Label
-  mtext(var, side = 1,
+  mtext(xlbl, side = 1,
         line = par("mar")[1] - 2,
         font = 1)
 
@@ -441,16 +479,19 @@ render_summary1 <- function(dat, var, plt) {
   # Orientation lines
   abline(v = aval, col = "grey90", lwd = 1)
 
-  # Calculate SAS compatible quantile
-  q <- quantile(dt, probs = c(0, .25, .5, .75, 1), type = 2)
+  # # Calculate SAS compatible quantile
+  # q <- quantile(dt, probs = c(0, .25, .5, .75, 1), type = 2)
+  #
+  # # Prepare to pass data
+  # bp <- list(
+  #   stats = matrix(q, ncol = 1),
+  #   n = length(dt),
+  #   conf = NULL,
+  #   out = numeric(0)
+  # )
 
-  # Prepare to pass data
-  bp <- list(
-    stats = matrix(q, ncol = 1),
-    n = length(dt),
-    conf = NULL,
-    out = numeric(0)
-  )
+  # Get boxplot stats
+  bp <- boxplot_stats1(dt)
 
   # Boxplot (horizontal)
   bxp(bp,
@@ -473,6 +514,23 @@ render_summary1 <- function(dat, var, plt) {
          col = "#05379B",
          lwd = 1,
          cex = 1.25)
+
+  # Display outliers
+  if (length(bp$out) > 0) {
+
+    points(bp$out, rep(1, length(bp$out)),
+           pch = 1,
+           col = "grey20",
+           lwd = 1.6,
+           cex = 1.25)
+
+    # Add labels
+    text(bp$out, rep(1, length(bp$out)),
+         labels = bp$onm,
+         cex = .9,
+         pos = 1)
+
+  }
 
   # Create legend
   legend("topright",
@@ -513,6 +571,7 @@ render_summary2 <- function(dat, var, plt, class) {
 
 
   op <- par("mar")
+  om <- par("oma")
   of <- par("fig")
 
   # Create temp file path
@@ -530,59 +589,67 @@ render_summary2 <- function(dat, var, plt, class) {
   wd <- wdi * 96
 
   # Output to image file
-  # All output types accept jpeg
-  # So start with that
   jpeg(pth, width = wd, height = ht, quality = 100, units = "px")
 
+  # Set margins
+  par(oma = c(5, 1, 2, .75) + 0.1,
+      mar = c(0, 3, 0, 0) + 0.1)
+
+  # Convert to data frame just in case it is a tibble
+  dat <- as.data.frame(dat)
+
+  # Add rownumbers
+  rownames(dat) <- seq(1, nrow(dat))
+
+  dat <- sort(dat, by = class)
+
   # Get analysis variables
-  # vrs <- get_vars(mdl)
-  # dvr <- vrs$dvar
-  # ivr <- vrs$ivar
+  cvls <- unique(dat[[class]])
+  vl1 <- cvls[1]
+  vl2 <- cvls[2]
 
   # Prepare data
-  rdt <- dat[[var]]
-  # dt <- dat[[ivr]]
+  dt1 <- dat[dat[[class]] == vl1, var]
+  dt2 <- dat[dat[[class]] == vl2, var]
 
-  #**********************************
-  #* Histogram
-  #**********************************
+  # Overall scale
+  scl <- range(dat[[var]])
+  scl <- c(scl[1] * .875, scl[2] * 1.125)
 
-  # Set margins
-  par(mar = c(0, 5, 3, .75) + 0.1,
-      fig = c(0, 1, .3, 1))
+  #******************************
+  #*  Histogram 1
+  #******************************
+
+  par(fig = c(0, 1, .6, 1))
 
   # Calculate stats
-  n   <- length(rdt)
-  mu  <- mean(rdt)
-  sdx <- sd(rdt)
+  n   <- length(dt1)
+  mu  <- mean(dt1)
+  sdx <- sd(dt1)
 
-  # Use calculated breaks to get scale
-  scl <- range(rdt)
-  scl <- c(scl[1] * .8, scl[2] * 1.2)
+  # Calculate breaks - Closer to SAS algorithm
+  brks <- pretty(range(dt1), n = nclass.Sturges(dt1),
+                 min.n = 1, high.u.bias = 3)
 
-  # Calculate breaks and y scale
-  h <- hist(rdt,
-            breaks = "Sturges",
+  # Histogram (Percent scale)
+  h <- hist(dt1,
+            breaks = brks,
             plot = FALSE)
 
   # Convert counts to percent
   h$counts <- h$counts / sum(h$counts) * 100
 
-  # Initial chart to draw vertical lines
-  hist(rdt,
-       breaks = "Sturges",
-       main = "",
-       ylab = "",
-       xlim = scl,
-       ylim = c(0, max(h$counts) * 1.05),
-       plot = TRUE,
-       axes = FALSE)
+  # Use calculated breaks to get scale
+  w <- diff(h$breaks)[1] # bin width
+  xmin <- min(h$breaks) - w
+  xmax <- max(h$breaks) + w
+  scl1 <- c(xmin, xmax)
 
-  # Get axis tick marks
-  aval <- axTicks(side = 1)
+  # Use calculated break to get normal curve
+  grid <- seq(scl1[1] , scl1[2], length.out = 300)
+  y_norm_percent <- 100 * w * dnorm(grid, mean = mu, sd = sdx)
+  y_mx <- max(max(y_norm_percent), max(h$counts))
 
-  # Orientation lines
-  abline(v = aval, col = "grey90", lwd = 1)
 
   # Create plot using histogram values
   plot(h,
@@ -590,134 +657,210 @@ render_summary2 <- function(dat, var, plt, class) {
        border = "grey20",
        main = "",
        xlab = "",
-       ylab = "",
+       ylab = "Percent",
        xlim = scl,
-       ylim = c(0, max(h$counts) * 1.05),
-       axes = FALSE,
-       add = TRUE)
-
-  # Title
-  mtext(paste0("Distribution of ", var), side = 3,
-        line = par("oma")[3] - 1.5,
-        font = 2, cex = 1.25, outer = TRUE)
-
-  # Subtitle
-  mtext(paste0("With ", alph, "% Confidence Interval for Mean"), side = 3,
-        line = par("oma")[3] - 2.5,
-        font = 1, outer = TRUE)
-
-  # Y Label
-  mtext("Percent", side = 2, line = par("oma")[2] - 2, outer = TRUE)
-
+       ylim = c(0, y_mx * 1.025),  # max(h$counts) * 1.05),
+       axes = FALSE)
 
   # Normal curve overlay (scaled to percent)
-  x <- seq(min(rdt) * 2, max(rdt) * 2, length.out = 300)
-  x <- seq(scl[1], scl[2], length.out = 300)
-
-  y_norm <- dnorm(x, mean = mu, sd = sdx)
-  y_norm <- y_norm / max(y_norm) * max(h$counts)
-
-  lines(x, y_norm, col = "steelblue4", lwd = 2)
+  # x <- seq(min(dt1) * 2, max(dt1) * 2, length.out = 300)
+  # x <- seq(scl[1], scl[2], length.out = 300)
+  #
+  # y_norm <- dnorm(x, mean = mu, sd = sdx)
+  # y_norm <- y_norm / max(y_norm) * max(h$counts)
+  #
+  # lines(x, y_norm, col = "steelblue4", lwd = 2)
+  lines(grid, y_norm_percent, col = "steelblue4", lwd = 2)
 
   # Kernel density overlay (scaled to percent)
-  dens <- density(rdt)
+  # dens <- density(dt1)
+  #
+  # y_kern <- dens$y / max(dens$y) * max(h$counts)
+  #
+  # lines(dens$x, y_kern, col = "orangered2", lwd = 2)
 
-  y_kern <- dens$y / max(dens$y) * max(h$counts)
+  # Bandwidth (Silverman / SAS)
+  bw <- 1.06 * sdx * n^(-1/5)
 
-  lines(dens$x, y_kern, col = "orangered2", lwd = 2)
+  # Kernel density estimate
+  dens <- density(dt1, kernel = "gaussian",  bw = bw, n = 512)
 
+  # Scale KDE to Percent axis
+  y_kernel_percent <- 100 * w * dens$y
 
-  # Add custom Y axis
+  yscl <- seq(50, length(y_kernel_percent) - 25)
+
+  # Overlay on histogram
+  lines(dens$x, y_kernel_percent, col = "orangered2", lwd = 2)
+
+  # Add custom axes
   axis(side = 2, las = 1, col.ticks = "grey55",
        mgp = c(3, .5, 0), tck = -0.015)
 
+  # Add y label
+  mtext("Percent", side = 2, line = 2.5)
+
+  # Add class label
+  legend("topleft", legend = vl1, bty = "n",
+         x.intersp = 0,  # Spacing between group label and box
+         y.intersp = 0,  # Spacing between content and borders
+         cex = .9
+  )
+
   # Frame
   box(col = "grey70", lwd = 1)
-  box("outer", col = "grey70", lwd = 1)
 
-  # Legend
-  mpos <- legend("topright",
-                 legend = c("Normal", "Kernel"),
-                 col = c("steelblue4", "orangered2"),
-                 lwd = 2,
-                 box.col = "grey80",
-                 bty = "n",
-                 cex = .9,
-                 inset = c(.01, .01),
-                 x.intersp = .5,
-                 y.intersp = c(0.5, 1.8)
+  #******************************
+  #*  Histogram 2
+  #******************************
+
+  par(fig = c(0, 1, .2, .6), new = TRUE)
+
+  # Calculate stats
+  n   <- length(dt2)
+  mu  <- mean(dt2)
+  sdx <- sd(dt2)
+
+  # Calculate breaks - Closer to SAS algorithm
+  brks <- pretty(range(dt2), n = nclass.Sturges(dt2),
+                 min.n = 1, high.u.bias = 3)
+
+  # Histogram (Percent scale)
+  h <- hist(dt2,
+            breaks = brks,
+            plot = FALSE)
+
+  # Convert counts to percent
+  h$counts <- h$counts / sum(h$counts) * 100
+
+  # Use calculated breaks to get scale
+  w <- diff(h$breaks)[1] # bin width
+  xmin <- min(h$breaks) - w
+  xmax <- max(h$breaks) + w
+  scl2 <- c(xmin, xmax)
+
+  # Use calculated break to get normal curve
+  grid <- seq(scl2[1] , scl2[2], length.out = 300)
+  y_norm_percent <- 100 * w * dnorm(grid, mean = mu, sd = sdx)
+  y_mx <- max(max(y_norm_percent), max(h$counts))
+
+  # Create plot using histogram values
+  plot(h,
+       col = "#CAD5E5", #"grey85",
+       border = "grey20",
+       main = "",
+       xlab = "",
+       ylab = "Percent",
+       xlim = scl,
+       ylim = c(0, y_mx * 1.025), # max(h$counts) * 1.05),
+       axes = FALSE)
+
+  # Normal curve overlay (scaled to percent)
+  # x <- seq(min(dt2) * 2, max(dt2) * 2, length.out = 300)
+  # x <- seq(scl[1], scl[2], length.out = 300)
+  #
+  # y_norm <- dnorm(x, mean = mu, sd = sdx)
+  # y_norm <- y_norm / max(y_norm) * max(h$counts)
+  #
+  # lines(x, y_norm, col = "steelblue4", lwd = 2)
+
+  lines(grid, y_norm_percent, col = "steelblue4", lwd = 2)
+
+  # Kernel density overlay (scaled to percent)
+  # dens <- density(dt2)
+  #
+  # y_kern <- dens$y / max(dens$y) * max(h$counts)
+  #
+  # lines(dens$x, y_kern, col = "orangered2", lwd = 2)
+
+
+  # Bandwidth (Silverman / SAS)
+  bw <- 1.06 * sdx * n^(-1/5)   # 1.06
+
+  # Kernel density estimate
+  dens <- density(dt2, kernel = "gaussian", bw = bw, n = 512)
+
+  # Scale KDE to Percent axis
+  y_kernel_percent <- 100 * w * dens$y
+
+  # Overlay on histogram
+  lines(dens$x, y_kernel_percent, col = "orangered2", lwd = 2)
+
+
+  # Add custom axes
+  # axis(side = 1, col.ticks = "grey55", # at = xtks, labels = TRUE,
+  #      mgp = c(3, .5, 0), tck = -0.015, cex.axis = .75)
+  axis(side = 2, las = 1, col.ticks = "grey55",
+       mgp = c(3, .5, 0), tck = -0.015)
+
+  # Add y label
+  mtext("Percent", side = 2, line = 2.5)
+
+  # Add class label
+  legend("topleft", legend = vl2, bty = "n",
+         x.intersp = 0,  # Spacing between group label and box
+         y.intersp = 0,  # Spacing between content and borders
+         cex = .9
   )
 
-  # Custom Legend border
-  rect(mpos$rect$left, mpos$rect$top - (mpos$rect$h - .5),
-       mpos$rect$left + mpos$rect$w, mpos$rect$top,
-       border = "grey80"
-  )
+  # Frame
+  box(col = "grey70", lwd = 1)
+
 
   #**********************************
   #* Boxplot
   #**********************************
 
-  par(mar = c(4, 5, 0, .75) + 0.1,
-      fig = c(0, 1, 0, .3), new = TRUE)
+  par(fig = c(0, 1, 0, .2), new = TRUE)
 
-  # Get data
+  # Prepare data
   dt <- dat[[var]]
+  rwnms <- rownames(dat)
+  nms1 <- rwnms[dat[[class]] == vl1]
+  nms2 <- rwnms[dat[[class]] == vl2]
 
-  # Get scales
-  xscl <- get_scale(dt, .05)  # Not used?
+  # Get x scale
+  # xscl <- get_scale(dt, .05)
 
-  # Calculations
-  n  <- length(dt)
-  mu <- mean(dt)
-  sdx <- sd(dt)
+  # Calculate
+  n1  <- length(dt1)
+  mu1 <- mean(dt1)
+  sdx1 <- sd(dt1)
+  n2  <- length(dt2)
+  mu2 <- mean(dt2)
+  sdx2 <- sd(dt2)
 
-  ## 95% CI for mean (SAS uses t-based CI)
-  tcrit <- qt(1 - alpha / 2, df = n - 1)
-
-  # Calculate confidence interval
-  ci <- mu + c(-1, 1) * tcrit * sdx / sqrt(n)
-
-
-  ## Draw empty plot first (for layering)
-  plot(dt, rep(1, n),
+  # Draw empty plot first, so we can put ablines() behind the boxes
+  plot(dt, rep(1, length(dt)),
+       ylim = c(.5, 2.5),
+       xlim = scl,
        type = "n",
        xlab = "",
        ylab = "",
        yaxt = "n",
-       xlim = scl,
        main = "",
        axes = FALSE) #With 95% Confidence Interval for Mean")
 
-
-  # X Label
-  mtext(var, side = 1,
-        line = par("mar")[1] - 2,
+  # Y Label
+  mtext(class, side = 2,
+        line = 2.5,
         font = 1)
 
-  ## Shaded CI band
-  usr <- par("usr")
-  rect(ci[1], usr[3], ci[2], usr[4],
-       col = "#B3D2D0",
-       border = NA)
-
-  # Draw axis
+  # Draw X axis
   aval <- axis(side = 1, las = 1, col.ticks = "grey55",
                mgp = c(3, .5, 0), tck = -0.015)
+
+  # # Draw Y axis
+  axis(side = 2, las = 1, col.ticks = "grey55", labels = cvls,
+       at = c(2, 1), mgp = c(3, .5, 0), tck = -0.015)
+
 
   # Orientation lines
   abline(v = aval, col = "grey90", lwd = 1)
 
-  # Calculate SAS compatible quantile
-  q <- quantile(dt, probs = c(0, .25, .5, .75, 1), type = 2)
+  # Get boxplot stats for 2 plots
+  bp <- boxplot_stats2(dt1, dt2, nms1, nms2, cvls)
 
-  # Prepare to pass data
-  bp <- list(
-    stats = matrix(q, ncol = 1),
-    n = length(dt),
-    conf = NULL,
-    out = numeric(0)
-  )
 
   # Boxplot (horizontal)
   bxp(bp,
@@ -730,28 +873,47 @@ render_summary2 <- function(dat, var, plt, class) {
       staplecol = "#05379B",
       medcol = "#05379B",
       medlwd = 1,
-      boxwex = .65,
+      show.names = TRUE,
+      boxwex = .425,
       outline = FALSE,
       axes = FALSE)  # Already drawn above
 
   ## Mean diamond
-  points(mu, 1,
+  points(c(mu1, mu2), c(2, 1),
          pch = 5,
          col = "#05379B",
          lwd = 1,
          cex = 1.25)
 
-  # Create legend
-  legend("topright",
-         legend = paste0(alph, "% Confidence"),
-         fill = "#B3D2D0",
-         border = "grey60",
-         box.col = "grey80",
-         inset = c(.01, .02),
-         x.intersp = .5,
-         y.intersp = c(0.5, 1.8),
+  # Outliers for first class value
+  if (length(bp$out1) > 0) {
+    points(bp$out1, rep(2, length(bp$out1)),
+           pch = 1,
+           col = "grey20",
+           lwd = 1.6,
+           cex = 1.25)
+
+    # Add labels
+    text(bp$out1, rep(2, length(bp$out1)),
+         labels = bp$onm1,
          cex = .9,
-         bty = "o")
+         pos = 1)
+  }
+
+  # Outliers for second class value
+  if (length(bp$out2) > 0) {
+    # Plot outlier points
+    points(out2, rep(1, length(out2)),
+           pch = 1,
+           col = "grey20",
+           lwd = 1.6,
+           cex = 1.25)
+    # Add labels
+    text(bp$out2, rep(1, length(bp$out2)),
+         labels = bp$onm2,
+         cex = .9,
+         pos = 1)
+  }
 
   # Frame
   box(col = "grey70", lwd = 1)
@@ -760,8 +922,39 @@ render_summary2 <- function(dat, var, plt, class) {
   #* Clean up
   #**********************************
 
+  # Title
+  mtext(paste0("Distribution of ", var), side = 3,
+        line = par("oma")[3] - 1.75,
+        font = 2, cex = 1.25, outer = TRUE)
+
+
+  # X Label
+  mtext(var, side = 1,
+        line = par("oma")[1] - 3.5,
+        font = 1, outer = TRUE)
+
+
+  box("outer", col = "grey70", lwd = 1)
+
+
+  # Legend
+  mpos <- legend("bottom",
+                 legend = c("Normal", "Kernel"),
+                 col = c("steelblue4", "orangered2"),
+                 horiz = TRUE,
+                 lwd = 2,
+                 box.col = "grey80",
+                 bty = "o",
+                 cex = .9,
+                 xpd = NA,
+                 inset = c(0, -1),
+                 x.intersp = .5,
+                 y.intersp = c(0.3, .3)  # c(0.5, 1.8)
+  )
+
+
   # Restore margins
-  par(mar = op, fig = of)
+  par(mar = op, fig = of, oma = om)
 
   # Close device context
   dev.off()
@@ -778,6 +971,8 @@ render_summary2 <- function(dat, var, plt, class) {
 
 # agreement, boxplot, histogram, interval, profiles, qqplot, summary
 
+
+# Curves for normal and density most correct on this one.
 #' @noRd
 render_histogram1 <- function(dat, var, plt) {
 
@@ -813,61 +1008,98 @@ render_histogram1 <- function(dat, var, plt) {
   # Set margins
   par(mar = c(4, 5, 2, .75) + 0.1)
 
+  # Assign labels
+  xlbl <- var
+  tlbl <- paste(" ", var)
+  if (!is.null(plt$varlbl)) {
+    xlbl <- "Difference"
+    tlbl <- paste0(" Difference: ", plt$varlbl)
+  }
+
   # Calculate stats
   n   <- length(rdt)
   mu  <- mean(rdt)
   sdx <- sd(rdt)
 
+  # Calculate breaks - Closer to SAS algorithm
+  brks <- pretty(range(rdt), n = nclass.Sturges(rdt),
+                   min.n = 1, high.u.bias = 3)
+
   # Histogram (Percent scale)
   h <- hist(rdt,
-            breaks = "Sturges",
+            breaks = brks,
             plot = FALSE)
 
   # Convert counts to percent
   h$counts <- h$counts / sum(h$counts) * 100
 
   # Use calculated breaks to get scale
-  # scl <- get_reg_xlim(h$breaks, mu, sdx, pad_frac = 0, max_sigma = 4)
-  # mx <- max(abs(rdt))
-  scl <- range(rdt)
-  scl <- c(scl[1] * .8, scl[2] * 1.2)
+  w <- diff(h$breaks)[1] # bin width
+  xmin <- min(h$breaks) - w
+  xmax <- max(h$breaks) + w
+  scl <- c(xmin, xmax)
+
+  # Use calculated break to get normal curve
+  grid <- seq(scl[1] , scl[2], length.out = 300)
+  y_norm_percent <- 100 * w * dnorm(grid, mean = mu, sd = sdx)
+  y_mx <- max(max(y_norm_percent), max(h$counts))
 
   # Create plot using histogram values
   plot(h,
        col = "#CAD5E5", #"grey85",
        border = "grey20",
-       main = paste0("Distribution of ", var),
+       main = paste0("Distribution of", tlbl),
        xlab = "",
        ylab = "Percent",
        xlim = scl,
-       ylim = c(0, max(h$counts) * 1.05),
+       ylim = c(0, y_mx * 1.025),
        axes = FALSE)
 
   # Normal curve overlay (scaled to percent)
-  x <- seq(min(rdt) * 2, max(rdt) * 2, length.out = 300)
-  x <- seq(scl[1], scl[2], length.out = 300)
+  # x <- seq(min(rdt) * 2, max(rdt) * 2, length.out = 300)
+  # x <- seq(scl[1], scl[2], length.out = 300)
+  #
+  # y_norm <- dnorm(x, mean = mu, sd = sdx)
+  # y_norm <- y_norm / max(y_norm) * max(h$counts)
+  #
+  # lines(x, y_norm, col = "steelblue4", lwd = 2)
 
-  y_norm <- dnorm(x, mean = mu, sd = sdx)
-  y_norm <- y_norm / max(y_norm) * max(h$counts)
+  # curve(dnorm(x, mean = mean(rdt), sd = sd(rdt)),
+  #       add = TRUE,
+  #       col = "blue", # Color for the Normal curve
+  #       lwd = 2)
 
-  lines(x, y_norm, col = "steelblue4", lwd = 2)
 
-  # Kernel density overlay (scaled to percent)
-  dens <- density(rdt)
 
-  y_kern <- dens$y / max(dens$y) * max(h$counts)
+  # Draw normal curve line
+  lines(grid, y_norm_percent, col = "steelblue4", lwd = 2)
 
-  lines(dens$x, y_kern, col = "orangered2", lwd = 2)
+
+  # Kernel density overlay (original)
+  # dens <- density(rdt)
+  #
+  # y_kern <- dens$y / max(dens$y) * max(h$counts)
+  #
+  # lines(dens$x, y_kern, col = "orangered2", lwd = 2)
+
+
+  # Bandwidth (Silverman / SAS)
+  bw <- 1.06 * sdx * n^(-1/5)
+
+  # Kernel density estimate
+  dens <- density(rdt, kernel = "gaussian", bw = bw, n = 512)
+
+  # Scale KDE to Percent axis
+  y_kernel_percent <- 100 * w * dens$y
+
+  yscl <- seq(50, length(y_kernel_percent) - 25)
+
+  # Overlay on histogram
+  lines(dens$x[yscl], y_kernel_percent[yscl], col = "orangered2", lwd = 2)
+
 
   # Add x axis label
-  mtext(var, side = 1, line = par("mar")[1] - 2)
-
-  # Calculate x axis ticks
-  # df <- abs(h$mids[1] - h$mids[2])
-  # te <- (df * seq(1, 10)) + h$mids[length(h$mids)]
-  # be <- (-(df * seq(10, 1))) + h$mids[1]
-  # df <-  c(be, h$mids, te)
-  # xtks <- df[df > scl[1] & df < scl[2]]
+  mtext(xlbl, side = 1, line = par("mar")[1] - 2)
 
   # Add custom axes
   axis(side = 1, col.ticks = "grey55", # at = xtks, labels = TRUE,
@@ -913,6 +1145,279 @@ render_histogram1 <- function(dat, var, plt) {
 
 #' @noRd
 render_histogram2 <- function(dat, var, plt, class) {
+
+  op <- par("mar")
+  om <- par("oma")
+
+  # Create temp file path
+  pth <- tempfile(fileext = ".jpg")
+
+  # Standard height and width
+  hti <- 4.5  # Height in inches
+  wdi <- 6  # Width in inches
+  bml <- 6  # bottom margin lines
+
+  # Convert inches to pixels
+  ht <- hti * 96
+  wd <- wdi * 96
+
+  # Convert to data frame
+  dat <- as.data.frame(dat)
+  dat <- sort(dat, by = class)
+
+  # Get analysis variables
+  cvls <- unique(dat[[class]])
+  vl1 <- cvls[1]
+  vl2 <- cvls[2]
+
+  # Prepare data
+  dt1 <- dat[dat[[class]] == vl1, var]
+  dt2 <- dat[dat[[class]] == vl2, var]
+
+  # Output to image file
+  jpeg(pth, width = wd, height = ht, quality = 100, units = "px")
+
+  # Set margins
+  par(oma = c(5, 1, 2, .75) + 0.1,
+      mar = c(0, 3, 0, 0) + 0.1,
+      mfrow = c(2, 1))
+
+  # Overall scale
+  scl <- range(dat[[var]])
+  scl <- c(scl[1] * .875, scl[2] * 1.125)
+
+
+  #******************************
+  #*  Histogram 1
+  #******************************
+
+  # Calculate stats
+  n   <- length(dt1)
+  mu  <- mean(dt1)
+  sdx <- sd(dt1)
+
+  # Calculate breaks - Closer to SAS algorithm
+  brks <- pretty(range(dt1), n = nclass.Sturges(dt1),
+                 min.n = 1, high.u.bias = 3)
+
+  # Histogram (Percent scale)
+  h <- hist(dt1,
+            breaks = brks,
+            plot = FALSE)
+
+  # Convert counts to percent
+  h$counts <- h$counts / sum(h$counts) * 100
+
+  # Use calculated breaks to get scale
+  w <- diff(h$breaks)[1] # bin width
+  xmin <- min(h$breaks) - w
+  xmax <- max(h$breaks) + w
+  scl1 <- c(xmin, xmax)
+
+  # Use calculated break to get normal curve
+  grid <- seq(scl1[1] , scl1[2], length.out = 300)
+  y_norm_percent <- 100 * w * dnorm(grid, mean = mu, sd = sdx)
+  y_mx <- max(max(y_norm_percent), max(h$counts))
+
+
+  # Create plot using histogram values
+  plot(h,
+       col = "#CAD5E5", #"grey85",
+       border = "grey20",
+       main = "",
+       xlab = "",
+       ylab = "Percent",
+       xlim = scl,
+       ylim = c(0, y_mx * 1.025),  # max(h$counts) * 1.05),
+       axes = FALSE)
+
+  # Normal curve overlay (scaled to percent)
+  # x <- seq(min(dt1) * 2, max(dt1) * 2, length.out = 300)
+  # x <- seq(scl[1], scl[2], length.out = 300)
+  #
+  # y_norm <- dnorm(x, mean = mu, sd = sdx)
+  # y_norm <- y_norm / max(y_norm) * max(h$counts)
+  #
+  # lines(x, y_norm, col = "steelblue4", lwd = 2)
+  lines(grid, y_norm_percent, col = "steelblue4", lwd = 2)
+
+  # Kernel density overlay (scaled to percent)
+  # dens <- density(dt1)
+  #
+  # y_kern <- dens$y / max(dens$y) * max(h$counts)
+  #
+  # lines(dens$x, y_kern, col = "orangered2", lwd = 2)
+
+  # Bandwidth (Silverman / SAS)
+  bw <- 1.06 * sdx * n^(-1/5)
+
+  # Kernel density estimate
+  dens <- density(dt1, kernel = "gaussian",  bw = bw, n = 512)
+
+  # Scale KDE to Percent axis
+  y_kernel_percent <- 100 * w * dens$y
+
+  yscl <- seq(50, length(y_kernel_percent) - 25)
+
+  # Overlay on histogram
+  lines(dens$x, y_kernel_percent, col = "orangered2", lwd = 2)
+
+  # Add custom axes
+  axis(side = 2, las = 1, col.ticks = "grey55",
+       mgp = c(3, .5, 0), tck = -0.015)
+
+  # Add y label
+  mtext("Percent", side = 2, line = 2.5)
+
+  # Add class label
+  legend("topleft", legend = vl1, bty = "n",
+         x.intersp = 0,  # Spacing between group label and box
+         y.intersp = 0,  # Spacing between content and borders
+         cex = .9
+  )
+
+  # Frame
+  box(col = "grey70", lwd = 1)
+
+  #******************************
+  #*  Histogram 2
+  #******************************
+
+  # Calculate stats
+  n   <- length(dt2)
+  mu  <- mean(dt2)
+  sdx <- sd(dt2)
+
+  # Calculate breaks - Closer to SAS algorithm
+  brks <- pretty(range(dt2), n = nclass.Sturges(dt2),
+                 min.n = 1, high.u.bias = 3)
+
+  # Histogram (Percent scale)
+  h <- hist(dt2,
+            breaks = brks,
+            plot = FALSE)
+
+  # Convert counts to percent
+  h$counts <- h$counts / sum(h$counts) * 100
+
+  # Use calculated breaks to get scale
+  w <- diff(h$breaks)[1] # bin width
+  xmin <- min(h$breaks) - w
+  xmax <- max(h$breaks) + w
+  scl2 <- c(xmin, xmax)
+
+  # Use calculated break to get normal curve
+  grid <- seq(scl2[1] , scl2[2], length.out = 300)
+  y_norm_percent <- 100 * w * dnorm(grid, mean = mu, sd = sdx)
+  y_mx <- max(max(y_norm_percent), max(h$counts))
+
+  # Create plot using histogram values
+  plot(h,
+       col = "#CAD5E5", #"grey85",
+       border = "grey20",
+       main = "",
+       xlab = "",
+       ylab = "Percent",
+       xlim = scl,
+       ylim = c(0, y_mx * 1.025), # max(h$counts) * 1.05),
+       axes = FALSE)
+
+  # Normal curve overlay (scaled to percent)
+  # x <- seq(min(dt2) * 2, max(dt2) * 2, length.out = 300)
+  # x <- seq(scl[1], scl[2], length.out = 300)
+  #
+  # y_norm <- dnorm(x, mean = mu, sd = sdx)
+  # y_norm <- y_norm / max(y_norm) * max(h$counts)
+  #
+  # lines(x, y_norm, col = "steelblue4", lwd = 2)
+
+  lines(grid, y_norm_percent, col = "steelblue4", lwd = 2)
+
+  # Kernel density overlay (scaled to percent)
+  # dens <- density(dt2)
+  #
+  # y_kern <- dens$y / max(dens$y) * max(h$counts)
+  #
+  # lines(dens$x, y_kern, col = "orangered2", lwd = 2)
+
+
+  # Bandwidth (Silverman / SAS)
+  bw <- 1.06 * sdx * n^(-1/5)   # 1.06
+
+  # Kernel density estimate
+  dens <- density(dt2, kernel = "gaussian", bw = bw, n = 512)
+
+  # Scale KDE to Percent axis
+  y_kernel_percent <- 100 * w * dens$y
+
+  # Overlay on histogram
+  lines(dens$x, y_kernel_percent, col = "orangered2", lwd = 2)
+
+
+  # Add custom axes
+  axis(side = 1, col.ticks = "grey55", # at = xtks, labels = TRUE,
+       mgp = c(3, .5, 0), tck = -0.015, cex.axis = .75)
+  axis(side = 2, las = 1, col.ticks = "grey55",
+       mgp = c(3, .5, 0), tck = -0.015)
+
+  # Add y label
+  mtext("Percent", side = 2, line = 2.5)
+
+  # Add class label
+  legend("topleft", legend = vl2, bty = "n",
+         x.intersp = 0,  # Spacing between group label and box
+         y.intersp = 0,  # Spacing between content and borders
+         cex = .9
+         )
+
+  # Frame
+  box(col = "grey70", lwd = 1)
+
+
+  #******************************
+  #*  Clean up
+  #******************************
+
+  box("outer", col = "grey70", lwd = 1)
+
+  # Add titles
+  mtext(paste0("Distribution of ", var), side = 3, line = par("oma")[3] - 1.75,
+        outer = TRUE, font = 2, cex = 1.25)
+
+  # Add x axis label
+  mtext(var, side = 1, line = par("oma")[1] - 3.5, outer = TRUE)
+
+  # Add legend
+  mpos <- legend("bottom",
+         legend = c("Normal ",
+                    "Kernel"),
+         col = c("steelblue4", "orangered2"),
+         lwd = 2,
+         cex = .9,
+         horiz = TRUE,
+         bty = "o",
+         box.col = "grey", # Grey border to match SAS
+         x.intersp = 1,  # Spacing between group label and box
+         y.intersp = 0,  # Spacing between content and borders
+         text.width = NA,  # Compute label widths dynamically
+         inset = c(0, -.38),
+         xpd = NA)
+
+  # Restore margins
+  par(mar = op,  mfrow = c(1, 1), oma = om)
+
+  # Close device context
+  dev.off()
+
+  # Put plot in reporter plot object
+  ret <- create_plot(pth, height = hti, width = wdi)
+
+  return(ret)
+
+}
+
+#' @noRd
+render_histogram2_back <- function(dat, var, plt, class) {
 
   op <- par("mar")
   om <- par("oma")
@@ -1076,7 +1581,7 @@ render_histogram2 <- function(dat, var, plt, class) {
          x.intersp = 0,  # Spacing between group label and box
          y.intersp = 0,  # Spacing between content and borders
          cex = .9
-         )
+  )
 
   # Frame
   box(col = "grey70", lwd = 1)
@@ -1097,19 +1602,19 @@ render_histogram2 <- function(dat, var, plt, class) {
 
   # Add legend
   mpos <- legend("bottom",
-         legend = c("Normal ",
-                    "Kernel"),
-         col = c("steelblue4", "orangered2"),
-         lwd = 2,
-         cex = .9,
-         horiz = TRUE,
-         bty = "o",
-         box.col = "grey", # Grey border to match SAS
-         x.intersp = 1,  # Spacing between group label and box
-         y.intersp = 0,  # Spacing between content and borders
-         text.width = NA,  # Compute label widths dynamically
-         inset = c(0, -.38),
-         xpd = NA)
+                 legend = c("Normal ",
+                            "Kernel"),
+                 col = c("steelblue4", "orangered2"),
+                 lwd = 2,
+                 cex = .9,
+                 horiz = TRUE,
+                 bty = "o",
+                 box.col = "grey", # Grey border to match SAS
+                 x.intersp = 1,  # Spacing between group label and box
+                 y.intersp = 0,  # Spacing between content and borders
+                 text.width = NA,  # Compute label widths dynamically
+                 inset = c(0, -.38),
+                 xpd = NA)
 
   # Restore margins
   par(mar = op,  mfrow = c(1, 1), oma = om)
@@ -1123,7 +1628,6 @@ render_histogram2 <- function(dat, var, plt, class) {
   return(ret)
 
 }
-
 
 
 # Legend moves to left if mean too far to the right
@@ -1156,6 +1660,14 @@ render_boxplot1 <- function(dat, var, plt) {
   # Set margins
   par(mar = c(3, 1, 3, .75) + 0.1)
 
+  # Assign labels
+  xlbl <- var
+  tlbl <- paste(" ", var)
+  if (!is.null(plt$varlbl)) {
+    xlbl <- "Difference"
+    tlbl <- paste0(" Difference: ", plt$varlbl)
+  }
+
   # Get scales
   xscl <- get_scale(dt, .05)
 
@@ -1181,7 +1693,7 @@ render_boxplot1 <- function(dat, var, plt) {
        axes = FALSE) #With 95% Confidence Interval for Mean")
 
   # Title
-  mtext(paste0("Distribution of ", var), side = 3,
+  mtext(paste0("Distribution of", tlbl), side = 3,
         line = par("mar")[3] - 1.5,
         font = 2, cex = 1.25)
 
@@ -1191,7 +1703,7 @@ render_boxplot1 <- function(dat, var, plt) {
         font = 1)
 
   # X Label
-  mtext(var, side = 1,
+  mtext(xlbl, side = 1,
         line = par("mar")[1] - 1.5,
         font = 1)
 
@@ -1252,7 +1764,7 @@ render_boxplot1 <- function(dat, var, plt) {
 
   # Legend location - Move to left side if needed
   lgnd <- "topright"
-  llim <- (range(aval)[1] - range(aval)[2]) * .75
+  llim <- (range(aval)[2] - range(aval)[1]) * .75
   if (bp$stats[4] > llim) {
     lgnd <- "topleft"
   }
@@ -1342,7 +1854,7 @@ render_boxplot2 <- function(dat, var, plt, class) {
   nms2 <- rwnms[dat[[fvr]] == fvls[2]]
 
   # Get x scale
-  xscl <- get_scale(dt, .05)
+  # xscl <- get_scale(dt, .05)
 
   # Calculate
   n1  <- length(dt1)
@@ -1503,6 +2015,14 @@ render_interval1 <- function(dat, var, plt) {
   mu <- mean(dt)
   sdx <- sd(dt)
 
+  # Assign labels
+  xlbl <- var
+  tlbl <- paste(" ", var)
+  if (!is.null(plt$varlbl)) {
+    xlbl <- "Difference"
+    tlbl <- paste0(" Difference: ", plt$varlbl)
+  }
+
   ## 95% CI for mean (SAS uses t-based CI)
   tcrit <- qt(1 - alpha / 2, df = n - 1)
 
@@ -1523,7 +2043,7 @@ render_interval1 <- function(dat, var, plt) {
        axes = FALSE)
 
   # Title
-  mtext(paste0("Mean of ", var), side = 3,
+  mtext(paste0("Mean of ", tlbl), side = 3,
         line = par("mar")[3] - 1.5,
         font = 2, cex = 1.25)
 
@@ -1533,7 +2053,7 @@ render_interval1 <- function(dat, var, plt) {
         font = 1)
 
   # X Label
-  mtext(var, side = 1,
+  mtext(xlbl, side = 1,
         line = par("mar")[1] - 1.5,
         font = 1)
 
@@ -1818,6 +2338,14 @@ render_tqqplot1 <- function(dat, var, plt) {
   # Prepare data
   rdt <- dat[[var]]
 
+  # Assign label
+  ylbl <- var
+  tlbl <- paste(" ", var)
+  if (!is.null(plt$varlbl)) {
+    ylbl <- "Difference"
+    tlbl <- paste0(": ", plt$varlbl)
+  }
+
   # Set margins
   par(mar = c(4, 5, 2, .75) + 0.1)
 
@@ -1827,13 +2355,14 @@ render_tqqplot1 <- function(dat, var, plt) {
 
   # Draw plot
   qqnorm(rdt,
-         main = paste0("Q-Q Plot of ", var),
+         main = paste0("Q-Q Plot of", tlbl),
          xlab = "",
-         ylab = var,
+         ylab = ylbl,
          pch  = 1,          # open circles
          col  = "#05379B",
          cex = 1.3,
         # ylim = scl,
+       #  asp = 1,
          axes = FALSE)
 
   # Add diagonal line
@@ -2026,12 +2555,209 @@ render_tqqplot2 <- function(dat, var, plt, class) {
 render_profiles <- function(dat, var, plt) {
 
 
+  op <- par("mar")
+
+  # Create temp file path
+  pth <- tempfile(fileext = ".jpg")
+
+  # Standard height and width
+  hti <- 4.5  # Height in inches
+  wdi <- 6  # Width in inches
+  bml <- 6  # bottom margin lines
+  alph <- (1 - plt$alph) * 100  # Percentage
+  alpha <- plt$alph             # Actual value
+
+  # Convert inches to pixels
+  ht <- hti * 96
+  wd <- wdi * 96
+
+  # Output to image file
+  # All output types accept jpeg
+  # So start with that
+  jpeg(pth, width = wd, height = ht, quality = 100, units = "px")
+
+  # Prepare data
+  splt <- trimws(strsplit(plt$varlbl, "-", fixed = TRUE)[[1]])
+  v1 <- splt[1]
+  v2 <- splt[2]
+  vrs <- c(v1, v2)
+
+  dt <- as.matrix(dat[ , vrs ])
+
+  ## X positions (categorical)
+  x <- c(1, 2)
+
+  par(mar = c(3, 3, 3, 3) + 0.1)
+
+  ## Empty plot frame
+  plot(x, range(dt),
+       type = "n",
+       xaxt = "n",
+       xlab = "",
+       ylab = "",
+       main = paste0("Paired Profiles for (", v1, ", ", v2, ")"),
+       axes = FALSE)
+
+  # X Axis
+  axis(1, at = x, labels = c(v1, v2))
+
+  # Y Axis
+  axis(side = 2, las = 1, col.ticks = "grey55",
+       mgp = c(3, .5, 0), tck = -0.015)
+  axis(side = 4, las = 1, col.ticks = "grey55",
+       mgp = c(3, .5, 0), tck = -0.015)
+
+  ## Individual subject profiles (thin lines)
+  for (i in seq_len(nrow(dt))) {
+    lines(x, dt[i, ],
+          col = rgb(0.2, 0.4, 0.8, 0.45),  # light blue
+          lwd = 1)
+  }
+
+  ## Mean profile (bold line)
+  mean_profile <- colMeans(dt)
+
+  lines(x, mean_profile,
+        col = "orangered2",
+        lwd = 3)
+
+  ## Mean legend
+  legend("top",
+         legend = "Mean",
+         col = "orangered2",
+         lwd = 3,
+         box.col = "grey80",
+         inset = c(.01, .02),
+         x.intersp = .5,
+         y.intersp = c(0.5, 1.8),
+         cex = .9,
+         bty = "o")
+
+  # Frame
+  box(col = "grey70", lwd = 1)
+  box("figure", col = "grey70", lwd = 1)
+
+  # Restore margins
+  par(mar = op)
+
+  # Close device context
+  dev.off()
+
+  # Put plot in reporter plot object
+  ret <- create_plot(pth, height = hti, width = wdi)
+
+  return(ret)
 
 }
 
 #' @noRd
 render_agreement <- function(dat, var, plt) {
 
+
+  op <- par("mar")
+
+  # Create temp file path
+  pth <- tempfile(fileext = ".jpg")
+
+  # Standard height and width
+  hti <- 4.5  # Height in inches
+  wdi <- 6  # Width in inches
+  bml <- 6  # bottom margin lines
+  alph <- (1 - plt$alph) * 100  # Percentage
+  alpha <- plt$alph             # Actual value
+
+  # Convert inches to pixels
+  ht <- hti * 96
+  wd <- wdi * 96
+
+  # Output to image file
+  jpeg(pth, width = wd, height = ht, quality = 100, units = "px")
+
+  # Prepare data
+  splt <- trimws(strsplit(plt$varlbl, "-", fixed = TRUE)[[1]])
+  v1 <- splt[1]
+  v2 <- splt[2]
+  vrs <- c(v1, v2)
+
+  # Get vectors
+  dt1 <- dat[[v1]]
+  dt2 <- dat[[v2]]
+
+  ## Means
+  m1 <- mean(dt1)
+  m2 <- mean(dt2)
+
+  ## Axis limits
+  lims <- range(c(dt1, dt2))
+
+  # Set margins
+  par(mar = c(4, 10, 2, 6) + 0.1)
+
+  ## Scatter plot
+  plot(dt1, dt2,
+       xlim = lims,
+       ylim = lims,
+       pch  = 1,
+       cex = 1.25,
+       col  = "#05379B",
+       xlab = "",
+       ylab = v2,
+       main = paste0("Agreement of ", v2, " and ", v1),
+       axes = FALSE,
+       asp  = 1)   # equal scaling (critical)
+
+  # X label
+  mtext(v1, side = 1, line = par("mar")[1] - 2)
+
+  # Axes
+  axis(side = 1, las = 1, col.ticks = "grey55",
+       mgp = c(3, .5, 0), tck = -0.015)
+  axis(side = 2, las = 1, col.ticks = "grey55",
+       mgp = c(3, .5, 0), tck = -0.015)
+
+  ## Identity (45-degree) line
+  usr <- par("usr")
+  segments(usr[1], usr[3], usr[2], usr[4],
+           col = "grey60", lwd = 1)
+
+  ## Mean point
+  points(m1, m2,
+         pch = 21,
+         bg  = "white",
+         col = "#05379B",
+         lwd = 2,
+         cex = 2.5)
+
+  ## Legend
+  legend("right",
+         legend = "Mean",
+         pch = 21,
+         pt.bg = "white",
+         col = "#05379B",
+         pt.lwd = 2,
+        # lwd = 3,
+         box.col = "grey80",
+         inset = c(-.2, 0),
+         x.intersp = 1,
+         y.intersp = c(0.5, 1.8),
+         pt.cex = 2.5,
+         xpd = NA,
+         bty = "o")
+
+  # Frame
+  box(col = "grey70", lwd = 1)
+  box("figure", col = "grey70", lwd = 1)
+
+  # Restore margins
+  par(mar = op)
+
+  # Close device context
+  dev.off()
+
+  # Put plot in reporter plot object
+  ret <- create_plot(pth, height = hti, width = wdi)
+
+  return(ret)
 
 
 }
@@ -2151,3 +2877,20 @@ boxplot_stats2 <- function(dt1, dt2, nms1, nms2, fvls) {
 
 }
 
+# breaks <- pretty(range(mdt), n = nclass.Sturges(mdt), min.n = 1, high.u.bias = 3)
+
+
+# breaks <- pretty(range(mdt), n = nclass.Sturges(mdt), min.n = 1, high.u.bias = 3)
+#
+# breaks <- pretty(range(cls$Weight), n = nclass.Sturges(cls$Weight), min.n = 1, high.u.bias = 3)
+#
+#
+#
+# breaks <- pretty(range(mdt), n = nclass.Sturges(mdt), min.n = 1, high.u.bias = 3)
+#
+# get_bins <- function(x, maxbins = 6) {
+#
+#   cbns <- nclass.Sturges(x)
+#
+#
+# }

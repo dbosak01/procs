@@ -466,9 +466,17 @@ proc_ttest <- function(data,
     if ("ttestplot" %in% class(plots) |
         "character" %in% class(plots)) {
       tplots <- list()
-      for (idx in seq_along(var)) {
+      if (!is.null(var)) {
+        for (idx in seq_along(var)) {
 
-        tplots[[idx]] <- plots
+          tplots[[idx]] <- plots
+        }
+      } else if (!is.null(paired)) {
+        for (idx in seq_along(paired)) {
+
+          tplots[[idx]] <- plots
+        }
+
       }
       plots <- tplots
     }
@@ -846,8 +854,9 @@ get_output_specs_ttest <- function(data, var, paired, class, opts, output,
           plt <- plots[[cnt]]
           plt$alph <- get_alpha(opts)
           plt$h0 <- get_option(opts, "h0", 0)
+          plt$varlbl <- vr
 
-          spcs[[paste0(lnm, "Plots")]] <- out_spec(stats = "dummy", var = vr, plots = plt)
+          spcs[[paste0(lnm, "Plots")]] <- out_spec(stats = "dummy", var = vnm, varlbl = vr, plots = plt)
         }
 
         cnt <- cnt + 1
@@ -1227,7 +1236,7 @@ gen_report_ttest <- function(data,
           ctbl <- get_class_ttest(dt, outp$var, class, TRUE, opts, plots)
         }
 
-        if (is.null(class) ||
+        if (is.null(class) && !tnm %in% "Plots" ||
            (!is.null(class) && tnm %in% c("Statistics", "ConfLimits"))) {   # Fix this
 
           # data, var, class, outp, freq = TRUE,
