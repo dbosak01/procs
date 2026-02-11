@@ -121,6 +121,16 @@
 #' \item{\strong{nway}: Returns only the highest level TYPE combination.  By
 #' default, the function returns all TYPE combinations.
 #' }
+#' \item{\strong{vardef}: Controls the denominator used in variance-related
+#' statistics. This option supports several denominator definitions:
+#'   \itemize{
+#'     \item{\strong{DF}: Uses \(n - 1\), the sample degrees of freedom.}
+#'     \item{\strong{N}: Uses \(n\), the total count of observations.}
+#'     \item{\strong{WEIGHT}: Uses the sum of weights.}
+#'     \item{\strong{WDF}: Uses the sum of weights minus one.}
+#'   }
+#' By default, this option use \strong{DF}.
+#' }
 #' }
 #' @section TYPE and FREQ Variables:
 #' The TYPE and FREQ variables appear on the output dataset by default.
@@ -186,6 +196,8 @@
 #' variables are specified,
 #' summary statistics will be generated for all numeric variables on the
 #' input data frame.
+#' @param weight The variable specifies weights for analysis variables in the
+#' statistical calculations.
 #' @param stats A vector of summary statistics keywords.  Valid
 #' keywords are: "css", "clm", "cv", "kurt", "kurtosis",
 #' "lclm", "mean", "median", "mode",
@@ -222,12 +234,13 @@
 #' will be nested in the \code{by}.
 # @param weight An optional weight parameter.
 #' @param options A vector of optional keywords. Valid values are: "alpha =",
-#' "completetypes", "maxdec =", "noprint", "notype", "nofreq", "nonobs", "nway".
-#' The "notype", "nofreq", and "nonobs" keywords will turn
+#' "completetypes", "maxdec =", "noprint", "notype", "nofreq", "nonobs", "nway",
+#' "vardef=". The "notype", "nofreq" and "nonobs"  keywords will turn
 #' off columns on the output datasets.  The "alpha = " option will set the alpha
 #' value for confidence limit statistics.  The default is 95% (alpha = 0.05).
 #' The "maxdec = " option sets the maximum number of decimal places displayed
 #' on report output. The "nway" option returns only the highest type values.
+#' The "vardef=" option specifies the variance divisor.
 #' @param titles A vector of one or more titles to use for the report output.
 #' @return Normally, the requested summary statistics are shown interactively
 #' in the viewer, and output results are returned as a data frame.
@@ -318,10 +331,10 @@ proc_means <- function(data,
                        output = NULL,
                        by = NULL,
                        class = NULL,
-                   #    weight = NULL,
+                       weight = NULL,
                        options = NULL,
                        titles = NULL
-                       ) {
+) {
 
   # SAS seems to always ignore these
   # Not sure why R has an option to keep them
@@ -336,15 +349,19 @@ proc_means <- function(data,
   # Deal with single value unquoted parameter values
   oclass <- deparse(substitute(class, env = environment()))
   class <- tryCatch({if (typeof(class) %in% c("character", "NULL")) class else oclass},
-                 error = function(cond) {oclass})
+                    error = function(cond) {oclass})
 
   ovar <- deparse(substitute(var, env = environment()))
   var <- tryCatch({if (typeof(var) %in% c("character", "NULL")) var else ovar},
-                 error = function(cond) {ovar})
+                  error = function(cond) {ovar})
+
+  oweight <- deparse(substitute(weight, env = environment()))
+  weight <- tryCatch({if (typeof(weight) %in% c("character", "NULL")) weight else oweight},
+                     error = function(cond) {oweight})
 
   ostats <- deparse(substitute(stats, env = environment()))
   stats <- tryCatch({if (typeof(stats) %in% c("character", "NULL")) stats else ostats},
-                  error = function(cond) {ostats})
+                    error = function(cond) {ostats})
 
   oopt <- deparse(substitute(options, env = environment()))
   options <- tryCatch({if (typeof(options) %in% c("integer", "double", "character", "NULL")) options else oopt},
@@ -352,7 +369,7 @@ proc_means <- function(data,
 
   oout <- deparse(substitute(output, env = environment()))
   output <- tryCatch({if (typeof(output) %in% c("character", "NULL")) output else oout},
-                      error = function(cond) {oout})
+                     error = function(cond) {oout})
 
   # Parameter checks
 
@@ -394,6 +411,17 @@ proc_means <- function(data,
       stop(paste("Invalid variable name: ", var[!var %in% nms], "\n"))
     }
   }
+  if (!is.null(weight)){
+   if (!all(weight %in% nms)) {
+
+      stop(paste("Invalid weight variable name: ", weight[!weight %in% nms], "\n"))
+
+    }else if (!is.numeric(data[[weight[1]]])){
+
+      stop("Weight variable must be numeric.\n")
+    }
+  }
+
 
   if (!is.null(class)) {
     if (!all(class %in% nms)) {
@@ -429,7 +457,7 @@ proc_means <- function(data,
 
   if (!is.null(options)) {
     kopts <- c("alpha", "completetypes", "long", "maxdec",
-               "noprint", "notype", "nofreq", "nonobs")
+               "noprint", "notype", "nofreq", "nonobs", "nway", "vardef")
 
     # Deal with "alpha =" and "maxdec = " by using name instead of value
     nopts <- names(options)
@@ -471,20 +499,21 @@ proc_means <- function(data,
   # Get report if requested
   if (view == TRUE | rptflg) {
     rptres <- gen_report_means(data, by = by, var = var, class = class,
-                            stats = stats, view = view,
-                            titles = titles, #weight = weight,
-                            opts = options)
+                               stats = stats, view = view,
+                               titles = titles, weight = weight,
+                               opts = options)
   }
 
   # Get output datasets if requested
   if (length(outreq) > 0) {
     res <- gen_output_means(data,
-                           by = by,
-                           class = class,
-                           var = var,
-                           output = outreq,
-                           opts = options
-                           )
+                            by = by,
+                            class = class,
+                            var = var,
+                            weight = weight,
+                            output = outreq,
+                            opts = options
+    )
   }
 
   # Add report to result if requested
@@ -506,7 +535,7 @@ proc_means <- function(data,
             var = var,
             stats = stats,
             output = output,
-           # weight = weight,
+            weight = weight,
             view = view,
             titles = titles,
             outcnt = ifelse("data.frame" %in% class(res),
@@ -555,6 +584,10 @@ log_means <- function(data,
     ret[length(ret) + 1] <- paste0(indt, "var: ",
                                    paste(var, collapse = " "))
 
+  if (!is.null(weight))
+    ret[length(ret) + 1] <- paste0(indt, "weight: ",
+                                   paste(weight, collapse = " "))
+
   if (!is.null(stats))
     ret[length(ret) + 1] <- paste0(indt, "stats: ",
                                    paste(stats, collapse = " "))
@@ -592,38 +625,38 @@ get_output_specs_means <- function(outs, stats, opts, output) {
   #   outreq <- outs  # need to check this
   #
   # } else {
-    outreq <- outs
-    if (length(outreq) >= 1) {
-      # for (nm in names(outreq)) {
-      #   if ("out_req" %in% class(outreq[[nm]])) {
-      #     if (is.null(outreq[[nm]]$stats)) {
-      #
-      #       outreq[[nm]]$stats <- stats
-      #     }
-      #     if (is.null(outreq[[nm]]$shape)) {
-      #
-      #       outreq[[nm]]$shape <- "wide"
-      #     }
-      #   } else {
-      #
-      #     warning("proc_means: Unknown parameter '" %p% nm %p% "'")
-      #     outreq[[nm]] <- out_spec(shape = "wide")
-      #   }
-      # }
+  outreq <- outs
+  if (length(outreq) >= 1) {
+    # for (nm in names(outreq)) {
+    #   if ("out_req" %in% class(outreq[[nm]])) {
+    #     if (is.null(outreq[[nm]]$stats)) {
+    #
+    #       outreq[[nm]]$stats <- stats
+    #     }
+    #     if (is.null(outreq[[nm]]$shape)) {
+    #
+    #       outreq[[nm]]$shape <- "wide"
+    #     }
+    #   } else {
+    #
+    #     warning("proc_means: Unknown parameter '" %p% nm %p% "'")
+    #     outreq[[nm]] <- out_spec(shape = "wide")
+    #   }
+    # }
+  } else {
+
+    if (option_true(output, "long")) {
+      outreq[["out"]] <- out_spec(stats = stats, shape = "long",
+                                  type = TRUE, freq = TRUE)
+    } else if (option_true(output, "stacked")) {
+      outreq[["out"]] <- out_spec(stats = stats, shape = "stacked",
+                                  type = TRUE, freq = TRUE)
     } else {
-
-      if (option_true(output, "long")) {
-        outreq[["out"]] <- out_spec(stats = stats, shape = "long",
-                               type = TRUE, freq = TRUE)
-      } else if (option_true(output, "stacked")) {
-        outreq[["out"]] <- out_spec(stats = stats, shape = "stacked",
-                               type = TRUE, freq = TRUE)
-      } else {
-        outreq[["out"]] <- out_spec(stats = stats, shape = "wide",
-                               type = TRUE, freq = TRUE)
-      }
-
+      outreq[["out"]] <- out_spec(stats = stats, shape = "wide",
+                                  type = TRUE, freq = TRUE)
     }
+
+  }
   # }
 
   return(outreq)
@@ -634,15 +667,15 @@ get_output_specs_means <- function(outs, stats, opts, output) {
 # Purpose of this function is to prepare data for output.
 # It will append the by, class, type, and freq columns to the subset df.
 # These subsets will get stacked up in the driver function.
-get_output <- function(data, var, stats, missing = FALSE,
-                             shape = "wide", type = NULL, freq = FALSE,
-                             by = NULL, class = NULL, opts = NULL,
-                             keep_names = FALSE) {
+get_output <- function(data, var, weight = NULL, stats, missing = FALSE,
+                       shape = "wide", type = NULL, freq = FALSE,
+                       by = NULL, class = NULL, opts = NULL,
+                       keep_names = FALSE) {
 
   if (is.null(stats))
     stats <- c("n", "mean", "std", "min", "max")
 
-  ret <- get_summaries(data, var, stats, missing = missing,
+  ret <- get_summaries(data, var, weight, stats, missing = missing,
                        shape = shape, opts = opts)
 
   if (freq)
@@ -715,59 +748,101 @@ get_output <- function(data, var, stats, missing = FALSE,
 }
 
 # This is where most of the summary statistics get calculated.
-get_summaries <- function(data, var, stats, missing = FALSE,
+get_summaries <- function(data, var, weight=NULL, stats, missing = FALSE,
                           shape = "wide", opts = NULL) {
 
   narm <- TRUE
   ret <- NULL
+  vardef <- tolower(get_option(opts, "vardef", "df"))
 
   for (nm in var) {
+
+    w <- NULL
 
     if (!nm %in% names(data)) {
 
       stop(paste0("Variable '", nm, "' not found on input dataset."))
     } else {
-
+      sts <- tolower(stats)
       rw <- data.frame(VAR = nm, stringsAsFactors = FALSE)
       var <- data[[nm]]
+      #create one copy of variable to use for some statistic calculation
+      var_all <- var
 
-      sts <- tolower(stats)
+      #adjust variable by weight if specified
+      if (!is.null(weight)) {
+
+        #create one copy of variable to use for some statistic calculation
+        keep <- !is.na(data[[weight]])
+        var_all <- var[keep]
+
+        #create w and var vector for stats calculations
+        keep <- !is.na(data[[weight]]) & !is.na(var) & data[[weight]] > 0
+        w = data[[weight]][keep]
+        var <- var[keep]
+
+      } else if (vardef == "weight" || vardef == "wdf") {
+        # If weight is not specified, but vardef is weight or wdf, then we will use equal weights for all non-missing values.
+        keep <- !is.na(var_all)
+        w <- rep(1, sum(keep))
+        var <- var[keep]
+
+      }
+
+      # compute denominator
+      denom <- switch(
+        vardef,
+        df = sum(!is.na(var)) - 1,
+        n  = sum(!is.na(var)),
+        weight = sum(w),
+        wdf = sum(w) - 1,
+        stop(paste0("Unexpected vardef value ", vardef,"'"))
+      )
+
       #browser()
 
       for (st in sts) {
 
         if (st == "n") {
 
-          rw[["N"]] <- sum(!is.na(var))
+          rw[["N"]] <- sum(!is.na(var_all))
         }
 
         if (st == "css") {
 
           if (all(is.na(var)))
             rw[["CSS"]] <- NA
-          else
+          else if (is.null(weight))
             rw[["CSS"]] <- sum((var - mean(var, na.rm = narm))^2, na.rm = narm)
+          else
+            rw[["CSS"]] <- sum(w*(var - sum(var*w, na.rm = narm)/sum(w))^2, na.rm = narm)
         }
 
         if (st == "cv") {
 
           if (all(is.na(var)))
             rw[["CV"]] <- NA
+          else if (is.null(weight))
+             rw[["CV"]] <- sqrt(get_variance(var, w, denom, narm))/ mean(var, na.rm = narm) * 100
           else
-            rw[["CV"]] <- sd(var, na.rm = narm) / mean(var, na.rm = narm) * 100
+            rw[["CV"]] <- sqrt(get_variance(var, w, denom, narm))/ (sum(var*w, na.rm = narm)/sum(w)) * 100
         }
 
         if (st == "mean") {
 
           if (all(is.na(var)))
             rw[["MEAN"]] <- NA
+          else if (is.null(weight))
+             rw[["MEAN"]] <- mean(var, na.rm = narm)
           else
-            rw[["MEAN"]] <- mean(var, na.rm = narm)
+            rw[["MEAN"]] <- sum(var*w, na.rm = narm)/sum(w)
         }
 
         if (st == "mode") {
 
           if (all(is.na(var)))
+            rw[["MODE"]] <- NA
+          else if (!is.null(weight))
             rw[["MODE"]] <- NA
           else
             rw[["MODE"]] <- get_mode(var)
@@ -792,8 +867,10 @@ get_summaries <- function(data, var, stats, missing = FALSE,
 
           if (all(is.na(var)))
             rw[["MEDIAN"]] <- NA
-          else
+          else if (is.null(weight))
             rw[["MEDIAN"]] <- median(var, na.rm = narm)
+          else
+            rw[["MEDIAN"]] <- get_weighted_quantile(var, w, probs = c(0.5), narm = narm)
         }
 
         if (st == "nobs") {
@@ -803,7 +880,7 @@ get_summaries <- function(data, var, stats, missing = FALSE,
 
         if (st == "nmiss") {
 
-          rw[["NMISS"]] <- sum(is.na(var))
+          rw[["NMISS"]] <- sum(is.na(var_all))
         }
 
         if (st %in% c("std", "stddev")) {
@@ -811,7 +888,7 @@ get_summaries <- function(data, var, stats, missing = FALSE,
           if (all(is.na(var)))
             rw[["STD"]] <- NA
           else
-            rw[["STD"]] <- sd(var, na.rm = narm)
+            rw[["STD"]] <- sqrt(get_variance(var, w, denom, narm))
         }
 
         if (st == "sum") {
@@ -820,14 +897,15 @@ get_summaries <- function(data, var, stats, missing = FALSE,
             rw[["SUM"]] <- NA
           else
             rw[["SUM"]] <- sum(var, na.rm = narm)
+
         }
 
         if (st == "range") {
 
-          if (all(is.na(var))) {
+          if (all(is.na(var_all))) {
             rw[["RANGE"]] <- NA
           } else {
-          rng <- range(var, na.rm = narm)
+            rng <- range(var_all, na.rm = narm)
             if (!is.null(rng) & length(rng) == 2)
               rw[["RANGE"]] <- rng[2] - rng[1]
             else
@@ -837,12 +915,15 @@ get_summaries <- function(data, var, stats, missing = FALSE,
 
         if (st == "vari") {
 
-          rw[["VARI"]] <- var(var, na.rm = narm)
+          rw[["VARI"]] <- get_variance(var, w, denom, narm)
         }
 
         if (st == "stderr") {
+          if (vardef == "df")
+            rw[["STDERR"]] <- get_stderr(var, w, denom, narm)
+          else
+            rw[["STDERR"]] <- NA
 
-          rw[["STDERR"]] <- get_stderr(var, narm)
         }
 
 
@@ -851,11 +932,15 @@ get_summaries <- function(data, var, stats, missing = FALSE,
 
           alph <- get_alpha(opts)
 
-          tmp <- get_clm(var, narm, alph)
+          tmp <- get_clm(var, w, denom, narm, alph)
 
-          rw[["LCLM"]] <- tmp[["lcl"]]
-
-          rw[["UCLM"]] <- tmp[["ucl"]]
+          if (vardef == "df"){
+            rw[["LCLM"]] <- tmp[["lcl"]]
+            rw[["UCLM"]] <- tmp[["ucl"]]
+          } else {
+            rw[["LCLM"]] <- NA
+            rw[["UCLM"]] <- NA
+          }
 
 
         } else {
@@ -865,10 +950,12 @@ get_summaries <- function(data, var, stats, missing = FALSE,
 
             alph <- get_alpha(opts)
 
+            tmp <- get_clm(var, w, denom, narm, alph, onesided = TRUE)
 
-            tmp <- get_clm(var, narm, alph, onesided = TRUE)
-
-            rw[["LCLM"]] <- tmp[["lcl"]]
+            if (vardef == "df")
+              rw[["LCLM"]] <- tmp[["lcl"]]
+            else
+              rw[["LCLM"]] <- NA
 
 
           }
@@ -879,11 +966,12 @@ get_summaries <- function(data, var, stats, missing = FALSE,
 
             alph <- get_alpha(opts)
 
-            tmp <- get_clm(var, narm, alph, onesided = TRUE)
+            tmp <- get_clm(var, w, denom, narm, alph, onesided = TRUE)
 
-            rw[["UCLM"]] <- tmp[["ucl"]]
-
-
+            if (vardef == "df")
+              rw[["UCLM"]] <- tmp[["ucl"]]
+            else
+              rw[["UCLM"]] <- NA
           }
         }
 
@@ -891,32 +979,39 @@ get_summaries <- function(data, var, stats, missing = FALSE,
 
           alph <- get_alpha(opts)
 
-          tmp <- get_clmstd(var, narm, alph)
+          tmp <- get_clmstd(var, w, denom, narm, alph)
 
-          rw[["LCLMSTD"]] <- tmp[["lcl"]]
-
-          rw[["UCLMSTD"]] <- tmp[["ucl"]]
-
-
+          if (vardef == "df"){
+            rw[["LCLMSTD"]] <- tmp[["lcl"]]
+            rw[["UCLMSTD"]] <- tmp[["ucl"]]
+          } else {
+            rw[["LCLMSTD"]] <- NA
+            rw[["UCLMSTD"]] <- NA
+          }
         }
 
         if (st == "t") {
 
           alph <- get_alpha(opts)
 
-          tmp <- get_t(var, alpha = alph)
+          tmp <- get_t(var, w, denom, alpha = alph)
 
-          rw[["T"]] <- tmp[["T"]]
-
+          if (vardef == "df")
+            rw[["T"]] <- tmp[["T"]]
+          else
+            rw[["T"]] <- NA
         }
 
         if (st == "prt") {
 
           alph <- get_alpha(opts)
 
-          tmp <- get_t(var, alpha = alph)
+          tmp <- get_t(var, w, denom, alpha = alph)
 
-          rw[["PRT"]] <- tmp[["PRT"]]
+          if (vardef == "df")
+            rw[["PRT"]] <- tmp[["PRT"]]
+          else
+            rw[["PRT"]] <- NA
 
         }
 
@@ -924,17 +1019,19 @@ get_summaries <- function(data, var, stats, missing = FALSE,
 
           alph <- get_alpha(opts)
 
-          tmp <- get_t(var, alpha = alph)
+          tmp <- get_t(var, w, denom, alpha = alph)
 
-          rw[["PROBT"]] <- tmp[["PRT"]]
-
+          if (vardef == "df")
+            rw[["PROBT"]] <- tmp[["PRT"]]
+          else
+            rw[["PROBT"]] <- NA
         }
 
         if (st == "df") {
 
           alph <- get_alpha(opts)
 
-          tmp <- get_t(var, alpha = alph)
+          tmp <- get_t(var, w, denom, alpha = alph)
 
           rw[["DF"]] <- tmp[["DF"]]
 
@@ -942,114 +1039,116 @@ get_summaries <- function(data, var, stats, missing = FALSE,
 
 
         if (st == "uss") {
-
-          rw[["USS"]] <-  sum(var^2, na.rm = narm)
+          if (is.null(w))
+             rw[["USS"]] <- sum(var^2, na.rm = narm)
+          else
+            rw[["USS"]] <-  sum(w*var^2, na.rm = narm)
         }
 
         if (st == "p1") {
 
-          rw[["P1"]] <- quantile(var, probs = c(0.01), type = 2, na.rm = narm)
+          rw[["P1"]] <- get_weighted_quantile(var, w, probs = c(0.01), narm = narm)
 
         }
 
         if (st == "p5") {
 
-          rw[["P5"]] <- quantile(var, probs = c(0.05), type = 2, na.rm = narm)
+          rw[["P5"]] <- get_weighted_quantile(var, w, probs = c(0.05), narm = narm)
 
         }
 
         if (st == "p10") {
 
-          rw[["P10"]] <- quantile(var, probs = c(0.1), type = 2, na.rm = narm)
+          rw[["P10"]] <- get_weighted_quantile(var, w, probs = c(0.1), narm = narm)
 
         }
 
         if (st == "p20") {
 
-          rw[["P20"]] <- quantile(var, probs = c(0.2), type = 2, na.rm = narm)
+          rw[["P20"]] <- get_weighted_quantile(var, w, probs = c(0.2), narm = narm)
 
         }
 
         if (st == "p25") {
 
-          rw[["P25"]] <- quantile(var, probs = c(0.25), type = 2, na.rm = narm)
+          rw[["P25"]] <- get_weighted_quantile(var, w, probs = c(0.25), narm = narm)
 
         }
 
         if (st == "q1") {
 
-          rw[["Q1"]] <- quantile(var, probs = c(0.25), type = 2, na.rm = narm)
+          rw[["Q1"]] <- get_weighted_quantile(var, w, probs = c(0.25), narm = narm)
 
         }
 
         if (st == "p30") {
 
-          rw[["P30"]] <- quantile(var, probs = c(0.3), type = 2, na.rm = narm)
+          rw[["P30"]] <- get_weighted_quantile(var, w, probs = c(0.3), narm = narm)
 
         }
         if (st == "p40") {
 
-          rw[["P40"]] <- quantile(var, probs = c(0.4), type = 2, na.rm = narm)
+          rw[["P40"]] <- get_weighted_quantile(var, w, probs = c(0.4), narm = narm)
 
         }
 
         if (st == "p50") {
 
-          rw[["P50"]] <- quantile(var, probs = c(0.5), type = 2, na.rm = narm)
+          rw[["P50"]] <- get_weighted_quantile(var, w, probs = c(0.5), narm = narm)
 
         }
 
         if (st == "p60") {
 
-          rw[["P60"]] <- quantile(var, probs = c(0.6), type = 2, na.rm = narm)
+          rw[["P60"]] <- get_weighted_quantile(var, w, probs = c(0.6), narm = narm)
 
         }
         if (st == "p70") {
 
-          rw[["P70"]] <- quantile(var, probs = c(0.7), type = 2, na.rm = narm)
+          rw[["P70"]] <- get_weighted_quantile(var, w, probs = c(0.7), narm = narm)
 
         }
 
         if (st == "p75") {
 
-          rw[["P75"]] <- quantile(var, probs = c(0.75), type = 2, na.rm = narm)
+          rw[["P75"]] <- get_weighted_quantile(var, w, probs = c(0.75), narm = narm)
 
         }
 
         if (st == "q3") {
 
-          rw[["Q3"]] <- quantile(var, probs = c(0.75), type = 2, na.rm = narm)
+          rw[["Q3"]] <- get_weighted_quantile(var, w, probs = c(0.75), narm = narm)
 
         }
 
         if (st == "p80") {
 
-          rw[["P80"]] <- quantile(var, probs = c(0.8), type = 2, na.rm = narm)
+          rw[["P80"]] <- get_weighted_quantile(var, w, probs = c(0.8), narm = narm)
 
         }
 
         if (st == "p90") {
 
-          rw[["P90"]] <- quantile(var, probs = c(0.9), type = 2, na.rm = narm)
+          rw[["P90"]] <- get_weighted_quantile(var, w, probs = c(0.9), narm = narm)
 
         }
 
         if (st == "p95") {
 
-          rw[["P95"]] <- quantile(var, probs = c(0.95), type = 2, na.rm = narm)
+          rw[["P95"]] <- get_weighted_quantile(var, w, probs = c(0.95), narm = narm)
 
         }
 
         if (st == "p99") {
 
-          rw[["P99"]] <- quantile(var, probs = c(0.99), type = 2, na.rm = narm)
+          rw[["P99"]] <- get_weighted_quantile(var, w, probs = c(0.99), narm = narm)
 
         }
 
         if (st == "qrange") {
 
-          q25 <- quantile(var, probs = c(0.25), type = 2, na.rm = narm)
-          q75 <- quantile(var, probs = c(0.75), type = 2, na.rm = narm)
+          q25 <- get_weighted_quantile(var, w, probs = c(0.25), narm = narm)
+          q75 <- get_weighted_quantile(var, w, probs = c(0.75), narm = narm)
 
           rw[["QRANGE"]] <- q75 - q25
 
@@ -1057,13 +1156,19 @@ get_summaries <- function(data, var, stats, missing = FALSE,
 
         if (st %in% c("skew", "skewness")) {
 
-          rw[["SKEW"]] <- get_skewness(var)
+          if (is.null(w))
+            rw[["SKEW"]] <- get_skewness(var,denom)
+          else
+            rw[["SKEW"]] <- NA
 
         }
 
         if (st %in% c("kurt", "kurtosis")) {
 
-          rw[["KURT"]] <- get_kurtosis(var)
+          if (is.null(w))
+            rw[["KURT"]] <- get_kurtosis(var,denom)
+          else
+            rw[["KURT"]] <- NA
 
         }
 
@@ -1135,19 +1240,19 @@ mlbls <- list(MEAN = "Mean", STD = "Std Dev", MEDIAN = "Median", MIN = "Minimum"
               Q1 = "Lower Quartile", Q3 = "Upper Quartile",
               UCLMSTD = "Upper %s%% CL for Std Dev",
               LCLMSTD = "Lower %s%% CL for Std Dev"
-              )
+)
 
 #' @import common
 #' @import tibble
 gen_report_means <- function(data,
-                            by = NULL,
-                            class = NULL,
-                            var = NULL,
-                            stats = c("n", "mean", "std", "min", "max"),
-                            weight = NULL,
-                            opts = NULL,
-                            view = TRUE,
-                            titles = NULL) {
+                             by = NULL,
+                             class = NULL,
+                             var = NULL,
+                             stats = c("n", "mean", "std", "min", "max"),
+                             weight = NULL,
+                             opts = NULL,
+                             view = TRUE,
+                             titles = NULL) {
 
   # Declare return list
   res <- list()
@@ -1203,7 +1308,7 @@ gen_report_means <- function(data,
     # data, var, class, outp, freq = TRUE,
     # type = NULL, byvals = NULL
     outp <- out_spec(stats = stats, shape = "wide")
-    smtbl <- get_class_report(dt, var, class, outp, freq = FALSE, opts = opts)
+    smtbl <- get_class_report(dt, var, class, outp, freq = FALSE, weight=weight, opts = opts)
 
     nm <- length(res) + 1
 
@@ -1326,7 +1431,7 @@ get_class_report <- function(data, var, class, outp, freq = TRUE,
     }
 
 
-    tmpres <- get_output(clslist[[k]], var = var,
+    tmpres <- get_output(clslist[[k]], var = var, weight = weight,
                          by = byvals,
                          class = cnmv,
                          stats = outp$stats,
@@ -1448,19 +1553,19 @@ gen_output_means <- function(data,
 
 
         if (has_option(opts, "nway") == FALSE ||
-           (has_option(opts, "nway") == TRUE && is.null(class))) {
+            (has_option(opts, "nway") == TRUE && is.null(class))) {
 
-            # Always add type 0
-            tmpby <- get_output(dat, var = var,
-                                by = bynm,
-                                class = cls,
-                                stats = outp$stats,
-                                shape = outp$shape,
-                                freq = frq,
-                                type = tp,
-                                opts = opts)
+          # Always add type 0
+          tmpby <- get_output(dat, var = var, weight = weight,
+                              by = bynm,
+                              class = cls,
+                              stats = outp$stats,
+                              shape = outp$shape,
+                              freq = frq,
+                              type = tp,
+                              opts = opts)
 
-            tmpby <- restore_datatypes(tmpby, dat, class)
+          tmpby <- restore_datatypes(tmpby, dat, class)
 
           if (is.null(tmpres))
             tmpres <- tmpby
@@ -1476,10 +1581,10 @@ gen_output_means <- function(data,
             tp <- 1
 
 
-          tmpcls <- get_class_output(dat, var = var,
-                              class = class, outp = outp,
-                              freq = frq, type = tp, byvals = bynm, opts = opts,
-                              stats = outp$stats)
+          tmpcls <- get_class_output(dat, var = var, weight = weight,
+                                     class = class, outp = outp,
+                                     freq = frq, type = tp, byvals = bynm, opts = opts,
+                                     stats = outp$stats)
 
           if (is.null(tmpres))
             tmpres <- tmpcls
@@ -1540,22 +1645,22 @@ gen_output_means <- function(data,
 
 #' @import utils
 get_class_output <- function(data, var, class, outp, freq = TRUE,
-                      type = NULL, byvals = NULL, weight = NULL,
-                      opts = NULL, stats = NULL) {
+                             type = NULL, byvals = NULL, weight = NULL,
+                             opts = NULL, stats = NULL) {
 
 
   res <- NULL
 
   if (is.null(class)) {
 
-    res <- get_output(data, var = var,
-                         by = byvals,
-                         class = NULL,
-                         stats = outp$stats,
-                         shape = outp$shape,
-                         freq = freq,
-                         type = type,
-                         opts = opts)
+    res <- get_output(data, var = var, weight = weight,
+                      by = byvals,
+                      class = NULL,
+                      stats = outp$stats,
+                      shape = outp$shape,
+                      freq = freq,
+                      type = type,
+                      opts = opts)
 
 
   } else {
@@ -1598,7 +1703,7 @@ get_class_output <- function(data, var, class, outp, freq = TRUE,
           }
 
 
-          tmpres <- get_output(clslist[[k]], var = var,
+          tmpres <- get_output(clslist[[k]], var = var, weight = weight,
                                by = byvals,
                                class = cnmv,
                                stats = outp$stats,
@@ -1633,28 +1738,28 @@ get_class_output <- function(data, var, class, outp, freq = TRUE,
     res <- restore_datatypes(res, data, class, clsnms)
 
     if ("STAT" %in% names(res)) {
-        # Sort stats by supplied order
-        # res[["STAT"]] <- factor(res[["STAT"]], levels = toupper(stats))  # stats not complete list
-        res[["STAT"]] <- factor(res[["STAT"]], levels = unique(res[["STAT"]]))
+      # Sort stats by supplied order
+      # res[["STAT"]] <- factor(res[["STAT"]], levels = toupper(stats))  # stats not complete list
+      res[["STAT"]] <- factor(res[["STAT"]], levels = unique(res[["STAT"]]))
 
-        # Deal with NA values in sort
-        ccnms <- as.character(clsnms)
-        # for (cnm in ccnms) {
-        #
-        #   res[[cnm]] <- ifelse(is.na(res[[cnm]]), "...", res[[cnm]])
-        # }
+      # Deal with NA values in sort
+      ccnms <- as.character(clsnms)
+      # for (cnm in ccnms) {
+      #
+      #   res[[cnm]] <- ifelse(is.na(res[[cnm]]), "...", res[[cnm]])
+      # }
 
-        # Sort
-        res <- sort(res, by = c("TYPE", ccnms, "STAT"), na.last = FALSE)
+      # Sort
+      res <- sort(res, by = c("TYPE", ccnms, "STAT"), na.last = FALSE)
 
-        # Restore stat column
-        res[["STAT"]] <- as.character(res[["STAT"]])
+      # Restore stat column
+      res[["STAT"]] <- as.character(res[["STAT"]])
 
-        # Restore CLASS columns
-        # for (cnm in ccnms) {
-        #
-        #   res[[cnm]] <- ifelse(res[[cnm]] == "...", NA, res[[cnm]])
-        # }
+      # Restore CLASS columns
+      # for (cnm in ccnms) {
+      #
+      #   res[[cnm]] <- ifelse(res[[cnm]] == "...", NA, res[[cnm]])
+      # }
 
     } else {
 
@@ -1665,7 +1770,7 @@ get_class_output <- function(data, var, class, outp, freq = TRUE,
 
     if (has_option(opts, "nway")) {
 
-       res <- res[res$TYPE == max(res$TYPE), ]
+      res <- res[res$TYPE == max(res$TYPE), ]
     }
 
     rnms <- names(res)

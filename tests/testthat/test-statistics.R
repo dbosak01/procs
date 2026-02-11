@@ -56,7 +56,8 @@ test_that("stats1: Standard error works.", {
 
   dt <- c(4, -1, 7, -4, 6, 8, 10)
 
-  res <- get_stderr(dt)
+  df <- length(dt) - 1
+  res <- get_stderr(dt,df=df)
 
   res
 
@@ -72,7 +73,8 @@ test_that("stats2: CLM works.", {
   dt <- c(4, -1, 7, -4, 6, 8, 10)
 
   # 95% limit
-  res <- get_clm(dt, alpha = .05)
+  df <- length(dt) - 1
+  res <- get_clm(dt,df=df, alpha = .05)
 
   res
 
@@ -81,7 +83,7 @@ test_that("stats2: CLM works.", {
 
 
   # 90% limit
-  res <- get_clm(dt, alpha = 0.1)
+  res <- get_clm(dt,df=df, alpha = 0.1)
 
   res
 
@@ -116,7 +118,8 @@ test_that("stats4: CLM works with NA.", {
 
   dt <- c(4, -1, 7, -4, NA, 8, 10)
 
-  res <- get_clm(dt, TRUE)
+  df <- length(na.omit(dt)) - 1
+  res <- get_clm(dt,df=df)
 
   res
 
@@ -266,7 +269,8 @@ test_that("stat12: get_t() works as expected.", {
 
   dt <- c(-10, -21, -12,  -5,   1, -70, -41, -24)
 
-  res <- get_t(dt)
+  df <- length(dt) - 1
+  res <- get_t(dt, df=df)
 
   res
 
@@ -279,7 +283,8 @@ test_that("stat12: get_t() works as expected.", {
 
 
   # Change in alpha does not change t test results
-  res <- get_t(dt, alpha = 0.1)
+  df <- length(dt) - 1
+  res <- get_t(dt, df=df, alpha = 0.1)
 
   res
 
@@ -296,8 +301,8 @@ test_that("stat13: get_skewness() works as expected.", {
   d <- c(27, 32, 46, 38, 23, 51, 19, 57, 33, 62,
          26, 43, 28, 69, 55, 28, 42, 36, 27, 62)
 
-
-  res <- get_skewness(d)
+  df <- length(d) - 1
+  res <- get_skewness(d,df)
 
 
   expect_equal(res, 0.49070401)
@@ -311,8 +316,8 @@ test_that("stat14: get_kurtosis() works as expected.", {
   d <- c(27, 32, 46, 38, 23, 51, 19, 57, 33, 62,
          26, 43, 28, 69, 55, 28, 42, 36, 27, 62)
 
-
-  res <- get_kurtosis(d)
+  df <- length(d) - 1
+  res <- get_kurtosis(d,df)
 
 
   expect_equal(res, -0.96131045)
@@ -330,8 +335,8 @@ test_that("stat15: get_clmstd() works as expected.", {
   # Target
   # STD     95% LCM   95% UCM
   # 5.1271	3.8741	7.5820
-
-  res <- get_clmstd(ht)
+  df = length(ht)-1
+  res <- get_clmstd(ht,df)
 
 
   res
@@ -342,9 +347,77 @@ test_that("stat15: get_clmstd() works as expected.", {
 })
 
 
+# A test for weighted quantiles
+test_that("stat16: get_weighted_quantile() works as expected.", {
+
+  #Unweighted median
+  x1 <- c(4, 1, 9, 3, 7)
+
+  res1 <- get_weighted_quantile(x1, probs = 0.5)
+  expect_equal(as.numeric(res1), 4)
+
+  #Weighted median
+  x2 <- c(1, 2, 3)
+  w2 <- c(1, 1, 10)
+
+  res2 <- get_weighted_quantile(x2, w2, probs = 0.2)
+  expect_equal(as.numeric(res2), 3)
+
+  #Weighted quantile with ≥10 values
+  x3 <- c(5, 8, 2, 9, 4, 7, 6, 3, 10, 1)
+  w3 <- c(1, 2, 1, 5, 1, 1, 1, 1, 3, 1)
+
+  res3 <- get_weighted_quantile(x3, w3, probs = 0.75)
+  expect_equal(as.numeric(res3), 9)
+
+})
+
+test_that("stat17: get_variance() and get_stderr() work for weighted data with no NA in x.", {
+
+  #weighted variance
+  x1 <- c(2,4,6,8)
+  w1 <- c(1,1,2,2)
+  df1 <- 6
+
+  expected_var1 <- 27.3333333 / df1
+  res_var1 <- get_variance(x1, w1, df1)
+  expect_equal(res_var1, expected_var1)
+
+  x2 <- c(10,20,30)
+  w2 <- c(5,1,4)
+  df2 <- 2
+
+  expected_var2 <- 890 / df2
+  res_var2 <- get_variance(x2, w2, df2)
+  expect_equal(res_var2, expected_var2)
 
 
+  #Weighted stderr
+  expected_stderr2 <- sqrt(expected_var2) / sqrt(sum(w2))
+  res_stderr2 <- get_stderr(x2, w2, df2)
+  expect_equal(res_stderr2, expected_stderr2)
+})
 
+test_that("stat18: get_t() works correctly for weighted one-sample t-test.", {
+
+  # Weighted example:
+  x <- c(2,4,6,8)
+  w <- c(1,1,2,2)
+  df <- 3
+
+  wmean <- 34/6
+  css <- 27.333333333333333
+  wvar <- css / df
+  wstderr <- sqrt(wvar) / sqrt(sum(w))
+  expected_t <- wmean / wstderr
+  expected_p <- 2 * pt(-abs(expected_t), df)
+
+  res <- get_t(x, w, df)
+
+  expect_equal(res[["T"]], 4.59851514)
+  expect_equal(res[["PRT"]], 0.019329284702)
+  expect_equal(res[["DF"]], 3)
+})
 # Matches SAS?
 # test_that("stat10: cmh works no weight uncorrected", {
 #
