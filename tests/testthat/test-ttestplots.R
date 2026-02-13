@@ -56,7 +56,7 @@ test_that("ttestplot1: ttestplot() object works as expected.", {
   expect_equal("ttestplot" %in% class(res), TRUE)
   expect_equal(res$showh0, FALSE)
   expect_equal(res$panel, TRUE)
-  expect_equal(res$type, c("summary", "qqplot"))
+  expect_equal(res$type, c("default"))
 
   # Assign something
   res <- ttestplot(type = c("agreement", "boxplot", "histogram", 'interval', 'profiles'))
@@ -501,6 +501,84 @@ test_that("ttestplot9: Paired analysis.", {
 
   expect_equal(length(res), 4)
   expect_equal("plot_spec" %in% class(res[[4]][[1]]), TRUE)
+
+})
+
+test_that("ttestplot10: plots = TRUE.", {
+
+
+  # One Sample
+  res <- proc_ttest(cls,
+                    var = "Weight",
+                    options = c(h0 = 80),
+                    output = report,
+                    plots = TRUE)
+
+  expect_equal(length(res), 4)
+  expect_equal("plot_spec" %in% class(res[[4]][[1]]), TRUE)
+  expect_equal("plot_spec" %in% class(res[[4]][[2]]), TRUE)
+
+  # Two Samples
+  res <- proc_ttest(cls,
+                    var = "Weight",
+                    class = "Sex",
+                    output = report,
+                    plots = TRUE)
+
+  expect_equal(length(res), 5)
+  expect_equal("plot_spec" %in% class(res[[5]][[1]]), TRUE)
+  expect_equal("plot_spec" %in% class(res[[5]][[2]]), TRUE)
+
+
+  # Paired
+  res <- proc_ttest(cls,
+                    paired = "Weight * Height",
+                    output = report,
+                    plots = TRUE)
+
+  expect_equal(length(res), 4)
+  expect_equal("plot_spec" %in% class(res[[4]][[1]]), TRUE)
+
+
+
+})
+
+test_that("ttestplot11: plots = 'all'", {
+
+
+  # One Sample
+  res <- proc_ttest(cls,
+                    var = "Weight",
+                    options = c(h0 = 80),
+                    output = report,
+                    plots = "all")
+
+  expect_equal(length(res), 4)
+  expect_equal("plot_spec" %in% class(res[[4]][[1]]), TRUE)
+  expect_equal(length(res[[4]]), 5)
+
+  # Two Samples
+  res <- proc_ttest(cls,
+                    var = "Weight",
+                    class = "Sex",
+                    output = report,
+                    plots =  "all")
+
+  expect_equal(length(res), 5)
+  expect_equal("plot_spec" %in% class(res[[5]][[1]]), TRUE)
+  expect_equal(length(res[[5]]), 5)
+
+
+  # Paired
+  res <- proc_ttest(cls,
+                    paired = "Weight * Height",
+                    output = report,
+                    plots = "all")
+
+  expect_equal(length(res), 4)
+  expect_equal("plot_spec" %in% class(res[[4]][[1]]), TRUE)
+  expect_equal(length(res[[4]]), 7)
+
 
 })
 

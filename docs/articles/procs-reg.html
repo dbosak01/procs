@@ -549,6 +549,41 @@ shaping options:</p>
 <span><span class="co"># 6 MODEL1 Weight   SEB Intercept   32.2745913</span></span>
 <span><span class="co"># 7 MODEL1 Weight   SEB    Height    0.5160939</span></span>
 <span><span class="co"># 8 MODEL1 Weight   SEB    Weight   -1.0000000</span></span></code></pre></div>
+</div>
+<div class="section level2">
+<h2 id="regression-plots">Regression Plots<a class="anchor" aria-label="anchor" href="#regression-plots"></a>
+</h2>
+<p>Regression plots can help you understand the quality of your model,
+and help decide between possible models. There are several ways to
+request a regression plot:</p>
+<ul>
+<li>
+<strong>plots = TRUE</strong>: The simplest way to request plots is
+to simply pass a TRUE value to the plots parameter on
+<code>prog_reg()</code>. The TRUE value will return a default set of
+plots.</li>
+<li>
+<strong>plots = “all”</strong>: The “all” keyword will return all
+available plots for the requested model(s).</li>
+<li>
+<strong>plots = [vector of strings]</strong>: If you know which
+plots you want, you may request them as a vector of plot names. These
+names are normally quoted, but may also be passed unquoted using the
+<code><a href="https://common.r-sassy.org/reference/v.html" class="external-link">v()</a></code> function.</li>
+<li>
+<strong>plots = regplot([with parameters])</strong>: For the most
+control, use the <code><a href="../reference/regplot.html">regplot()</a></code> function and pass the desired
+parameters. Parameters include the desire chart types, whether to
+“unpack” any summary panels, and whether to show labels on outlier
+values. See the <code><a href="../reference/regplot.html">regplot()</a></code> function for full documentation
+on the options available.</li>
+</ul>
+<p>Here is a simple example showing the default plots:</p>
+<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Shape wide</span></span>
+<span><span class="va">res10</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/proc_reg.html">proc_reg</a></span><span class="op">(</span><span class="va">cls</span>, <span class="va">Weight</span> <span class="op">~</span> <span class="va">Height</span>, </span>
+<span>                 plots <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
+<p><img src="../man/images/reg7a.png" alt="Proc reg plots 1"><img src="../man/images/reg7b.png" alt="Proc reg plots 2"><img src="../man/images/reg7c.png" alt="Proc reg plots 3"><img src="../man/images/reg7d.png" alt="Proc reg plots 4"></p>
 <p>Next: <a href="procs-dm.html">Data Manipulation</a></p>
 </div>
   </div>
@@ -563,7 +598,7 @@ shaping options:</p>
 
       <footer><div class="copyright">
   <p></p>
-<p>Developed by David Bosak.</p>
+<p>Developed by David Bosak, Diyu Yang.</p>
 </div>
 
 <div class="pkgdown">

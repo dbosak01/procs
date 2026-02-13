@@ -123,6 +123,16 @@
 #' }
 #' These shaping options are passed on the \code{output} parameter.  For example,
 #' to return the data in "long" form, use \code{output = "long"}.
+#' @section Plots:
+#' In addition to T-test statistics, you may request that plots be displayed
+#' on the interactive report.  The simplest way to request plots is to
+#' pass the value TRUE on the \code{plots} parameters.  This action will produce
+#' default plots appropriate for the type of analysis you are performing.
+#' You may also pass a vector of plot type strings.  The available plot types
+#' are as follows:
+#' \itemize{
+#' \item{\strong{long}: }
+#' }
 # @section Data Constraints:
 # Explain limits of data for each stat option.  Number of non-missing
 # values, etc.
@@ -176,9 +186,12 @@
 #' The "h0 = " option sets the baseline hypothesis value for single-variable
 #' hypothesis testing.  The "noprint" option turns off the interactive report.
 #' @param titles A vector of one or more titles to use for the report output.
-#' @param plots A plot request. The request may be made as a vector of
-#' plot names, or a \code{\link{ttestplot}} object. If there are multiple
-#' variables to test, you may pass multiple plot requests in a list.
+#' @param plots A plot request. The value TRUE will give you a default set of
+#' plots appropriate for the test you are performing.  The request may also be
+#' made as a vector of plot names, or a call to the \code{\link{ttestplot}}
+#' object. If there are multiple
+#' variables to test, you may pass multiple plot requests in a list.  See
+#' the \code{\link{ttestplot}} documentation for additional details.
 #' @return Normally, the requested T-Test statistics are shown interactively
 #' in the viewer, and output results are returned as a list of data frames.
 #' You may then access individual datasets from the list using dollar sign ($)
@@ -371,7 +384,7 @@ proc_ttest <- function(data,
 
   oplots <- deparse(substitute(plots, env = environment()))
   if (all(grepl("regplot(", oplots, fixed = TRUE) == FALSE)) {
-    plots <- tryCatch({if (typeof(plots) %in% c("character", "list", "NULL")) plots else oplots},
+    plots <- tryCatch({if (typeof(plots) %in% c("logical", "character", "list", "NULL")) plots else oplots},
                       error = function(cond) {oplots})
 
   }
@@ -463,8 +476,16 @@ proc_ttest <- function(data,
 
   # Prepare plots for easier processing
   if (!is.null(plots)) {
-    if ("ttestplot" %in% class(plots) |
-        "character" %in% class(plots)) {
+    if ("logical" %in% class(plots)) {
+      if (plots == TRUE) {
+        plots <- ttestplot()
+      }
+    }
+    if ("character" %in% class(plots)) {
+
+      plots <- ttestplot(type = plots)
+    }
+    if ("ttestplot" %in% class(plots)) {
       tplots <- list()
       if (!is.null(var)) {
         for (idx in seq_along(var)) {

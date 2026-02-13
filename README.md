@@ -23,7 +23,7 @@ PROC SORT, and PROC PRINT.
 The reason these procedures are included is because they are frequently used
 in conjunction with the statistical procedures to prepare results for reporting.  
 
-There are three motivations for simulating SAS® statistical procedures in R:
+There are four motivations for simulating SAS® statistical procedures in R:
 
 **1) Rich Outputs:** R provides a wide range of statistical packages and functions.
 However, these statistical functions frequently return a fragmented output.

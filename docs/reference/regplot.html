@@ -120,7 +120,7 @@ on the "type" parameter.</p>
 <dd><p>The type(s) of plot to create. Multiple types should be passed
 as a vector of strings.  Valid values are "diagnostics", "residualbypredicted",
 "rstudentbypredicted", "rstudentbyleverage", "qqplot", "observedbypredicted",
-"cooksd", "residualhistogram",
+"cooksd", "residualhistogram", "residualboxplot", "dffits", "dfbetas",
 "rfplot", "residuals", and "fitplot".  The default value is
 a vector with "diagnostics", "residuals", and "fitplot".  The "diagnostics"
 keyword produces a single combined chart with 8 different plots and a
@@ -140,7 +140,8 @@ individual plots instead.  This parameter is equivalent to the
 are: "adjrsq", "aic", "coeffvar", "depmean", "default", "edf", "mse", "nobs",
 "nparm", "rsquare", and "sse".  The
 default value is "default", which produces the following statistics:
-"nobs", "nparm", "edf", "mse", "rsquare", and "adjrsq".</p></dd>
+"nobs", "nparm", "edf", "mse", "rsquare", and "adjrsq". You may also pass
+the value "none" if you do not want any statistics shown on the chart.</p></dd>
 
 
 <dt id="arg-label">label<a class="anchor" aria-label="anchor" href="#arg-label"></a></dt>
@@ -191,6 +192,9 @@ This is only available for models with a single regressor.</p></li>
 <li><p><strong>residualhistogram</strong>: Histogram of residuals,
 with a normal and kernel curve overlay.</p></li>
 <li><p><strong>observedbypredicted</strong>: Dependent variable (Observed) vs. Predicted values.</p></li>
+<li><p><strong>residualboxplot</strong>: A boxplot of residuals.</p></li>
+<li><p><strong>dffits</strong>: Displays the influence of each observation on fitted values.</p></li>
+<li><p><strong>dfbetas</strong>: Displays the influence of each observation on regression coefficients.</p></li>
 </ul><p>The above plots may be requested in different ways: as a vector of keywords,
 or as a call to the <code>regplot</code> function.  The keyword approach will
 produce plots with default parameters. A call to <code>regplot</code> will
@@ -290,7 +294,7 @@ function for further details.</p>
 
 
       <footer><div class="copyright">
-  <p></p><p>Developed by David Bosak.</p>
+  <p></p><p>Developed by David Bosak, Diyu Yang.</p>
 </div>
 
 <div class="pkgdown">

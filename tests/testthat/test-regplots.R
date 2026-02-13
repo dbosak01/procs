@@ -86,7 +86,7 @@ test_that("regplot1: regplot() object works as expected.", {
 
 
 #   This plot gets split if there are multiple independent variables.
-test_that("regplot2: proc_reg() works for residuals", {
+test_that("regplot2: works for residuals", {
 
   # One independant variable
   res <- proc_reg(cls,
@@ -165,7 +165,7 @@ test_that("regplot2: proc_reg() works for residuals", {
 })
 
 # Good.
-test_that("regplot3: proc_reg() works for fitplot.", {
+test_that("regplot3: works for fitplot.", {
 
   # 95% Confidence
   res <- proc_reg(cls,
@@ -217,7 +217,7 @@ test_that("regplot3: proc_reg() works for fitplot.", {
 })
 
 
-test_that("regplot4: proc_reg() works for multiple plots.", {
+test_that("regplot4: works for multiple plots.", {
 
 
   res <- proc_reg(cls,
@@ -235,7 +235,7 @@ test_that("regplot4: proc_reg() works for multiple plots.", {
 
 # Dots not lining up exactly with SAS.  Close but not perfect.
 # Needs work.  Something still wrong.
-test_that("regplot5: proc_reg() works for qqplot", {
+test_that("regplot5: works for qqplot", {
 
 
   res <- proc_reg(cls,
@@ -284,7 +284,7 @@ test_that("regplot5: proc_reg() works for qqplot", {
 
 
 # OK
-test_that("regplot6: proc_reg() works for rfplot plot", {
+test_that("regplot6: works for rfplot plot", {
 
 
   res <- proc_reg(cls,
@@ -324,7 +324,7 @@ test_that("regplot6: proc_reg() works for rfplot plot", {
 })
 
 # Works
-test_that("regplot7: proc_reg() panel = FALSE works", {
+test_that("regplot7: panel = FALSE works", {
 
 
   res <- proc_reg(cls,
@@ -339,7 +339,7 @@ test_that("regplot7: proc_reg() panel = FALSE works", {
 })
 
 # Good
-test_that("regplot8: proc_reg() works for cooksd plot", {
+test_that("regplot8: works for cooksd plot", {
 
 
   res <- proc_reg(cls,
@@ -366,7 +366,7 @@ test_that("regplot8: proc_reg() works for cooksd plot", {
 
 
 # Good
-test_that("regplot9: proc_reg() works for residualbypredicted", {
+test_that("regplot9: works for residualbypredicted", {
 
 
   res <- proc_reg(cls,
@@ -391,7 +391,7 @@ test_that("regplot9: proc_reg() works for residualbypredicted", {
 # Seems good.  Worry about whether it is always +2 and -2 for boundary lines.
 # +2 and -2 appears to be standard deviation. It can be changed on the rstudent
 # function, but no obvious parameter on SAS chart.  So probably OK.
-test_that("regplot10: proc_reg() works for rstudentbypredicted", {
+test_that("regplot10: works for rstudentbypredicted", {
 
 
   res <- proc_reg(cls,
@@ -424,7 +424,7 @@ test_that("regplot10: proc_reg() works for rstudentbypredicted", {
 })
 
 # Looks good.
-test_that("regplot11: proc_reg() works for rstudentbyleverage", {
+test_that("regplot11: works for rstudentbyleverage", {
 
   # Class data
   res <- proc_reg(cls,
@@ -468,7 +468,7 @@ test_that("regplot11: proc_reg() works for rstudentbyleverage", {
 })
 
 
-test_that("regplot12: proc_reg() works for rstudentbyleverage with labels and id", {
+test_that("regplot12: works for rstudentbyleverage with labels and id", {
 
   # Assigned label - Awesome!
   res <- proc_reg(cls,
@@ -520,7 +520,7 @@ test_that("regplot12: proc_reg() works for rstudentbyleverage with labels and id
 
 # X and Y Scales have to be the same.
 # Margins also matter. Margins can change slope of line.
-test_that("regplot13: proc_reg() works for observedbypredicted", {
+test_that("regplot13: works for observedbypredicted", {
 
   # OK
   res <- proc_reg(cls,
@@ -563,7 +563,7 @@ test_that("regplot13: proc_reg() works for observedbypredicted", {
 })
 
 # Bins will not match.  Using Sturges algoritm instead.
-test_that("regplot14: proc_reg() works for residualhistogram", {
+test_that("regplot14: works for residualhistogram", {
 
   #
   res <- proc_reg(cls,
@@ -605,7 +605,7 @@ test_that("regplot14: proc_reg() works for residualhistogram", {
 })
 
 
-test_that("regplot15: proc_reg() passing type strings works.", {
+test_that("regplot15: passing type strings works.", {
 
   # Pass quoted string type
   res <- proc_reg(cls,
@@ -648,7 +648,7 @@ test_that("regplot15: proc_reg() passing type strings works.", {
 })
 
 # This is amazing
-test_that("regplot16: proc_reg() works for diagnostics", {
+test_that("regplot16: works for diagnostics", {
 
   # One variable
   res <- proc_reg(cls,
@@ -689,10 +689,31 @@ test_that("regplot16: proc_reg() works for diagnostics", {
   expect_equal("plot_spec" %in% class(res[[5]][[1]]), TRUE)
 
 
+
+  # Labels no ID
+  res <- proc_reg(cls,
+                  model = "Weight = Height",
+                  output = report,
+                  plots = regplot(type = "diagnostics", label = TRUE))
+
+  expect_equal(length(res), 5)
+  expect_equal("plot_spec" %in% class(res[[5]][[1]]), TRUE)
+
+  # Labels with ID
+  res <- proc_reg(cls,
+                  model = "Weight = Height",
+                  output = report,
+                  plots = regplot(type = "diagnostics", label = TRUE,
+                                  id = "Name"))
+
+  expect_equal(length(res), 5)
+  expect_equal("plot_spec" %in% class(res[[5]][[1]]), TRUE)
+
+
 })
 
 
-test_that("regplot17: proc_reg() edge cases.", {
+test_that("regplot17: edge cases.", {
 
 
   # New data
@@ -732,7 +753,7 @@ test_that("regplot17: proc_reg() edge cases.", {
 })
 
 
-test_that("regplot18: regplot() statistics work as expected.", {
+test_that("regplot18: statistics work as expected.", {
 
   # ADJRSQ, AIC, BIC, COEFFVAR, CP, DEFAULT, DEPMEAN, EDF, GMSEP, JP,
   # MSE, NOBS, NPARM, PC, RSQUARE, SBC, SP, SSE
@@ -778,7 +799,7 @@ test_that("regplot18: regplot() statistics work as expected.", {
   #
   # bvl
   #
-  # bvl2 <- BIC(fit)
+  # bvl2 <- BIC(fit)  # Can't get BIC to work
   #
   # bvl3 <- extractAIC(fit, log(nrow(cls)))
 
@@ -787,7 +808,7 @@ test_that("regplot18: regplot() statistics work as expected.", {
 
 
 # Works
-test_that("regplot19: proc_reg() works for residualboxplot", {
+test_that("regplot19: works for residualboxplot", {
 
 
   res <- proc_reg(cls,
@@ -808,5 +829,226 @@ test_that("regplot19: proc_reg() works for residualboxplot", {
 
 })
 
+# Works
+test_that("regplot20: works for TRUE and 'all'", {
+
+  # plots = TRUE
+  res <- proc_reg(cls,
+                  model = "Weight = Height",
+                  output = report,
+                  plots = TRUE)
+
+  expect_equal(length(res), 5)
+  expect_equal("plot_spec" %in% class(res[[5]][[1]]), TRUE)
+
+  # All
+  res <- proc_reg(cls,
+                  model = "Weight = Height",
+                  output = report,
+                  plots = 'all')
+
+  expect_equal(length(res), 5)
+  expect_equal("plot_spec" %in% class(res[[5]][[1]]), TRUE)
+
+  # All with label and id
+  res <- proc_reg(cls,
+                  model = "Weight = Height",
+                  output = report,
+                  plots = regplot('all', label = TRUE, id = "Name"))
+
+  expect_equal(length(res), 5)
+  expect_equal("plot_spec" %in% class(res[[5]][[1]]), TRUE)
 
 
+
+})
+
+
+test_that("regplot21: works for dffits", {
+
+  # Basic
+  res <- proc_reg(cls,
+                  model = "Weight = Height",
+                  output = report,
+                  plots = regplot(type = "dffits"))
+
+  expect_equal(length(res), 5)
+  expect_equal("plot_spec" %in% class(res[[5]][[1]]), TRUE)
+
+  # Labels
+  res <- proc_reg(cls,
+                  model = "Weight = Height",
+                  output = report,
+                  plots = regplot(type = "dffits", label = TRUE, id = "Name"))
+
+  expect_equal(length(res), 5)
+  expect_equal("plot_spec" %in% class(res[[5]][[1]]), TRUE)
+
+  # No ID variable
+  res <- proc_reg(cls,
+                  model = "Weight = Height",
+                  output = report,
+                  plots = regplot(type = "dffits", label = TRUE))
+
+  expect_equal(length(res), 5)
+  expect_equal("plot_spec" %in% class(res[[5]][[1]]), TRUE)
+
+
+  # New data - Awesome
+  res <- proc_reg(iris,
+                  model = "Sepal.Length = Petal.Length",
+                  output = report,
+                  plots = regplot(type = "dffits", label = TRUE))
+
+  expect_equal(length(res), 5)
+  expect_equal("plot_spec" %in% class(res[[5]][[1]]), TRUE)
+
+
+})
+
+
+test_that("regplot22: works for dfbetas", {
+
+  # Basic
+  res <- proc_reg(cls,
+                  model = "Weight = Height",
+                  output = report,
+                  plots = regplot(type = "dfbetas"))
+
+  expect_equal(length(res), 5)
+  expect_equal("plot_spec" %in% class(res[[5]][[1]]), TRUE)
+
+  # Labels
+  res <- proc_reg(cls,
+                  model = "Weight = Height",
+                  output = report,
+                  plots = regplot(type = "dfbetas", label = TRUE, id = "Name"))
+
+  expect_equal(length(res), 5)
+  expect_equal("plot_spec" %in% class(res[[5]][[1]]), TRUE)
+
+  # No ID variable
+  res <- proc_reg(cls,
+                  model = "Weight = Height",
+                  output = report,
+                  plots = regplot(type = "dfbetas", label = TRUE))
+
+  expect_equal(length(res), 5)
+  expect_equal("plot_spec" %in% class(res[[5]][[1]]), TRUE)
+
+
+  # New data - Awesome
+  res <- proc_reg(iris,
+                  model = "Sepal.Length = Petal.Length",
+                  output = report,
+                  plots = regplot(type = "dfbetas", label = TRUE))
+
+  expect_equal(length(res), 5)
+  expect_equal("plot_spec" %in% class(res[[5]][[1]]), TRUE)
+
+
+})
+
+test_that("regplot23: dfbetas multiple dependent variables", {
+
+  cls2 <- cls
+  cls$Sample1 <- runif(nrow(cls2), 50, 100)
+  cls$Sample2 <- runif(nrow(cls2), 50, 100)
+  cls$Sample3 <- runif(nrow(cls2), 50, 100)
+  cls$Sample4 <- runif(nrow(cls2), 50, 100)
+  cls$Sample5 <- runif(nrow(cls2), 50, 100)
+  cls$Sample6 <- runif(nrow(cls2), 50, 100)
+  cls$Sample7 <- runif(nrow(cls2), 50, 100)
+  cls$Sample8 <- runif(nrow(cls2), 50, 100)
+  cls$Sample9 <- runif(nrow(cls2), 50, 100)
+
+  # 4 variables
+  res <- proc_reg(cls,
+                  model = "Weight = Height Age Sample1",
+                  output = report,
+                  plots = regplot(type = "dfbetas"))
+
+  expect_equal(length(res), 5)
+  expect_equal("plot_spec" %in% class(res[[5]][[1]]), TRUE)
+
+
+  # 6 variables
+  res <- proc_reg(cls,
+                  model = "Weight = Height Sample1 Sample2 Sample3 Sample4",
+                  output = report,
+                  plots = regplot(type = "dfbetas"))
+
+  expect_equal(length(res), 5)
+  expect_equal("plot_spec" %in% class(res[[5]][[1]]), TRUE)
+
+
+  # 9 variables
+  res <- proc_reg(cls,
+                  model = "Weight = Height Sample1 Sample2 Sample3 Sample4 Sample5 Sample6 Sample7",
+                  output = report,
+                  plots = regplot(type = "dfbetas"))
+
+  expect_equal(length(res), 5)
+  expect_equal("plot_spec" %in% class(res[[5]][[1]]), TRUE)
+  expect_equal("plot_spec" %in% class(res[[5]][[2]]), TRUE)
+
+  # 3 variables - panel = FALSE
+  res <- proc_reg(cls,
+                  model = "Weight = Height Age",
+                  output = report,
+                  plots = regplot(type = "dfbetas", panel = FALSE))
+
+  expect_equal(length(res), 5)
+  expect_equal("plot_spec" %in% class(res[[5]][[1]]), TRUE)
+  expect_equal("plot_spec" %in% class(res[[5]][[2]]), TRUE)
+  expect_equal("plot_spec" %in% class(res[[5]][[3]]), TRUE)
+
+
+  # 3 variables - panel = FALSE and labels
+  res <- proc_reg(cls,
+                  model = "Weight = Height Age",
+                  output = report,
+                  plots = regplot(type = "dfbetas", panel = FALSE, label = TRUE))
+
+  expect_equal(length(res), 5)
+  expect_equal("plot_spec" %in% class(res[[5]][[1]]), TRUE)
+  expect_equal("plot_spec" %in% class(res[[5]][[2]]), TRUE)
+  expect_equal("plot_spec" %in% class(res[[5]][[3]]), TRUE)
+
+
+  # 3 variables - panel = FALSE, labels, and id
+  res <- proc_reg(cls,
+                  model = "Weight = Height Age",
+                  output = report,
+                  plots = regplot(type = "dfbetas", panel = FALSE, label = TRUE,
+                                  id = "Name"))
+
+  expect_equal(length(res), 5)
+  expect_equal("plot_spec" %in% class(res[[5]][[1]]), TRUE)
+  expect_equal("plot_spec" %in% class(res[[5]][[2]]), TRUE)
+  expect_equal("plot_spec" %in% class(res[[5]][[3]]), TRUE)
+
+
+  # 3 variables - panel = TRUE, labels
+  res <- proc_reg(cls,
+                  model = "Weight = Height Age",
+                  output = report,
+                  plots = regplot(type = "dfbetas", panel = TRUE, label = TRUE))
+
+  expect_equal(length(res), 5)
+  expect_equal("plot_spec" %in% class(res[[5]][[1]]), TRUE)
+
+
+  # 3 variables - panel = TRUE, labels, and id
+  res <- proc_reg(cls,
+                  model = "Weight = Height Age",
+                  output = report,
+                  plots = regplot(type = "dfbetas", panel = TRUE, label = TRUE,
+                                  id = "Name"))
+
+  expect_equal(length(res), 5)
+  expect_equal("plot_spec" %in% class(res[[5]][[1]]), TRUE)
+
+
+
+})

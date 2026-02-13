@@ -197,8 +197,9 @@ see the <strong>Options</strong> section for explanations of each.</p></dd>
 
 
 <dt id="arg-plots">plots<a class="anchor" aria-label="anchor" href="#arg-plots"></a></dt>
-<dd><p>Pass the desired plot(s) on this parameter. Valid values are "regplot",
-or a call to the <code><a href="regplot.html">regplot</a></code> function.  Default is NULL, meaning no
+<dd><p>Pass the desired plot(s) on this parameter. Valid values are TRUE,
+"all", a vector of plot names, or a call to the <code><a href="regplot.html">regplot</a></code> function.
+Default is NULL, meaning no
 plots are desired.  If there are multiple model requests, you can pass a single
 plot request which will apply to all tables, or a list of plot requests that
 align one-to-one for each model formula.</p></dd>
@@ -391,6 +392,9 @@ This is only available for models with a single regressor.</p></li>
 <li><p><strong>residualhistogram</strong>: Histogram of residuals,
 with a normal and kernel curve overlay.</p></li>
 <li><p><strong>observedbypredicted</strong>: Dependent variable (Observed) vs. Predicted values.</p></li>
+<li><p><strong>dffits</strong>: Displays the influence of each observation on fitted values.</p></li>
+<li><p><strong>dfbetas</strong>: Displays the influence of each observation
+for each coefficient in the model.</p></li>
 </ul><p>The above plots may be requested in different ways: as a vector of keywords,
 or as a call to the <code><a href="regplot.html">regplot</a></code> function.  The keyword approach will
 produce plots with default parameters. A call to <code><a href="regplot.html">regplot</a></code> will
@@ -493,7 +497,7 @@ function for further details.</p>
 
 
       <footer><div class="copyright">
-  <p></p><p>Developed by David Bosak.</p>
+  <p></p><p>Developed by David Bosak, Diyu Yang.</p>
 </div>
 
 <div class="pkgdown">

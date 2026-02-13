@@ -1128,7 +1128,10 @@ get_text_width <- function(txt, font = "arial", font_size = 12,
   return(ret)
 }
 
-
+# Vectorized function to calculate string width.
+# Error and warning handling is necessary because the string
+# may contain special characters which generate errors/warnings
+# in the strwidth() function.
 strwdth <- Vectorize(function(wrd, un) {
 
   if (is.na(wrd)) {

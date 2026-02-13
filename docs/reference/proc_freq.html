@@ -186,9 +186,11 @@ on "Ordering Frequency Output" for more information on this parameter.</p></dd>
 
 
 <dt id="arg-plots">plots<a class="anchor" aria-label="anchor" href="#arg-plots"></a></dt>
-<dd><p>Pass the desired plot(s) on this parameter. Valid values are "freqplot",
-or a call to the <code><a href="freqplot.html">freqplot</a></code> function.  Default is NULL, meaning no
-plots are desired.  If there are multiple table requests, you can pass a single
+<dd><p>Pass the desired plot(s) on this parameter. Valid values are TRUE,
+"freqplot", or a call to the <code><a href="freqplot.html">freqplot</a></code> function.  Default is NULL,
+meaning no
+plots are desired.  The value TRUE will give a default frequency plot for each
+table request.  If there are multiple table requests, you can pass a single
 plot request which will apply to all tables, or a list of plot requests that
 align one-to-one for each table request.</p></dd>
 
@@ -561,7 +563,7 @@ see <code><a href="proc_transpose.html">proc_transpose</a></code>.</p></div>
 
 
       <footer><div class="copyright">
-  <p></p><p>Developed by David Bosak.</p>
+  <p></p><p>Developed by David Bosak, Diyu Yang.</p>
 </div>
 
 <div class="pkgdown">

@@ -1800,5 +1800,26 @@ test_that("freqplot31: Odd cases with plots.", {
 })
 
 
+test_that("freqplot32: TRUE works as expected.", {
 
+
+  res <- proc_freq(mtcars, tables = c("cyl", "am", "cyl * am"),
+                   plots = TRUE,
+                   output = report)
+
+  expect_equal("data.frame" %in% class(res[[1]]), TRUE)
+  expect_equal("plot_spec" %in% class(res[[2]]), TRUE)
+
+
+  # res <- proc_freq(mtcars, tables = c("cyl", "am", "cyl * am"),
+  #                  plots = "all",
+  #                  output = report)
+  #
+  #
+  # expect_equal("data.frame" %in% class(res[[1]]), TRUE)
+  # expect_equal("plot_spec" %in% class(res[[2]]), TRUE)
+
+
+
+})
 

@@ -208,6 +208,11 @@
 #' }
 #' \item{\strong{observedbypredicted}: Dependent variable (Observed) vs. Predicted values.
 #' }
+#' \item{\strong{dffits}: Displays the influence of each observation on fitted values.
+#' }
+#' \item{\strong{dfbetas}: Displays the influence of each observation
+#' for each coefficient in the model.
+#' }
 #' }
 #' The above plots may be requested in different ways: as a vector of keywords,
 #' or as a call to the \code{\link{regplot}} function.  The keyword approach will
@@ -261,8 +266,9 @@
 #' The "noprint" option turns off the interactive report. For other options,
 #' see the \strong{Options} section for explanations of each.
 #' @param titles A vector of one or more titles to use for the report output.
-#' @param plots Pass the desired plot(s) on this parameter. Valid values are "regplot",
-#' or a call to the \code{\link{regplot}} function.  Default is NULL, meaning no
+#' @param plots Pass the desired plot(s) on this parameter. Valid values are TRUE,
+#' "all", a vector of plot names, or a call to the \code{\link{regplot}} function.
+#' Default is NULL, meaning no
 #' plots are desired.  If there are multiple model requests, you can pass a single
 #' plot request which will apply to all tables, or a list of plot requests that
 #' align one-to-one for each model formula.
@@ -405,7 +411,7 @@ proc_reg <- function(data,
 
   oplots <- deparse(substitute(plots, env = environment()))
   if (all(grepl("regplot(", oplots, fixed = TRUE) == FALSE)) {
-    plots <- tryCatch({if (typeof(plots) %in% c("character", "list", "NULL")) plots else oplots},
+    plots <- tryCatch({if (typeof(plots) %in% c("logical", "character", "list", "NULL")) plots else oplots},
                        error = function(cond) {oplots})
 
   }
@@ -445,6 +451,11 @@ proc_reg <- function(data,
 
   # Prepare plots for easier processing
   if (!is.null(plots)) {
+    if ("logical" %in% class(plots)) {
+      if (all(plots == TRUE)) {
+        plots <- "regplot"
+      }
+    }
     if ("regplot" %in% class(plots) |
         "character" %in% class(plots)) {
       tplots <- list()

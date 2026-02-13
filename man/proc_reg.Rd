@@ -72,8 +72,9 @@ see the \strong{Options} section for explanations of each.}
 
 \item{titles}{A vector of one or more titles to use for the report output.}
 
-\item{plots}{Pass the desired plot(s) on this parameter. Valid values are "regplot",
-or a call to the \code{\link{regplot}} function.  Default is NULL, meaning no
+\item{plots}{Pass the desired plot(s) on this parameter. Valid values are TRUE,
+"all", a vector of plot names, or a call to the \code{\link{regplot}} function.
+Default is NULL, meaning no
 plots are desired.  If there are multiple model requests, you can pass a single
 plot request which will apply to all tables, or a list of plot requests that
 align one-to-one for each model formula.}
@@ -305,6 +306,11 @@ This is only available for models with a single regressor.
 with a normal and kernel curve overlay.
 }
 \item{\strong{observedbypredicted}: Dependent variable (Observed) vs. Predicted values.
+}
+\item{\strong{dffits}: Displays the influence of each observation on fitted values.
+}
+\item{\strong{dfbetas}: Displays the influence of each observation
+for each coefficient in the model.
 }
 }
 The above plots may be requested in different ways: as a vector of keywords,

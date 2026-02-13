@@ -16,7 +16,7 @@ regplot(
 \item{type}{The type(s) of plot to create. Multiple types should be passed
 as a vector of strings.  Valid values are "diagnostics", "residualbypredicted",
 "rstudentbypredicted", "rstudentbyleverage", "qqplot", "observedbypredicted",
-"cooksd", "residualhistogram", "residualboxplot",
+"cooksd", "residualhistogram", "residualboxplot", "dffits", "dfbetas",
 "rfplot", "residuals", and "fitplot".  The default value is
 a vector with "diagnostics", "residuals", and "fitplot".  The "diagnostics"
 keyword produces a single combined chart with 8 different plots and a
@@ -99,6 +99,10 @@ with a normal and kernel curve overlay.
 \item{\strong{observedbypredicted}: Dependent variable (Observed) vs. Predicted values.
 }
 \item{\strong{residualboxplot}: A boxplot of residuals.
+}
+\item{\strong{dffits}: Displays the influence of each observation on fitted values.
+}
+\item{\strong{dfbetas}: Displays the influence of each observation on regression coefficients.
 }
 }
 The above plots may be requested in different ways: as a vector of keywords,

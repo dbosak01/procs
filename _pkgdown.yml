@@ -39,6 +39,7 @@ reference:
   contents:
   - freqplot
   - regplot
+  - ttestplot
 
 news:
   cran_dates: false

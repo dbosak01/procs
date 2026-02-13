@@ -349,5 +349,39 @@ res9
 
 ```
 
+## Regression Plots
+
+Regression plots can help you understand the quality of your model, and
+help decide between possible models.  There are several ways to request 
+a regression plot:
+
+* **plots = TRUE**:  The simplest way to request plots
+is to simply pass a TRUE value to the plots parameter on `prog_reg()`. The TRUE
+value will return a default set of plots.
+* **plots = "all"**: The "all" keyword will return all available plots for 
+the requested model(s).
+* **plots = [vector of strings]**: If you know which plots you want, you may
+request them as a vector of plot names.  These names are normally quoted, but 
+may also be passed unquoted using the `v()` function.
+* **plots = regplot([with parameters])**: For the most control, use the 
+`regplot()` function and pass the desired parameters.  Parameters include
+the desire chart types, whether to "unpack" any summary panels, and whether
+to show labels on outlier values.  See the `regplot()` function for full 
+documentation on the options available.
+
+Here is a simple example showing the default plots:
+```{r eval=FALSE, echo=TRUE} 
+# Shape wide
+res10 <- proc_reg(cls, Weight ~ Height, 
+                 plots = TRUE)
+
+
+```
+
+<img src="../man/images/reg7a.png" alt="Proc reg plots 1"/>
+<img src="../man/images/reg7b.png" alt="Proc reg plots 2"/>
+<img src="../man/images/reg7c.png" alt="Proc reg plots 3"/>
+<img src="../man/images/reg7d.png" alt="Proc reg plots 4"/>
+
 
 Next: [Data Manipulation](procs-dm.html)

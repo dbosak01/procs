@@ -111,7 +111,8 @@ the viewer interactively and returned from the function.</p>
 <span>  by <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  class <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  options <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  titles <span class="op">=</span> <span class="cn">NULL</span></span>
+<span>  titles <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  plots <span class="op">=</span> <span class="cn">NULL</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -189,6 +190,15 @@ hypothesis testing.  The "noprint" option turns off the interactive report.</p><
 
 <dt id="arg-titles">titles<a class="anchor" aria-label="anchor" href="#arg-titles"></a></dt>
 <dd><p>A vector of one or more titles to use for the report output.</p></dd>
+
+
+<dt id="arg-plots">plots<a class="anchor" aria-label="anchor" href="#arg-plots"></a></dt>
+<dd><p>A plot request. The value TRUE will give you a default set of
+plots appropriate for the test you are performing.  The request may also be
+made as a vector of plot names, or a call to the <code><a href="ttestplot.html">ttestplot</a></code>
+object. If there are multiple
+variables to test, you may pass multiple plot requests in a list.  See
+the <code><a href="ttestplot.html">ttestplot</a></code> documentation for additional details.</p></dd>
 
 </dl></div>
     <div id="value">
@@ -306,6 +316,17 @@ columns, and variables are in rows. This shaping option is the default.</p></li>
 </ul><p>These shaping options are passed on the <code>output</code> parameter.  For example,
 to return the data in "long" form, use <code>output = "long"</code>.</p>
     </div>
+    <div id="plots">
+    <h2>Plots</h2>
+
+
+<p>In addition to T-test statistics, you may request that plots be displayed
+on the interactive report.  The simplest way to request plots is to
+pass the value TRUE on the <code>plots</code> parameters.  This action will produce
+default plots appropriate for the type of analysis you are performing.
+You may also pass a vector of plot type strings.  The available plot types
+are as follows:</p><ul><li><p><strong>long</strong>:</p></li>
+</ul></div>
 
     <div id="ref-examples">
     <h2>Examples</h2>
@@ -451,7 +472,7 @@ to return the data in "long" form, use <code>output = "long"</code>.</p>
 
 
       <footer><div class="copyright">
-  <p></p><p>Developed by David Bosak.</p>
+  <p></p><p>Developed by David Bosak, Diyu Yang.</p>
 </div>
 
 <div class="pkgdown">

@@ -76,6 +76,10 @@
 #' }
 #' \item{\strong{residualboxplot}: A boxplot of residuals.
 #' }
+#' \item{\strong{dffits}: Displays the influence of each observation on fitted values.
+#' }
+#' \item{\strong{dfbetas}: Displays the influence of each observation on regression coefficients.
+#' }
 #' }
 #' The above plots may be requested in different ways: as a vector of keywords,
 #' or as a call to the \code{\link{regplot}} function.  The keyword approach will
@@ -112,7 +116,7 @@
 #' @param type The type(s) of plot to create. Multiple types should be passed
 #' as a vector of strings.  Valid values are "diagnostics", "residualbypredicted",
 #' "rstudentbypredicted", "rstudentbyleverage", "qqplot", "observedbypredicted",
-#' "cooksd", "residualhistogram", "residualboxplot",
+#' "cooksd", "residualhistogram", "residualboxplot", "dffits", "dfbetas",
 #' "rfplot", "residuals", and "fitplot".  The default value is
 #' a vector with "diagnostics", "residuals", and "fitplot".  The "diagnostics"
 #' keyword produces a single combined chart with 8 different plots and a
@@ -220,13 +224,15 @@ regplot <- function(type = c("diagnostics", "residuals", "fitplot"), panel = TRU
   # Parameter Checks
   vldvals <- c("diagnostics", "residuals", "fitplot", 'qqplot', 'rfplot',
                "residualbypredicted", "rstudentbypredicted", "rstudentbyleverage",
-               "cooksd", "residualhistogram", "observedbypredicted", "residualboxplot")
+               "cooksd", "residualhistogram", "observedbypredicted", "residualboxplot",
+               "all", "dffits", "dfbetas")
   if (any(!type %in% vldvals)) {
 
     ivd <- type[!type %in% vldvals]
     stop(paste0("Parameter value for 'type' invalid: ", paste0("'", ivd, "'", collapse = ", "),
                 "\nValid values are: ",
-                "'diagnostics', 'residuals', 'fitplot', 'qqplot', 'rfplot', ",
+                "'all', 'diagnostics', 'residuals', 'fitplot', 'qqplot', 'rfplot', ",
+                "'dffits', 'dfbetas', ",
                 "'residualbypredicted', 'rstudentbypredicted', 'rstudentbyleverage', ",
                 "'cooksd', 'residualhistogram', 'observedbypredicted', 'residualboxplot'."
                 ))
@@ -278,6 +284,13 @@ render_regplot <- function (dat, res, mdl, plt, alph) {
 
     typs <- plt$type
 
+    if (all(typs == "all")) {
+
+      typs <- c("residualhistogram", "residualbypredicted", "rstudentbypredicted",
+                "observedbypredicted", "cooksd", "rstudentbyleverage", 'qqplot', 'rfplot',
+                "residualboxplot", "dffits", "diagnostics", "residuals", "fitplot")
+    }
+
     # "Unpack" logic
     if ("diagnostics" %in% typs & plt$panel == FALSE) {
 
@@ -328,8 +341,15 @@ render_regplot <- function (dat, res, mdl, plt, alph) {
         ret[["observedbypredicted"]] <- render_observedbypredicted(dat, res, mdl, plt)
       } else if (tp == "residualhistogram") {
         ret[["residualhistogram"]] <- render_residualhistogram(dat, res, mdl, plt)
-      }else if (tp == "residualboxplot") {
+      } else if (tp == "residualboxplot") {
         ret[["residualboxplot"]] <- render_residualboxplot(dat, res, mdl, plt)
+      } else if (tp == "dffits") {
+        ret[["dffits"]] <- render_dffits(dat, res, mdl, plt)
+      } else if (tp == "dfbetas") {
+        resplts <- render_dfbetas(dat, res, mdl, plt)
+        for (idx in seq_len(length(resplts))) {
+          ret[[paste0("dfbetas", idx)]] <- resplts[[idx]]
+        }
       }
     }
 
@@ -521,6 +541,29 @@ render_diagnostics <- function(dat, res, mdl, plt, alph) {
   # Frame
   box(col = "grey70", lwd = 1)
 
+  # Add labels
+  if (plt$label) {
+
+    # Identify points that need labels
+    lblids <- ifelse((rdt > 2 | rdt < -2) | ldt > cut, TRUE, FALSE)
+    if (!is.null(plt$id)) {
+      if (!plt$id %in% names(dat)) {
+        stop("Label ID variable '", plt$id, "' not found in input dataset.")
+      }
+
+      lbls <- dat[[plt$id]][lblids]
+    } else {
+      lbls <- seq(1, length(rdt))[lblids]
+    }
+
+    # Filter data
+    lrdt <- rdt[lblids]
+    lldt <- ldt[lblids]
+
+    # Assign labels
+    text(lldt, lrdt, labels = lbls, pos = 3)
+  }
+
   #******************************
   # 4) QQPlot
   #******************************
@@ -657,6 +700,33 @@ render_diagnostics <- function(dat, res, mdl, plt, alph) {
   # Frame
   box(col = "grey70", lwd = 1)
 
+  # Add labels
+  if (plt$label) {
+
+    # Identify points that need labels
+    lblids <- ifelse(cd > cutoff, TRUE, FALSE)
+    if (!is.null(plt$id)) {
+      if (!plt$id %in% names(dat)) {
+        stop("Label ID variable '", plt$id, "' not found in input dataset.")
+      }
+
+      lbls <- dat[[plt$id]][lblids]
+    } else {
+      lbls <- seq(1, length(cd))[lblids]
+    }
+
+    # Filter data
+    lcd <- cd[lblids]
+    lxcd <- xcd[lblids]
+
+    # Filter colors
+    # lcol <- cols[cols != nc]
+
+    # Assign labels
+    text(lxcd, lcd, labels = lbls, pos = 3)
+  }
+
+
   #******************************
   # 7) Residual Histogram
   #******************************
@@ -672,9 +742,13 @@ render_diagnostics <- function(dat, res, mdl, plt, alph) {
   mu  <- mean(rdt)
   sdx <- sd(rdt)
 
+  # Calculate breaks
+  brks <- pretty(range(rdt), n = nclass.Sturges(rdt),
+                 min.n = 1, high.u.bias = 3)
+
   # Histogram (Percent scale)
   h <- hist(rdt,
-            breaks = "Sturges",
+            breaks = brks,
             plot = FALSE)
 
   # Convert counts to percent
@@ -682,6 +756,17 @@ render_diagnostics <- function(dat, res, mdl, plt, alph) {
 
   # Use calculated breaks to get scale
   scl <- get_reg_xlim(h$breaks, mu, sdx, pad_frac = 0, max_sigma = 4)
+
+  # Use calculated breaks to get scale
+  w <- diff(h$breaks)[1] # bin width
+  xmin <- min(h$breaks) - w
+  xmax <- max(h$breaks) + w
+  scl1 <- c(xmin, xmax)
+
+  # Use calculated break to get normal curve
+  grid <- seq(scl[1] , scl[2], length.out = 300)
+  y_norm_percent <- 100 * w * dnorm(grid, mean = mu, sd = sdx)
+  y_mx <- max(max(y_norm_percent), max(h$counts))
 
   # Create plot using histogram values
   plot(h,
@@ -691,23 +776,11 @@ render_diagnostics <- function(dat, res, mdl, plt, alph) {
        xlab = "",
        ylab = "",
        xlim = scl,
-       ylim = c(0, max(h$counts) * 1.05),
+       ylim = c(0, y_mx * 1.05),
        axes = FALSE)
 
   # Normal curve overlay (scaled to percent)
-  x <- seq(min(rdt) * 2, max(rdt) * 2, length.out = 300)
-
-  y_norm <- dnorm(x, mean = mu, sd = sdx)
-  y_norm <- y_norm / max(y_norm) * max(h$counts)
-
-  lines(x, y_norm, col = "steelblue4", lwd = 2)
-
-  # Kernel density overlay (scaled to percent)
-  dens <- density(rdt)
-
-  y_kern <- dens$y / max(dens$y) * max(h$counts)
-
-  lines(dens$x, y_kern, col = "orangered2", lwd = 2)
+  lines(grid, y_norm_percent, col = "steelblue4", lwd = 2)
 
   # Add x axis label
   mtext("Residual", side = 1, line = par("mar")[1] - 2, cex = .9)
@@ -1309,7 +1382,9 @@ render_rstudentbypredicted <- function(dat, res, mdl, plt) {
     # lcol <- cols[cols != nc]
 
     # Assign labels
-    text(lpdt, lrdt, labels = lbls, pos = 3)
+    if (length(lrdt) > 0) {
+      text(lpdt, lrdt, labels = lbls, pos = 3)
+    }
   }
 
   # Restore margins
@@ -1664,16 +1739,32 @@ render_residualhistogram <- function(dat, res, mdl, plt) {
   mu  <- mean(rdt)
   sdx <- sd(rdt)
 
+  # Calculate breaks - Closer to SAS algorithm
+  brks <- pretty(range(rdt), n = nclass.Sturges(rdt),
+                 min.n = 1, high.u.bias = 3)
+
   # Histogram (Percent scale)
   h <- hist(rdt,
-            breaks = "Sturges",
+            breaks = brks,
             plot = FALSE)
 
   # Convert counts to percent
   h$counts <- h$counts / sum(h$counts) * 100
 
+  # Use calculated breaks to get normal scale
+  w <- diff(h$breaks)[1] # bin width
+  xmin <- min(h$breaks) - w
+  xmax <- max(h$breaks) + w
+  scl1 <- c(xmin, xmax)
+
   # Use calculated breaks to get scale
   scl <- get_reg_xlim(h$breaks, mu, sdx, pad_frac = 0, max_sigma = 4)
+
+  # Use calculated break to get normal curve
+  grid <- seq(scl1[1] , scl1[2], length.out = 300)
+  y_norm_percent <- 100 * w * dnorm(grid, mean = mu, sd = sdx)
+  y_mx <- max(max(y_norm_percent), max(h$counts))
+
 
   # Create plot using histogram values
   plot(h,
@@ -1683,23 +1774,36 @@ render_residualhistogram <- function(dat, res, mdl, plt) {
        xlab = "",
        ylab = "Percent",
        xlim = scl,
-       ylim = c(0, max(h$counts) * 1.05),
+       ylim = c(0, y_mx * 1.05), # max(h$counts) * 1.05),
        axes = FALSE)
 
   # Normal curve overlay (scaled to percent)
-  x <- seq(min(rdt) * 2, max(rdt) * 2, length.out = 300)
+  # x <- seq(min(rdt) * 2, max(rdt) * 2, length.out = 300)
+  #
+  # y_norm <- dnorm(x, mean = mu, sd = sdx)
+  # y_norm <- y_norm / max(y_norm) * max(h$counts)
 
-  y_norm <- dnorm(x, mean = mu, sd = sdx)
-  y_norm <- y_norm / max(y_norm) * max(h$counts)
-
-  lines(x, y_norm, col = "steelblue4", lwd = 2)
+  lines(grid, y_norm_percent, col = "steelblue4", lwd = 2)
 
   # Kernel density overlay (scaled to percent)
-  dens <- density(rdt)
+  # dens <- density(rdt)
+  #
+  # y_kern <- dens$y / max(dens$y) * max(h$counts)
+  # lines(dens$x, y_kern, col = "orangered2", lwd = 2)
 
-  y_kern <- dens$y / max(dens$y) * max(h$counts)
+  # Bandwidth (Silverman / SAS)
+  bw <- 1.06 * sdx * n^(-1/5)
 
-  lines(dens$x, y_kern, col = "orangered2", lwd = 2)
+  # Kernel density estimate
+  dens <- density(rdt, kernel = "gaussian", bw = bw, n = 512)
+
+  # Scale KDE to Percent axis
+  y_kernel_percent <- 100 * w * dens$y
+
+  yscl <- seq(50, length(y_kernel_percent) - 25)
+
+  # Overlay on histogram
+  lines(dens$x[yscl], y_kernel_percent[yscl], col = "orangered2", lwd = 2)
 
   # Add x axis label
   mtext("Residual", side = 1, line = par("mar")[1] - 2)
@@ -2026,6 +2130,7 @@ render_cooksd <- function(dat, res, mdl, plt) {
   # Generate zero line
   abline(h = 0, col = "#05379B", lwd = 1)
 
+  # X axis label
   mtext("Observation", side = 1, line = par("mar")[1] - 2)
 
   # Frame
@@ -2050,9 +2155,6 @@ render_cooksd <- function(dat, res, mdl, plt) {
     # Filter data
     lcd <- cd[lblids]
     lxcd <- xcd[lblids]
-
-    # Filter colors
-    # lcol <- cols[cols != nc]
 
     # Assign labels
     text(lxcd, lcd, labels = lbls, pos = 3)
@@ -2257,6 +2359,536 @@ render_residualboxplot <- function(dat, res, mdl, plt) {
 
 
 
+render_dffits <- function(dat, res, mdl, plt) {
+
+  op <- par("mar")
+
+  # Create temp file path
+  pth <- tempfile(fileext = ".jpg")
+
+  # Standard height and width
+  hti <- 4.5  # Height in inches
+  wdi <- 6  # Width in inches
+  bml <- 6  # bottom margin lines
+
+  # Convert inches to pixels
+  ht <- hti * 96
+  wd <- wdi * 96
+
+  # Output to image file
+  jpeg(pth, width = wd, height = ht, quality = 100, units = "px")
+
+  # Get analysis variables
+  vrs <- get_vars(mdl)
+  dvr <- vrs$dvar
+  ivr <- vrs$ivar
+
+  # Prepare data
+  fit <- lm(mdl, data = dat)
+  dff <- dffits(fit)
+  n   <- length(dff)
+  p   <- length(coef(fit))    # includes intercept
+
+  # Set margins
+  par(mar = c(4, 5, 2, .75) + 0.1)
+
+  ## PROC REG cutoff for DFFITS
+  cutoff <- 2 * sqrt(p / n)
+
+  plot(seq_along(dff), dff,
+       type = "h",            # vertical spikes
+       lwd  = 1,
+       col  = "#05379B",
+       xlab = "",
+       ylab = "DFFITS",
+       main = paste0("Influence Diagnostics for ", dvr),
+       ylim = range(c(dff, -cutoff, cutoff)) * 1.1,
+       axes = FALSE)
+
+  ## Open circles at spike tips
+  points(seq_along(dff), dff,
+         pch = 1,
+         cex = 1.25,
+         col = "#05379B")
+
+  # Add custom axes
+  axis(side = 1, col.ticks = "grey55", mgp = c(3, .5, 0), tck = -0.015)
+  axis(side = 2, las = 1, col.ticks = "grey55", mgp = c(3, .5, 0), tck = -0.015)
+
+  ## Reference lines (PROC REG)
+  abline(h = 0, col = "#05379B", lwd = 1)
+  abline(h =  cutoff, col = "grey60", lwd = 1)
+  abline(h = -cutoff, col = "grey60", lwd = 1)
+
+  # Add bottom label
+  mtext("Observation", side = 1, line = par("mar")[1] - 2)
+
+  # Frame
+  box(col = "grey70", lwd = 1)
+  box("figure", col = "grey70", lwd = 1)
+
+  # Add labels
+  if (plt$label) {
+
+    # Identify points that need labels
+    lblids1 <- ifelse(dff > cutoff, TRUE, FALSE)
+    lblids2 <- ifelse(dff < -cutoff, TRUE, FALSE)
+    if (!is.null(plt$id)) {
+      if (!plt$id %in% names(dat)) {
+        stop("Label ID variable '", plt$id, "' not found in input dataset.")
+      }
+
+      lbls1 <- dat[[plt$id]][lblids1]
+      lbls2 <- dat[[plt$id]][lblids2]
+    } else {
+      lbls1 <- seq(1, length(dff))[lblids1]
+      lbls2 <- seq(1, length(dff))[lblids2]
+    }
+
+    # Filter data
+    ly1 <- dff[lblids1]
+    lx1 <- seq_along(dff)[lblids1]
+
+    ly2 <- dff[lblids2]
+    lx2 <- seq_along(dff)[lblids2]
+
+    # Filter colors
+    # lcol <- cols[cols != nc]
+
+    # Assign labels
+    if (length(ly1) > 0) {
+      text(lx1, ly1, labels = lbls1, pos = 3)
+    }
+    if (length(ly2) > 0) {
+      text(lx2, ly2, labels = lbls2, pos = 1)
+    }
+  }
+
+  # Restore margins
+  par(mar = op)
+
+  # Close device context
+  dev.off()
+
+  # Put plot in reporter plot object
+  ret <- create_plot(pth, height = hti, width = wdi)
+
+  return(ret)
+
+}
+
+
+render_dfbetas <- function(dat, res, mdl, plt) {
+
+  # Get current values
+  op <- par("mar")
+  om <- par("oma")
+
+  # Function can return multiple plots
+  ret <- list()
+
+  # Standard height and width
+  hti <- 4.5  # Height in inches
+  wdi <- 6  # Width in inches
+  bml <- 6  # bottom margin lines
+
+  # Convert inches to pixels
+  ht <- hti * 96
+  wd <- wdi * 96
+
+  # Get analysis variables
+  vrs <- get_vars(mdl)
+  dvr <- vrs$dvar
+  ivr <- vrs$ivar
+
+  # Prepare data
+  fit <- lm(mdl, data = dat)
+  dfb <- dfbetas(fit)     # matrix: n x p
+  n   <- nrow(dfb)
+  p   <- ncol(dfb)
+
+  # Get names for labels
+  param_names <- colnames(dfb)
+
+  # Baseline
+  chrts <- 1
+  rngs <- seq(1, p)
+
+  if (plt$panel) {
+    if (p == 1) {
+      mfrw <- c(1, 1)
+    } else if (p == 2) {
+      mfrw <- c(1, 2)
+    } else if (p > 2 & p < 5) {
+      mfrw <- c(2, 2)
+    } else if (p > 4 & p < 7) {
+      mfrw <- c(2, 3)
+    } else if (p > 6) {
+      chrts <- ceiling(p / 6)
+      mfrw <- c(2, 3)
+    }
+
+    # Split into a list of ranges per chart
+    if (chrts > 1) {
+      rngs <- split(rngs, ceiling(rngs/6))
+    } else {
+      rngs <- list(rngs)
+    }
+  } else {
+
+    # One chart per variable
+    chrts <- p
+    rngs <- split(rngs, rngs)
+    mfrw <- c(1, 1)
+  }
+
+  ## PROC REG cutoff for DFBETAS
+  cutoff <- 2 / sqrt(n)
+
+  # Get yscale - Consistent Y scale on panel plot
+  if (plt$label) {
+    yscl <- c(min(dfb, -cutoff), max(dfb, cutoff)) * 1.2 # Give more room for labels
+  } else {
+    yscl <- c(min(dfb, -cutoff), max(dfb, cutoff)) * 1.1
+  }
+
+  # Get xscale
+  xscl <- c(0 - .01, nrow(dat) * 1.05)
+
+  for (i in seq_len(chrts)) {
+
+    # Create temp file path
+    pth <- tempfile(fileext = ".jpg")
+
+    # Output to image file
+    jpeg(pth, width = wd, height = ht, quality = 100, units = "px")
+
+    # Set margins
+    if (plt$panel) {
+      par(mfrow = mfrw,
+          mar = c(2, 0, 2, .75) + 0.1,
+          oma = c(2, 5, 2, 0) + .1)
+    } else {
+      par(mfrow = mfrw,
+          mar = c(2, 0, 0, .75) + 0.1,
+          oma = c(2, 5, 2, 0) + .1)
+    }
+
+    for (j in rngs[[i]]) {
+
+      # Get data for this chart
+      vals <- dfb[, j]
+
+      # Non-panel plot computes custom y scale for each variable
+      if (plt$panel == FALSE) {
+        yscl <- c(min(vals, -cutoff), max(vals, cutoff)) * 1.1
+      }
+
+      # Create empty plot
+      plot(seq_len(n), vals,
+           type = "n",
+           xlim = xscl,
+           ylim = yscl,
+           axes = FALSE)
+
+      # Determine grid position
+      grdPos <- par("mfg")
+
+      # X axis
+      xtcks <- axis(side = 1, col.ticks = "grey55", mgp = c(3, .5, 0), tck = -0.015)
+
+      # Y axis
+      if (grdPos[2] == 1) {
+        ytcks <- axis(side = 2, las = 1, col.ticks = "grey55", mgp = c(3, .5, 0), tck = -0.015)
+      }
+
+      # Grid lines
+      if (plt$panel) {
+        abline(h = ytcks, col = "grey90", lwd = 1)
+        abline(v =  xtcks, col = "grey90", lwd = 1)
+      }
+
+      par(new = TRUE)
+
+      if (plt$panel) {
+        ttl <- param_names[j]
+      } else {
+        ttl <- ""
+      }
+
+      # Create actual data plot
+      plot(seq_len(n), vals,
+           type = "h",
+           font.main = 1,
+           lwd  = 1,
+           col  = "#05379B",
+           xlab = "",
+           ylab = "",
+           main = ttl,
+           xlim = xscl,
+           ylim = yscl, # range(c(vals, -cutoff, cutoff)) * 1.1,
+           axes = FALSE)
+
+      par(new = FALSE)
+
+      ## Open circles at tips
+      if (plt$panel == FALSE) {
+        points(seq_len(n), vals,
+               pch = 1,
+               cex = 1.25,
+               col = "#05379B")
+      }
+
+      ## Reference lines (PROC REG)
+      abline(h = 0, col = "#05379B", lwd = 1)
+      abline(h =  cutoff, col = "grey60", lwd = 1)
+      abline(h = -cutoff, col = "grey60", lwd = 1)
+
+      # Add labels
+      if (plt$label) {
+
+        ## Positive values
+
+        # Identify points that need labels
+        lblids <- ifelse(vals > cutoff, TRUE, FALSE)
+        if (!is.null(plt$id)) {
+          if (!plt$id %in% names(dat)) {
+            stop("Label ID variable '", plt$id, "' not found in input dataset.")
+          }
+
+          lbls <- dat[[plt$id]][lblids]
+        } else {
+          lbls <- seq(1, length(vals))[lblids]
+        }
+
+        # Filter data
+        xpos <- seq_len(n)[lblids]
+        ypos <- vals[lblids]
+
+        # Assign labels
+        if (length(xpos) > 0) {
+          text(xpos, ypos, labels = lbls, pos = 3)
+        }
+
+        ## Negative values
+
+        # Identify points that need labels
+        lblids <- ifelse(vals < -cutoff, TRUE, FALSE)
+        if (!is.null(plt$id)) {
+          if (!plt$id %in% names(dat)) {
+            stop("Label ID variable '", plt$id, "' not found in input dataset.")
+          }
+
+          lbls <- dat[[plt$id]][lblids]
+        } else {
+          lbls <- seq(1, length(vals))[lblids]
+        }
+
+        # Filter data
+        xpos <- seq_len(n)[lblids]
+        ypos <- vals[lblids]
+
+        # Assign labels
+        if (length(xpos) > 0) {
+          text(xpos, ypos, labels = lbls, pos = 1)
+        }
+
+      }
+
+      box(col = "grey70", lwd = 1)
+    }
+
+    ## Overall title
+    # Set title
+    if (plt$panel) {
+      mtext(paste0("Influence Diagnostics for ", dvr), side = 3, cex = 1.2,
+            outer = TRUE, font = 2, line = par("oma")[3] - 2.25)
+    } else {
+
+      vr <- param_names[j]
+
+      mtext(paste0("Influence on ", vr, " for ", dvr), side = 3, cex = 1.2,
+            outer = TRUE, font = 2, line = par("oma")[3] - 1.75)
+    }
+
+    # Labels
+    mtext("Observation", side = 1, outer = TRUE, line = par("oma")[1] - 2)
+    mtext("DFBETAS", side = 2, outer = TRUE, line = par("oma")[2] - 2)
+
+    # Frame
+    box("outer", col = "grey70", lwd = 1)
+
+    # Restore margins
+    par(mar = op, oma = om, mfrow = c(1, 1))
+
+    # Close device context
+    dev.off()
+
+    # Put plot in reporter plot object
+    ret[[length(ret) + 1]] <- create_plot(pth, height = hti, width = wdi)
+
+  }
+
+
+  return(ret)
+
+}
+
+
+
+render_dfbetas_backup <- function(dat, res, mdl, plt) {
+
+  # Get current values
+  op <- par("mar")
+  om <- par("oma")
+
+  # Function can return multiple plots
+  ret <- list()
+
+  # Standard height and width
+  hti <- 4.5  # Height in inches
+  wdi <- 6  # Width in inches
+  bml <- 6  # bottom margin lines
+
+  # Convert inches to pixels
+  ht <- hti * 96
+  wd <- wdi * 96
+
+  # Get analysis variables
+  vrs <- get_vars(mdl)
+  dvr <- vrs$dvar
+  ivr <- vrs$ivar
+
+  # Prepare data
+  fit <- lm(mdl, data = dat)
+  dfb <- dfbetas(fit)     # matrix: n x p
+  n   <- nrow(dfb)
+  p   <- ncol(dfb)
+
+  param_names <- colnames(dfb)
+
+  chrts <- 1
+  rngs <- seq(1, p)
+  if (p == 1) {
+    mfrw <- c(1, 1)
+  } else if (p == 2) {
+    mfrw <- c(1, 2)
+  } else if (p > 2 & p < 5) {
+    mfrw <- c(2, 2)
+  } else if (p > 4 & p < 7) {
+    mfrw <- c(2, 3)
+  } else if (p > 6) {
+    chrts <- ceiling(p / 6)
+    mfrw <- c(2, 3)
+  }
+
+  # Split into a list of ranges per chart
+  if (chrts > 1) {
+    rngs <- split(rngs, ceiling(rngs/6))
+  } else {
+    rngs <- list(rngs)
+  }
+
+  ## PROC REG cutoff for DFBETAS
+  cutoff <- 2 / sqrt(n)
+
+  # Get yscale
+  yscl <- c(min(dfb, -cutoff), max(dfb, cutoff)) * 1.1
+
+  # Get xscale
+  xscl <- c(0 - .01, nrow(dat) * 1.05)
+
+  for (i in seq_len(chrts)) {
+
+    # Create temp file path
+    pth <- tempfile(fileext = ".jpg")
+
+    # Output to image file
+    jpeg(pth, width = wd, height = ht, quality = 100, units = "px")
+
+    # Set margins
+    par(mfrow = mfrw,
+        mar = c(2, 0, 2, .75) + 0.1,
+        oma = c(2, 5, 2, 0) + .1)
+
+    for (j in rngs[[i]]) {
+
+      # Get data for this chart
+      vals <- dfb[, j]
+
+      plot(seq_len(n), vals,
+           type = "n",
+           xlim = xscl,
+           ylim = yscl,
+           axes = FALSE)
+
+      # Determine grid position
+      grdPos <- par("mfg")
+
+      # X axis
+      xtcks <- axis(side = 1, col.ticks = "grey55", mgp = c(3, .5, 0), tck = -0.015)
+
+      # Y axis
+      if (grdPos[2] == 1) {
+        ytcks <- axis(side = 2, las = 1, col.ticks = "grey55", mgp = c(3, .5, 0), tck = -0.015)
+      }
+
+      # Grid lines
+      abline(h = ytcks, col = "grey90", lwd = 1)
+      abline(v =  xtcks, col = "grey90", lwd = 1)
+
+      par(new = TRUE)
+
+      plot(seq_len(n), vals,
+           type = "h",
+           font.main = 1,
+           lwd  = 1,
+           col  = "#05379B",
+           xlab = "",
+           ylab = "",
+           main = param_names[j],
+           xlim = xscl,
+           ylim = yscl, # range(c(vals, -cutoff, cutoff)) * 1.1,
+           axes = FALSE)
+
+      par(new = FALSE)
+
+      ## Reference lines (PROC REG)
+      abline(h = 0, col = "#05379B", lwd = 1)
+      abline(h =  cutoff, col = "grey60", lwd = 1)
+      abline(h = -cutoff, col = "grey60", lwd = 1)
+
+      box(col = "grey70", lwd = 1)
+    }
+
+    ## Overall title
+    # Set title
+    mtext(paste0("Influence Diagnostics for ", dvr), side = 3, cex = 1.2,
+          outer = TRUE, font = 2, line = par("oma")[3] - 2.25)
+
+    # Labels
+    mtext("Observation", side = 1, outer = TRUE, line = par("oma")[1] - 2)
+    mtext("DFBETAS", side = 2, outer = TRUE, line = par("oma")[2] - 2)
+
+    # Frame
+    box("outer", col = "grey70", lwd = 1)
+
+    # Restore margins
+    par(mar = op, oma = om, mfrow = c(1, 1))
+
+    # Close device context
+    dev.off()
+
+    # Put plot in reporter plot object
+    ret[[length(ret) + 1]] <- create_plot(pth, height = hti, width = wdi)
+
+  }
+
+
+  return(ret)
+}
+
+
 # Utilities ---------------------------------------------------------------
 
 
@@ -2280,7 +2912,7 @@ collect_stats <- function(res, plt) {
 
   }
 
-  # Apperently got from AI and these are wrong
+  # Apparently got from AI and these are wrong
   # obs, edf, rsquare, parms, mse, adjrsquare,
   # coefvar, depmean
   # sse, bic, gmsep, pc, sp, aic, cp, jp, sbc

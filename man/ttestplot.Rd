@@ -4,15 +4,13 @@
 \alias{ttestplot}
 \title{Request T-Test Plots}
 \usage{
-ttestplot(type = c("summary", "qqplot"), panel = TRUE, showh0 = FALSE)
+ttestplot(type = "default", panel = TRUE, showh0 = FALSE)
 }
 \arguments{
 \item{type}{The type(s) of plot to create. Multiple types should be passed
 as a vector of strings.  Valid values are "agreement", "boxplot", "histogram",
 "interval", "profiles", "qqplot", "summary".  The default value is
-a vector with "summary" and "qqplot".  The "summary"
-keyword produces a single combined chart with 2 different plots: a histogram
-and a box plot.}
+a vector with "summary" and "qqplot".}
 
 \item{panel}{Whether or not to display the summary plot combined into
 in a single panel.  Default is TRUE.  A value of FALSE will create
@@ -44,73 +42,38 @@ the entire list to \code{\link{proc_print}}.
 }
 \section{Plots}{
 
-The \code{plots} parameter allows you to request several types of regression
+The \code{plots} parameter allows you to request several types of T-Test
 plots. Below are the types of plots that are supported.  The list shows
 the plot type keyword needed to request the plot, and a brief description:
 \itemize{
-\item{\strong{diagnostics}:  A fit diagnostics panel that contains 8 different
-types of plots and a table of statistics.
+\item{\strong{agreement}:  An agreement plot for the input data.  Only
+available for paired comparisons.
 }
-\item{\strong{residuals}: Produces a panel of residual plots against
-each independent variable in the model.
+\item{\strong{boxplot}: Displays a box and whisker plot for group comparisons,
+including confidence intervals (if appropriate).
 }
-\item{\strong{fitplot}:  Produces a scatter plot of the dependent variable
-against the regressor, including the fitted line and confidence/prediction bands.
-This is only available for models with a single regressor.
+\item{\strong{histogram}: A histogram with normal curve and kernel density
+overlays.
 }
-\item{\strong{qqplot}: Normal Quantile-Quantile (Q-Q) plot of residuals.
+\item{\strong{interval}: Visualizes the confidence intervals for means.
 }
-\item{\strong{rfplot}: Residual-Fit (RF) spread plot.
+\item{\strong{profiles}: A line plot mapping responses
+between analysis variables. Available only for paired analysis.
 }
-\item{\strong{residualbypredicted}: Residuals vs. Predicted values.
+\item{\strong{qqplot}: A quantile-quantile plot used to assess the assumption
+of normality.
 }
-\item{\strong{rstudentbypredicted}: Externally Studentized Residuals (RStudent) vs. Predicted values.
-}
-\item{\strong{rstudentbyleverage}: Externally Studentized Residuals vs. Leverage.
-}
-\item{\strong{cooksd}: Cook’s D statistic vs. Observation number.
-}
-\item{\strong{residualhistogram}: Histogram of residuals,
-with a normal and kernel curve overlay.
-}
-\item{\strong{observedbypredicted}: Dependent variable (Observed) vs. Predicted values.
-}
-\item{\strong{residualboxplot}: A boxplot of residuals.
+\item{\strong{summary}: Combines the histogram and boxplot charts
+onto the same panel.
 }
 }
-The above plots may be requested in different ways: as a vector of keywords,
-or as a call to the \code{\link{regplot}} function.  The keyword approach will
-produce plots with default parameters. A call to \code{\link{regplot}} will
-give you control over some parameters to the charts.  See the \code{\link{regplot}}
-function for further details.
-}
+The above plots may be requested as a vector of keywords to the \code{plots}
+parameter on \code{\link{proc_ttest}}, or as vector of values
+to the \code{type} parameter on \code{ttestplots}.
 
-\section{Statistics}{
-
-\itemize{
-\item{\strong{adjrsq}: Adjusted R-square.
-}
-\item{\strong{aic}: Akaike's information criterion.
-}
-\item{\strong{coeffvar}: Coefficient of variation.
-}
-\item{\strong{depmean}: Mean of dependent.
-}
-\item{\strong{default}: A set of default statistics.
-}
-\item{\strong{edf}: Error degrees of freedom.
-}
-\item{\strong{mse}: Mean squared error.
-}
-\item{\strong{nobs}: Number of observations used.
-}
-\item{\strong{nparm}: Number of parameters in the model (including the intercept).
-}
-\item{\strong{rsquare}: The R-square statistic.
-}
-\item{\strong{sse}: Error sum of squares.
-}
-}
+Note that, when passed as a vector of keywords, only the requested plots
+will be produced.  That is to say, the "only" keyword in SAS is implied
+at all times for \code{\link{proc_ttest}}.
 }
 
 \examples{

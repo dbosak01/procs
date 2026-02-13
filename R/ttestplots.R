@@ -24,78 +24,43 @@
 #' set \code{output = report} on the call to \code{\link{proc_freq}}, and pass
 #' the entire list to \code{\link{proc_print}}.
 #' @section Plots:
-#' The \code{plots} parameter allows you to request several types of regression
+#' The \code{plots} parameter allows you to request several types of T-Test
 #' plots. Below are the types of plots that are supported.  The list shows
 #' the plot type keyword needed to request the plot, and a brief description:
 #' \itemize{
-#' \item{\strong{diagnostics}:  A fit diagnostics panel that contains 8 different
-#' types of plots and a table of statistics.
+#' \item{\strong{agreement}:  An agreement plot for the input data.  Only
+#' available for paired comparisons.
 #' }
-#' \item{\strong{residuals}: Produces a panel of residual plots against
-#'  each independent variable in the model.
+#' \item{\strong{boxplot}: Displays a box and whisker plot for group comparisons,
+#' including confidence intervals (if appropriate).
 #' }
-#' \item{\strong{fitplot}:  Produces a scatter plot of the dependent variable
-#' against the regressor, including the fitted line and confidence/prediction bands.
-#' This is only available for models with a single regressor.
+#' \item{\strong{histogram}: A histogram with normal curve and kernel density
+#' overlays.
 #' }
-#' \item{\strong{qqplot}: Normal Quantile-Quantile (Q-Q) plot of residuals.
+#' \item{\strong{interval}: Visualizes the confidence intervals for means.
 #' }
-#' \item{\strong{rfplot}: Residual-Fit (RF) spread plot.
+#' \item{\strong{profiles}: A line plot mapping responses
+#' between analysis variables. Available only for paired analysis.
 #' }
-#' \item{\strong{residualbypredicted}: Residuals vs. Predicted values.
+#' \item{\strong{qqplot}: A quantile-quantile plot used to assess the assumption
+#' of normality.
 #' }
-#' \item{\strong{rstudentbypredicted}: Externally Studentized Residuals (RStudent) vs. Predicted values.
-#' }
-#' \item{\strong{rstudentbyleverage}: Externally Studentized Residuals vs. Leverage.
-#' }
-#' \item{\strong{cooksd}: Cook’s D statistic vs. Observation number.
-#' }
-#' \item{\strong{residualhistogram}: Histogram of residuals,
-#' with a normal and kernel curve overlay.
-#' }
-#' \item{\strong{observedbypredicted}: Dependent variable (Observed) vs. Predicted values.
-#' }
-#' \item{\strong{residualboxplot}: A boxplot of residuals.
+#' \item{\strong{summary}: Combines the histogram and boxplot charts
+#' onto the same panel.
 #' }
 #' }
-#' The above plots may be requested in different ways: as a vector of keywords,
-#' or as a call to the \code{\link{regplot}} function.  The keyword approach will
-#' produce plots with default parameters. A call to \code{\link{regplot}} will
-#' give you control over some parameters to the charts.  See the \code{\link{regplot}}
-#' function for further details.
+#' The above plots may be requested as a vector of keywords to the \code{plots}
+#' parameter on \code{\link{proc_ttest}}, or as vector of values
+#' to the \code{type} parameter on \code{ttestplots}.
 #'
-#' @section Statistics:
-#' \itemize{
-#' \item{\strong{adjrsq}: Adjusted R-square.
-#' }
-#' \item{\strong{aic}: Akaike's information criterion.
-#' }
-#' \item{\strong{coeffvar}: Coefficient of variation.
-#' }
-#' \item{\strong{depmean}: Mean of dependent.
-#' }
-#' \item{\strong{default}: A set of default statistics.
-#' }
-#' \item{\strong{edf}: Error degrees of freedom.
-#' }
-#' \item{\strong{mse}: Mean squared error.
-#' }
-#' \item{\strong{nobs}: Number of observations used.
-#' }
-#' \item{\strong{nparm}: Number of parameters in the model (including the intercept).
-#' }
-#' \item{\strong{rsquare}: The R-square statistic.
-#' }
-#' \item{\strong{sse}: Error sum of squares.
-#' }
-#' }
+#' Note that, when passed as a vector of keywords, only the requested plots
+#' will be produced.  That is to say, the "only" keyword in SAS is implied
+#' at all times for \code{\link{proc_ttest}}.
 #'
 #' @param type The type(s) of plot to create. Multiple types should be passed
 #' as a vector of strings.  Valid values are "agreement", "boxplot", "histogram",
 #' "interval", "profiles", "qqplot", "summary".  The default value is
-#' a vector with "summary" and "qqplot".  The "summary"
-#' keyword produces a single combined chart with 2 different plots: a histogram
-#' and a box plot.
+#' a vector with "summary" and "qqplot".
 #' @param panel Whether or not to display the summary plot combined into
 #' in a single panel.  Default is TRUE.  A value of FALSE will create
 #' individual plots instead.  This parameter is equivalent to the
@@ -105,7 +70,7 @@
 #' @examples
 #' library(procs)
 #' @export
-ttestplot <- function(type = c("summary", "qqplot"), panel = TRUE, showh0 = FALSE) {
+ttestplot <- function(type = "default", panel = TRUE, showh0 = FALSE) {
 
   # Non-standard evaluation
   otype <- deparse(substitute(type, env = environment()))
@@ -117,14 +82,14 @@ ttestplot <- function(type = c("summary", "qqplot"), panel = TRUE, showh0 = FALS
 
   # Parameter Checks
   vldvals <- c("agreement", "boxplot", "histogram", 'interval', 'profiles',
-               "qqplot", "summary")
+               "qqplot", "summary", "default", "all")
   if (any(!type %in% vldvals)) {
 
     ivd <- type[!type %in% vldvals]
     stop(paste0("Parameter value for 'type' invalid: ", paste0("'", ivd, "'", collapse = ", "),
                 "\nValid values are: ",
                 "'agreement', 'boxplot', 'histogram', 'interval', 'profiles', ",
-                "'qqplot', 'summary'."
+                "'qqplot', 'summary', 'default', 'all'."
     ))
   }
 
@@ -159,15 +124,24 @@ render_ttestplot <- function (dat, var, plt, class, res) {
 
   ret <- NULL
 
-  if (is.character(plt)) {
-    if (all(plt == "ttestplot")) {
-      plt <- ttestplot()
-    } else {
-      plt <- ttestplot(type = plt)
-    }
-  }
-
   if ("ttestplot" %in% class(plt)) {
+
+    if (all(plt$type == "default")) {
+      if (!is.null(plt$varlbl)) {
+        plt$type <- c("summary", "profiles", "agreement", "qqplot")
+      } else {
+        plt$type <- c("summary", "qqplot")
+      }
+    }
+
+    if (all(plt$type == "all")) {
+      # agreement, boxplot, histogram, interval, profiles, qqplot, summary
+      if (!is.null(plt$varlbl)) {
+        plt$type <- c("summary", "histogram", "boxplot", "interval", "profiles", "agreement", "qqplot")
+      } else {
+        plt$type <- c("summary", "histogram", "boxplot", "interval", "qqplot")
+      }
+    }
 
     typs <- plt$type
 
@@ -532,8 +506,15 @@ render_summary1 <- function(dat, var, plt) {
 
   }
 
+  # Legend location - Move to left side if needed
+  lgnd <- "topright"
+  pt <- (bp$stats[4] - xscl[1])/diff(xscl)
+  if (pt > .75) {
+    lgnd <- "topleft"
+  }
+
   # Create legend
-  legend("topright",
+  legend(lgnd,
          legend = paste0(alph, "% Confidence"),
          fill = "#B3D2D0",
          border = "grey60",
@@ -903,7 +884,7 @@ render_summary2 <- function(dat, var, plt, class) {
   # Outliers for second class value
   if (length(bp$out2) > 0) {
     # Plot outlier points
-    points(out2, rep(1, length(out2)),
+    points(bp$out2, rep(1, length(bp$out2)),
            pch = 1,
            col = "grey20",
            lwd = 1.6,
@@ -1764,8 +1745,8 @@ render_boxplot1 <- function(dat, var, plt) {
 
   # Legend location - Move to left side if needed
   lgnd <- "topright"
-  llim <- (range(aval)[2] - range(aval)[1]) * .75
-  if (bp$stats[4] > llim) {
+  pt <- (bp$stats[4] - xscl[1])/diff(xscl)
+  if (pt > .75) {
     lgnd <- "topleft"
   }
 
@@ -1948,7 +1929,7 @@ render_boxplot2 <- function(dat, var, plt, class) {
   # Outliers for second class value
   if (length(bp$out2) > 0) {
     # Plot outlier points
-    points(out2, rep(1, length(out2)),
+    points(bp$out2, rep(1, length(bp$out2)),
            pch = 1,
            col = "grey20",
            lwd = 1.6,

@@ -74,9 +74,12 @@ hypothesis testing.  The "noprint" option turns off the interactive report.}
 
 \item{titles}{A vector of one or more titles to use for the report output.}
 
-\item{plots}{A plot request. The request may be made as a vector of
-plot names, or a \code{\link{ttestplot}} object. If there are multiple
-variables to test, you may pass multiple plot requests in a list.}
+\item{plots}{A plot request. The value TRUE will give you a default set of
+plots appropriate for the test you are performing.  The request may also be
+made as a vector of plot names, or a call to the \code{\link{ttestplot}}
+object. If there are multiple
+variables to test, you may pass multiple plot requests in a list.  See
+the \code{\link{ttestplot}} documentation for additional details.}
 }
 \value{
 Normally, the requested T-Test statistics are shown interactively
@@ -215,6 +218,19 @@ columns, and variables are in rows. This shaping option is the default.
 }
 These shaping options are passed on the \code{output} parameter.  For example,
 to return the data in "long" form, use \code{output = "long"}.
+}
+
+\section{Plots}{
+
+In addition to T-test statistics, you may request that plots be displayed
+on the interactive report.  The simplest way to request plots is to
+pass the value TRUE on the \code{plots} parameters.  This action will produce
+default plots appropriate for the type of analysis you are performing.
+You may also pass a vector of plot type strings.  The available plot types
+are as follows:
+\itemize{
+\item{\strong{long}: }
+}
 }
 
 \examples{

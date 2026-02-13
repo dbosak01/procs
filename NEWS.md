@@ -3,7 +3,10 @@
 * Added "order" parameter to `proc_freq()`.
 * Added "plots" parameter to `proc_freq()`.
 * Added "plots" parameter to `proc_reg()`.
+* Added "plots" parameter to `proc_ttest()`.
 * Added "AIC" statistic to `proc_reg()`.
+* Added "weight" parameter to `proc_means()`.
+* Added "vardef" option to `proc_means()`.
 
 # procs 1.0.7
 

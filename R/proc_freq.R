@@ -266,9 +266,11 @@
 #' @param order Indicates how to order the function output. Options are "internal",
 #' "formatted", "freq" and "data".  Default is "internal".  See the section
 #' on "Ordering Frequency Output" for more information on this parameter.
-#' @param plots Pass the desired plot(s) on this parameter. Valid values are "freqplot",
-#' or a call to the \code{\link{freqplot}} function.  Default is NULL, meaning no
-#' plots are desired.  If there are multiple table requests, you can pass a single
+#' @param plots Pass the desired plot(s) on this parameter. Valid values are TRUE,
+#' "freqplot", or a call to the \code{\link{freqplot}} function.  Default is NULL,
+#' meaning no
+#' plots are desired.  The value TRUE will give a default frequency plot for each
+#' table request.  If there are multiple table requests, you can pass a single
 #' plot request which will apply to all tables, or a list of plot requests that
 #' align one-to-one for each table request.
 #' @return The function will return all requested datasets by default.  This is
@@ -458,7 +460,7 @@ proc_freq <- function(data,
                      error = function(cond) {rout})
 
   pout <- deparse(substitute(plots, env = environment()))
-  plots <- tryCatch({if (typeof(plots) %in% c("list", "character", "NULL")) plots else pout},
+  plots <- tryCatch({if (typeof(plots) %in% c("logical", "list", "character", "NULL")) plots else pout},
                     error = function(cond) {pout})
 
 
@@ -544,6 +546,9 @@ proc_freq <- function(data,
 
   # Prepare plots for easier processing
   if (!is.null(plots)) {
+    if ("logical" %in% class(plots)) {
+      plots <- "freqplot"
+    }
     if ("freqplot" %in% class(plots) |
         "character" %in% class(plots)) {
       tplots <- list()

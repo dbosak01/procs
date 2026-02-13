@@ -65,9 +65,11 @@ the \strong{Options} section for a description of these options.}
 "formatted", "freq" and "data".  Default is "internal".  See the section
 on "Ordering Frequency Output" for more information on this parameter.}
 
-\item{plots}{Pass the desired plot(s) on this parameter. Valid values are "freqplot",
-or a call to the \code{\link{freqplot}} function.  Default is NULL, meaning no
-plots are desired.  If there are multiple table requests, you can pass a single
+\item{plots}{Pass the desired plot(s) on this parameter. Valid values are TRUE,
+"freqplot", or a call to the \code{\link{freqplot}} function.  Default is NULL,
+meaning no
+plots are desired.  The value TRUE will give a default frequency plot for each
+table request.  If there are multiple table requests, you can pass a single
 plot request which will apply to all tables, or a list of plot requests that
 align one-to-one for each table request.}
 }
