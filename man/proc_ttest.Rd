@@ -227,10 +227,9 @@ on the interactive report.  The simplest way to request plots is to
 pass the value TRUE on the \code{plots} parameters.  This action will produce
 default plots appropriate for the type of analysis you are performing.
 You may also pass a vector of plot type strings.  The available plot types
-are as follows:
-\itemize{
-\item{\strong{long}: }
-}
+are "agreement", "boxplot", "histogram",
+"interval", "profiles", "qqplot", and "summary".  See the documentation
+for \code{\link{ttestplot}} for more information.
 }
 
 \examples{
@@ -367,4 +366,35 @@ res5
 # 2     T  3.41296500
 # 3 PROBT  0.00291762
 
+# Example 6: Plots
+res6 <- proc_ttest(dat, var = "group1", options = c("h0" = 0),
+                   output = report,   # To return plot objects
+                   plots = TRUE)      # Request default plots
+
+# View results
+res6
+# $Statistics
+# N MEAN     STD    STDERR  MIN MAX
+# 1 10 0.75 1.78901 0.5657345 -1.6 3.7
+#
+# $ConfLimits
+# MEAN       LCLM    UCLM     STD  LCLMSTD  UCLMSTD
+# 1 0.75 -0.5297804 2.02978 1.78901 1.230544 3.266034
+#
+# $TTests
+# DF       T     PROBT
+# 1  9 1.32571 0.2175978
+#
+# $Plots
+# $Plots$summary
+# # A plot specification:
+# - path: 'C:\Users\dbosa\AppData\Local\Temp\RtmpOYrg1Y\file5dfa866215cf2.jpg'
+# - height: 4.5
+# - width: 6
+#
+# $Plots$qqplot
+# # A plot specification:
+# - path: 'C:\Users\dbosa\AppData\Local\Temp\RtmpOYrg1Y\file5dfa84693581d.jpg'
+# - height: 4.5
+# - width: 6
 }
