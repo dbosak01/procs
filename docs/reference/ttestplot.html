@@ -170,7 +170,60 @@ at all times for <code><a href="proc_ttest.html">proc_ttest</a></code>.</p>
 
     <div id="ref-examples">
     <h2>Examples</h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://procs.r-sassy.org">procs</a></span><span class="op">)</span></span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://procs.r-sassy.org">procs</a></span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Turn off printing for CRAN checks</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">options</a></span><span class="op">(</span><span class="st">"procs.print"</span> <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># View sample data</span></span>
+<span><span class="va">sleep</span></span>
+<span><span class="co">#    extra group ID</span></span>
+<span><span class="co"># 1    0.7     1  1</span></span>
+<span><span class="co"># 2   -1.6     1  2</span></span>
+<span><span class="co"># 3   -0.2     1  3</span></span>
+<span><span class="co"># 4   -1.2     1  4</span></span>
+<span><span class="co"># 5   -0.1     1  5</span></span>
+<span><span class="co"># 6    3.4     1  6</span></span>
+<span><span class="co"># 7    3.7     1  7</span></span>
+<span><span class="co"># 8    0.8     1  8</span></span>
+<span><span class="co"># 9    0.0     1  9</span></span>
+<span><span class="co"># 10   2.0     1 10</span></span>
+<span><span class="co"># 11   1.9     2  1</span></span>
+<span><span class="co"># 12   0.8     2  2</span></span>
+<span><span class="co"># 13   1.1     2  3</span></span>
+<span><span class="co"># 14   0.1     2  4</span></span>
+<span><span class="co"># 15  -0.1     2  5</span></span>
+<span><span class="co"># 16   4.4     2  6</span></span>
+<span><span class="co"># 17   5.5     2  7</span></span>
+<span><span class="co"># 18   1.6     2  8</span></span>
+<span><span class="co"># 19   4.6     2  9</span></span>
+<span><span class="co"># 20   3.4     2 10</span></span>
+<span></span>
+<span></span>
+<span><span class="co"># Example 1: plots = TRUE</span></span>
+<span><span class="fu"><a href="proc_ttest.html">proc_ttest</a></span><span class="op">(</span><span class="va">sleep</span>,</span>
+<span>           var <span class="op">=</span> <span class="st">"extra"</span>,</span>
+<span>           class <span class="op">=</span> <span class="st">"group"</span>,</span>
+<span>           plots <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Example 2: plots = "all"</span></span>
+<span><span class="fu"><a href="proc_ttest.html">proc_ttest</a></span><span class="op">(</span><span class="va">sleep</span>,</span>
+<span>           var <span class="op">=</span> <span class="st">"extra"</span>,</span>
+<span>           class <span class="op">=</span> <span class="st">"group"</span>,</span>
+<span>           plots <span class="op">=</span> <span class="st">"all"</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Example 3: plots = {vector}</span></span>
+<span><span class="fu"><a href="proc_ttest.html">proc_ttest</a></span><span class="op">(</span><span class="va">sleep</span>,</span>
+<span>           var <span class="op">=</span> <span class="st">"extra"</span>,</span>
+<span>           class <span class="op">=</span> <span class="st">"group"</span>,</span>
+<span>           plots <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"histogram"</span>, <span class="st">"boxplot"</span>, <span class="st">"interval"</span><span class="op">)</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Example 4: plots = ttestplot()</span></span>
+<span><span class="fu"><a href="proc_ttest.html">proc_ttest</a></span><span class="op">(</span><span class="va">sleep</span>,</span>
+<span>           var <span class="op">=</span> <span class="st">"extra"</span>,</span>
+<span>           class <span class="op">=</span> <span class="st">"group"</span>,</span>
+<span>           plots <span class="op">=</span> <span class="fu">ttestplot</span><span class="op">(</span><span class="st">"summary"</span>, panel <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span><span class="op">)</span></span>
+<span></span></code></pre></div>
     </div>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">

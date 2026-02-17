@@ -370,6 +370,39 @@ res7
 # 6 Weight PROBT  2.754086e-06
 
 ```
+## Plots
+`proc_ttest()` can generate plots for all types of T-tests. The plots are 
+very easy to generate.  You can request plots in several ways:
 
+* **plots = TRUE**: A TRUE
+value will return a default set of plots for `proc_ttest()`.  The default
+plots change depending on what type of analysis you are performing.  All
+types of analysis include at least a summary distribution chart and a QQ plot.
+A paired analysis will also include a paired profiles chart and an agreemnt
+plot.
+* **plots = "all"**: The "all" keyword will return all available plots for 
+the requested analysis.
+* **plots = [vector of strings]**: Plots may be
+requested as a vector of plot names.  These names are normally quoted, but 
+may also be passed unquoted using the `v()` function. The available plot names are 
+"agreement", "boxplot", "histogram", "interval", "profiles", "qqplot", and "summary".
+* **plots = ttestplot([with parameters])**: The `ttestplot()` function 
+gives you the most control over the charts produced. This function takes
+parameters which allow you to specify which charts to show, and whether to show 
+them in a summary view or as separate charts. See the `ttestplot()` function
+for additional details.
+
+Here are the default plots for a paired T-test:
+```{r eval=FALSE, echo=TRUE} 
+# Request default plots
+proc_ttest(cls, paired = "Weight * Height",
+           plots = TRUE)
+
+```
+
+<img src="../man/images/ttest5a.png" alt="Proc reg plots 1"/>
+<img src="../man/images/ttest5b.png" alt="Proc reg plots 2"/>
+<img src="../man/images/ttest5c.png" alt="Proc reg plots 3"/>
+<img src="../man/images/ttest5d.png" alt="Proc reg plots 4"/>
 
 Next: [Regression Function](procs-reg.html)

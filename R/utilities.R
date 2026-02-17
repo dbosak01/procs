@@ -1093,6 +1093,97 @@ get_valid_obs <- function(data, formula) {
 
 }
 
+pretty_custom <- function(x, n = 7) {
+  # Handle edge case: empty or constant vector
+  if (length(x) == 0) return(numeric(0))
+  rng <- range(x, na.rm = TRUE)
+  if (rng[1] == rng[2]) return(rng[1])
+
+  # 1. Calculate the raw interval size
+  raw_range <- rng[2] - rng[1]
+  raw_step <- raw_range / (n - 1)
+
+  # 2. Normalize step to a value between 1 and 10 (base 10)
+  magnitude <- 10^floor(log10(raw_step))
+  normalized_step <- raw_step / magnitude
+
+  # 3. Choose the "nicest" snap point
+  # Common 'pretty' steps are 1, 2, 2.5, 5, and 10
+  nice_steps <- c(1, 2, 2.5, 5, 10)
+  actual_step <- nice_steps[which.min(abs(nice_steps - normalized_step))] * magnitude
+
+  # 4. Find the start and end points (aligned with the step size)
+  start <- floor(rng[1] / actual_step) * actual_step
+  end <- ceiling(rng[2] / actual_step) * actual_step
+
+  # 5. Generate the sequence
+  return(seq(from = start, to = end, by = actual_step))
+}
+
+pretty_centered <- function(x, n = 7) {
+  if (length(x) == 0) return(numeric(0))
+
+  rng <- range(x, na.rm = TRUE)
+  mu  <- mean(x, na.rm = TRUE)
+
+  # 1. Calculate the ideal step size to cover the range in ~n steps
+  raw_range <- diff(rng)
+  raw_step  <- raw_range / (n - 1)
+
+  # 2. Normalize step to "nice" intervals (1, 2, 2.5, 5, 10)
+  magnitude <- 10^floor(log10(raw_step))
+  normalized_step <- raw_step / magnitude
+  nice_steps <- c(1, 2, 2.5, 5, 10)
+  actual_step <- nice_steps[which.min(abs(nice_steps - normalized_step))] * magnitude
+
+  # 3. Center the 4th breakpoint at the "nice" value closest to the mean
+  # This ensures the middle of our sequence is a clean number near the mean
+  center_point <- round(mu / actual_step) * actual_step
+
+  # 4. Calculate how many steps we need to cover the data below and above the center
+  # We want roughly (n-1)/2 steps on each side
+  side_steps <- ceiling((n - 1) / 2)
+
+  # 5. Generate sequence centered on our nice mean-proxy
+  breaks <- seq(
+    from = center_point - (side_steps * actual_step),
+    to   = center_point + (side_steps * actual_step),
+    by   = actual_step
+  )
+
+  # 6. Optional: Expand if the range isn't fully covered due to centering
+  while(min(breaks) > rng[1]) breaks <- c(min(breaks) - actual_step, breaks)
+  while(max(breaks) < rng[2]) breaks <- c(breaks, max(breaks) + actual_step)
+
+  return(breaks)
+}
+
+
+
+pretty_sas <- function(x, n = 7) {
+
+  # x <- c(-.8, 78)
+
+  rng <- range(x, na.rm = TRUE)
+  mu  <- mean(x, na.rm = TRUE)
+  dif <-  diff(rng)
+  step <- dif / (n - 1)
+
+  magnitude <- 10^floor(log10(step))
+  base <- magnitude / 2
+  pstep <- base*ceiling(step/base)
+
+  bars <- ceiling(dif / pstep)
+
+  pbars <- seq(0, bars * pstep, pstep)
+
+  fbars <- pbars + rng[1]
+
+  ret <- base * floor(fbars/base)
+
+  return(ret)
+}
+
 
 
 # Text Functions ----------------------------------------------------------

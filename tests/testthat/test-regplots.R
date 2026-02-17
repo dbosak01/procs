@@ -385,6 +385,9 @@ test_that("regplot9: works for residualbypredicted", {
   expect_equal(length(res), 5)
   expect_equal("plot_spec" %in% class(res[[5]][[1]]), TRUE)
 
+
+
+
 })
 
 

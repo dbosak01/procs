@@ -3034,9 +3034,19 @@ draw_stats_box <- function(stats,
        adj = c(1, 0.5))
 }
 
-get_scale <- function(vct, pct = .1) {
+get_scale <- function(vct, pct = .1, h0 = NULL) {
 
   rng <- range(vct)
+
+  if (!is.null(h0)) {
+    if (h0 < rng[1]) {
+      rng[1] <- h0
+    }
+    if (h0 > rng[2]) {
+      rng[2] <- h0
+    }
+
+  }
 
   mn <- rng[1] * (1 - pct)
   mx <- rng[2] * (1 + pct)

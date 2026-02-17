@@ -469,6 +469,44 @@ the output datasets clearly:</p>
 <span><span class="co"># 4 Weight    DF  1.800000e+01</span></span>
 <span><span class="co"># 5 Weight     T  6.703988e+00</span></span>
 <span><span class="co"># 6 Weight PROBT  2.754086e-06</span></span></code></pre></div>
+</div>
+<div class="section level2">
+<h2 id="plots">Plots<a class="anchor" aria-label="anchor" href="#plots"></a>
+</h2>
+<p><code><a href="../reference/proc_ttest.html">proc_ttest()</a></code> can generate plots for all types of
+T-tests. The plots are very easy to generate. You can request plots in
+several ways:</p>
+<ul>
+<li>
+<strong>plots = TRUE</strong>: A TRUE value will return a default
+set of plots for <code><a href="../reference/proc_ttest.html">proc_ttest()</a></code>. The default plots change
+depending on what type of analysis you are performing. All types of
+analysis include at least a summary distribution chart and a QQ plot. A
+paired analysis will also include a paired profiles chart and an
+agreemnt plot.</li>
+<li>
+<strong>plots = “all”</strong>: The “all” keyword will return all
+available plots for the requested analysis.</li>
+<li>
+<strong>plots = [vector of strings]</strong>: Plots may be requested
+as a vector of plot names. These names are normally quoted, but may also
+be passed unquoted using the <code><a href="https://common.r-sassy.org/reference/v.html" class="external-link">v()</a></code> function. The available
+plot names are “agreement”, “boxplot”, “histogram”, “interval”,
+“profiles”, “qqplot”, and “summary”.</li>
+<li>
+<strong>plots = ttestplot([with parameters])</strong>: The
+<code><a href="../reference/ttestplot.html">ttestplot()</a></code> function gives you the most control over the
+charts produced. This function takes parameters which allow you to
+specify which charts to show, and whether to show them in a summary view
+or as separate charts. See the <code><a href="../reference/ttestplot.html">ttestplot()</a></code> function for
+additional details.</li>
+</ul>
+<p>Here are the default plots for a paired T-test:</p>
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Request default plots</span></span>
+<span><span class="fu"><a href="../reference/proc_ttest.html">proc_ttest</a></span><span class="op">(</span><span class="va">cls</span>, paired <span class="op">=</span> <span class="st">"Weight * Height"</span>,</span>
+<span>           plots <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
+<p><img src="../man/images/ttest5a.png" alt="Proc reg plots 1"><img src="../man/images/ttest5b.png" alt="Proc reg plots 2"><img src="../man/images/ttest5c.png" alt="Proc reg plots 3"><img src="../man/images/ttest5d.png" alt="Proc reg plots 4"></p>
 <p>Next: <a href="procs-reg.html">Regression Function</a></p>
 </div>
   </div>

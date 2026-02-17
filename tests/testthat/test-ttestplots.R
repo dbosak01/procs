@@ -28,7 +28,7 @@ Thomas   M  11   57.5   85.0   B
 William   M  15   66.5  112.0  B')
 
 paird <- read.table(header = TRUE, text = '
-subject_id before_measure after_measure region
+subject_id before after region
 1 12 15  A
 2 14 16  A
 3 10 11  A
@@ -75,7 +75,6 @@ test_that("ttestplot2: basic plot types.", {
   res <- proc_ttest(cls,
                     var = c("Height"),
                     options = c("h0" = 65, "alpha" = 0.05),
-                    titles = "My first Frequency Table",
                     output = report,
                     plots = ttestplot("histogram"))
 
@@ -89,7 +88,6 @@ test_that("ttestplot2: basic plot types.", {
   res <- proc_ttest(cls,
                     var = c("Weight"),
                     options = c("h0" = 65, "alpha" = 0.05),
-                    titles = "My first Frequency Table",
                     output = report,
                     plots = ttestplot("histogram"))
 
@@ -104,7 +102,6 @@ test_that("ttestplot2: basic plot types.", {
   res <- proc_ttest(cls,
                     var = c("Height"),
                     options = c("h0" = 65, "alpha" = 0.05),
-                    titles = "My first Frequency Table",
                     output = report,
                     plots = ttestplot("boxplot"))
 
@@ -116,7 +113,6 @@ test_that("ttestplot2: basic plot types.", {
   res <- proc_ttest(cls,
                     var = c("Height"),
                     options = c("h0" = 65, "alpha" = 0.05),
-                    titles = "My first Frequency Table",
                     output = report,
                     plots = ttestplot("interval"))
 
@@ -127,7 +123,6 @@ test_that("ttestplot2: basic plot types.", {
   res <- proc_ttest(cls,
                     var = c("Height"),
                     options = c("h0" = 65, "alpha" = 0.05),
-                    titles = "My first Frequency Table",
                     output = report,
                     plots = ttestplot("qqplot"))
 
@@ -146,7 +141,6 @@ test_that("ttestplot3: multiple plot types.", {
   res <- proc_ttest(cls,
                     var = c("Height"),
                     options = c("h0" = 65, "alpha" = 0.05),
-                    titles = "My first Frequency Table",
                     output = report,
                     plots = ttestplot(c("histogram", "boxplot", "interval", "qqplot")))
 
@@ -166,7 +160,6 @@ test_that("ttestplot4: summary plot type.", {
   res <- proc_ttest(cls,
                     var = c("Height"),
                     options = c("h0" = 65, "alpha" = 0.05),
-                    titles = "My first Frequency Table",
                     output = report,
                     plots = ttestplot("summary"))
 
@@ -182,7 +175,6 @@ test_that("ttestplot4: summary plot type.", {
   res <- proc_ttest(cls,
                     var = c("Height"),
                     options = c("h0" = 65, "alpha" = 0.1),
-                    titles = "My first Frequency Table",
                     output = report,
                     plots = ttestplot("summary"))
 
@@ -197,7 +189,6 @@ test_that("ttestplot4: summary plot type.", {
   res <- proc_ttest(cls,
                     var = c("Height"),
                     options = c("h0" = 65, "alpha" = 0.05),
-                    titles = "My first Frequency Table",
                     output = report,
                     plots = ttestplot("summary", panel = FALSE))
 
@@ -219,7 +210,6 @@ test_that("ttestplot5: summary plot type by groups.", {
   res <- proc_ttest(cls,
                     var = c("Height"),
                     options = c("h0" = 65, "alpha" = 0.05),
-                    titles = "My first Frequency Table",
                     output = report,
                     by = Sex,
                     plots = ttestplot("summary"))
@@ -241,7 +231,6 @@ test_that("ttestplot6: multiple variables.", {
   res <- proc_ttest(cls,
                     var = c("Height", "Weight"),
                     options = c("h0" = 65, "alpha" = 0.05),
-                    titles = "My first Frequency Table",
                     output = report,
                  #   by = Sex,
                     plots = ttestplot("summary"))
@@ -258,7 +247,6 @@ test_that("ttestplot6: multiple variables.", {
   res <- proc_ttest(cls,
                     var = c("Height", "Weight"),
                     options = c("h0" = 65, "alpha" = 0.05),
-                    titles = "My first Frequency Table",
                     output = report,
                     by = Sex,
                     plots = ttestplot("summary"))
@@ -282,7 +270,6 @@ test_that("ttestplot7: class analysis.", {
   res <- proc_ttest(cls,
                     var = c("Height"),
                     options = c("h0" = 65, "alpha" = 0.05),
-                    titles = "My first Frequency Table",
                     output = report,
                     class = Sex,
                     plots = ttestplot("boxplot"))
@@ -298,7 +285,6 @@ test_that("ttestplot7: class analysis.", {
   res <- proc_ttest(cls,
                     var = c("Height"),
                     options = c("h0" = 65, "alpha" = 0.1),
-                    titles = "My first Frequency Table",
                     output = report,
                     class = Sex,
                     plots = ttestplot("interval"))
@@ -314,7 +300,6 @@ test_that("ttestplot7: class analysis.", {
   res <- proc_ttest(cls,
                     var = c("Weight"),
                     options = c("h0" = 65, "alpha" = 0.05),
-                    titles = "My first Frequency Table",
                     output = report,
                     class = Sex,
                     plots = ttestplot("histogram"))
@@ -329,7 +314,6 @@ test_that("ttestplot7: class analysis.", {
   res <- proc_ttest(cls,
                     var = c("Weight"),
                     options = c("h0" = 65, "alpha" = 0.05),
-                    titles = "My first Frequency Table",
                     output = report,
                     class = Sex,
                     plots = ttestplot("histogram"))
@@ -344,7 +328,6 @@ test_that("ttestplot7: class analysis.", {
   res <- proc_ttest(cls,
                     var = c("Height"),
                     options = c("h0" = 65, "alpha" = 0.05),
-                    titles = "My first Frequency Table",
                     output = report,
                     class = Sex,
                     plots = ttestplot("qqplot"))
@@ -382,7 +365,6 @@ test_that("ttestplot8: boxplot outliers are working as expected.", {
   res <- proc_ttest(dt1,
                     var = c("Weight"),
                     options = c("h0" = 65, "alpha" = 0.1),
-                    titles = "My first Frequency Table",
                     output = report,
                     plots = ttestplot("boxplot"))
 
@@ -395,7 +377,6 @@ test_that("ttestplot8: boxplot outliers are working as expected.", {
   res <- proc_ttest(cls,
                     var = c("Weight"),
                     options = c("h0" = 65, "alpha" = 0.1),
-                    titles = "My first Frequency Table",
                     class = "Sex",
                     output = report,
                     plots = ttestplot("boxplot"))
@@ -411,12 +392,24 @@ test_that("ttestplot8: edge cases.", {
   res <- proc_ttest(cls,
                     var = c("Weight"),
                     options = c("h0" = 65, "alpha" = 0.1),
-                    titles = "My first Frequency Table",
                     output = report,
-                    plots = ttestplot("boxplot"))
+                    plots = ttestplot("boxplot", showh0 = TRUE))
 
   expect_equal(length(res), 4)
   expect_equal("plot_spec" %in% class(res[[4]][[1]]), TRUE)
+
+
+
+  # Summary2 scale off on this data - OK Now
+  res <- proc_ttest(sleep,
+                    var = extra,
+                    class = group,
+                    output = report,
+                    plots = ttestplot("summary"))
+
+  expect_equal(length(res), 5)
+  expect_equal("plot_spec" %in% class(res[[5]][[1]]), TRUE)
+
 
 
 })
@@ -571,7 +564,7 @@ test_that("ttestplot11: plots = 'all'", {
 
   # Paired
   res <- proc_ttest(cls,
-                    paired = "Weight * Height",
+                    paired = "Height * Weight",
                     output = report,
                     plots = "all")
 
@@ -582,4 +575,66 @@ test_that("ttestplot11: plots = 'all'", {
 
 })
 
+test_that("ttestplot12: Documentation examples", {
 
+  res <- proc_ttest(paird, paired = "before * after",
+                    output = report,
+                    plots = "all")
+
+  expect_equal(length(res), 4)
+  expect_equal("plot_spec" %in% class(res[[4]][[1]]), TRUE)
+  expect_equal(length(res[[4]]), 4)
+
+
+})
+
+# Also check that x scale adjusts if h0 is outsize confidence intervals
+test_that("ttestplot13: showh0 parameter", {
+
+  # Boxplot1
+  res <- proc_ttest(cls,
+                    var = c("Height"),
+                    options = c("h0" = 75, "alpha" = 0.05),
+                    output = report,
+                    plots = ttestplot("boxplot", showh0 = TRUE))
+
+  expect_equal(length(res), 4)
+  expect_equal("plot_spec" %in% class(res[[4]][[1]]), TRUE)
+
+
+  # Interval 1
+  res <- proc_ttest(cls,
+                    var = c("Height"),
+                    options = c("h0" = 63, "alpha" = 0.05),
+                    output = report,
+                    plots = ttestplot("interval", showh0 = TRUE))
+
+  expect_equal(length(res), 4)
+  expect_equal("plot_spec" %in% class(res[[4]][[1]]), TRUE)
+
+
+
+  # Summary 1
+  res <- proc_ttest(cls,
+                    var = c("Height"),
+                    options = c("h0" = 63, "alpha" = 0.05),
+                    output = report,
+                    plots = ttestplot("summary", showh0 = TRUE))
+
+  expect_equal(length(res), 4)
+  expect_equal("plot_spec" %in% class(res[[4]][[1]]), TRUE)
+
+
+
+  # Interval2
+  res <- proc_ttest(cls,
+                    var = c("Height"),
+                    options = c("h0" = 0, "alpha" = 0.05),
+                    class = "Sex",
+                    output = report,
+                    plots = ttestplot("interval", showh0 = TRUE))
+
+  expect_equal(length(res), 5)
+  expect_equal("plot_spec" %in% class(res[[5]][[1]]), TRUE)
+
+})
