@@ -579,7 +579,7 @@ test_that("ttestplot12: Documentation examples", {
 
   res <- proc_ttest(paird, paired = "before * after",
                     output = report,
-                    plots = "all")
+                    plots = TRUE)
 
   expect_equal(length(res), 4)
   expect_equal("plot_spec" %in% class(res[[4]][[1]]), TRUE)
