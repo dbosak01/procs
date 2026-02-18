@@ -28,66 +28,61 @@
 #' @title Request Regression Plots
 #' @description A function to request regression plots on a call to
 #' \code{\link{proc_reg}}. The function allows you to specify the type of
-#' regression plots to produce. It produces a combined diagnostics panel
-#' by default.  You may also specify individual plots to create by setting
-#' the "panel" parameter to FALSE, and passing a vector of plot names
+#' regression plots to produce. It produces a combined diagnostics panel,
+#' residuals dot plot, and a fit plot by default.  You may also specify
+#' individual plots to create by setting by passing a vector of plot names
 #' on the "type" parameter.
-#' @details Any requested
-#' plots will be displayed on interactive reports only.
-#' Plots are created as jpeg files, and stored in a temp directory.  Those
-#' temporary files are then referenced by the interactive report to display
-#' the graphic.
+#' @details There are many types of regression plots.  The plots have different
+#' uses.  Some of the plots help you assess normality of the data.  Other plots
+#' help you assess the quality of the model.  You can select the type of plots
+#' you want by passing a vector of plot names on the \code{type} parameter.
 #'
-#' If desired, you may
-#' output the report objects and pass to \code{\link{proc_print}}. To do this,
-#' set \code{output = report} on the call to \code{\link{proc_freq}}, and pass
-#' the entire list to \code{\link{proc_print}}.
-#' @section Plots:
-#' The \code{plots} parameter allows you to request several types of regression
-#' plots. Below are the types of plots that are supported.  The list shows
-#' the plot type keyword needed to request the plot, and a brief description:
+#' Here is a list of possible plot types and a short description of each:
 #' \itemize{
 #' \item{\strong{diagnostics}:  A fit diagnostics panel that contains 8 different
 #' types of plots and a table of statistics.
 #' }
-#' \item{\strong{residuals}: Produces a panel of residual plots against
-#'  each independent variable in the model.
+#' \item{\strong{cooksd}: Cook’s D statistic vs. Observation number.
+#' }
+#' \item{\strong{dfbetas}: Displays the influence of each observation
+#' for each coefficient in the model.
+#' }
+#' \item{\strong{dffits}: Displays the influence of each observation on fitted values.
 #' }
 #' \item{\strong{fitplot}:  Produces a scatter plot of the dependent variable
 #' against the regressor, including the fitted line and confidence/prediction bands.
 #' This is only available for models with a single regressor.
 #' }
+#' \item{\strong{observedbypredicted}: Dependent variable (Observed) vs. Predicted values.
+#' }
 #' \item{\strong{qqplot}: Normal Quantile-Quantile (Q-Q) plot of residuals.
 #' }
-#' \item{\strong{rfplot}: Residual-Fit (RF) spread plot.
+#' \item{\strong{residuals}: Produces a panel of residual plots against
+#'  each independent variable in the model.
+#' }
+#' \item{\strong{residualboxplot}: A box plot of residual values.
 #' }
 #' \item{\strong{residualbypredicted}: Residuals vs. Predicted values.
-#' }
-#' \item{\strong{rstudentbypredicted}: Externally Studentized Residuals (RStudent) vs. Predicted values.
-#' }
-#' \item{\strong{rstudentbyleverage}: Externally Studentized Residuals vs. Leverage.
-#' }
-#' \item{\strong{cooksd}: Cook’s D statistic vs. Observation number.
 #' }
 #' \item{\strong{residualhistogram}: Histogram of residuals,
 #' with a normal and kernel curve overlay.
 #' }
-#' \item{\strong{observedbypredicted}: Dependent variable (Observed) vs. Predicted values.
+#' \item{\strong{rfplot}: Residual-Fit (RF) spread plot.
 #' }
-#' \item{\strong{residualboxplot}: A boxplot of residuals.
+#' \item{\strong{rstudentbyleverage}: Externally Studentized Residuals vs. Leverage.
 #' }
-#' \item{\strong{dffits}: Displays the influence of each observation on fitted values.
-#' }
-#' \item{\strong{dfbetas}: Displays the influence of each observation on regression coefficients.
+#' \item{\strong{rstudentbypredicted}: Externally Studentized Residuals (RStudent) vs. Predicted values.
 #' }
 #' }
-#' The above plots may be requested in different ways: as a vector of keywords,
-#' or as a call to the \code{\link{regplot}} function.  The keyword approach will
-#' produce plots with default parameters. A call to \code{\link{regplot}} will
-#' give you control over some parameters to the charts.  See the \code{\link{regplot}}
-#' function for further details.
 #'
-#' @section Statistics:
+#' If possible, the statistics from the report tabular output are used for the plots.
+#' Otherwise, additional statistics functions are called to produce the
+#' needed statistics.
+#'
+#' @section Plot Statistics:
+#' The diagnostics panel and the fit plot each contain a small table of
+#' statistics.  This table is customizable.  The following keywords may be
+#' used to to customize the statistics table:
 #' \itemize{
 #' \item{\strong{adjrsq}: Adjusted R-square.
 #' }
@@ -112,34 +107,63 @@
 #' \item{\strong{sse}: Error sum of squares.
 #' }
 #' }
+#' To use these keywords, pass them as a vector to the \code{stats}
+#' parameter on the \code{regplot} function.
+#' @section Labeling Outliers:
+#' Some types of plots can be used to identify outliers in the data. For instance,
+#' the Cook's D chart is excellent for such a task.
+#' When identifying outliers, it is helpful to have them labelled on the chart.
+#' The labels make it possible to trace the outliers back to the source
+#' data.
 #'
+#' To get a basic row/observation label, set the \code{labels} parameter to TRUE.
+#' If there is a column in the data that can be used to identify an individual
+#' record, pass that column name on the \code{id} parameter.  The values
+#' from that column will then be used as outlier labels on those charts that
+#' support labels.
+#'
+#' @section Additional Information:
+#' Regression plots will be displayed on interactive reports only.
+#' Plots are created as jpeg files, and stored in a temp directory.  Those
+#' temporary files are then referenced by the interactive report to display
+#' the graphic.
+#'
+#' If desired, you may
+#' output the report objects and pass to \code{\link{proc_print}}. To do this,
+#' set \code{output = report} on the call to \code{\link{proc_reg}}, and pass
+#' the entire list to \code{\link{proc_print}}.
 #' @param type The type(s) of plot to create. Multiple types should be passed
-#' as a vector of strings.  Valid values are "diagnostics", "residualbypredicted",
-#' "rstudentbypredicted", "rstudentbyleverage", "qqplot", "observedbypredicted",
-#' "cooksd", "residualhistogram", "residualboxplot", "dffits", "dfbetas",
-#' "rfplot", "residuals", and "fitplot".  The default value is
+#' as a vector of strings.  Valid values are "diagnostics", "cooksd", "dfbetas",
+#' "dffits", "fitplot", "observedbypredicted", "qqplot", "residuals",
+#' "residualboxplot", "residualbypredicted", "residualhistogram", "rfplot",
+#' "rstudentbyleverage", and "rstudentbypredicted".  The default value is
 #' a vector with "diagnostics", "residuals", and "fitplot".  The "diagnostics"
 #' keyword produces a single combined chart with 8 different plots and a
 #' selection of statistics in a small table.  The statistics can be controlled
-#' by the \code{stats} parameter.
+#' by the \code{stats} parameter. You may also pass the "all" keyword to produce
+#' all charts available for the analysis.
 #' @param panel Whether or not to display the diagnostics plots combined into
 #' in a single panel.  Default is TRUE.  A value of FALSE will create
 #' individual plots instead.  This parameter is equivalent to the
 #' "unpack" keyword in SAS.
-#' @param stats The statistics to display on the diagnostics panel. Valid values
+#' @param stats The statistics to display on the diagnostics panel or fit plot.
+#' Valid values
 #' are: "adjrsq", "aic", "coeffvar", "depmean", "default", "edf", "mse", "nobs",
 #' "nparm", "rsquare", and "sse".  The
 #' default value is "default", which produces the following statistics:
 #' "nobs", "nparm", "edf", "mse", "rsquare", and "adjrsq". You may also pass
-#' the value "none" if you do not want any statistics shown on the chart.
-#' @param label Whether or not to label values automatically. Valid values
-#' are TRUE or FALSE.  Default is FALSE. If TRUE, this options will assign
-#' labels to outlier values on some charts. Only some individual charts are labelled,
-#' not the panel diagnostics chart.
+#' the value "none" if you do not want any statistics shown on the chart. In the
+#' case of the diagnostics panel, if the statistics table is removed, it
+#' will be replaced with a residual box plot.
+#' @param label Whether or not to label outlier values. Valid values
+#' are TRUE or FALSE.  Default is FALSE. If TRUE, this option will assign
+#' labels to outlier values on some charts. Charts that support labels are
+#' as follows: "diagnostics", "cooksd", "dffits", "dfbetas", "rstudentbypredicted",
+#' and "rstudentbyleverage".
 #' @param id If the \code{label} parameter is TRUE, this parameter determines
 #' which value is assigned to the label.  By default, the row number will
 #' be assigned.  You may also assign a column name from the input dataset
-#' to use as the label value.
+#' to this parameter to use as the label value.
 #' @examples
 #' library(procs)
 #'
@@ -151,23 +175,25 @@
 #' # Example 1: Regression statistics with default plots
 #' res <- proc_reg(iris, model = "Sepal.Length = Petal.Length",
 #'                  output = report,
-#'                  plots = regplot,
+#'                  plots = TRUE,
 #'                  titles = "Iris Regression Statistics")
 #'
 #' # View results
 #' res
 #'
-#' # Example 2: Regression statistics with custom plot strings and by variable
+#' # Example 2: Regression statistics with custom plot request and by variable
 #' res <- proc_reg(iris, model = "Sepal.Length = Petal.Length",
 #'                  output = report,
 #'                  by = Species,
-#'                  plots = v(diagnostics, residuals, residualhistogram, cooksd),
+#'                  plots = regplot(type = v(residualhistogram,
+#'                                  rstudentbypredicted, rstudentbyleverage),
+#'                                  label = TRUE),
 #'                  titles = "Iris Regression Statistics")
 #'
 #' # View results
 #' res
 #'
-#' # Example 3: Regression statistics with multiple models, same plot
+#' # Example 3: Regression statistics with multiple models, same plot string
 #' res <- proc_reg(iris, model = c("Sepal.Length = Petal.Length",
 #'                                 "Sepal.Length = Sepal.Width",
 #'                                 "Sepal.Length = Petal.Width"),
@@ -184,8 +210,8 @@
 #'                                 "Sepal.Length = Petal.Width"),
 #'                  output = report,
 #'                  plots = list("diagnostics",
-#'                               "cooksd",
-#'                               "residualhistogram"),
+#'                               "residualhistogram",
+#'                               "fitplot"),
 #'                  titles = "Iris Regression Statistics")
 #'
 #' # View results
@@ -200,8 +226,18 @@
 #'                               regplot(type = "cooksd",
 #'                                       label = TRUE),
 #'                               regplot(type = "fitplot",
-#'                                       label = TRUE,
 #'                                       stats = c("nobs", "mse", "rsquare"))),
+#'                  titles = "Iris Regression Statistics")
+#'
+#' # View results
+#' res
+#'
+#' # Example 6: Regression statistics with multiple models, influence charts
+#' res <- proc_reg(iris, model = c("Sepal.Length = Petal.Length",
+#'                                 "Sepal.Length = Petal.Length Petal.Width",
+#'                                 "Sepal.Length = Petal.Length Petal.Width Sepal.Width"),
+#'                  output = report,
+#'                  plots = regplot(v(cooksd, dffits, dfbetas), label = TRUE),
 #'                  titles = "Iris Regression Statistics")
 #'
 #' # View results
@@ -366,6 +402,7 @@ render_regplot <- function (dat, res, mdl, plt, alph) {
 # Diagnostics Panel -------------------------------------------------------
 
 # Deal with "none" stats parameter.  Adding extra box plot.
+#' @import grDevices
 #' @noRd
 render_diagnostics <- function(dat, res, mdl, plt, alph) {
 
@@ -2734,159 +2771,6 @@ render_dfbetas <- function(dat, res, mdl, plt) {
 
 }
 
-
-
-render_dfbetas_backup <- function(dat, res, mdl, plt) {
-
-  # Get current values
-  op <- par("mar")
-  om <- par("oma")
-
-  # Function can return multiple plots
-  ret <- list()
-
-  # Standard height and width
-  hti <- 4.5  # Height in inches
-  wdi <- 6  # Width in inches
-  bml <- 6  # bottom margin lines
-
-  # Convert inches to pixels
-  ht <- hti * 96
-  wd <- wdi * 96
-
-  # Get analysis variables
-  vrs <- get_vars(mdl)
-  dvr <- vrs$dvar
-  ivr <- vrs$ivar
-
-  # Prepare data
-  fit <- lm(mdl, data = dat)
-  dfb <- dfbetas(fit)     # matrix: n x p
-  n   <- nrow(dfb)
-  p   <- ncol(dfb)
-
-  param_names <- colnames(dfb)
-
-  chrts <- 1
-  rngs <- seq(1, p)
-  if (p == 1) {
-    mfrw <- c(1, 1)
-  } else if (p == 2) {
-    mfrw <- c(1, 2)
-  } else if (p > 2 & p < 5) {
-    mfrw <- c(2, 2)
-  } else if (p > 4 & p < 7) {
-    mfrw <- c(2, 3)
-  } else if (p > 6) {
-    chrts <- ceiling(p / 6)
-    mfrw <- c(2, 3)
-  }
-
-  # Split into a list of ranges per chart
-  if (chrts > 1) {
-    rngs <- split(rngs, ceiling(rngs/6))
-  } else {
-    rngs <- list(rngs)
-  }
-
-  ## PROC REG cutoff for DFBETAS
-  cutoff <- 2 / sqrt(n)
-
-  # Get yscale
-  yscl <- c(min(dfb, -cutoff), max(dfb, cutoff)) * 1.1
-
-  # Get xscale
-  xscl <- c(0 - .01, nrow(dat) * 1.05)
-
-  for (i in seq_len(chrts)) {
-
-    # Create temp file path
-    pth <- tempfile(fileext = ".jpg")
-
-    # Output to image file
-    jpeg(pth, width = wd, height = ht, quality = 100, units = "px")
-
-    # Set margins
-    par(mfrow = mfrw,
-        mar = c(2, 0, 2, .75) + 0.1,
-        oma = c(2, 5, 2, 0) + .1)
-
-    for (j in rngs[[i]]) {
-
-      # Get data for this chart
-      vals <- dfb[, j]
-
-      plot(seq_len(n), vals,
-           type = "n",
-           xlim = xscl,
-           ylim = yscl,
-           axes = FALSE)
-
-      # Determine grid position
-      grdPos <- par("mfg")
-
-      # X axis
-      xtcks <- axis(side = 1, col.ticks = "grey55", mgp = c(3, .5, 0), tck = -0.015)
-
-      # Y axis
-      if (grdPos[2] == 1) {
-        ytcks <- axis(side = 2, las = 1, col.ticks = "grey55", mgp = c(3, .5, 0), tck = -0.015)
-      }
-
-      # Grid lines
-      abline(h = ytcks, col = "grey90", lwd = 1)
-      abline(v =  xtcks, col = "grey90", lwd = 1)
-
-      par(new = TRUE)
-
-      plot(seq_len(n), vals,
-           type = "h",
-           font.main = 1,
-           lwd  = 1,
-           col  = "#05379B",
-           xlab = "",
-           ylab = "",
-           main = param_names[j],
-           xlim = xscl,
-           ylim = yscl, # range(c(vals, -cutoff, cutoff)) * 1.1,
-           axes = FALSE)
-
-      par(new = FALSE)
-
-      ## Reference lines (PROC REG)
-      abline(h = 0, col = "#05379B", lwd = 1)
-      abline(h =  cutoff, col = "grey60", lwd = 1)
-      abline(h = -cutoff, col = "grey60", lwd = 1)
-
-      box(col = "grey70", lwd = 1)
-    }
-
-    ## Overall title
-    # Set title
-    mtext(paste0("Influence Diagnostics for ", dvr), side = 3, cex = 1.2,
-          outer = TRUE, font = 2, line = par("oma")[3] - 2.25)
-
-    # Labels
-    mtext("Observation", side = 1, outer = TRUE, line = par("oma")[1] - 2)
-    mtext("DFBETAS", side = 2, outer = TRUE, line = par("oma")[2] - 2)
-
-    # Frame
-    box("outer", col = "grey70", lwd = 1)
-
-    # Restore margins
-    par(mar = op, oma = om, mfrow = c(1, 1))
-
-    # Close device context
-    dev.off()
-
-    # Put plot in reporter plot object
-    ret[[length(ret) + 1]] <- create_plot(pth, height = hti, width = wdi)
-
-  }
-
-
-  return(ret)
-}
 
 
 # Utilities ---------------------------------------------------------------

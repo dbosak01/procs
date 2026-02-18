@@ -24,8 +24,49 @@
 #' frequency plot to produce, and various layout options. It supports
 #' bar charts and dot plots for one and two-way analysis.  It also supports
 #' vertical or horizontal orientation, by variables, and various scale options.
-#' @details Any requested
-#' plots will be displayed on interactive reports only.
+#' @details
+#' The \code{freqplot} function can be passed to the \code{plots} parameter
+#' on \code{\link{proc_freq}} to give you some control over what kind
+#' of frequency plot is produced.  Generally, one call to \code{freqplot} produces
+#' one frequency plot.  The exception is on two-way interactions, and there
+#' are more interactions that can fit on a single panel.  In this case,
+#' the function will produce multiple panels so that frequencies for all
+#' interactions are displayed. The number of plots on a panel can be controlled
+#' using the \code{npanelpos} parameter.
+#'
+#' The default plot is a simple bar chart showing frequency counts for each
+#' category. The X axis will show the categories, and the Y axis will show
+#' the frequency counts.  You may change the orientation of the chart using
+#' the \code{orient} parameter.  You may also change the Y scale using the
+#' \code{scale} parameter. Options include a percentage, logarithmic, or
+#' square root scale.
+#'
+#' There are many more options for two-way interactions.  For two-way
+#' interactions, you may choose to display the data as bar charts,
+#' dot plots, stacked bar charts, or clustered bar charts. To create stacked
+#' or clustered bar charts, set the \code{type} parameter to "barchart", and
+#' then specify the desired layout with the \code{twoway} parameter.
+#'
+#' The "grouphorizontal" and "groupvertical" options on the \code{twoway}
+#' parameter apply to both bar charts and dot plots. These keywords control
+#' whether you want the frequency groups displayed horizontally across
+#' the panel, or vertically from top to bottom.  The default is to display
+#' groups vertically.
+#'
+#' The layout for two-way charts can be further manipulated with the \code{groupby}
+#' parameter.  Normally for two-way charts the first variable is the X axis
+#' "columns" and the second variable is the grouping variable "rows".
+#' Passing a value of "rows" to
+#' the \code{groupby} parameter essentially flips this orientation, so that
+#' the first variable becomes the rows and the second variable becomes
+#' the columns.  Note that these types of charts can be manipulated further with
+#' the \code{orient} parameter.
+#'
+#' By combining the above options, you can produce many styles of frequency
+#' plots.
+#'
+#' Any requested
+#' plots will be displayed on the interactive report only.
 #' Plots are created as jpeg files, and stored in a temp directory.  Those
 #' temporary files are then referenced by the interactive report to display
 #' the graphic.
@@ -33,9 +74,9 @@
 #' If desired, you may
 #' output the report objects and pass to \code{\link{proc_print}}. To do this,
 #' set \code{output = report} on the call to \code{\link{proc_freq}}, and pass
-#' the entire list to \code{\link{proc_print}}.
-#' @param type The type of plot to create. Valid values are "barchart" or
-#' "dotplot".  Default is "barchart".
+#' the resulting list to \code{\link{proc_print}}.
+#' @param type A string indicating the type of plot to create.
+#' Valid values are "barchart" or "dotplot".  Default is "barchart".
 #' @param orient The orientation of the plot.  Valid values are "vertical"
 #' or "horizontal".  Default is "vertical".
 #' @param scale The scale to use for the plot. Valid values are "freq",
@@ -43,14 +84,16 @@
 #' the value "grouppercent" is also valid.
 #' @param twoway Options for two-way layouts. Valid values are
 #' "cluster", "grouphorizontal", "groupvertical", or "stacked". Default
-#' is "groupvertical".  This parameter applies to two-way tables only.
+#' is "groupvertical".
 #' @param groupby The variable configuration for two-way charts.
-#' Valid values are "column" or "row". Default is "column". The "row" option
+#' Valid values are "column" or "row". Default is "column", which means
+#' the first variable in the interaction will be used for the "column" variable,
+#' and the second variable for the "rows" on the panel. The "row" option
 #' effectively reverses the variable configuration.
 #' @param npanelpos The number of charts per panel. Default is 4. This
 #' parameter applies to two-way tables only.
 #' @returns The frequency plot object.  This object is then passed to
-#' \code{\link{proc_freq}} for evaluation and rendering. Data from the
+#' \code{\link{proc_freq}} for evaluation and rendering. Data for the
 #' frequency plot comes directly from the \code{\link{proc_freq}} reporting
 #' data frame.
 #' @examples
@@ -63,27 +106,37 @@
 #' # Prepare sample data
 #' dt <- as.data.frame(HairEyeColor, stringsAsFactors = FALSE)
 #'
-#' # Example 1: Frequency statistics with default plots
+#' # Example 1: Single plot request for all tables
 #' res <- proc_freq(dt, tables = v(Hair, Eye, Hair * Eye),
 #'                  weight = Freq,
-#'                  output = report,
-#'                  plots = freqplot,
+#'                  plots = freqplot(type = "dotplot"),
 #'                  titles = "Hair and Eye Frequency Statistics")
 #'
 #' # View results
 #' res
 #'
-#' # Example 2: Frequency statistics with custom plots
+#' # Example 2: Separate plots request for each table
 #' res <- proc_freq(dt, tables = v(Hair, Eye, Hair * Eye),
 #'                  weight = Freq,
-#'                  output = report,
 #'                  plots = list(freqplot(type = "barchart",
 #'                                        orient = "horizontal"),
 #'                               freqplot(type = "dotplot",
 #'                                        scale = "percent"),
 #'                               freqplot(type = "barchart",
-#'                                        twoway = "cluster"),
-#'                  titles = "Hair and Eye Frequency Statistics"))
+#'                                        twoway = "cluster")),
+#'                  titles = "Hair and Eye Frequency Statistics")
+#'
+#' # View results
+#' res
+#'
+#' # Example 3: Display options for group orientation
+#' res <- proc_freq(dt, tables = v(Hair * Eye, Eye * Hair),
+#'                  weight = Freq,
+#'                  plots = list(freqplot(type = "dotplot",
+#'                                        twoway = "grouphorizontal"),
+#'                               freqplot(type = "dotplot",
+#'                                        twoway = "groupvertical")),
+#'                  titles = "Hair and Eye Frequency Statistics")
 #'
 #' # View results
 #' res
@@ -186,7 +239,7 @@ render_freqplot <- function (dat, tbl1, tbl2 = NULL, plt) {
 }
 
 
-
+#' @noRd
 render_freqplot.1way <- function(dat, tbl, plt) {
 
   op <- par("mar")
@@ -502,6 +555,7 @@ render_freqplot.1way <- function(dat, tbl, plt) {
 
 }
 
+#' @noRd
 render_freqplot.2way <- function(dat, tbl1, tbl2, plt) {
 
   if (plt$twoway %in% c("cluster", "stacked")) {
@@ -1094,239 +1148,7 @@ render_freqplot.group <- function(dat, tbl1, tbl2, plt) {
 
 }
 
-
-#' @title Render the Frequency Plot - One Way plot
-#' @description A function to render the frequency plot.
-#' @param plt The object to render
-#' @param dat The data to render
-#' @param table The table request to render.
-#' @returns The path to the plot.
-#' @import graphics
-#' @import grDevices
-#' @import reporter
 #' @noRd
-# render_freqplot.cluster <- function(dat, tbl1, tbl2, plt) {
-#
-#   # Create temp file path
-#   pth <- tempfile(fileext = ".jpg")
-#
-#   # Standard height and width
-#   hti <- 4.5  # Height in inches
-#   wdi <- 6  # Width in inches
-#   bml <- 6  # bottom margin lines
-#
-#   # Convert inches to pixels
-#   ht <- hti * 96
-#   wd <- wdi * 96
-#
-#   # Set bar background color
-#   bgcolor <- "#E5EAF2"
-#   bgcolor <- c("royalblue3", "indianred2", "seagreen3")
-#
-#   # Set orientation
-#   horz <- FALSE  # Default to vertical
-#   if (plt$orient == "horizontal") {
-#     horz <- TRUE
-#   }
-#
-#   # Create Title
-#   ttl <- paste0("Distribution of ", tbl1, " by ", tbl2)
-#
-#   # Output to image file
-#   # All output types accept jpeg
-#   # So start with that
-#   jpeg(pth, width = wd, height = ht, quality = 100)
-#
-#   # Assign Cat variables
-#   # to get orientation correct.
-#   # SAS is inconsistent.
-#   if (plt$type == "dotplot") {
-#     if (plt$orient == "vertical") {
-#       var1 <- "CAT2"
-#       var2 <- "CAT1"
-#     } else {
-#       var1 <- "CAT2"
-#       var2 <- "CAT1"
-#     }
-#   } else {
-#     if (plt$orient == "vertical") {
-#       var1 <- "CAT1"
-#       var2 <- "CAT2"
-#     } else {
-#       var1 <- "CAT1"
-#       var2 <- "CAT2"
-#     }
-#   }
-#
-#   # Get distinct values
-#   v1 <- unique(dat[[var1]])
-#   v2 <- unique(dat[[var2]])
-#   dtm <- NULL
-#   dtna <- NULL
-#   mx <- 0
-#
-#   # Create matrix
-#   # v1 in rows and v2 in columns
-#   for (vl in v2) {
-#
-#     dt <- dat[dat[[var2]] == vl, ]
-#
-#     # Prepare data
-#     if (plt$scale == "percent") {
-#
-#       cnt <- as.numeric(dt$PCT)
-#       slbl <- "Percent"
-#
-#     } else if (plt$scale == "log") {
-#
-#       cnt <- as.numeric(log10(dt$CNT))
-#       slbl <- "Log Frequency"
-#
-#     } else if (plt$scale == "sqrt") {
-#
-#       cnt <- as.numeric(sqrt(dt$CNT))
-#       slbl <- "Sqrt Frequency"
-#
-#     } else {  # Default to Frequency
-#
-#       cnt <- as.numeric(dt$CNT)
-#       slbl <- "Frequency"
-#
-#     }
-#
-#     nas <- rep(NA, length(cnt))
-#     mx <- max(c(mx, cnt))
-#
-#     if (is.null(dtm)) {
-#       dtm <- data.frame(cnt)
-#       dtna <- data.frame(nas)
-#     } else {
-#       dtm <- cbind(dtm, cnt)
-#       dtna <- cbind(dtna, nas)
-#     }
-#   }
-#
-#   # Assign names
-#   names(dtm) <- NULL
-#   rownames(dtm) <- v1
-#
-#   # NA data names
-#   names(dtna) <- NULL
-#   rownames(dtna) <- v1
-#
-#   # Convert to matrix
-#   dtm <- as.matrix(dtm)
-#   dtna <- as.matrix(dtna)
-#
-#   # Assign labels
-#   if (plt$orient == "vertical") {
-#     blbl <- tbl2
-#     llbl <- slbl
-#   } else {
-#     blbl <- slbl
-#     llbl <- tbl2
-#   }
-#
-#   # Get scale
-#   scl <- c(0, mx * 1.05)
-#
-#   # Get original margins
-#   omar <- par()$mar
-#
-#   if (plt$type == "dotplot") {
-#     stop("Two-way cluster option is not available for dot type frequency plots.")
-#   } else {  # Bar chart
-#
-#     if (horz == TRUE) {  # Horizontal
-#
-#       # Set custom margins
-#       op <- par(mar = c(5, 6, 4, 2) + 0.1)
-#
-#       # Create empty plot
-#       b1 <- barplot(
-#         dtna,  # Empty data
-#         beside = TRUE,
-#         main = ttl,  # Title
-#         xlab = blbl,  # Lable x axis
-#         #  ylab = tbl,  # Label y axis
-#         xlim = scl,  # x axis scale
-#         horiz = TRUE,
-#         axes = FALSE  # Don't create axis yet
-#       )
-#
-#
-#       mtext(llbl, side = 2, line = op$mar[1] - 1)
-#
-#       # Get tick marks for ablines
-#       a1 <- axis(1, las = 1, col.ticks = "grey55")  # Create axis
-#       # a2 <- axis(2, las = 1, col.ticks = "grey55")  # Create axis
-#
-#       ## Add gridlines based on axis created above
-#       abline(v = a1, col = "grey90", lwd = 1)
-#
-#     } else {  # Vertical
-#
-#       # Set custom margins
-#       op <- par(mar = c(5, 5, 4, 2) + 0.1)
-#
-#       # Create empty plot.
-#       # xlim created automatically
-#       # and passed to next barplot
-#       b1 <- barplot(
-#         dtna,  # Empty data
-#         beside = TRUE,
-#         main = ttl,  # Title
-#         xlab = blbl,  # Lable x axis
-#         ylab = llbl,  # Label y axis
-#         ylim = scl,  # y axis scale
-#         horiz = FALSE,
-#         axes = FALSE  # Don't create axis yet
-#       )
-#
-#       # Get tick marks for ablines
-#       # a1 <- axis(1, las = 1, col.ticks = "grey55")  # Create axis
-#       a2 <- axis(2, las = 1, col.ticks = "grey55")  # Create axis
-#
-#       ## Add gridlines based on axis created above
-#       abline(h = a2, col = "grey90", lwd = 1)
-#     }
-#
-#
-#     # Add barplot
-#     b2 <- barplot(
-#       dtm,   # Data
-#       beside = TRUE,
-#       horiz = horz,
-#       names.arg = v2,
-#       col  = bgcolor,
-#       border = "grey55",
-#       las = 1,
-#       tick = TRUE,
-#       add = TRUE,   # Add to existing plot
-#       axes = FALSE  # Already created above
-#     )
-#
-#   }
-#
-#
-#   ## frame
-#   box(col = "grey70", lwd = 1)
-#   box("figure", col = "grey70", lwd = 1)
-#
-#   # Restore margins
-#   par(mar = omar)
-#
-#   # Close device context
-#   dev.off()
-#
-#   # Put plot in reporter plot object
-#   ret <- create_plot(pth, height = hti, width = wdi)
-#
-#   return(ret)
-#
-# }
-
-
 render_freqplot.nongroup <- function(dat, tbl1, tbl2, plt) {
 
   # Create temp file path
@@ -1721,367 +1543,8 @@ render_freqplot.nongroup <- function(dat, tbl1, tbl2, plt) {
 }
 
 
-#
-#
-# render_scatterplot <- function() {
-#
-#
-#
-#   cols <- ifelse(Sex == "M", "royalblue3", "indianred2")
-#
-#
-#
-#   hti <- 6  # Height in inches
-#   wdi <- 7  # Width in inches
-#   bml <- 6  # bottom margin lines
-#
-#   # Convert inches to pixels
-#   ht <- hti * 96
-#   wd <- wdi * 96
-#
-#   # Save old margins
-#   oldmar <- par()$mar
-#
-#   # Set up jpeg output
-#   jpeg(width = wd, height = ht, quality = 100, antialias = "cleartype")
-#
-#   # Set margins
-#   par(mar = c(bml, 5, 4, 2) + 0.1)
-#
-#   # Create plot
-#   plot(Height, Weight,
-#        xlab = "Height",
-#        ylab = "Weight",
-#        pch  = 1,        # open circles
-#        las = 1,  # Horizontal label orientation
-#        #lab = c(7, 5, 7),  # Number of tick marks
-#        col  = cols,  # Grouping is here
-#   )
-#
-#   # Calculate inset y value
-#   line_height_fraction <- (par("mai")[1] / par("pin")[2])
-#   ins <- - (line_height_fraction * 0.9)
-#
-#   # Draw legend
-#   legend("bottom",  # Starting location is bottom of plot area
-#          legend = c("Sex", "M", "F"), # Variable name and value labels
-#          col    = c("black", "royalblue3", "indianred2"),
-#          pch    = c(NA, 1, 1),  # Don't show any symbol for variable name
-#          x.intersp = c(0, 1, 1),  # Spacing between group label and box
-#          y.intersp = 0,  # Spacing between content and borders
-#          horiz  = TRUE,
-#          bty    = "o",  # Single line border around legend
-#          inset  = c(0, ins),  # Offset from bottom of plot area
-#          box.col = "grey", # Grey border to match SAS
-#          xpd    = TRUE   # Allow legend to leave plot area and appear in margin
-#   )
-#
-#   # Restore margins
-#   par(mar = oldmar)
-#
-#   # Turn off device context
-#   dev.off()
-#
-#
-#
-#
-#
-# }
 
 
 
 
 
-#' @importFrom stats aggregate
-#' @import graphics
-#' @noRd
-# render_bar <- function(dat, cmd, plt, interactive = FALSE) {
-#
-#
-#   # Get variables
-#   xvar <- cmd$var
-#   yvar <- cmd$response
-#
-#   # Get stat
-#   st <- cmd$stat
-#
-#   # Get titles
-#   ttls <- plt$titles
-#
-#   # Create counter variable
-#   dat$cnt. <- 1
-#
-#   # Get grouping variables
-#   grps <- cmd$group
-#
-#   # Get group values
-#   grpvals <- NULL
-#   if (!is.null(grps)) {
-#
-#     grpvals <- unique(dat[[grps]])
-#   }
-#
-#   # Colors - for now
-#   if (length(grps) == 0) {
-#     cols <- "grey90"
-#   } else {
-#     cols <- c("#7B8CC3",   # blue-ish
-#               "#DC6E6C",   # red-ish
-#               "#5FB7A8",   # teal
-#               "#B08D52"    # brown/gold
-#     )
-#
-#     cols <- cols[seq(1, length(grpvals))]
-#   }
-#
-#   # Clustered display
-#   bsd <- FALSE
-#   if (!is.null(cmd$groupdisplay)) {
-#     if (tolower(cmd$groupdisplay) == "cluster") {
-#       bsd <- TRUE
-#     }
-#   }
-#
-#   # No response, use the count variable, no statistic
-#   if (is.null(yvar)) {
-#     yvar <- "cnt."
-#   }
-#
-#   if (is.null(st)) {
-#     st <- "sum"
-#   }
-#
-#   byvars <- list(dat[[xvar]])
-#   grpvars <- NULL
-#   if (!is.null(grps)) {
-#     for (grp in grps) {
-#       byvars[[length(byvars) + 1]] <- dat[[grp]]
-#       grpvars[[length(grpvars) + 1]] <- paste0("GRP", length(grpvars) + 1)
-#     }
-#     mrg <- par()$mar
-#     mrg[1] <- mrg[1] + 1
-#     par(mar = mrg)
-#   }
-#
-#   # Sum by variables
-#   sdat <- aggregate(dat[[yvar]], by = byvars, FUN = st)
-#   names(sdat) <- c("CAT", grpvars, "FREQ")
-#
-#   # print("sdat")
-#   # print(sdat)
-#
-#   # Get x names
-#   xnms <- unique(sdat$CAT)
-#
-#   if (is.null(grps)) {
-#     ynms <- ""
-#     mdat <- sdat$FREQ
-#   } else {
-#
-#     # Get y names
-#     ynms <- unique(sdat$GRP1)
-#
-#     # Create matrix
-#     mdat <- sdat$FREQ
-#     dim(mdat) <- c(length(xnms), length(ynms))
-#     dimnames(mdat) <- list(xnms, ynms)
-#
-#     # transpose
-#     mdat <- t(mdat)
-#   }
-#
-#   # Create scale
-#   # yl <- c(0, max(sdat$FREQ))
-#
-#   # print("mdat")
-#   # print(mdat)
-#   # print("xnms")
-#   # print(xnms)
-#   # print("xvar")
-#   # print(xvar)
-#
-#   lgnd <- FALSE
-#   if (!is.null(grps)) {
-#     lgnd <- TRUE
-#   }
-#
-#   # If no output file and not interactive, don't run.
-#   # Will be necessary to pass CRAN checks.
-#   if ((interactive & interactive()) |
-#       !interactive) {
-#
-#     # Bar chart
-#     barplot(mdat,
-#             names.arg = xnms,
-#             main = ttls,
-#             beside = bsd,
-#             xlab = xvar,
-#             ylab = "Frequency",
-#             #  ylim = yl,
-#             col = cols,
-#             border = "grey20",
-#             legend.text = lgnd
-#     )
-#
-#     # This will take some work
-#     # Comment out for now
-#     # Problem is getting it placed in the bottom margin
-#     # R doesn't do it that way by default
-#     # Will have to custom program it
-#     # if (!is.null(grps)) {
-#     #
-#     #   legend(
-#     #   )
-#   }
-#
-#   # }
-#
-# }
-
-
-# Cumfreqplot -------------------------------------------------------------
-
-
-
-# @import ggplot2
-# @noRd
-# gen_summarypanel <- function(dta, var1, var2 = NULL, confidence = NULL) {
-#
-#   lblX <- var1
-#   lblY <- "Percent"
-#   ttl <- 'Distribution of ' %p% var1
-#   subttl <- NULL
-#   # if (!is.null(confidence))
-#   #   subttl <- "With " %p% confidence %p% "% Confidence Interval for Mean"
-#   v1 <- dta[[var1]]
-#
-#   brks <- get_breaks(v1)
-#   bins <- length(brks) - 1
-#
-#
-#   ret <- ggplot(dta, aes(x=.data[[var1]])) +
-#     geom_histogram(aes(y = after_stat(count)/sum(after_stat(count)) * 100),
-#                    breaks= brks,
-#                    colour="black", fill="#CAD5E5") +
-#     theme(plot.title = element_text(size = 10, face="bold", lineheight = .2, hjust = .5),
-#           plot.subtitle = element_text(size = 8, hjust = .5, lineheight = .2),
-#           axis.title.x = element_text(size = 8),
-#           axis.title.y = element_text(size = 8),
-#           axis.text.x = element_text(size = 8),
-#           axis.text.y = element_text(size = 8)) +
-#     labs(title = ttl, x = lblX, y = lblY, subtitle = subttl) +
-#     stat_function(fun = function(x) dnorm(x, mean = mean(v1), sd = sd(v1)) * 100 * bins,
-#                   color = "#6383C0", linewidth = .75)
-#
-#
-#
-#
-#   return(ret)
-#
-#
-# }
-
-get_breaks <- function(var1) {
-
-
-  bins <- round(diff(range(var1)) / (2 * IQR(var1) / length(var1)^(1/3)))
-
-  mn <- floor(min(var1))
-  mx <- ceiling(max(var1))
-  me <- mean(var1)
-
-
-  #ret <- quantile(c(mn, mx), breaks=1/bins*seq(1, bins))
-
-  if (length(unique(var1)) < 10) {
-
-    ret <- sort(unique(var1))
-
-  } else {
-
-    ret <- ((mx - mn)/bins)*seq(1, bins)
-
-    ret <- mn + ret
-
-    diff <- ret[2] - ret[1]
-
-    if (diff + ret[length(ret)] > mx)
-      ret <- c(mn, ret)
-    else
-      ret <- c(mn, ret, diff + ret[length(ret)])
-
-
-    if (diff >= 5)
-      ret <- unique(round(ret / 5) * 5)
-    else
-      ret <- unique(round(ret))
-
-  }
-
-  print(ret)
-
-  return(ret)
-}
-
-
-# @import ggplot2
-gen_qqplot <- function(var1, var2 = NULL) {
-
-  # lblX <- names(var1)
-  # lblY <- "Percent"
-  # bins <- 5
-  # brks <- c(50, 55, 60, 65, 70, 75)
-  #
-  #
-  # ret <- ggplot(var1, aes(x=lblX)) +
-  #   geom_histogram(aes(y = (..count..)/sum(..count..) * 100), breaks= brks, colour="black", fill="#CAD5E5") +
-  #   stat_function(fun = function(x) dnorm(x, mean = mean(var1), sd = sd(var1)) * 100 * bins, color = "#6383C0", size = .75)
-  #
-  #
-  # return(ret)
-}
-
-
-#
-#
-# set.seed(1234)
-# dat <- data.frame(cond = factor(rep(c("A","B"), each=200)),
-#                   rating = c(rnorm(200),rnorm(200, mean=.8)))
-# # View first few rows
-# head(dat)
-# #>   cond     rating
-# #> 1    A -1.2070657
-# #> 2    A  0.2774292
-# #> 3    A  1.0844412
-# #> 4    A -2.3456977
-# #> 5    A  0.4291247
-# #> 6    A  0.5060559
-#
-# library(ggplot2)
-#
-#
-#
-# ## Basic histogram from the vector "rating". Each bin is .5 wide.
-# ## These both result in the same output:
-# ggplot(dat, aes(x=rating)) + geom_histogram(binwidth=.5)
-# # qplot(dat$rating, binwidth=1)
-#
-# # Draw with black outline, white fill
-
-
-
-
-
-
- # geom_density(adjust = 1.1) +
-#
-# # Density curve
-# ggplot(cls, aes(x=Height)) + geom_density(adjust = 1.3)
-#
-# # Histogram overlaid with kernel density curve
-# ggplot(dat, aes(x=rating)) +
-#   geom_histogram(aes(y=..density..),      # Histogram with density instead of count on y-axis
-#                  binwidth=.5,
-#                  colour="black", fill="white") +
-#   geom_density(alpha=.2, fill="#FF6666")  # Overlay with transparent density plot
-#

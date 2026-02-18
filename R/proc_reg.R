@@ -178,47 +178,47 @@
 #'
 #' @section Plots:
 #' The \code{plots} parameter allows you to request several types of regression
-#' plots. Below are the types of plots that are supported.  The list shows
+#' plot. Below are the types of plots that are supported.  The list shows
 #' the plot type keyword needed to request the plot, and a brief description:
 #' \itemize{
 #' \item{\strong{diagnostics}:  A fit diagnostics panel that contains 8 different
 #' types of plots and a table of statistics.
 #' }
-#' \item{\strong{residuals}: Produces a panel of residual plots against
-#'  each independent variable in the model.
+#' \item{\strong{cooksd}: Cook’s D statistic vs. Observation number.
+#' }
+#' \item{\strong{dfbetas}: Displays the influence of each observation
+#' for each coefficient in the model.
+#' }
+#' \item{\strong{dffits}: Displays the influence of each observation on fitted values.
 #' }
 #' \item{\strong{fitplot}:  Produces a scatter plot of the dependent variable
 #' against the regressor, including the fitted line and confidence/prediction bands.
 #' This is only available for models with a single regressor.
 #' }
+#' \item{\strong{observedbypredicted}: Dependent variable (Observed) vs. Predicted values.
+#' }
 #' \item{\strong{qqplot}: Normal Quantile-Quantile (Q-Q) plot of residuals.
 #' }
-#' \item{\strong{rfplot}: Residual-Fit (RF) spread plot.
+#' \item{\strong{residuals}: Produces a panel of residual plots against
+#'  each independent variable in the model.
 #' }
 #' \item{\strong{residualbypredicted}: Residuals vs. Predicted values.
-#' }
-#' \item{\strong{rstudentbypredicted}: Externally Studentized Residuals (RStudent) vs. Predicted values.
-#' }
-#' \item{\strong{rstudentbyleverage}: Externally Studentized Residuals vs. Leverage.
-#' }
-#' \item{\strong{cooksd}: Cook’s D statistic vs. Observation number.
 #' }
 #' \item{\strong{residualhistogram}: Histogram of residuals,
 #' with a normal and kernel curve overlay.
 #' }
-#' \item{\strong{observedbypredicted}: Dependent variable (Observed) vs. Predicted values.
+#' \item{\strong{rfplot}: Residual-Fit (RF) spread plot.
 #' }
-#' \item{\strong{dffits}: Displays the influence of each observation on fitted values.
+#' \item{\strong{rstudentbyleverage}: Externally Studentized Residuals vs. Leverage.
 #' }
-#' \item{\strong{dfbetas}: Displays the influence of each observation
-#' for each coefficient in the model.
+#' \item{\strong{rstudentbypredicted}: Externally Studentized Residuals (RStudent) vs. Predicted values.
 #' }
 #' }
 #' The above plots may be requested in different ways: as a vector of keywords,
 #' or as a call to the \code{\link{regplot}} function.  The keyword approach will
-#' produce plots with default parameters. A call to \code{\link{regplot}} will
-#' give you control over some parameters to the charts.  See the \code{\link{regplot}}
-#' function for further details.
+#' produce plots with a default configuration for each type of plot . A call to
+#' \code{\link{regplot}} will give you control over some plot options.
+#' See the \code{\link{regplot}} function for further details.
 #'
 #' @param data The input data frame for which to perform the regression analysis.
 #' This parameter is required.
@@ -270,8 +270,8 @@
 #' "all", a vector of plot names, or a call to the \code{\link{regplot}} function.
 #' Default is NULL, meaning no
 #' plots are desired.  If there are multiple model requests, you can pass a single
-#' plot request which will apply to all tables, or a list of plot requests that
-#' align one-to-one for each model formula.
+#' plot request which will apply to all models, or a list of plot requests that
+#' aligns one-to-one for each model formula.
 #' @return Normally, the requested regression statistics are shown interactively
 #' in the viewer, and output results are returned as a data frame.
 #' If you request "report" datasets, they will be returned as a list.
@@ -369,6 +369,58 @@
 #' # 2 mod1   SEB   dist 15.379587         NA   6.7584402  0.4155128 -1.00000000
 #' # 3 mod2 PARMS  speed  3.155753   526.2665   8.2839056 -1.0000000  0.16556757
 #' # 4 mod2   SEB  speed  3.155753         NA   0.8743845 -1.0000000  0.01749448
+#'
+#' # Example 6: Plot requests via a vector of keywords
+#' res7 <- proc_reg(dat, model = dist ~ speed,
+#'                       plots = c("residualhistogram", "fitplot", "qqplot", "cooksd"),
+#'                       output = report)
+#'
+#' # View results
+#' res7
+#' # $NObs
+#' # LABEL NOBS
+#' # 1 Number of Observations Read   50
+#' # 2 Number of Observations Used   50
+#' #
+#' # $ANOVA
+#' # LABEL DF    SUMSQ     MEANSQ     FVAL        PROBF
+#' # 1           Model  1 21185.46 21185.4589 89.56711 1.489919e-12
+#' # 2           Error 48 11353.52   236.5317       NA           NA
+#' # 3 Corrected Total 49 32538.98         NA       NA           NA
+#' #
+#' # $FitStatistics
+#' # RMSE DEPMEAN  COEFVAR       RSQ    ADJRSQ
+#' # 1 15.37959   42.98 35.78312 0.6510794 0.6438102
+#' #
+#' # $ParameterEstimates
+#' # PARM DF        EST    STDERR         T        PROBT
+#' # 1 Intercept  1 -17.579095 6.7584402 -2.601058 1.231882e-02
+#' # 2     speed  1   3.932409 0.4155128  9.463990 1.489919e-12
+#' #
+#' # $Plots
+#' # $Plots$residualhistogram
+#' # # A plot specification:
+#' # - path: 'C:\Users\dbosa\AppData\Local\Temp\RtmpOYrg1Y\file5dfa81dfb8e6.jpg'
+#' # - height: 4.5
+#' # - width: 6
+#' #
+#' # $Plots$fitplot
+#' # # A plot specification:
+#' # - path: 'C:\Users\dbosa\AppData\Local\Temp\RtmpOYrg1Y\file5dfa8361465ed.jpg'
+#' # - height: 4.5
+#' # - width: 6
+#' #
+#' # $Plots$qqplot
+#' # # A plot specification:
+#' # - path: 'C:\Users\dbosa\AppData\Local\Temp\RtmpOYrg1Y\file5dfa86ca52064.jpg'
+#' # - height: 4.5
+#' # - width: 6
+#' #
+#' # $Plots$cooksd
+#' # # A plot specification:
+#' # - path: 'C:\Users\dbosa\AppData\Local\Temp\RtmpOYrg1Y\file5dfa84d614ded.jpg'
+#' # - height: 4.5
+#' # - width: 6
 proc_reg <- function(data,
                      model,
                      by = NULL,

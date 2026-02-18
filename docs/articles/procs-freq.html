@@ -444,17 +444,34 @@ no equivalent in SAS®.</p>
 </h2>
 <p>To better understand your data, it is important to visualize it. The
 <code><a href="../reference/proc_freq.html">proc_freq()</a></code> function offers basic plotting of frequencies
-via the “plots” parameter and the <code><a href="../reference/freqplot.html">freqplot()</a></code> function. Here
-is a simple example demonstrating how to get frequency plots for a
-selection of tables using the sample data from above:</p>
+via the “plots” parameter and the <code><a href="../reference/freqplot.html">freqplot()</a></code> function.</p>
+<div class="section level3">
+<h3 id="default-plots">Default Plots<a class="anchor" aria-label="anchor" href="#default-plots"></a>
+</h3>
+<p>Here is a simple example demonstrating how to get default frequency
+plots for a selection of tables using the sample data from above:</p>
 <pre><code><span><span class="fu"><a href="../reference/proc_freq.html">proc_freq</a></span><span class="op">(</span><span class="va">dat</span>, tables <span class="op">=</span> <span class="fu"><a href="https://common.r-sassy.org/reference/v.html" class="external-link">v</a></span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span>, <span class="va">x</span> <span class="op">*</span> <span class="va">y</span><span class="op">)</span>,</span>
 <span>          weight <span class="op">=</span> <span class="va">z</span>,</span>
-<span>          plots <span class="op">=</span> <span class="va">freqplot</span><span class="op">)</span></span></code></pre>
+<span>          plots <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre>
 <p>The generated report will look like this:</p>
 <p><img src="../man/images/freqtut12.png" alt="Default frequency plots"></p>
-<p>The report now shows a bar chart for each of the table requests. The
-style of plot can be modified using the parameters on the
-<code><a href="../reference/freqplot.html">freqplot()</a></code> function, like this:</p>
+<p>The report now shows a bar chart for each of the table requests.</p>
+</div>
+<div class="section level3">
+<h3 id="customized-plots">Customized Plots<a class="anchor" aria-label="anchor" href="#customized-plots"></a>
+</h3>
+<p>The <code>plots</code> parameter on <code><a href="../reference/proc_freq.html">proc_freq()</a></code> also
+accepts a <code><a href="../reference/freqplot.html">freqplot()</a></code> object. This object offers some
+customization of the requested plot. Besides the default frequency chart
+produced in the example above, you may also request dot plots, stacked
+bar charts, or grouped bar charts. The <code><a href="../reference/freqplot.html">freqplot()</a></code> function
+also allows you to control the chart’s orientation, scale, and other
+basic aspects of the plot.</p>
+<p>If your call to <code><a href="../reference/proc_freq.html">proc_freq()</a></code> has multiple tables, you can
+pass a single <code><a href="../reference/freqplot.html">freqplot()</a></code> object that applies to all tables.
+You may also customize the charts for each table in the
+<code><a href="../reference/proc_freq.html">proc_freq()</a></code> call. To customize the charts for each table,
+pass separate calls to <code><a href="../reference/freqplot.html">freqplot()</a></code> in list, like this:</p>
 <pre><code><span><span class="fu"><a href="../reference/proc_freq.html">proc_freq</a></span><span class="op">(</span><span class="va">dat</span>, tables <span class="op">=</span> <span class="fu"><a href="https://common.r-sassy.org/reference/v.html" class="external-link">v</a></span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span>, <span class="va">x</span> <span class="op">*</span> <span class="va">y</span><span class="op">)</span>,</span>
 <span>          weight <span class="op">=</span> <span class="va">z</span>,</span>
 <span>          plots <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="fu"><a href="../reference/freqplot.html">freqplot</a></span><span class="op">(</span>type <span class="op">=</span> <span class="st">"dotplot"</span><span class="op">)</span>,</span>
@@ -463,9 +480,11 @@ style of plot can be modified using the parameters on the
 <span>                       </span></code></pre>
 <p><img src="../man/images/freqtut13.png" alt="Frequency plot options"></p>
 <p>Modifying the <code><a href="../reference/freqplot.html">freqplot()</a></code> parameters can help improve the
-quality of the chart, and make it easier to understand what is happening
-with your data.</p>
+quality of your chart, and make it easier to understand what is
+happening with your data. See the <code><a href="../reference/freqplot.html">freqplot()</a></code> documentation
+for more information on how to customize your frequency plots.</p>
 <p>Next: <a href="procs-means.html">The Means Function</a></p>
+</div>
 </div>
   </div>
 

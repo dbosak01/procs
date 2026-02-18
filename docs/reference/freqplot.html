@@ -116,8 +116,8 @@ vertical or horizontal orientation, by variables, and various scale options.</p>
 
 
 <dl><dt id="arg-type">type<a class="anchor" aria-label="anchor" href="#arg-type"></a></dt>
-<dd><p>The type of plot to create. Valid values are "barchart" or
-"dotplot".  Default is "barchart".</p></dd>
+<dd><p>A string indicating the type of plot to create.
+Valid values are "barchart" or "dotplot".  Default is "barchart".</p></dd>
 
 
 <dt id="arg-orient">orient<a class="anchor" aria-label="anchor" href="#arg-orient"></a></dt>
@@ -134,12 +134,14 @@ the value "grouppercent" is also valid.</p></dd>
 <dt id="arg-twoway">twoway<a class="anchor" aria-label="anchor" href="#arg-twoway"></a></dt>
 <dd><p>Options for two-way layouts. Valid values are
 "cluster", "grouphorizontal", "groupvertical", or "stacked". Default
-is "groupvertical".  This parameter applies to two-way tables only.</p></dd>
+is "groupvertical".</p></dd>
 
 
 <dt id="arg-groupby">groupby<a class="anchor" aria-label="anchor" href="#arg-groupby"></a></dt>
 <dd><p>The variable configuration for two-way charts.
-Valid values are "column" or "row". Default is "column". The "row" option
+Valid values are "column" or "row". Default is "column", which means
+the first variable in the interaction will be used for the "column" variable,
+and the second variable for the "rows" on the panel. The "row" option
 effectively reverses the variable configuration.</p></dd>
 
 
@@ -151,21 +153,55 @@ parameter applies to two-way tables only.</p></dd>
     <div id="value">
     <h2>Value</h2>
     <p>The frequency plot object.  This object is then passed to
-<code><a href="proc_freq.html">proc_freq</a></code> for evaluation and rendering. Data from the
+<code><a href="proc_freq.html">proc_freq</a></code> for evaluation and rendering. Data for the
 frequency plot comes directly from the <code><a href="proc_freq.html">proc_freq</a></code> reporting
 data frame.</p>
     </div>
     <div id="details">
     <h2>Details</h2>
-    <p>Any requested
-plots will be displayed on interactive reports only.
+    <p>The <code>freqplot</code> function can be passed to the <code>plots</code> parameter
+on <code><a href="proc_freq.html">proc_freq</a></code> to give you some control over what kind
+of frequency plot is produced.  Generally, one call to <code>freqplot</code> produces
+one frequency plot.  The exception is on two-way interactions, and there
+are more interactions that can fit on a single panel.  In this case,
+the function will produce multiple panels so that frequencies for all
+interactions are displayed. The number of plots on a panel can be controlled
+using the <code>npanelpos</code> parameter.</p>
+<p>The default plot is a simple bar chart showing frequency counts for each
+category. The X axis will show the categories, and the Y axis will show
+the frequency counts.  You may change the orientation of the chart using
+the <code>orient</code> parameter.  You may also change the Y scale using the
+<code>scale</code> parameter. Options include a percentage, logarithmic, or
+square root scale.</p>
+<p>There are many more options for two-way interactions.  For two-way
+interactions, you may choose to display the data as bar charts,
+dot plots, stacked bar charts, or clustered bar charts. To create stacked
+or clustered bar charts, set the <code>type</code> parameter to "barchart", and
+then specify the desired layout with the <code>twoway</code> parameter.</p>
+<p>The "grouphorizontal" and "groupvertical" options on the <code>twoway</code>
+parameter apply to both bar charts and dot plots. These keywords control
+whether you want the frequency groups displayed horizontally across
+the panel, or vertically from top to bottom.  The default is to display
+groups vertically.</p>
+<p>The layout for two-way charts can be further manipulated with the <code>groupby</code>
+parameter.  Normally for two-way charts the first variable is the X axis
+"columns" and the second variable is the grouping variable "rows".
+Passing a value of "rows" to
+the <code>groupby</code> parameter essentially flips this orientation, so that
+the first variable becomes the rows and the second variable becomes
+the columns.  Note that these types of charts can be manipulated further with
+the <code>orient</code> parameter.</p>
+<p>By combining the above options, you can produce many styles of frequency
+plots.</p>
+<p>Any requested
+plots will be displayed on the interactive report only.
 Plots are created as jpeg files, and stored in a temp directory.  Those
 temporary files are then referenced by the interactive report to display
 the graphic.</p>
 <p>If desired, you may
 output the report objects and pass to <code><a href="proc_print.html">proc_print</a></code>. To do this,
 set <code>output = report</code> on the call to <code><a href="proc_freq.html">proc_freq</a></code>, and pass
-the entire list to <code><a href="proc_print.html">proc_print</a></code>.</p>
+the resulting list to <code><a href="proc_print.html">proc_print</a></code>.</p>
     </div>
 
     <div id="ref-examples">
@@ -179,27 +215,37 @@ the entire list to <code><a href="proc_print.html">proc_print</a></code>.</p>
 <span><span class="co"># Prepare sample data</span></span>
 <span><span class="va">dt</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/as.data.frame.html" class="external-link">as.data.frame</a></span><span class="op">(</span><span class="va">HairEyeColor</span>, stringsAsFactors <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># Example 1: Frequency statistics with default plots</span></span>
+<span><span class="co"># Example 1: Single plot request for all tables</span></span>
 <span><span class="va">res</span> <span class="op">&lt;-</span> <span class="fu"><a href="proc_freq.html">proc_freq</a></span><span class="op">(</span><span class="va">dt</span>, tables <span class="op">=</span> <span class="fu"><a href="https://common.r-sassy.org/reference/v.html" class="external-link">v</a></span><span class="op">(</span><span class="va">Hair</span>, <span class="va">Eye</span>, <span class="va">Hair</span> <span class="op">*</span> <span class="va">Eye</span><span class="op">)</span>,</span>
 <span>                 weight <span class="op">=</span> <span class="va">Freq</span>,</span>
-<span>                 output <span class="op">=</span> <span class="va">report</span>,</span>
-<span>                 plots <span class="op">=</span> <span class="va">freqplot</span>,</span>
+<span>                 plots <span class="op">=</span> <span class="fu">freqplot</span><span class="op">(</span>type <span class="op">=</span> <span class="st">"dotplot"</span><span class="op">)</span>,</span>
 <span>                 titles <span class="op">=</span> <span class="st">"Hair and Eye Frequency Statistics"</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># View results</span></span>
 <span><span class="va">res</span></span>
 <span></span>
-<span><span class="co"># Example 2: Frequency statistics with custom plots</span></span>
+<span><span class="co"># Example 2: Separate plots request for each table</span></span>
 <span><span class="va">res</span> <span class="op">&lt;-</span> <span class="fu"><a href="proc_freq.html">proc_freq</a></span><span class="op">(</span><span class="va">dt</span>, tables <span class="op">=</span> <span class="fu"><a href="https://common.r-sassy.org/reference/v.html" class="external-link">v</a></span><span class="op">(</span><span class="va">Hair</span>, <span class="va">Eye</span>, <span class="va">Hair</span> <span class="op">*</span> <span class="va">Eye</span><span class="op">)</span>,</span>
 <span>                 weight <span class="op">=</span> <span class="va">Freq</span>,</span>
-<span>                 output <span class="op">=</span> <span class="va">report</span>,</span>
 <span>                 plots <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="fu">freqplot</span><span class="op">(</span>type <span class="op">=</span> <span class="st">"barchart"</span>,</span>
 <span>                                       orient <span class="op">=</span> <span class="st">"horizontal"</span><span class="op">)</span>,</span>
 <span>                              <span class="fu">freqplot</span><span class="op">(</span>type <span class="op">=</span> <span class="st">"dotplot"</span>,</span>
 <span>                                       scale <span class="op">=</span> <span class="st">"percent"</span><span class="op">)</span>,</span>
 <span>                              <span class="fu">freqplot</span><span class="op">(</span>type <span class="op">=</span> <span class="st">"barchart"</span>,</span>
-<span>                                       twoway <span class="op">=</span> <span class="st">"cluster"</span><span class="op">)</span>,</span>
-<span>                 titles <span class="op">=</span> <span class="st">"Hair and Eye Frequency Statistics"</span><span class="op">)</span><span class="op">)</span></span>
+<span>                                       twoway <span class="op">=</span> <span class="st">"cluster"</span><span class="op">)</span><span class="op">)</span>,</span>
+<span>                 titles <span class="op">=</span> <span class="st">"Hair and Eye Frequency Statistics"</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># View results</span></span>
+<span><span class="va">res</span></span>
+<span></span>
+<span><span class="co"># Example 3: Display options for group orientation</span></span>
+<span><span class="va">res</span> <span class="op">&lt;-</span> <span class="fu"><a href="proc_freq.html">proc_freq</a></span><span class="op">(</span><span class="va">dt</span>, tables <span class="op">=</span> <span class="fu"><a href="https://common.r-sassy.org/reference/v.html" class="external-link">v</a></span><span class="op">(</span><span class="va">Hair</span> <span class="op">*</span> <span class="va">Eye</span>, <span class="va">Eye</span> <span class="op">*</span> <span class="va">Hair</span><span class="op">)</span>,</span>
+<span>                 weight <span class="op">=</span> <span class="va">Freq</span>,</span>
+<span>                 plots <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="fu">freqplot</span><span class="op">(</span>type <span class="op">=</span> <span class="st">"dotplot"</span>,</span>
+<span>                                       twoway <span class="op">=</span> <span class="st">"grouphorizontal"</span><span class="op">)</span>,</span>
+<span>                              <span class="fu">freqplot</span><span class="op">(</span>type <span class="op">=</span> <span class="st">"dotplot"</span>,</span>
+<span>                                       twoway <span class="op">=</span> <span class="st">"groupvertical"</span><span class="op">)</span><span class="op">)</span>,</span>
+<span>                 titles <span class="op">=</span> <span class="st">"Hair and Eye Frequency Statistics"</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># View results</span></span>
 <span><span class="va">res</span></span>

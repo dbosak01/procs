@@ -14,8 +14,8 @@ freqplot(
 )
 }
 \arguments{
-\item{type}{The type of plot to create. Valid values are "barchart" or
-"dotplot".  Default is "barchart".}
+\item{type}{A string indicating the type of plot to create.
+Valid values are "barchart" or "dotplot".  Default is "barchart".}
 
 \item{orient}{The orientation of the plot.  Valid values are "vertical"
 or "horizontal".  Default is "vertical".}
@@ -26,10 +26,12 @@ the value "grouppercent" is also valid.}
 
 \item{twoway}{Options for two-way layouts. Valid values are
 "cluster", "grouphorizontal", "groupvertical", or "stacked". Default
-is "groupvertical".  This parameter applies to two-way tables only.}
+is "groupvertical".}
 
 \item{groupby}{The variable configuration for two-way charts.
-Valid values are "column" or "row". Default is "column". The "row" option
+Valid values are "column" or "row". Default is "column", which means
+the first variable in the interaction will be used for the "column" variable,
+and the second variable for the "rows" on the panel. The "row" option
 effectively reverses the variable configuration.}
 
 \item{npanelpos}{The number of charts per panel. Default is 4. This
@@ -37,7 +39,7 @@ parameter applies to two-way tables only.}
 }
 \value{
 The frequency plot object.  This object is then passed to
-\code{\link{proc_freq}} for evaluation and rendering. Data from the
+\code{\link{proc_freq}} for evaluation and rendering. Data for the
 frequency plot comes directly from the \code{\link{proc_freq}} reporting
 data frame.
 }
@@ -49,8 +51,48 @@ bar charts and dot plots for one and two-way analysis.  It also supports
 vertical or horizontal orientation, by variables, and various scale options.
 }
 \details{
+The \code{freqplot} function can be passed to the \code{plots} parameter
+on \code{\link{proc_freq}} to give you some control over what kind
+of frequency plot is produced.  Generally, one call to \code{freqplot} produces
+one frequency plot.  The exception is on two-way interactions, and there
+are more interactions that can fit on a single panel.  In this case,
+the function will produce multiple panels so that frequencies for all
+interactions are displayed. The number of plots on a panel can be controlled
+using the \code{npanelpos} parameter.
+
+The default plot is a simple bar chart showing frequency counts for each
+category. The X axis will show the categories, and the Y axis will show
+the frequency counts.  You may change the orientation of the chart using
+the \code{orient} parameter.  You may also change the Y scale using the
+\code{scale} parameter. Options include a percentage, logarithmic, or
+square root scale.
+
+There are many more options for two-way interactions.  For two-way
+interactions, you may choose to display the data as bar charts,
+dot plots, stacked bar charts, or clustered bar charts. To create stacked
+or clustered bar charts, set the \code{type} parameter to "barchart", and
+then specify the desired layout with the \code{twoway} parameter.
+
+The "grouphorizontal" and "groupvertical" options on the \code{twoway}
+parameter apply to both bar charts and dot plots. These keywords control
+whether you want the frequency groups displayed horizontally across
+the panel, or vertically from top to bottom.  The default is to display
+groups vertically.
+
+The layout for two-way charts can be further manipulated with the \code{groupby}
+parameter.  Normally for two-way charts the first variable is the X axis
+"columns" and the second variable is the grouping variable "rows".
+Passing a value of "rows" to
+the \code{groupby} parameter essentially flips this orientation, so that
+the first variable becomes the rows and the second variable becomes
+the columns.  Note that these types of charts can be manipulated further with
+the \code{orient} parameter.
+
+By combining the above options, you can produce many styles of frequency
+plots.
+
 Any requested
-plots will be displayed on interactive reports only.
+plots will be displayed on the interactive report only.
 Plots are created as jpeg files, and stored in a temp directory.  Those
 temporary files are then referenced by the interactive report to display
 the graphic.
@@ -58,7 +100,7 @@ the graphic.
 If desired, you may
 output the report objects and pass to \code{\link{proc_print}}. To do this,
 set \code{output = report} on the call to \code{\link{proc_freq}}, and pass
-the entire list to \code{\link{proc_print}}.
+the resulting list to \code{\link{proc_print}}.
 }
 \examples{
 library(procs)
@@ -70,27 +112,37 @@ options("procs.print" = FALSE)
 # Prepare sample data
 dt <- as.data.frame(HairEyeColor, stringsAsFactors = FALSE)
 
-# Example 1: Frequency statistics with default plots
+# Example 1: Single plot request for all tables
 res <- proc_freq(dt, tables = v(Hair, Eye, Hair * Eye),
                  weight = Freq,
-                 output = report,
-                 plots = freqplot,
+                 plots = freqplot(type = "dotplot"),
                  titles = "Hair and Eye Frequency Statistics")
 
 # View results
 res
 
-# Example 2: Frequency statistics with custom plots
+# Example 2: Separate plots request for each table
 res <- proc_freq(dt, tables = v(Hair, Eye, Hair * Eye),
                  weight = Freq,
-                 output = report,
                  plots = list(freqplot(type = "barchart",
                                        orient = "horizontal"),
                               freqplot(type = "dotplot",
                                        scale = "percent"),
                               freqplot(type = "barchart",
-                                       twoway = "cluster"),
-                 titles = "Hair and Eye Frequency Statistics"))
+                                       twoway = "cluster")),
+                 titles = "Hair and Eye Frequency Statistics")
+
+# View results
+res
+
+# Example 3: Display options for group orientation
+res <- proc_freq(dt, tables = v(Hair * Eye, Eye * Hair),
+                 weight = Freq,
+                 plots = list(freqplot(type = "dotplot",
+                                       twoway = "grouphorizontal"),
+                              freqplot(type = "dotplot",
+                                       twoway = "groupvertical")),
+                 titles = "Hair and Eye Frequency Statistics")
 
 # View results
 res

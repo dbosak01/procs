@@ -347,22 +347,39 @@ the development of the **procs** package, and have no equivalent in SAS®.
 
 To better understand your data, it is important to visualize it.  The 
 `proc_freq()` function offers basic plotting of frequencies via the 
-"plots" parameter and the `freqplot()` function.  Here is a simple example 
-demonstrating how to get frequency plots for a selection of tables
+"plots" parameter and the `freqplot()` function.  
+
+### Default Plots
+
+Here is a simple example 
+demonstrating how to get default frequency plots for a selection of tables
 using the sample data from above:
 ```
 proc_freq(dat, tables = v(x, y, x * y),
           weight = z,
-          plots = freqplot)
+          plots = TRUE)
 
 ```
 The generated report will look like this:
 
 <img src="../man/images/freqtut12.png" alt="Default frequency plots"/>
 
-The report now shows a bar chart for each of the table requests. The style 
-of plot can be modified using the parameters on the `freqplot()` function,
-like this:
+The report now shows a bar chart for each of the table requests. 
+
+### Customized Plots
+
+The `plots` parameter on `proc_freq()` also accepts a `freqplot()` object.
+This object offers some customization of the requested plot.  Besides the 
+default frequency chart produced in the example above, you may also request
+dot plots, stacked bar charts, or grouped bar charts.  The `freqplot()`
+function also allows you to control the chart's orientation, scale, and
+other basic aspects of the plot.
+
+If your call to `proc_freq()` has multiple tables, you can pass a single 
+`freqplot()` object that applies to all tables.  You may also 
+customize the charts for each table in the 
+`proc_freq()` call. To customize the charts for each table, pass separate 
+calls to `freqplot()` in list, like this: 
 
 ```
 proc_freq(dat, tables = v(x, y, x * y),
@@ -376,8 +393,10 @@ proc_freq(dat, tables = v(x, y, x * y),
 
 <img src="../man/images/freqtut13.png" alt="Frequency plot options"/>
 
-Modifying the `freqplot()` parameters can help improve the quality of the 
+Modifying the `freqplot()` parameters can help improve the quality of your 
 chart, and make it easier to understand what is happening with your data.
+See the `freqplot()` documentation for more information on how to customize
+your frequency plots.
 
 
 Next: [The Means Function](procs-means.html)

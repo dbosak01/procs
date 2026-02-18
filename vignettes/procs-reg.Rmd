@@ -366,7 +366,7 @@ may also be passed unquoted using the `v()` function.
 * **plots = regplot([with parameters])**: For the most control, use the 
 `regplot()` function and pass the desired parameters.  Parameters include
 the desire chart types, whether to "unpack" any summary panels, and whether
-to show labels on outlier values.  See the `regplot()` function for full 
+to show labels for outlier values.  See the `regplot()` function for full 
 documentation on the options available.
 
 Here is a simple example showing the default plots:
