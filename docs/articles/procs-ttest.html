@@ -474,8 +474,9 @@ the output datasets clearly:</p>
 <h2 id="plots">Plots<a class="anchor" aria-label="anchor" href="#plots"></a>
 </h2>
 <p><code><a href="../reference/proc_ttest.html">proc_ttest()</a></code> can generate plots for all types of
-T-tests. The plots are very easy to generate. You can request plots in
-several ways:</p>
+T-tests. The plots are very easy to generate. You will use the
+<code>plots</code> parameter to make plot requests, and these requests
+can be accomplished in several ways:</p>
 <ul>
 <li>
 <strong>plots = TRUE</strong>: A TRUE value will return a default
@@ -486,7 +487,7 @@ paired analysis will also include a paired profiles chart and an
 agreement plot.</li>
 <li>
 <strong>plots = “all”</strong>: The “all” keyword will return all
-available plots for the requested analysis.</li>
+available plots for the requested test.</li>
 <li>
 <strong>plots = [vector of strings]</strong>: Plots may be requested
 as a vector of plot names. These names are normally quoted, but may also
@@ -500,20 +501,21 @@ charts produced. This function takes parameters which allow you to
 specify which charts to show, and some other customization features. See
 the <code><a href="../reference/ttestplot.html">ttestplot()</a></code> function for additional details.</li>
 </ul>
-<p>Let’s re-run the one sample test from above with plots. In this case,
-we want to see the null hypothesis on the chart, and request an interval
-chart in addition to the standard summary and qqplot. Therefore, we can
-perform a custom plot request with the <code><a href="../reference/ttestplot.html">ttestplot()</a></code> function
-and pass the desired parameters:</p>
+<p>Let’s re-run the one sample T-Test from above, but this time with
+plots. In this case, we want to see the null hypothesis on the chart,
+and request an interval chart in addition to the default summary and
+qqplot. Therefore, we can perform a custom plot request with the
+<code><a href="../reference/ttestplot.html">ttestplot()</a></code> function and pass the desired parameters:</p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># Request plots</span></span>
+<code class="sourceCode R"><span><span class="co"># One sample T-Test with plots</span></span>
 <span><span class="fu"><a href="../reference/proc_ttest.html">proc_ttest</a></span><span class="op">(</span><span class="va">cls</span>, var <span class="op">=</span> <span class="va">Height</span>, options <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>h0 <span class="op">=</span> <span class="fl">65</span><span class="op">)</span>,</span>
 <span>           plots <span class="op">=</span> <span class="fu"><a href="../reference/ttestplot.html">ttestplot</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"summary"</span>, <span class="st">"qqplot"</span>, <span class="st">"interval"</span><span class="op">)</span>, </span>
 <span>                             showh0 <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <p><img src="../man/images/ttest5a.png" alt="Proc ttest plots 1"><img src="../man/images/ttest5b.png" alt="Proc ttest plots 2"><img src="../man/images/ttest5c.png" alt="Proc ttest plots 3"></p>
 <p>Notice the amount of analysis performed by a single call to
 <code><a href="../reference/proc_ttest.html">proc_ttest()</a></code>. These functions are designed with needs of
-the analyst in mind.</p>
+the analyst in mind, and can give you an enormous amount of information
+with very little effort.</p>
 <p>Next: <a href="procs-reg.html">Regression Function</a></p>
 </div>
   </div>

@@ -246,7 +246,7 @@ The above test shows although there was a change before and after the stimulus,
 that change was not statistically significant. 
 
 Note that the `proc_freq()` and `proc_req()` functions also have the capability
-to generated plots for the selected analysis. See the documentation for those
+to generate plots for the selected analysis. See the documentation for those
 functions for more details.
 
 ### Other Functions
