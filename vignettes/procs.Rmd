@@ -212,10 +212,13 @@ pressure <- read.table(header = TRUE, text = '
 
 ```
 
-Now let's determine if there is a significant change before and after the stimulus:
+Now let's determine if there is a significant change before and after the stimulus.
+For this type of T-Test test, we will use the `paired` parameter.  To better
+understand the data, we will also turn on the default plots:
 ```{r eval=FALSE, echo=TRUE} 
 # Perform T-Test
-res3 <- proc_ttest(pressure, paired = "SBPbefore * SBPafter")
+res3 <- proc_ttest(pressure, paired = "SBPbefore * SBPafter", 
+                   plots = TRUE)
 
 # View results
 res3
@@ -234,10 +237,17 @@ res3
 ```
 If printing is enabled, the following is sent to the viewer:
 
-<img src="../man/images/ttest.png" alt="Proc ttest example"/>
+<img src="../man/images/ttesta.png" alt="Proc ttest example chart 1"/>
+<img src="../man/images/ttestb.png" alt="Proc ttest example chart 2"/>
+<img src="../man/images/ttestc.png" alt="Proc ttest example chart 3"/>
+<img src="../man/images/ttestd.png" alt="Proc ttest example chart 4"/>
 
 The above test shows although there was a change before and after the stimulus, 
-that change was not statistically significant.
+that change was not statistically significant. 
+
+Note that the `proc_freq()` and `proc_req()` functions also have the capability
+to generated plots for the selected analysis. See the documentation for those
+functions for more details.
 
 ### Other Functions
 

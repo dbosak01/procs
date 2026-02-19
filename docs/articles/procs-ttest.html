@@ -483,7 +483,7 @@ set of plots for <code><a href="../reference/proc_ttest.html">proc_ttest()</a></
 depending on what type of analysis you are performing. All types of
 analysis include at least a summary distribution chart and a QQ plot. A
 paired analysis will also include a paired profiles chart and an
-agreemnt plot.</li>
+agreement plot.</li>
 <li>
 <strong>plots = “all”</strong>: The “all” keyword will return all
 available plots for the requested analysis.</li>
@@ -497,16 +497,23 @@ plot names are “agreement”, “boxplot”, “histogram”, “interval”,
 <strong>plots = ttestplot([with parameters])</strong>: The
 <code><a href="../reference/ttestplot.html">ttestplot()</a></code> function gives you the most control over the
 charts produced. This function takes parameters which allow you to
-specify which charts to show, and whether to show them in a summary view
-or as separate charts. See the <code><a href="../reference/ttestplot.html">ttestplot()</a></code> function for
-additional details.</li>
+specify which charts to show, and some other customization features. See
+the <code><a href="../reference/ttestplot.html">ttestplot()</a></code> function for additional details.</li>
 </ul>
-<p>Here are the default plots for a paired T-test:</p>
+<p>Let’s re-run the one sample test from above with plots. In this case,
+we want to see the null hypothesis on the chart, and request an interval
+chart in addition to the standard summary and qqplot. Therefore, we can
+perform a custom plot request with the <code><a href="../reference/ttestplot.html">ttestplot()</a></code> function
+and pass the desired parameters:</p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># Request default plots</span></span>
-<span><span class="fu"><a href="../reference/proc_ttest.html">proc_ttest</a></span><span class="op">(</span><span class="va">cls</span>, paired <span class="op">=</span> <span class="st">"Weight * Height"</span>,</span>
-<span>           plots <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
-<p><img src="../man/images/ttest5a.png" alt="Proc reg plots 1"><img src="../man/images/ttest5b.png" alt="Proc reg plots 2"><img src="../man/images/ttest5c.png" alt="Proc reg plots 3"><img src="../man/images/ttest5d.png" alt="Proc reg plots 4"></p>
+<code class="sourceCode R"><span><span class="co"># Request plots</span></span>
+<span><span class="fu"><a href="../reference/proc_ttest.html">proc_ttest</a></span><span class="op">(</span><span class="va">cls</span>, var <span class="op">=</span> <span class="va">Height</span>, options <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>h0 <span class="op">=</span> <span class="fl">65</span><span class="op">)</span>,</span>
+<span>           plots <span class="op">=</span> <span class="fu"><a href="../reference/ttestplot.html">ttestplot</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"summary"</span>, <span class="st">"qqplot"</span>, <span class="st">"interval"</span><span class="op">)</span>, </span>
+<span>                             showh0 <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<p><img src="../man/images/ttest5a.png" alt="Proc ttest plots 1"><img src="../man/images/ttest5b.png" alt="Proc ttest plots 2"><img src="../man/images/ttest5c.png" alt="Proc ttest plots 3"></p>
+<p>Notice the amount of analysis performed by a single call to
+<code><a href="../reference/proc_ttest.html">proc_ttest()</a></code>. These functions are designed with needs of
+the analyst in mind.</p>
 <p>Next: <a href="procs-reg.html">Regression Function</a></p>
 </div>
   </div>

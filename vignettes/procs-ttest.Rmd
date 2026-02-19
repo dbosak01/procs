@@ -372,37 +372,47 @@ res7
 ```
 ## Plots
 `proc_ttest()` can generate plots for all types of T-tests. The plots are 
-very easy to generate.  You can request plots in several ways:
+very easy to generate.  You will use the `plots` parameter to make plot requests,
+and these requests can be accomplished in several ways:
 
 * **plots = TRUE**: A TRUE
 value will return a default set of plots for `proc_ttest()`.  The default
 plots change depending on what type of analysis you are performing.  All
 types of analysis include at least a summary distribution chart and a QQ plot.
-A paired analysis will also include a paired profiles chart and an agreemnt
+A paired analysis will also include a paired profiles chart and an agreement
 plot.
 * **plots = "all"**: The "all" keyword will return all available plots for 
-the requested analysis.
+the requested test.
 * **plots = [vector of strings]**: Plots may be
 requested as a vector of plot names.  These names are normally quoted, but 
 may also be passed unquoted using the `v()` function. The available plot names are 
 "agreement", "boxplot", "histogram", "interval", "profiles", "qqplot", and "summary".
 * **plots = ttestplot([with parameters])**: The `ttestplot()` function 
 gives you the most control over the charts produced. This function takes
-parameters which allow you to specify which charts to show, and whether to show 
-them in a summary view or as separate charts. See the `ttestplot()` function
+parameters which allow you to specify which charts to show, and some 
+other customization features. See the `ttestplot()` function
 for additional details.
 
-Here are the default plots for a paired T-test:
+Let's re-run the one sample T-Test from above, but this time with plots.
+In this case, we want to see the null hypothesis on the chart, and request
+an interval chart in addition to the default summary and qqplot.  Therefore, 
+we can perform a custom plot request with the `ttestplot()` function and
+pass the desired parameters:
 ```{r eval=FALSE, echo=TRUE} 
-# Request default plots
-proc_ttest(cls, paired = "Weight * Height",
-           plots = TRUE)
+# One sample T-Test with plots
+proc_ttest(cls, var = Height, options = c(h0 = 65),
+           plots = ttestplot(c("summary", "qqplot", "interval"), 
+                             showh0 = TRUE))
+
 
 ```
 
-<img src="../man/images/ttest5a.png" alt="Proc reg plots 1"/>
-<img src="../man/images/ttest5b.png" alt="Proc reg plots 2"/>
-<img src="../man/images/ttest5c.png" alt="Proc reg plots 3"/>
-<img src="../man/images/ttest5d.png" alt="Proc reg plots 4"/>
+<img src="../man/images/ttest5a.png" alt="Proc ttest plots 1"/>
+<img src="../man/images/ttest5b.png" alt="Proc ttest plots 2"/>
+<img src="../man/images/ttest5c.png" alt="Proc ttest plots 3"/>
+
+Notice the amount of analysis performed by a single call to `proc_ttest()`. 
+These functions are designed with needs of the analyst in mind, and can 
+give you an enormous amount of information with very little effort.
 
 Next: [Regression Function](procs-reg.html)

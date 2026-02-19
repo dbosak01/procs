@@ -316,10 +316,13 @@ stimulus. It uses the following data:</p>
 <span><span class="st">  127 135</span></span>
 <span><span class="st">  '</span><span class="op">)</span></span></code></pre></div>
 <p>Now let’s determine if there is a significant change before and after
-the stimulus:</p>
+the stimulus. For this type of T-Test test, we will use the
+<code>paired</code> parameter. To better understand the analysis, we
+will also turn on the default plots:</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Perform T-Test</span></span>
-<span><span class="va">res3</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/proc_ttest.html">proc_ttest</a></span><span class="op">(</span><span class="va">pressure</span>, paired <span class="op">=</span> <span class="st">"SBPbefore * SBPafter"</span><span class="op">)</span></span>
+<span><span class="va">res3</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/proc_ttest.html">proc_ttest</a></span><span class="op">(</span><span class="va">pressure</span>, paired <span class="op">=</span> <span class="st">"SBPbefore * SBPafter"</span>, </span>
+<span>                   plots <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># View results</span></span>
 <span><span class="va">res3</span></span>
@@ -335,9 +338,12 @@ the stimulus:</p>
 <span><span class="co">#                  VAR DF         T     PROBT</span></span>
 <span><span class="co"># 1 SBPbefore-SBPafter 11 -1.089648 0.2991635</span></span></code></pre></div>
 <p>If printing is enabled, the following is sent to the viewer:</p>
-<p><img src="../man/images/ttest.png" alt="Proc ttest example"></p>
+<p><img src="../man/images/ttesta.png" alt="Proc ttest example chart 1"><img src="../man/images/ttestb.png" alt="Proc ttest example chart 2"><img src="../man/images/ttestc.png" alt="Proc ttest example chart 3"><img src="../man/images/ttestd.png" alt="Proc ttest example chart 4"></p>
 <p>The above test shows although there was a change before and after the
 stimulus, that change was not statistically significant.</p>
+<p>Note that the <code><a href="../reference/proc_freq.html">proc_freq()</a></code> and <code>proc_req()</code>
+functions also have the capability to generated plots for the selected
+analysis.</p>
 </div>
 <div class="section level3">
 <h3 id="other-functions">Other Functions<a class="anchor" aria-label="anchor" href="#other-functions"></a>
