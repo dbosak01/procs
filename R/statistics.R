@@ -95,29 +95,33 @@ pfmt <- value(condition(x < .0001, "<.0001"),
 
 #' Include missing values
 #' @noRd
-get_variance <- function(x, w = NULL, df, narm = TRUE) {
-  if (narm)
-    x <- x[!is.na(x)]
-  if (df==0){
+get_variance <- function(x, df, wgt = NULL, narm = TRUE) {
+
+  if (narm) {
+      x <- x[!is.na(x)]
+  }
+
+  if (sum(!is.na(x)) == 0 || df <= 0) {
     ret <- NA
-  } else if (is.null(w)) {
+  } else if (is.null(wgt)) {
     ret <- sum((x - mean(x, na.rm = narm))^2, na.rm = narm) / df
   } else {
-    ret <- sum(w*(x - sum(x*w, na.rm = narm)/sum(w))^2, na.rm = narm) / df
+    ret <- sum(wgt*(x - sum(x*wgt, na.rm = narm)/sum(wgt))^2, na.rm = narm) / df
   }
   return(ret)
 }
 
 #' @noRd
-get_stderr <- function(x, w = NULL, df, narm = TRUE) {
-  if (narm)
+get_stderr <- function(x, df, wgt = NULL, narm = TRUE) {
+  if (narm) {
     x <- x[!is.na(x)]
-  if (sum(!is.na(x)==0)){
+  }
+  if (sum(!is.na(x)) == 0 || df <= 0) {
     ret <- NA
-  } else if (is.null(w)) {
-    ret <- sqrt(get_variance(x, w, df, narm)) / sqrt(sum(!is.na(x)))
+  } else if (is.null(wgt)) {
+    ret <- sqrt(get_variance(x, df, wgt, narm)) / sqrt(sum(!is.na(x)))
   } else {
-    ret <- sqrt(get_variance(x, w, df, narm)) / sqrt(sum(w, na.rm = narm))
+    ret <- sqrt(get_variance(x, df, wgt, narm)) / sqrt(sum(wgt, na.rm = narm))
   }
 
   return(ret)
@@ -125,9 +129,10 @@ get_stderr <- function(x, w = NULL, df, narm = TRUE) {
 }
 
 #' @noRd
-get_t <- function(x, w=NULL, df, y = NULL, narm = TRUE, alpha = 0.05, paired = FALSE) {
-  if (narm)
+get_t <- function(x, df, wgt=NULL, y = NULL, narm = TRUE, alpha = 0.05, paired = FALSE) {
+  if (narm) {
     x <- x[!is.na(x)]
+  }
   if (!is.numeric(alpha))
     alpha <- as.numeric(alpha)
 
@@ -142,15 +147,15 @@ get_t <- function(x, w=NULL, df, y = NULL, narm = TRUE, alpha = 0.05, paired = F
 
   if (is.null(y) & paired == FALSE) {
 
-    stderr_x = get_stderr(x, w, df, narm)
-    if (df==0){
+    stderr_x = get_stderr(x, df, wgt, narm)
+    if (df<=0){
       t_value <- NA
       p_value <- NA
     } else {
-      if (is.null(w))
+      if (is.null(wgt))
         t_value <- mean(x, na.rm = narm) / stderr_x
       else
-        t_value <- sum(x*w, na.rm = narm)/sum(w)/ stderr_x
+        t_value <- sum(x*wgt, na.rm = narm)/sum(wgt)/ stderr_x
       p_value <- 2 * pt(-abs(t_value), df = df)
     }
 
@@ -165,15 +170,16 @@ get_t <- function(x, w=NULL, df, y = NULL, narm = TRUE, alpha = 0.05, paired = F
 }
 
 #' @noRd
-get_weighted_quantile<- function(x, w=NULL, probs, narm = TRUE) {
-  if (narm)
+get_weighted_quantile<- function(x, probs, wgt=NULL, narm = TRUE) {
+  if (narm) {
     x <- x[!is.na(x)]
-  if (is.null(w)){
+  }
+  if (is.null(wgt)){
     ret <- quantile(x, probs = probs, type = 2, na.rm = narm)
   } else{
     ord <- order(x)
     x_sorted <- x[ord]
-    w_sorted <- w[ord]
+    w_sorted <- wgt[ord]
     cw <- cumsum(w_sorted) / sum(w_sorted)
     ret <- sapply(probs, function(pp) x_sorted[which(cw >= pp)[1]])
   }
@@ -183,11 +189,14 @@ get_weighted_quantile<- function(x, w=NULL, probs, narm = TRUE) {
 
 
 #' @noRd
-get_clm <- function(x, w = NULL, df, narm = TRUE, alpha = 0.05, onesided = FALSE) {
-  if (narm)
+get_clm <- function(x, df, wgt = NULL, narm = TRUE, alpha = 0.05, onesided = FALSE) {
+  if (narm) {
     x <- x[!is.na(x)]
+  }
   if (!is.numeric(alpha))
     alpha <- as.numeric(alpha)
+
+
 
   if (onesided) {
     alp <- 1 - alpha
@@ -202,17 +211,14 @@ get_clm <- function(x, w = NULL, df, narm = TRUE, alpha = 0.05, onesided = FALSE
     n <- sum(!is.na(x))
 
     # Sample weighted mean
-    if (is.null(w))
+    if (is.null(wgt))
       xbar <- mean(x, na.rm = narm)
     else
-      xbar <- sum(x*w, na.rm = narm)/sum(w)
-
-    # Sample standard deviation
-    std <- sqrt(get_variance(x, w, df, narm))
+      xbar <- sum(x*wgt, na.rm = narm)/sum(wgt)
 
     # Margin of error
 
-    margin <- qt(alp,df=df)*std/sqrt(n)
+    margin <- qt(alp,df=df)*get_stderr(x, df, wgt, narm)
 
     # Lower and upper confidence interval boundaries
     res <- c(ucl = xbar + margin,
@@ -224,7 +230,7 @@ get_clm <- function(x, w = NULL, df, narm = TRUE, alpha = 0.05, onesided = FALSE
 
 
 #' @noRd
-get_clmstd <- function(x, df, w=NULL, narm = TRUE, alpha = 0.05, onesided = FALSE) {
+get_clmstd <- function(x, df, wgt=NULL, narm = TRUE, alpha = 0.05, onesided = FALSE) {
 
   if (!is.numeric(alpha))
     alpha <- as.numeric(alpha)
@@ -240,7 +246,7 @@ get_clmstd <- function(x, df, w=NULL, narm = TRUE, alpha = 0.05, onesided = FALS
     x <- na.omit(x)
 
   # Calculate variance
-  x.var <- get_variance(x, w, df, narm)
+  x.var <- get_variance(x, df, wgt, narm)
 
 
   # Calculate chisq for upper and lower cl
@@ -530,9 +536,6 @@ get_chisq_back <- function(x, y, wgt = NULL, corrct = FALSE, bylbl = "", output 
 #' @noRd
 get_skewness <- function(x, df, narm = TRUE) {
 
-  if (narm)
-    x <- x[!is.na(x)]
-
   ret <- NULL
 
   if(any(ina <- is.na(x))) {
@@ -541,8 +544,9 @@ get_skewness <- function(x, df, narm = TRUE) {
   }
 
   n <- length(x)
-  if(n < 3)
+  if(n < 3){
     ret <- NA
+  }
   else{
   # ret <- Skewness(x)
     x <- x - mean(x)
@@ -580,9 +584,6 @@ get_skewness_back <- function(x, narm = TRUE) {
 #' @noRd
 get_kurtosis <- function(x, df, narm = TRUE) {
 
-  if (narm)
-    x <- x[!is.na(x)]
-
   ret <- NULL
 
   if(any(ina <- is.na(x))) {
@@ -592,8 +593,9 @@ get_kurtosis <- function(x, df, narm = TRUE) {
 
   n <- length(x)
 
-  if(n < 4)
+  if(n < 4){
     ret <- NA
+  }
   else{
     x <- x - mean(x)
     r <- n * sum(x ^ 4, na.rm = narm) / (sum(x ^ 2, na.rm = narm) ^ 2)

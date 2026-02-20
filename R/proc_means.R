@@ -126,7 +126,7 @@
 #'   \itemize{
 #'     \item{\strong{DF}: Uses \(n - 1\), the sample degrees of freedom.}
 #'     \item{\strong{N}: Uses \(n\), the total count of observations.}
-#'     \item{\strong{WEIGHT}: Uses the sum of weights.}
+#'     \item{\strong{WEIGHT/WGT}: Uses the sum of weights.}
 #'     \item{\strong{WDF}: Uses the sum of weights minus one.}
 #'   }
 #' By default, this option use \strong{DF}.
@@ -754,6 +754,7 @@ get_summaries <- function(data, var, weight=NULL, stats, missing = FALSE,
   narm <- TRUE
   ret <- NULL
   vardef <- tolower(get_option(opts, "vardef", "df"))
+  if (vardef=="wgt") vardef <- "weight"
 
   for (nm in var) {
 
@@ -790,6 +791,7 @@ get_summaries <- function(data, var, weight=NULL, stats, missing = FALSE,
       }
 
       # compute denominator
+
       denom <- switch(
         vardef,
         df = sum(!is.na(var)) - 1,
@@ -823,9 +825,9 @@ get_summaries <- function(data, var, weight=NULL, stats, missing = FALSE,
           if (all(is.na(var)))
             rw[["CV"]] <- NA
           else if (is.null(weight))
-             rw[["CV"]] <- sqrt(get_variance(var, w, denom, narm))/ mean(var, na.rm = narm) * 100
+             rw[["CV"]] <- sqrt(get_variance(var, denom, w, narm))/ mean(var, na.rm = narm) * 100
           else
-            rw[["CV"]] <- sqrt(get_variance(var, w, denom, narm))/ (sum(var*w, na.rm = narm)/sum(w)) * 100
+            rw[["CV"]] <- sqrt(get_variance(var, denom, w, narm))/ (sum(var*w, na.rm = narm)/sum(w)) * 100
         }
 
         if (st == "mean") {
@@ -888,7 +890,7 @@ get_summaries <- function(data, var, weight=NULL, stats, missing = FALSE,
           if (all(is.na(var)))
             rw[["STD"]] <- NA
           else
-            rw[["STD"]] <- sqrt(get_variance(var, w, denom, narm))
+            rw[["STD"]] <- sqrt(get_variance(var, denom, w, narm))
         }
 
         if (st == "sum") {
@@ -915,12 +917,12 @@ get_summaries <- function(data, var, weight=NULL, stats, missing = FALSE,
 
         if (st == "vari") {
 
-          rw[["VARI"]] <- get_variance(var, w, denom, narm)
+          rw[["VARI"]] <- get_variance(var, denom, w, narm)
         }
 
         if (st == "stderr") {
           if (vardef == "df")
-            rw[["STDERR"]] <- get_stderr(var, w, denom, narm)
+            rw[["STDERR"]] <- get_stderr(var, denom, w, narm)
           else
             rw[["STDERR"]] <- NA
 
@@ -931,8 +933,8 @@ get_summaries <- function(data, var, weight=NULL, stats, missing = FALSE,
         if (st == "clm" || all(c("lclm", "uclm") %in% sts)) {
 
           alph <- get_alpha(opts)
+          tmp <- get_clm(var, denom, w, narm, alph)
 
-          tmp <- get_clm(var, w, denom, narm, alph)
 
           if (vardef == "df"){
             rw[["LCLM"]] <- tmp[["lcl"]]
@@ -950,7 +952,7 @@ get_summaries <- function(data, var, weight=NULL, stats, missing = FALSE,
 
             alph <- get_alpha(opts)
 
-            tmp <- get_clm(var, w, denom, narm, alph, onesided = TRUE)
+            tmp <- get_clm(var, denom, w, narm, alph, onesided = TRUE)
 
             if (vardef == "df")
               rw[["LCLM"]] <- tmp[["lcl"]]
@@ -966,7 +968,7 @@ get_summaries <- function(data, var, weight=NULL, stats, missing = FALSE,
 
             alph <- get_alpha(opts)
 
-            tmp <- get_clm(var, w, denom, narm, alph, onesided = TRUE)
+            tmp <- get_clm(var, denom, w, narm, alph, onesided = TRUE)
 
             if (vardef == "df")
               rw[["UCLM"]] <- tmp[["ucl"]]
@@ -979,7 +981,7 @@ get_summaries <- function(data, var, weight=NULL, stats, missing = FALSE,
 
           alph <- get_alpha(opts)
 
-          tmp <- get_clmstd(var, w, denom, narm, alph)
+          tmp <- get_clmstd(var, denom, w, narm, alph)
 
           if (vardef == "df"){
             rw[["LCLMSTD"]] <- tmp[["lcl"]]
@@ -994,7 +996,7 @@ get_summaries <- function(data, var, weight=NULL, stats, missing = FALSE,
 
           alph <- get_alpha(opts)
 
-          tmp <- get_t(var, w, denom, alpha = alph)
+          tmp <- get_t(var, denom, w, alpha = alph)
 
           if (vardef == "df")
             rw[["T"]] <- tmp[["T"]]
@@ -1006,7 +1008,7 @@ get_summaries <- function(data, var, weight=NULL, stats, missing = FALSE,
 
           alph <- get_alpha(opts)
 
-          tmp <- get_t(var, w, denom, alpha = alph)
+          tmp <- get_t(var, denom, w, alpha = alph)
 
           if (vardef == "df")
             rw[["PRT"]] <- tmp[["PRT"]]
@@ -1019,7 +1021,7 @@ get_summaries <- function(data, var, weight=NULL, stats, missing = FALSE,
 
           alph <- get_alpha(opts)
 
-          tmp <- get_t(var, w, denom, alpha = alph)
+          tmp <- get_t(var, denom, w, alpha = alph)
 
           if (vardef == "df")
             rw[["PROBT"]] <- tmp[["PRT"]]
@@ -1031,7 +1033,7 @@ get_summaries <- function(data, var, weight=NULL, stats, missing = FALSE,
 
           alph <- get_alpha(opts)
 
-          tmp <- get_t(var, w, denom, alpha = alph)
+          tmp <- get_t(var, denom, w, alpha = alph)
 
           rw[["DF"]] <- tmp[["DF"]]
 
