@@ -51,18 +51,55 @@ male   Active  Same 16
 male   Placebo Better  7
 male   Placebo Same 19')
 
-test_that("stats1: Standard error works.", {
+test_that("stats1: Standard error and variance works.", {
 
 
   dt <- c(4, -1, 7, -4, 6, 8, 10)
 
-  res <- get_stderr(dt)
-
+  df <- length(dt) - 1
+  res <- get_stderr(dt,df=df)
   res
 
   expect_equal(res, 1.9112983)
 
+  res <- get_variance(dt,df=df)
+  res
 
+  expect_equal(res, 25.57142857)
+
+  #weighted variance
+  x1 <- c(2,4,6,8)
+  w1 <- c(1,1,2,2)
+  df1 <- 6
+
+  expected_var1 <- 27.3333333 / df1
+  res_var1 <- get_variance(x1, df1, w1)
+  expect_equal(res_var1, expected_var1)
+
+  x2 <- c(10,20,30)
+  w2 <- c(5,1,4)
+  df2 <- 2
+
+  expected_var2 <- 890 / df2
+  res_var2 <- get_variance(x2, df2, w2)
+  expect_equal(res_var2, expected_var2)
+
+
+  #Weighted stderr
+  dt <- c(2,4,6,8)
+  w <- c(1,1,2,2)
+
+
+  res <- get_stderr(dt, 3, w)
+  res
+  expect_equal(res, 1.232281834)
+
+
+  #test df = 0
+  x3 <- c(5)
+  df3 <- length(x3) - 1
+  expect_equal(get_stderr(x3, df=df3), NA)
+  expect_equal(get_variance(x3, df=df3), NA)
 })
 
 
@@ -70,9 +107,9 @@ test_that("stats2: CLM works.", {
 
 
   dt <- c(4, -1, 7, -4, 6, 8, 10)
-
+  df <- length(dt) - 1
   # 95% limit
-  res <- get_clm(dt, alpha = .05)
+  res <- get_clm(dt, df,alpha = .05)
 
   res
 
@@ -81,15 +118,20 @@ test_that("stats2: CLM works.", {
 
 
   # 90% limit
-  res <- get_clm(dt, alpha = 0.1)
+  res <- get_clm(dt,df, alpha = 0.1)
 
   res
 
   expect_equal(res[["ucl"]], 7.9997115)
   expect_equal(res[["lcl"]], 0.5717171)
 
+  #weighted
+  w <- c(1,1,2,2,1,1,1)
+  res <- get_clm(dt, df, w, alpha = .05)
+  res
 
-
+  expect_equal(res[["ucl"]], 8.6724917)
+  expect_equal(res[["lcl"]], -1.339158346)
 
 })
 
@@ -109,15 +151,27 @@ test_that("stats3: getmode works.", {
 
   expect_equal(res, "c")
 
+  #multiple modes
+  dt <- c(4, 3, 7, 4, 3)
+  res <- get_mode(dt)
+
+  expect_equal(res, NA)
+
 })
 
-test_that("stats4: CLM works with NA.", {
+test_that("stats4: CLM works with some edge cases.", {
 
-
+  #NAs
   dt <- c(4, -1, 7, -4, NA, 8, 10)
+  df <- length(na.omit(dt)) - 1
+  res <- get_clm(dt,df)
 
-  res <- get_clm(dt, TRUE)
+  res
 
+  expect_equal(res[["ucl"]], 9.7479957)
+  expect_equal(res[["lcl"]], -1.74799573)
+  #non-numeric alpha
+  res <- get_clm(dt,df, alpha = "0.05")
   res
 
   expect_equal(res[["ucl"]], 9.7479957)
@@ -266,7 +320,8 @@ test_that("stat12: get_t() works as expected.", {
 
   dt <- c(-10, -21, -12,  -5,   1, -70, -41, -24)
 
-  res <- get_t(dt)
+  df <- length(dt) - 1
+  res <- get_t(dt,df)
 
   res
 
@@ -277,9 +332,9 @@ test_that("stat12: get_t() works as expected.", {
 
   dt <- c(-10, -21, -12,  -5,   1, -70, -41, -24)
 
-
   # Change in alpha does not change t test results
-  res <- get_t(dt, alpha = 0.1)
+  df <- length(dt) - 1
+  res <- get_t(dt,df, alpha = 0.1)
 
   res
 
@@ -287,6 +342,11 @@ test_that("stat12: get_t() works as expected.", {
   expect_equal(res[["PRT"]], 0.026967454)
   expect_equal(res[["DF"]],  7.00000000)
 
+  #non-numeric alpha
+  res <- get_t(dt,df, alpha = "0.1")
+  expect_equal(res[["T"]], -2.78847393)
+  expect_equal(res[["PRT"]], 0.026967454)
+  expect_equal(res[["DF"]],  7.00000000)
 
 })
 
@@ -296,11 +356,21 @@ test_that("stat13: get_skewness() works as expected.", {
   d <- c(27, 32, 46, 38, 23, 51, 19, 57, 33, 62,
          26, 43, 28, 69, 55, 28, 42, 36, 27, 62)
 
-
-  res <- get_skewness(d)
+  df <- length(d) - 1
+  res <- get_skewness(d,df)
 
 
   expect_equal(res, 0.49070401)
+
+  #NA
+  d <- c(27, 32, 46, 38, 23, 51, 19, 57, 33, 62,
+         26, 43, 28, 69, NA, 55, 28, 42, 36, 27, 62)
+
+  df <- length(na.omit(d)) - 1
+  res <- get_skewness(d,df)
+
+  expect_equal(res, 0.49070401)
+
 
 })
 
@@ -311,8 +381,18 @@ test_that("stat14: get_kurtosis() works as expected.", {
   d <- c(27, 32, 46, 38, 23, 51, 19, 57, 33, 62,
          26, 43, 28, 69, 55, 28, 42, 36, 27, 62)
 
+  df <- length(d) - 1
+  res <- get_kurtosis(d,df)
 
-  res <- get_kurtosis(d)
+
+  expect_equal(res, -0.96131045)
+
+  #NA
+  d <- c(27, 32, 46, 38, 23, 51, 19, 57, 33, 62,
+         26, 43, 28, 69, NA, 55, 28, 42, 36, 27, 62)
+
+  df <- length(na.omit(d)) - 1
+  res <- get_kurtosis(d,df)
 
 
   expect_equal(res, -0.96131045)
@@ -330,8 +410,8 @@ test_that("stat15: get_clmstd() works as expected.", {
   # Target
   # STD     95% LCM   95% UCM
   # 5.1271	3.8741	7.5820
-
-  res <- get_clmstd(ht)
+  df <- length(ht)-1
+  res <- get_clmstd(ht,df)
 
 
   res
@@ -341,6 +421,31 @@ test_that("stat15: get_clmstd() works as expected.", {
 
 })
 
+
+# A test for weighted quantiles
+test_that("stat16: get_weighted_quantile() works as expected.", {
+
+  #Unweighted median
+  x1 <- c(4, 1, 9, 3, 7)
+
+  res1 <- get_weighted_quantile(x1, probs = 0.5)
+  expect_equal(as.numeric(res1), 4)
+
+  #Weighted median
+  x2 <- c(1, 2, 3)
+  w2 <- c(1, 1, 10)
+
+  res2 <- get_weighted_quantile(x2, probs = 0.2, w2)
+  expect_equal(as.numeric(res2), 3)
+
+  #Weighted quantile with ≥10 values
+  x3 <- c(5, 8, 2, 9, 4, 7, 6, 3, 10, 1)
+  w3 <- c(1, 2, 1, 5, 1, 1, 1, 1, 3, 1)
+
+  res3 <- get_weighted_quantile(x3, probs = 0.75, w3)
+  expect_equal(as.numeric(res3), 9)
+
+})
 
 
 

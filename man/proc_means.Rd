@@ -12,6 +12,7 @@ proc_means(
   output = NULL,
   by = NULL,
   class = NULL,
+  weight = NULL,
   options = NULL,
   titles = NULL
 )
@@ -63,13 +64,17 @@ separate tables, while class groups will be continued in the same table.
 When a \code{by} and a \code{class} are both specified, the \code{class}
 will be nested in the \code{by}.}
 
+\item{weight}{The variable specifies weights for analysis variables in the
+statistical calculations.}
+
 \item{options}{A vector of optional keywords. Valid values are: "alpha =",
-"completetypes", "maxdec =", "noprint", "notype", "nofreq", "nonobs", "nway".
-The "notype", "nofreq", and "nonobs" keywords will turn
+"completetypes", "maxdec =", "noprint", "notype", "nofreq", "nonobs", "nway",
+"vardef=". The "notype", "nofreq" and "nonobs"  keywords will turn
 off columns on the output datasets.  The "alpha = " option will set the alpha
 value for confidence limit statistics.  The default is 95\% (alpha = 0.05).
 The "maxdec = " option sets the maximum number of decimal places displayed
-on report output. The "nway" option returns only the highest type values.}
+on report output. The "nway" option returns only the highest type values.
+The "vardef=" option specifies the variance divisor.}
 
 \item{titles}{A vector of one or more titles to use for the report output.}
 }
@@ -206,6 +211,16 @@ dataset.
 }
 \item{\strong{nway}: Returns only the highest level TYPE combination.  By
 default, the function returns all TYPE combinations.
+}
+\item{\strong{vardef}: Controls the denominator used in variance-related
+statistics. This option supports several denominator definitions:
+\itemize{
+\item{\strong{DF}: Uses \(n - 1\), the sample degrees of freedom.}
+\item{\strong{N}: Uses \(n\), the total count of observations.}
+\item{\strong{WEIGHT/WGT}: Uses the sum of weights.}
+\item{\strong{WDF}: Uses the sum of weights minus one.}
+}
+By default, this option use \strong{DF}.
 }
 }
 }
