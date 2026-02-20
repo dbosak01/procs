@@ -201,9 +201,12 @@ enhancement.</p>
 </h3>
 <p><strong>Q:</strong> I’m trying to find the option to produce a plot,
 and can’t find it. Does the package support plots or not?</p>
-<p><strong>A:</strong> Not yet. Plots are expected for a future release.
-In the meantime, you can send the output results into <a href="https://ggplot2.tidyverse.org/" class="external-link">ggplot2</a> and create the plots
-on your own.</p>
+<p><strong>A:</strong> Yes. As of <strong>procs</strong> version 1.0.8,
+the <code><a href="../reference/proc_freq.html">proc_freq()</a></code>, <code><a href="../reference/proc_ttest.html">proc_ttest()</a></code>, and
+<code><a href="../reference/proc_reg.html">proc_reg()</a></code> functions produce plots. To get a default set of
+plots, set <code>plots = TRUE</code> for the desired function. The
+documentation for each function has more information on the types of
+charts that can be produced, and various options.</p>
 <p><a href="#top">top</a></p>
 <hr>
 </div>
@@ -267,9 +270,14 @@ the <a href="https://reporter.r-sassy.org/" class="external-link">reporter</a> p
 always order the categories alphabetically. But I have a specific order
 in mind that is not alphabetical. Is there a way to order the frequency
 categories in a specific way?</p>
-<p><strong>A:</strong> Yes. If your frequency variable is defined as a
-factor, the <code><a href="../reference/proc_freq.html">proc_freq()</a></code> function will order the frequency
-categories by that factor. Here is an example:</p>
+<p><strong>A:</strong> Yes. The <code>order</code> parameter on
+<code><a href="../reference/proc_freq.html">proc_freq()</a></code> allows you to order your frequencies in four
+different ways: internal order (the default), data order, format order,
+or frequency order. See the <code><a href="../reference/proc_freq.html">proc_freq()</a></code> documentation on
+the specific keywords needed to control the order.</p>
+<p>Also note that if your frequency variable is defined as a factor, the
+<code><a href="../reference/proc_freq.html">proc_freq()</a></code> function will order the frequency categories by
+that factor. Here is an example:</p>
 <pre><code><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://procs.r-sassy.org">procs</a></span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Turn off printing for CRAN checks</span></span>

@@ -109,6 +109,8 @@ test_that("freqplot1: render_freqplot() works for freqplots.", {
 
   expect_equal(file.exists(pth), TRUE)
 
+  expect_error(freqplot(c("barchart", "dotplot")))
+
 })
 
 test_that("freqplot2: One-way proc_freq with plots works.", {

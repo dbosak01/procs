@@ -55,7 +55,7 @@ A function to request regression plots on a call to
 \code{\link{proc_reg}}. The function allows you to specify the type of
 regression plots to produce. It produces a combined diagnostics panel,
 residuals dot plot, and a fit plot by default.  You may also specify
-individual plots to create by setting by passing a vector of plot names
+individual plots by passing a vector of plot names
 on the "type" parameter.
 }
 \details{
@@ -104,7 +104,7 @@ with a normal and kernel curve overlay.
 
 If possible, the statistics from the report tabular output are used for the plots.
 Otherwise, additional statistics functions are called to produce the
-needed statistics.
+needed values.
 }
 \section{Plot Statistics}{
 
@@ -167,10 +167,10 @@ set \code{output = report} on the call to \code{\link{proc_reg}}, and pass
 the entire list to \code{\link{proc_print}}.
 }
 
-\section{Discrepancies with SAS®}{
+\section{Discrepancies with SAS}{
 
 The histogram binning algorithm in R is different from the binning algorithm
-in SAS. R uses a "Sturges" algorithm, which more accurately represents
+in SAS®. R uses a "Sturges" algorithm, which more accurately represents
 the distribution of the data.  This algorithm may produce a different number
 of bins and different height of bars than the corresponding SAS chart.
 

@@ -442,7 +442,7 @@ no equivalent in SAS®.</p>
 <div class="section level2">
 <h2 id="frequency-plots">Frequency Plots<a class="anchor" aria-label="anchor" href="#frequency-plots"></a>
 </h2>
-<p>To better understand your data, it is important to visualize it. The
+<p>To better understand your data, it is valuable to visualize it. The
 <code><a href="../reference/proc_freq.html">proc_freq()</a></code> function offers basic plotting of frequencies
 via the “plots” parameter and the <code><a href="../reference/freqplot.html">freqplot()</a></code> function.</p>
 <div class="section level3">
@@ -455,7 +455,10 @@ plots for a selection of tables using the sample data from above:</p>
 <span>          plots <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre>
 <p>The generated report will look like this:</p>
 <p><img src="../man/images/freqtut12.png" alt="Default frequency plots"></p>
-<p>The report now shows a bar chart for each of the table requests.</p>
+<p>The report now shows a bar chart for each of the table requests. Note
+that on the two-way interaction, a bar chart is produced for each
+interaction and place onto a single panel. If the interactions do not
+fit on a single panel, additional panels will be generated.</p>
 </div>
 <div class="section level3">
 <h3 id="customized-plots">Customized Plots<a class="anchor" aria-label="anchor" href="#customized-plots"></a>

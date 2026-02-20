@@ -155,14 +155,14 @@ parameter applies to two-way tables only.</p></dd>
     <p>The frequency plot object.  This object is then passed to
 <code><a href="proc_freq.html">proc_freq</a></code> for evaluation and rendering. Data for the
 frequency plot comes directly from the <code><a href="proc_freq.html">proc_freq</a></code> reporting
-data frame.</p>
+data frames.</p>
     </div>
     <div id="details">
     <h2>Details</h2>
     <p>The <code>freqplot</code> function can be passed to the <code>plots</code> parameter
 on <code><a href="proc_freq.html">proc_freq</a></code> to give you some control over what kind
 of frequency plot is produced.  Generally, one call to <code>freqplot</code> produces
-one frequency plot.  The exception is on two-way interactions, and there
+one frequency plot.  The exception is on two-way interactions when there
 are more interactions that can fit on a single panel.  In this case,
 the function will produce multiple panels so that frequencies for all
 interactions are displayed. The number of plots on a panel can be controlled
@@ -173,7 +173,7 @@ the frequency counts.  You may change the orientation of the chart using
 the <code>orient</code> parameter.  You may also change the Y scale using the
 <code>scale</code> parameter. Options include a percentage, logarithmic, or
 square root scale.</p>
-<p>There are many more options for two-way interactions.  For two-way
+<p>There are several more options for two-way interactions.  For two-way
 interactions, you may choose to display the data as bar charts,
 dot plots, stacked bar charts, or clustered bar charts. To create stacked
 or clustered bar charts, set the <code>type</code> parameter to "barchart", and

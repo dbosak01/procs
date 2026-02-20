@@ -185,12 +185,20 @@
 #' The "h0 = " option sets the baseline hypothesis value for single-variable
 #' hypothesis testing.  The "noprint" option turns off the interactive report.
 #' @param titles A vector of one or more titles to use for the report output.
-#' @param plots A plot request. The value TRUE will give you a default set of
-#' plots appropriate for the test you are performing.  The request may also be
-#' made as a vector of plot names, or a call to the \code{\link{ttestplot}}
-#' object. If there are multiple
-#' variables to test, you may pass multiple plot requests in a list.  See
-#' the \code{\link{ttestplot}} documentation for additional details.
+#' @param plots A plot request. Valid values are NULL, TRUE, "all", a vector
+#' of plot names, or a call to \code{\link{ttestplot}}.  The value TRUE will
+#' give you a default set of
+#' plots appropriate for the test you are performing. The value "all" will
+#' give you all available plots for the test you are performing. To request
+#' specific plots, pass a vector of plot names or call
+#' \code{\link{ttestplot}} and pass the desired plot names on the \code{type}
+#' parameter. See
+#' the \code{\link{ttestplot}} documentation for the available plot names
+#' and additional details. If there are multiple
+#' variables to test, you may pass one plot request which applies to all tests,
+#' or multiple plot requests in a list. In the latter case, the plot requests
+#' should align one to one with the test variables. The default is NULL,
+#' meaning no plots will be generated.
 #' @return Normally, the requested T-Test statistics are shown interactively
 #' in the viewer, and output results are returned as a list of data frames.
 #' You may then access individual datasets from the list using dollar sign ($)

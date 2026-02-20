@@ -193,12 +193,20 @@ hypothesis testing.  The "noprint" option turns off the interactive report.</p><
 
 
 <dt id="arg-plots">plots<a class="anchor" aria-label="anchor" href="#arg-plots"></a></dt>
-<dd><p>A plot request. The value TRUE will give you a default set of
-plots appropriate for the test you are performing.  The request may also be
-made as a vector of plot names, or a call to the <code><a href="ttestplot.html">ttestplot</a></code>
-object. If there are multiple
-variables to test, you may pass multiple plot requests in a list.  See
-the <code><a href="ttestplot.html">ttestplot</a></code> documentation for additional details.</p></dd>
+<dd><p>A plot request. Valid values are NULL, TRUE, "all", a vector
+of plot names, or a call to <code><a href="ttestplot.html">ttestplot</a></code>.  The value TRUE will
+give you a default set of
+plots appropriate for the test you are performing. The value "all" will
+give you all available plots for the test you are performing. To request
+specific plots, pass a vector of plot names or call
+<code><a href="ttestplot.html">ttestplot</a></code> and pass the desired plot names on the <code>type</code>
+parameter. See
+the <code><a href="ttestplot.html">ttestplot</a></code> documentation for the available plot names
+and additional details. If there are multiple
+variables to test, you may pass one plot request which applies to all tests,
+or multiple plot requests in a list. In the latter case, the plot requests
+should align one to one with the test variables. The default is NULL,
+meaning no plots will be generated.</p></dd>
 
 </dl></div>
     <div id="value">

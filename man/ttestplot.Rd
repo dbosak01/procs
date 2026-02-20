@@ -20,16 +20,16 @@ equivalent to the "unpack" keyword in SAS.}
 
 \item{showh0}{Whether or not to show the null hypothesis on the chart.
 Default is FALSE. If this parameter is TRUE, a vertical line will be created
-on some charts to show the value specified for the "h0" option on
+on some charts to show the value specified for the "h0=" option on
 \code{\link{proc_ttest}}.}
 }
 \description{
 A function to request T-test plots on a call to
 \code{\link{proc_ttest}}. The function allows you to specify the type of
-regression plots to produce. By default, it produces plots appropriate
+T-Test plots to produce. By default, it produces plots appropriate
 to the analysis being performed.
 You may also request specific plots
-by passing a vector of plot names on the \code{type} parameter.
+by passing a vector of plot names to the \code{type} parameter.
 }
 \details{
 Plots produced by \code{\link{proc_ttest}} can change depending on
@@ -103,10 +103,10 @@ will be produced.  That is to say, the "only" keyword in SAS is implied
 at all times for \code{\link{proc_ttest}}.
 }
 
-\section{Discrepancies with SAS®}{
+\section{Discrepancies with SAS}{
 
 The histogram binning algorithm in R is different from the binning algorithm
-in SAS. R uses a "Sturges" algorithm, which more accurately represents
+in SAS®. R uses a "Sturges" algorithm, which more accurately represents
 the distribution of the data.  This algorithm may produce a different number
 of bins and different height of bars than the corresponding SAS chart.
 

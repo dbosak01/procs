@@ -95,9 +95,11 @@ These types of tables are on the list for a future enhancement.
 Does the package support plots or not?
 
 
-**A:** Not yet. Plots are expected for a future release. In the meantime, 
-you can send the output results into [ggplot2](https://ggplot2.tidyverse.org/)
-and create the plots on your own.
+**A:** Yes. As of **procs** version 1.0.8, the `proc_freq()`, `proc_ttest()`,
+and `proc_reg()` functions produce plots.  To get a default set of plots,
+set `plots = TRUE` for the desired function.  The documentation for each
+function has more information on the types of charts that can be produced,
+and various options.
 
 [top](#top) 
 
@@ -168,7 +170,12 @@ reporting features, see the [reporter](https://reporter.r-sassy.org/) package.
 But I have a specific order in mind that is not alphabetical.  Is there a way
 to order the frequency categories in a specific way?
 
-**A:** Yes.  If your frequency variable is defined as a factor, the 
+**A:** Yes. The `order` parameter on `proc_freq()` allows you to order your
+frequencies in four different ways: internal order (the default), data order,
+format order, or frequency order.  See the `proc_freq()` documentation on the 
+specific keywords needed to control the order.
+
+Also note that if your frequency variable is defined as a factor, the 
 `proc_freq()` function will order the frequency categories by that factor.
 Here is an example: 
 ```

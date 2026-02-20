@@ -345,7 +345,7 @@ the development of the **procs** package, and have no equivalent in SAS®.
 
 ## Frequency Plots
 
-To better understand your data, it is important to visualize it.  The 
+To better understand your data, it is valuable to visualize it.  The 
 `proc_freq()` function offers basic plotting of frequencies via the 
 "plots" parameter and the `freqplot()` function.  
 
@@ -364,7 +364,10 @@ The generated report will look like this:
 
 <img src="../man/images/freqtut12.png" alt="Default frequency plots"/>
 
-The report now shows a bar chart for each of the table requests. 
+The report now shows a bar chart for each of the table requests. Note that on
+the two-way interaction, a bar chart is produced for each interaction and
+place onto a single panel.  If the interactions do not fit on a single panel,
+additional panels will be generated.
 
 ### Customized Plots
 

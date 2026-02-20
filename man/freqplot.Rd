@@ -41,7 +41,7 @@ parameter applies to two-way tables only.}
 The frequency plot object.  This object is then passed to
 \code{\link{proc_freq}} for evaluation and rendering. Data for the
 frequency plot comes directly from the \code{\link{proc_freq}} reporting
-data frame.
+data frames.
 }
 \description{
 A function to request a frequency plot on a call to
@@ -54,7 +54,7 @@ vertical or horizontal orientation, by variables, and various scale options.
 The \code{freqplot} function can be passed to the \code{plots} parameter
 on \code{\link{proc_freq}} to give you some control over what kind
 of frequency plot is produced.  Generally, one call to \code{freqplot} produces
-one frequency plot.  The exception is on two-way interactions, and there
+one frequency plot.  The exception is on two-way interactions when there
 are more interactions that can fit on a single panel.  In this case,
 the function will produce multiple panels so that frequencies for all
 interactions are displayed. The number of plots on a panel can be controlled
@@ -67,7 +67,7 @@ the \code{orient} parameter.  You may also change the Y scale using the
 \code{scale} parameter. Options include a percentage, logarithmic, or
 square root scale.
 
-There are many more options for two-way interactions.  For two-way
+There are several more options for two-way interactions.  For two-way
 interactions, you may choose to display the data as bar charts,
 dot plots, stacked bar charts, or clustered bar charts. To create stacked
 or clustered bar charts, set the \code{type} parameter to "barchart", and
