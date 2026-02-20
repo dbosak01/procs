@@ -1279,8 +1279,6 @@ render_residualbypredicted <- function(dat, res, mdl) {
   ht <- hti * 96
   wd <- wdi * 96
 
-  wd <- wd - 10
-
   # Output to image file
   # All output types accept jpeg
   # So start with that
