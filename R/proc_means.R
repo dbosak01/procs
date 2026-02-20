@@ -196,8 +196,6 @@
 #' variables are specified,
 #' summary statistics will be generated for all numeric variables on the
 #' input data frame.
-#' @param weight The variable specifies weights for analysis variables in the
-#' statistical calculations.
 #' @param stats A vector of summary statistics keywords.  Valid
 #' keywords are: "css", "clm", "cv", "kurt", "kurtosis",
 #' "lclm", "mean", "median", "mode",
@@ -232,7 +230,13 @@
 #' separate tables, while class groups will be continued in the same table.
 #' When a \code{by} and a \code{class} are both specified, the \code{class}
 #' will be nested in the \code{by}.
-# @param weight An optional weight parameter.
+#' @param weight The name of a variable to use for weighted statistics.
+#' This parameter is optional, and NULL by default.
+#' The weight can be used to
+#' calculate weighted means, sums, variances, etc. Note that any observations with
+#' NA values for the weight will be excluded from the analysis.  Also observe
+#' the "vardef" option for weighted variances, as this option can effect
+#' which denominator is used.
 #' @param options A vector of optional keywords. Valid values are: "alpha =",
 #' "completetypes", "maxdec =", "noprint", "notype", "nofreq", "nonobs", "nway",
 #' "vardef=". The "notype", "nofreq" and "nonobs"  keywords will turn

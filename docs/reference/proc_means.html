@@ -108,6 +108,7 @@ the viewer interactively and returned from the function.</p>
 <span>  output <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  by <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  class <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  weight <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  options <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  titles <span class="op">=</span> <span class="cn">NULL</span></span>
 <span><span class="op">)</span></span></code></pre></div>
@@ -175,14 +176,25 @@ When a <code>by</code> and a <code>class</code> are both specified, the <code>cl
 will be nested in the <code>by</code>.</p></dd>
 
 
+<dt id="arg-weight">weight<a class="anchor" aria-label="anchor" href="#arg-weight"></a></dt>
+<dd><p>The name of a variable to use for weighted statistics.
+This parameter is optional, and NULL by default.
+The weight can be used to
+calculate weighted means, sums, variances, etc. Note that any observations with
+NA values for the weight will be excluded from the analysis.  Also observe
+the "vardef" option for weighted variances, as this option can effect
+which denominator is used.</p></dd>
+
+
 <dt id="arg-options">options<a class="anchor" aria-label="anchor" href="#arg-options"></a></dt>
 <dd><p>A vector of optional keywords. Valid values are: "alpha =",
-"completetypes", "maxdec =", "noprint", "notype", "nofreq", "nonobs", "nway".
-The "notype", "nofreq", and "nonobs" keywords will turn
+"completetypes", "maxdec =", "noprint", "notype", "nofreq", "nonobs", "nway",
+"vardef=". The "notype", "nofreq" and "nonobs"  keywords will turn
 off columns on the output datasets.  The "alpha = " option will set the alpha
 value for confidence limit statistics.  The default is 95% (alpha = 0.05).
 The "maxdec = " option sets the maximum number of decimal places displayed
-on report output. The "nway" option returns only the highest type values.</p></dd>
+on report output. The "nway" option returns only the highest type values.
+The "vardef=" option specifies the variance divisor.</p></dd>
 
 
 <dt id="arg-titles">titles<a class="anchor" aria-label="anchor" href="#arg-titles"></a></dt>
@@ -305,6 +317,14 @@ option will inhibit printing.</p></li>
 dataset.</p></li>
 <li><p><strong>nway</strong>: Returns only the highest level TYPE combination.  By
 default, the function returns all TYPE combinations.</p></li>
+<li><p><strong>vardef</strong>: Controls the denominator used in variance-related
+statistics. This option supports several denominator definitions:
+</p><ul><li><p><strong>DF</strong>: Uses \(n - 1\), the sample degrees of freedom.</p></li>
+<li><p><strong>N</strong>: Uses \(n\), the total count of observations.</p></li>
+<li><p><strong>WEIGHT/WGT</strong>: Uses the sum of weights.</p></li>
+<li><p><strong>WDF</strong>: Uses the sum of weights minus one.</p></li>
+</ul>
+By default, this option use <strong>DF</strong>.</li>
 </ul></div>
     <div id="type-and-freq-variables">
     <h2>TYPE and FREQ Variables</h2>
