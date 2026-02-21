@@ -187,7 +187,7 @@ freqplot <- function(type = "barchart", orient = "vertical", scale = "freq",
   }
 
   if (!twoway %in% c("grouphorizontal", "groupvertical", "stacked", "cluster")) {
-    stop(paste0("Parameter value for 'type' invalid. Valid values are 'groupvertical', ",
+    stop(paste0("Parameter value for 'twoway' invalid. Valid values are 'groupvertical', ",
     "'grouphorizontal', 'stacked', or 'cluster'."))
   }
 

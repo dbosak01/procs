@@ -627,7 +627,9 @@ proc_freq <- function(data,
     if ("logical" %in% class(plots)) {
       plots <- "freqplot"
     }
-    if ("freqplot" %in% class(plots) |
+    if (all(class(plots) == "list")) {
+      # Do nothing
+    } else if ("freqplot" %in% class(plots) |
         "character" %in% class(plots)) {
       tplots <- list()
       for (idx in seq_along(tables)) {

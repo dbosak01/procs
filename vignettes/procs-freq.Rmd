@@ -374,7 +374,7 @@ additional panels will be generated.
 The `plots` parameter on `proc_freq()` also accepts a `freqplot()` object.
 This object offers some customization of the requested plot.  Besides the 
 default frequency chart produced in the example above, you may also request
-dot plots, stacked bar charts, or grouped bar charts.  The `freqplot()`
+dot plots, stacked bar charts, or clustered bar charts.  The `freqplot()`
 function also allows you to control the chart's orientation, scale, and
 other basic aspects of the plot.
 

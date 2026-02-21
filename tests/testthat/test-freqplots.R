@@ -1802,9 +1802,10 @@ test_that("freqplot31: Odd cases with plots.", {
 })
 
 
-test_that("freqplot32: TRUE works as expected.", {
+test_that("freqplot32: TRUE and multiple plot requests work as expected.", {
 
 
+  # TRUE
   res <- proc_freq(mtcars, tables = c("cyl", "am", "cyl * am"),
                    plots = TRUE,
                    output = report)
@@ -1813,13 +1814,40 @@ test_that("freqplot32: TRUE works as expected.", {
   expect_equal("plot_spec" %in% class(res[[2]]), TRUE)
 
 
-  # res <- proc_freq(mtcars, tables = c("cyl", "am", "cyl * am"),
-  #                  plots = "all",
-  #                  output = report)
-  #
-  #
-  # expect_equal("data.frame" %in% class(res[[1]]), TRUE)
-  # expect_equal("plot_spec" %in% class(res[[2]]), TRUE)
+  # Multiple requests
+  res <- proc_freq(mtcars, tables = c("cyl", "am", "cyl * am"),
+                   plots = list(freqplot("dotplot"),
+                                freqplot("barchart", orient = "horizontal"),
+                                freqplot("barchart", twoway = "cluster")),
+                   output = report)
+
+
+  expect_equal("data.frame" %in% class(res[[1]]), TRUE)
+  expect_equal("plot_spec" %in% class(res[[2]]), TRUE)
+  expect_equal("data.frame" %in% class(res[[3]]), TRUE)
+  expect_equal("plot_spec" %in% class(res[[4]]), TRUE)
+  expect_equal("data.frame" %in% class(res[[5]]), TRUE)
+  expect_equal("plot_spec" %in% class(res[[6]]), TRUE)
+
+  # Create sample data
+  dat <- read.table(header = TRUE,
+                    text = 'x y z
+                          6 A 60
+                          6 A 70
+                          2 A 100
+                          2 B 10
+                          3 B 67
+                          2 C 81
+                          3 C 63
+                          5 C 55')
+
+
+  proc_freq(dat, tables = v(x, y, x * y),
+            weight = z,
+            plots = list(freqplot(type = "dotplot"),
+                         freqplot(orient = "horizontal"),
+                         freqplot(twoway = "stacked")))
+
 
 
 
