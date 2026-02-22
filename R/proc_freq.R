@@ -537,10 +537,6 @@ proc_freq <- function(data,
   order <- tryCatch({if (typeof(order) %in% c("character", "NULL")) order else rout},
                      error = function(cond) {rout})
 
-  pout <- deparse(substitute(plots, env = environment()))
-  plots <- tryCatch({if (typeof(plots) %in% c("logical", "list", "character", "NULL")) plots else pout},
-                    error = function(cond) {pout})
-
 
   # Parameter checks
 

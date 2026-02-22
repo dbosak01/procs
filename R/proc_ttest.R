@@ -420,12 +420,6 @@ proc_ttest <- function(data,
   paired <- tryCatch({if (typeof(paired) %in% c("character", "NULL")) paired else opaired},
                      error = function(cond) {opaired})
 
-  oplots <- deparse(substitute(plots, env = environment()))
-  if (all(grepl("regplot(", oplots, fixed = TRUE) == FALSE)) {
-    plots <- tryCatch({if (typeof(plots) %in% c("logical", "character", "list", "NULL")) plots else oplots},
-                      error = function(cond) {oplots})
-
-  }
 
   # Parameter checks
   if (!"data.frame" %in% class(data)) {

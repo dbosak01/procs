@@ -620,11 +620,11 @@ test_that("regplot15: passing type strings works.", {
   expect_equal("plot_spec" %in% class(res[[5]][[1]]), TRUE)
 
 
-  # Unquoted string
+  # Quoted string
   res <- proc_reg(cls,
                   model = "Weight = Height",
                   output = report,
-                  plots = residualhistogram)
+                  plots = "residualhistogram")
 
   expect_equal(length(res), 5)
   expect_equal("plot_spec" %in% class(res[[5]][[1]]), TRUE)

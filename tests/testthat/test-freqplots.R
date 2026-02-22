@@ -141,7 +141,7 @@ test_that("freqplot2: One-way proc_freq with plots works.", {
 
   # Freqplot NSE
   res <- proc_freq(dat, tables = c("Eyes"),
-                   plots = freqplot,
+                   plots = freqplot(),
                    output = report,
                    titles = "My first Frequency Plot")
 
@@ -193,7 +193,7 @@ test_that("freqplot3: One-way proc_freq with plots order variations work.", {
 
     # Frequency order
     res <- proc_freq(dat, tables = c("Eyes"),
-                     plots = freqplot,
+                     plots = freqplot(),
                      output = report,
                      order = freq,
                      titles = "My first Frequency Plot")
@@ -1654,7 +1654,7 @@ test_that("freqplot27: Multiple table requests work as expected", {
   res <- proc_freq(dat, tables = v(Hair, Eyes, Hair * Eyes),
                     weight = Count,
                     output = report,
-                    plots = freqplot,
+                    plots = freqplot(),
                     titles = "Hair and Eye Frequency Statistics")
 
   expect_equal(length(res), 6)
@@ -1709,7 +1709,7 @@ test_that("freqplot28: Two Way only works as expected.", {
 
 
   res <- proc_freq(mtcars, tables = c("cyl"),
-                   plots = freqplot,
+                   plots = freqplot(),
                    output = report)
 
   expect_equal("data.frame" %in% class(res[[1]]), TRUE)
@@ -1717,7 +1717,7 @@ test_that("freqplot28: Two Way only works as expected.", {
 
 
   res <- proc_freq(mtcars, tables = c("cyl * am"),
-            plots = freqplot,
+            plots = freqplot(),
             output = report)
 
 
@@ -1733,7 +1733,7 @@ test_that("freqplot29: Report with plot can be printed with proc_print.", {
   pth <- file.path(base_path, "print/test13.pdf")
 
   res <- proc_freq(mtcars, tables = c("cyl * am"),
-                   plots = freqplot,
+                   plots = freqplot(),
                    output = report)
 
   proc_print(res, pth, output_type = "PDF", view = FALSE)
@@ -1849,6 +1849,45 @@ test_that("freqplot32: TRUE and multiple plot requests work as expected.", {
                          freqplot(twoway = "stacked")))
 
 
+  dat <- read.table(header = TRUE, text = '
+  Region Eyes Hair Count
+  1 blue  fair   23
+  1 blue  dark   11
+  1 green medium 18
+  1 brown red     5
+  1 brown black   3
+  2 blue  medium 44
+  2 green fair   50
+  2 green dark   23
+  2 brown medium 53
+  1 blue  red     7
+  1 green fair   19
+  1 green dark   14
+  1 brown medium 41
+  2 blue  fair   46
+  2 blue  dark   40
+  2 green red    31
+  2 brown fair   56
+  2 brown dark   54
+  1 blue  medium 24
+  1 green red     7
+  1 brown fair   34
+  1 brown dark   40
+  2 blue  red    21
+  2 blue  black   6
+  2 green medium 37
+  2 brown red    42
+  2 brown black  13
+  ')
+
+
+
+  # freq 007
+  proc_freq(dat, tables = v(Eyes, Hair * Eyes, Eyes * Hair), weight = Count,
+            title = "Eye and Hair Color of European Children",
+            plots = list(freqplot("dotplot", orient = "horizontal"),
+                         freqplot("barchart", twoway = "stacked"),
+                         freqplot("barchart", twoway = "cluster")))
 
 
 })
