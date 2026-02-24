@@ -277,6 +277,14 @@ test_that("utils9: get_option() returns appropriate data type.", {
 
   expect_equal(typeof(res), "logical")
 
+
+  opts <- c(vardef = "df", "nway")
+
+  res <- get_option(opts, "vardef", "df", FALSE)
+
+  expect_equal(typeof(res), "character")
+  expect_equal(res, "df")
+
 })
 
 #

@@ -80,6 +80,9 @@
       <a href="../articles/procs-example3.html">Example 3: Disposition</a>
     </li>
     <li>
+      <a href="../articles/procs-globals.html">Global Options</a>
+    </li>
+    <li>
       <a href="../articles/procs-faq.html">Frequently Asked Questions</a>
     </li>
   </ul>
@@ -637,6 +640,109 @@ variables:</p>
 <span><span class="co"># But now Subject is a character</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/class.html" class="external-link">class</a></span><span class="op">(</span><span class="va">dat2</span><span class="op">$</span><span class="va">Subject</span><span class="op">)</span></span>
 <span><span class="co"># [1] "character"</span></span></code></pre></div>
+</div>
+<div class="section level3">
+<h3 id="sorting-missing-values">Sorting Missing Values<a class="anchor" aria-label="anchor" href="#sorting-missing-values"></a>
+</h3>
+<p>Normally, R sorts missing values (NA) to the bottom or last. This
+behavior is also the default with <code><a href="../reference/proc_sort.html">proc_sort()</a></code>. To
+illustrate, let’s add an NA value to the dataset created above, so that
+we can experiment. Here is the modification:</p>
+<div class="sourceCode" id="cb27"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Create input data with missing values</span></span>
+<span><span class="va">dat2</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/utils/read.table.html" class="external-link">read.table</a></span><span class="op">(</span>header <span class="op">=</span> <span class="cn">TRUE</span>, text <span class="op">=</span> <span class="st">'</span></span>
+<span><span class="st">                  Name    Subject   Semester1  Semester2</span></span>
+<span><span class="st">                  Samma   Maths     96             94</span></span>
+<span><span class="st">                  Sandy   English     76             NA</span></span>
+<span><span class="st">                  Devesh    German    76             95</span></span>
+<span><span class="st">                  Rakesh    Maths       50             63</span></span>
+<span><span class="st">                  Priya   English     62             80</span></span>
+<span><span class="st">                  Kranti    Maths       92             92</span></span>
+<span><span class="st">                  William   German    87             75'</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># View dataset</span></span>
+<span><span class="va">dat2</span></span>
+<span><span class="co">#      Name Subject Semester1 Semester2</span></span>
+<span><span class="co"># 1   Samma   Maths        96        94</span></span>
+<span><span class="co"># 2   Sandy English        76        NA</span></span>
+<span><span class="co"># 3  Devesh  German        76        95</span></span>
+<span><span class="co"># 4  Rakesh   Maths        50        63</span></span>
+<span><span class="co"># 5   Priya English        NA        80</span></span>
+<span><span class="co"># 6  Kranti   Maths        92        92</span></span>
+<span><span class="co"># 7 William  German        87        75</span></span></code></pre></div>
+<p>Now let’s try some different sorts. Here is the default sort:</p>
+<div class="sourceCode" id="cb28"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Default sort on column with NA</span></span>
+<span><span class="fu"><a href="../reference/proc_sort.html">proc_sort</a></span><span class="op">(</span><span class="va">dat2</span>, by <span class="op">=</span> <span class="va">Semester2</span><span class="op">)</span></span>
+<span><span class="co">#      Name Subject Semester1 Semester2</span></span>
+<span><span class="co"># 4  Rakesh   Maths        50        63</span></span>
+<span><span class="co"># 7 William  German        87        75</span></span>
+<span><span class="co"># 5   Priya English        NA        80</span></span>
+<span><span class="co"># 6  Kranti   Maths        92        92</span></span>
+<span><span class="co"># 1   Samma   Maths        96        94</span></span>
+<span><span class="co"># 3  Devesh  German        76        95</span></span>
+<span><span class="co"># 2   Sandy English        76        NA</span></span></code></pre></div>
+<p>As you can see, the function sorts the NA value last. But what if you
+want to sort it first?</p>
+<p>Fortunately, there is a parameter to control the NA sort behavior:
+<code>na.sort</code>. This parameter allows you to sort the NAs first,
+last, or in a manner consistent with SAS. Here is how to sort the NAs
+first:</p>
+<div class="sourceCode" id="cb29"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Force NA to top </span></span>
+<span><span class="fu"><a href="../reference/proc_sort.html">proc_sort</a></span><span class="op">(</span><span class="va">dat2</span>, by <span class="op">=</span> <span class="va">Semester2</span>, na.sort <span class="op">=</span> <span class="st">"first"</span><span class="op">)</span></span>
+<span><span class="co">#      Name Subject Semester1 Semester2</span></span>
+<span><span class="co"># 2   Sandy English        76        NA</span></span>
+<span><span class="co"># 4  Rakesh   Maths        50        63</span></span>
+<span><span class="co"># 7 William  German        87        75</span></span>
+<span><span class="co"># 5   Priya English        NA        80</span></span>
+<span><span class="co"># 6  Kranti   Maths        92        92</span></span>
+<span><span class="co"># 1   Samma   Maths        96        94</span></span>
+<span><span class="co"># 3  Devesh  German        76        95</span></span></code></pre></div>
+<p>Note that “first” and “last” will always sort NAs in the requested
+direction, no matter the direction of the sort overall. Here is the same
+sort on “Semester2”, but this time descending instead of ascending:</p>
+<div class="sourceCode" id="cb30"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># NA still forced to top </span></span>
+<span><span class="fu"><a href="../reference/proc_sort.html">proc_sort</a></span><span class="op">(</span><span class="va">dat2</span>, by <span class="op">=</span> <span class="va">Semester2</span>, order <span class="op">=</span> <span class="st">"d"</span>, na.sort <span class="op">=</span> <span class="st">"first"</span><span class="op">)</span></span>
+<span><span class="co">#      Name Subject Semester1 Semester2</span></span>
+<span><span class="co"># 2   Sandy English        76        NA</span></span>
+<span><span class="co"># 3  Devesh  German        76        95</span></span>
+<span><span class="co"># 1   Samma   Maths        96        94</span></span>
+<span><span class="co"># 6  Kranti   Maths        92        92</span></span>
+<span><span class="co"># 5   Priya English        NA        80</span></span>
+<span><span class="co"># 7 William  German        87        75</span></span>
+<span><span class="co"># 4  Rakesh   Maths        50        63</span></span></code></pre></div>
+<p>In SAS, however, the NAs can go to the top or bottom, depending on
+the direction of the sort. The <code>na.sort</code> parameter also has a
+“sas” option to mimic this behavior. Observe:</p>
+<div class="sourceCode" id="cb31"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Ascending sort  </span></span>
+<span><span class="fu"><a href="../reference/proc_sort.html">proc_sort</a></span><span class="op">(</span><span class="va">dat2</span>, by <span class="op">=</span> <span class="va">Semester2</span>, order <span class="op">=</span> <span class="st">"a"</span>, na.sort <span class="op">=</span> <span class="st">"sas"</span><span class="op">)</span></span>
+<span><span class="co">#      Name Subject Semester1 Semester2</span></span>
+<span><span class="co"># 2   Sandy English        76        NA</span></span>
+<span><span class="co"># 4  Rakesh   Maths        50        63</span></span>
+<span><span class="co"># 7 William  German        87        75</span></span>
+<span><span class="co"># 5   Priya English        NA        80</span></span>
+<span><span class="co"># 6  Kranti   Maths        92        92</span></span>
+<span><span class="co"># 1   Samma   Maths        96        94</span></span>
+<span><span class="co"># 3  Devesh  German        76        95</span></span>
+<span></span>
+<span><span class="co"># Descending sort  </span></span>
+<span><span class="fu"><a href="../reference/proc_sort.html">proc_sort</a></span><span class="op">(</span><span class="va">dat2</span>, by <span class="op">=</span> <span class="va">Semester2</span>, order <span class="op">=</span> <span class="st">"d"</span>, na.sort <span class="op">=</span> <span class="st">"sas"</span><span class="op">)</span></span>
+<span><span class="co">#      Name Subject Semester1 Semester2</span></span>
+<span><span class="co"># 3  Devesh  German        76        95</span></span>
+<span><span class="co"># 1   Samma   Maths        96        94</span></span>
+<span><span class="co"># 6  Kranti   Maths        92        92</span></span>
+<span><span class="co"># 5   Priya English        NA        80</span></span>
+<span><span class="co"># 7 William  German        87        75</span></span>
+<span><span class="co"># 4  Rakesh   Maths        50        63</span></span>
+<span><span class="co"># 2   Sandy English        76        NA</span></span></code></pre></div>
+<p>The “sas” option allows you to more easily match the sort produced by
+SAS PROC SORT. You may set this option globally with
+<code>options("procs.na.sort" = "sas")</code>. See the
+<code><a href="../reference/proc_sort.html">proc_sort()</a></code> documentation and
+<code><a href="../articles/procs-globals.html">vignette("procs-globals")</a></code> for additional information.</p>
 </div>
 </div>
   </div>

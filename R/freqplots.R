@@ -41,9 +41,9 @@
 #' \code{scale} parameter. Options include a percentage, logarithmic, or
 #' square root scale.
 #'
-#' There are several more options for two-way interactions.  For two-way
-#' interactions, you may choose to display the data as bar charts,
-#' dot plots, stacked bar charts, or clustered bar charts. To create stacked
+#' There are more options for two-way interactions.  For two-way
+#' interactions, you may choose to display the data as
+#' stacked bar charts or clustered bar charts. To create stacked
 #' or clustered bar charts, set the \code{type} parameter to "barchart", and
 #' then specify the desired layout with the \code{twoway} parameter.
 #'

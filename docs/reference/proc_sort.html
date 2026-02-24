@@ -62,6 +62,9 @@ The parameters will accept either quoted or unquoted values."><meta property="og
       <a href="../articles/procs-example3.html">Example 3: Disposition</a>
     </li>
     <li>
+      <a href="../articles/procs-globals.html">Global Options</a>
+    </li>
+    <li>
       <a href="../articles/procs-faq.html">Frequently Asked Questions</a>
     </li>
   </ul></li>
@@ -111,7 +114,8 @@ The parameters will accept either quoted or unquoted values.</p>
 <span>  keep <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  order <span class="op">=</span> <span class="st">"ascending"</span>,</span>
 <span>  options <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  as.character <span class="op">=</span> <span class="cn">FALSE</span></span>
+<span>  as.character <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  na.sort <span class="op">=</span> <span class="cn">NULL</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -155,6 +159,18 @@ variable as a factor.  This parameter therefore allows you to use
 the factor for the sort, but then convert back to a character
 once the sort is complete.</p></dd>
 
+
+<dt id="arg-na-sort">na.sort<a class="anchor" aria-label="anchor" href="#arg-na-sort"></a></dt>
+<dd><p>An option that determines how to sort NA values.  Valid
+values are NULL, "first", "last", and "sas". Values may be quoted or
+unquoted. The "sas"
+value will sort NAs first for ascending keys, and last for descending
+keys.  The NA sort style may be controlled globally with
+<code>options("procs.na.sort" = &lt;value&gt;)</code>.  Any values passed
+on the local parameter will override the global setting. The default
+value is NULL, which defers to the global setting.  If the global setting
+is NULL, the parameter will default to "last".</p></dd>
+
 </dl></div>
     <div id="value">
     <h2>Value</h2>
@@ -174,6 +190,27 @@ Duplicate rows will be identified by the key variables listed on
 the by parameter if passed.  Otherwise, the function will dedupe on
 all variables returned.</p></li>
 </ul></div>
+    <div id="missing-values">
+    <h2>Missing Values</h2>
+
+
+<p>Missing values are handled in R differently than they are handled in SAS.
+In R, missing values (NA) are sorted last, and most sorting
+functions in R give you an option to sort it first if desired.</p>
+<p>SAS, on the other hand, considers a missing as the smallest value.  If the
+sort is ascending, it will sort the missing values first.  If the sort is
+descending, it will sort the missing values last.</p>
+<p>The <code>na.sort</code> parameter on <code>proc_sort</code> gives you a choice of
+how NAs are sorted.  By default, the function sorts in the standard R
+manner.  If you are trying to replicate a SAS sort, set the
+value to "sas".</p>
+<p>Note that this parameter only sorts NA values in a manner similar to SAS.
+It does not guarantee that the entire sort will match SAS.  There can
+still be differences in the sort caused by formats, character set mismatch,
+or other reasons.</p>
+<p>If you want to always use the SAS style sort, you can set it as a global
+option, like this: <code>options("procs.na.sort" = "sas")</code>.</p>
+    </div>
 
     <div id="ref-examples">
     <h2>Examples</h2>

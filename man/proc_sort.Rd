@@ -10,7 +10,8 @@ proc_sort(
   keep = NULL,
   order = "ascending",
   options = NULL,
-  as.character = FALSE
+  as.character = FALSE,
+  na.sort = NULL
 )
 }
 \arguments{
@@ -38,6 +39,16 @@ common to use factors for sorting in R, but you may not want to keep the
 variable as a factor.  This parameter therefore allows you to use
 the factor for the sort, but then convert back to a character
 once the sort is complete.}
+
+\item{na.sort}{An option that determines how to sort NA values.  Valid
+values are NULL, "first", "last", and "sas". Values may be quoted or
+unquoted. The "sas"
+value will sort NAs first for ascending keys, and last for descending
+keys.  The NA sort style may be controlled globally with
+\code{options("procs.na.sort" = <value>)}.  Any values passed
+on the local parameter will override the global setting. The default
+value is NULL, which defers to the global setting.  If the global setting
+is NULL, the parameter will default to "last".}
 }
 \value{
 The sorted dataset.  If a data frame was input, a
@@ -65,6 +76,30 @@ Duplicate rows will be identified by the key variables listed on
 the by parameter if passed.  Otherwise, the function will dedupe on
 all variables returned.}
 }
+}
+
+\section{Missing Values}{
+
+Missing values are handled in R differently than they are handled in SAS.
+In R, missing values (NA) are sorted last, and most sorting
+functions in R give you an option to sort it first if desired.
+
+SAS, on the other hand, considers a missing as the smallest value.  If the
+sort is ascending, it will sort the missing values first.  If the sort is
+descending, it will sort the missing values last.
+
+The \code{na.sort} parameter on \code{proc_sort} gives you a choice of
+how NAs are sorted.  By default, the function sorts in the standard R
+manner.  If you are trying to replicate a SAS sort, set the
+value to "sas".
+
+Note that this parameter only sorts NA values in a manner similar to SAS.
+It does not guarantee that the entire sort will match SAS.  There can
+still be differences in the sort caused by formats, character set mismatch,
+or other reasons.
+
+If you want to always use the SAS style sort, you can set it as a global
+option, like this: \code{options("procs.na.sort" = "sas")}.
 }
 
 \examples{

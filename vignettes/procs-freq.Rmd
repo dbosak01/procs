@@ -366,13 +366,13 @@ The generated report will look like this:
 
 The report now shows a bar chart for each of the table requests. Note that on
 the two-way interaction, a bar chart is produced for each interaction and
-place onto a single panel.  If the interactions do not fit on a single panel,
+placed onto a single panel.  If the interactions do not fit on a single panel,
 additional panels will be generated.
 
 ### Customized Plots
 
 The `plots` parameter on `proc_freq()` also accepts a `freqplot()` object.
-This object offers some customization of the requested plot.  Besides the 
+This object offers some customization of the requested plots.  Besides the 
 default frequency chart produced in the example above, you may also request
 dot plots, stacked bar charts, or clustered bar charts.  The `freqplot()`
 function also allows you to control the chart's orientation, scale, and

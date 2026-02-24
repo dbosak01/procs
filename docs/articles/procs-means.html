@@ -80,6 +80,9 @@
       <a href="../articles/procs-example3.html">Example 3: Disposition</a>
     </li>
     <li>
+      <a href="../articles/procs-globals.html">Global Options</a>
+    </li>
+    <li>
       <a href="../articles/procs-faq.html">Frequently Asked Questions</a>
     </li>
   </ul>
@@ -551,6 +554,80 @@ and <code>class</code> parameters:</p>
 </div>
 </div>
 <div class="section level2">
+<h2 id="weight">Weight<a class="anchor" aria-label="anchor" href="#weight"></a>
+</h2>
+<p>Sometimes you need to calculate statistics using the relative
+importance of an observation. In these cases, <code><a href="../reference/proc_means.html">proc_means()</a></code>
+allows the use of a weighted value for each observation. The weighted
+value for an observation can be passed on the <code>weight</code>
+parameter.</p>
+<p>First, let’s create some data to use for our analysis:</p>
+<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">dat2</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/utils/read.table.html" class="external-link">read.table</a></span><span class="op">(</span>header <span class="op">=</span> <span class="cn">TRUE</span>, text <span class="op">=</span> <span class="st">'</span></span>
+<span><span class="st">                Name      Assessment     Score   Weight</span></span>
+<span><span class="st">                Smith     Quiz1          84      0.05</span></span>
+<span><span class="st">                Smith     Quiz2          25      0.05</span></span>
+<span><span class="st">                Smith     Midterm        85      0.35</span></span>
+<span><span class="st">                Smith     Quiz3           0      0.05</span></span>
+<span><span class="st">                Smith     Quiz4          62      0.05</span></span>
+<span><span class="st">                Smith     Final          93      0.45</span></span>
+<span><span class="st">                Wang      Quiz1         100      0.05</span></span>
+<span><span class="st">                Wang      Quiz2          95      0.05</span></span>
+<span><span class="st">                Wang      Midterm        98      0.35</span></span>
+<span><span class="st">                Wang      Quiz3         105      0.05</span></span>
+<span><span class="st">                Wang      Quiz4          87      0.05</span></span>
+<span><span class="st">                Wang      Final          96      0.45'</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># View data</span></span>
+<span><span class="va">dat2</span></span>
+<span><span class="co">#     Name Assessment Score Weight</span></span>
+<span><span class="co"># 1  Smith      Quiz1    84   0.05</span></span>
+<span><span class="co"># 2  Smith      Quiz2    25   0.05</span></span>
+<span><span class="co"># 3  Smith    Midterm    85   0.35</span></span>
+<span><span class="co"># 4  Smith      Quiz3     0   0.05</span></span>
+<span><span class="co"># 5  Smith      Quiz4    62   0.05</span></span>
+<span><span class="co"># 6  Smith      Final    93   0.45</span></span>
+<span><span class="co"># 7   Wang      Quiz1   100   0.05</span></span>
+<span><span class="co"># 8   Wang      Quiz2    95   0.05</span></span>
+<span><span class="co"># 9   Wang    Midterm    98   0.35</span></span>
+<span><span class="co"># 10  Wang      Quiz3   105   0.05</span></span>
+<span><span class="co"># 11  Wang      Quiz4    87   0.05</span></span>
+<span><span class="co"># 12  Wang      Final    96   0.45</span></span></code></pre></div>
+<p>To understand how the weighting works, let’s then calculate some
+un-weighted statistics on this data:</p>
+<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">res</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/proc_means.html">proc_means</a></span><span class="op">(</span><span class="va">dat2</span>, var <span class="op">=</span> <span class="va">Score</span>, </span>
+<span>                  class <span class="op">=</span> <span class="va">Name</span>,</span>
+<span>                  options <span class="op">=</span> <span class="st">"nway"</span>,</span>
+<span>                  stats <span class="op">=</span> <span class="fu"><a href="https://common.r-sassy.org/reference/v.html" class="external-link">v</a></span><span class="op">(</span><span class="va">n</span>, <span class="va">mean</span>, <span class="va">median</span>, <span class="va">std</span>, <span class="va">min</span>, <span class="va">max</span>, <span class="va">vari</span><span class="op">)</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># View results</span></span>
+<span><span class="va">res</span></span>
+<span><span class="co">#   CLASS TYPE FREQ   VAR N     MEAN MEDIAN       STD MIN MAX       VARI</span></span>
+<span><span class="co"># 1 Smith    1    6 Score 6 58.16667     73 37.679791   0  93 1419.76667</span></span>
+<span><span class="co"># 2  Wang    1    6 Score 6 96.83333     97  5.980524  87 105   35.76667</span></span></code></pre></div>
+<p>Now let’s use the <code>weight</code> parameter to calculate weighted
+statistics:</p>
+<div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">res</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/proc_means.html">proc_means</a></span><span class="op">(</span><span class="va">dat2</span>, var <span class="op">=</span> <span class="va">Score</span>,</span>
+<span>                  class <span class="op">=</span> <span class="va">Name</span>,</span>
+<span>                  weight <span class="op">=</span> <span class="va">Weight</span>, </span>
+<span>                  options <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"nway"</span>, vardef <span class="op">=</span> <span class="st">"wgt"</span><span class="op">)</span>,</span>
+<span>                  stats <span class="op">=</span> <span class="fu"><a href="https://common.r-sassy.org/reference/v.html" class="external-link">v</a></span><span class="op">(</span><span class="va">n</span>, <span class="va">mean</span>, <span class="va">median</span>, <span class="va">std</span>, <span class="va">min</span>, <span class="va">max</span>, <span class="va">vari</span><span class="op">)</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># View results</span></span>
+<span><span class="va">res</span></span>
+<span><span class="co">#   CLASS TYPE FREQ   VAR N  MEAN MEDIAN       STD MIN MAX     VARI</span></span>
+<span><span class="co"># 1 Smith    1    6 Score 6 80.15     85 23.937993   0  93 573.0275</span></span>
+<span><span class="co"># 2  Wang    1    6 Score 6 96.85     96  3.102821  87 105   9.6275</span></span></code></pre></div>
+<p>Notice that the function returned weighted values for the mean,
+median, standard deviation, and variance. However, the statistics for n,
+min, and max did not change.</p>
+<p>Also note that the “vardef” option controls which denominator is used
+for the variance (VARI) statistic. See the <code><a href="../reference/proc_means.html">proc_means()</a></code>
+documentation for further information on this option.</p>
+</div>
+<div class="section level2">
 <h2 id="data-shaping">Data Shaping<a class="anchor" aria-label="anchor" href="#data-shaping"></a>
 </h2>
 <p>The <code><a href="../reference/proc_means.html">proc_means()</a></code> function also offers options for data
@@ -563,7 +640,7 @@ variables in columns. The “stacked” option puts both statistics and
 variables in rows.</p>
 <p>The following example illustrates the differences between these data
 shaping options:</p>
-<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Shape wide</span></span>
 <span><span class="va">res1</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/proc_means.html">proc_means</a></span><span class="op">(</span><span class="va">dat</span>, stats <span class="op">=</span> <span class="fu"><a href="https://common.r-sassy.org/reference/v.html" class="external-link">v</a></span><span class="op">(</span><span class="va">median</span>, <span class="va">sum</span>, <span class="va">q1</span>, <span class="va">q3</span><span class="op">)</span>,</span>
 <span>                   output <span class="op">=</span> <span class="va">wide</span><span class="op">)</span></span>

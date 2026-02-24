@@ -550,6 +550,114 @@ class(dat2$Subject)
 # [1] "character"
 ```
 
+### Sorting Missing Values
 
+Normally, R sorts missing values (NA) to the bottom or last. This behavior is
+also the default with `proc_sort()`.  To illustrate, let's add an NA
+value to the dataset created above, so that we can experiment.  Here is 
+the modification:
+```{r eval=FALSE, echo=TRUE} 
+# Create input data with missing values
+dat2 <- read.table(header = TRUE, text = '
+                  Name    Subject   Semester1  Semester2
+                  Samma	  Maths	    96             94
+                  Sandy	  English	  76             NA
+                  Devesh	German	  76             95
+                  Rakesh	Maths	    50             63
+                  Priya	  English	  62             80
+                  Kranti	Maths	    92             92
+                  William	German	  87             75')
 
+# View dataset
+dat2
+#      Name Subject Semester1 Semester2
+# 1   Samma   Maths        96        94
+# 2   Sandy English        76        NA
+# 3  Devesh  German        76        95
+# 4  Rakesh   Maths        50        63
+# 5   Priya English        NA        80
+# 6  Kranti   Maths        92        92
+# 7 William  German        87        75
 
+```
+Now let's try some different sorts. Here is the default sort:
+```{r eval=FALSE, echo=TRUE} 
+# Default sort on column with NA
+proc_sort(dat2, by = Semester2)
+#      Name Subject Semester1 Semester2
+# 4  Rakesh   Maths        50        63
+# 7 William  German        87        75
+# 5   Priya English        NA        80
+# 6  Kranti   Maths        92        92
+# 1   Samma   Maths        96        94
+# 3  Devesh  German        76        95
+# 2   Sandy English        76        NA
+
+```
+As you can see, the function sorts the NA value last.  But what if you want to
+sort it first?  
+
+Fortunately, there is a parameter to control the NA sort behavior: `na.sort`.
+This parameter allows you to sort the NAs first, last, or in a manner consistent
+with SAS.  Here is how to sort the NAs first:
+```{r eval=FALSE, echo=TRUE} 
+# Force NA to top 
+proc_sort(dat2, by = Semester2, na.sort = "first")
+#      Name Subject Semester1 Semester2
+# 2   Sandy English        76        NA
+# 4  Rakesh   Maths        50        63
+# 7 William  German        87        75
+# 5   Priya English        NA        80
+# 6  Kranti   Maths        92        92
+# 1   Samma   Maths        96        94
+# 3  Devesh  German        76        95
+
+```
+Note that "first" and "last" will always sort NAs in the requested direction,
+no matter the direction of the sort overall.  Here is the same sort on 
+"Semester2", but this time descending instead of ascending:
+```{r eval=FALSE, echo=TRUE} 
+# NA still forced to top 
+proc_sort(dat2, by = Semester2, order = "d", na.sort = "first")
+#      Name Subject Semester1 Semester2
+# 2   Sandy English        76        NA
+# 3  Devesh  German        76        95
+# 1   Samma   Maths        96        94
+# 6  Kranti   Maths        92        92
+# 5   Priya English        NA        80
+# 7 William  German        87        75
+# 4  Rakesh   Maths        50        63
+
+```
+In SAS, however, the NAs can go to the top or bottom, depending on the direction 
+of the sort. The `na.sort` parameter also has a "sas" option to mimic this 
+behavior. Observe:
+```{r eval=FALSE, echo=TRUE} 
+# Ascending sort  
+proc_sort(dat2, by = Semester2, order = "a", na.sort = "sas")
+#      Name Subject Semester1 Semester2
+# 2   Sandy English        76        NA
+# 4  Rakesh   Maths        50        63
+# 7 William  German        87        75
+# 5   Priya English        NA        80
+# 6  Kranti   Maths        92        92
+# 1   Samma   Maths        96        94
+# 3  Devesh  German        76        95
+
+# Descending sort  
+proc_sort(dat2, by = Semester2, order = "d", na.sort = "sas")
+#      Name Subject Semester1 Semester2
+# 3  Devesh  German        76        95
+# 1   Samma   Maths        96        94
+# 6  Kranti   Maths        92        92
+# 5   Priya English        NA        80
+# 7 William  German        87        75
+# 4  Rakesh   Maths        50        63
+# 2   Sandy English        76        NA
+
+```
+The "sas" option allows you to more easily match the sort produced by 
+SAS PROC SORT.  You may set this option globally with 
+`options("procs.na.sort" = "sas")`. See the `proc_sort()` documentation 
+and `vignette("procs-globals")` for 
+additional information.

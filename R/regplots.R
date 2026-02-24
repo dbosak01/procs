@@ -267,6 +267,10 @@ regplot <- function(type = c("diagnostics", "residuals", "fitplot"), panel = TRU
   stats <- tryCatch({if (typeof(stats) %in% c("character", "NULL")) stats else ostats},
                      error = function(cond) {ostats})
 
+  oid <- deparse(substitute(id, env = environment()))
+  id <- tryCatch({if (typeof(id) %in% c("character", "NULL")) id else oid},
+                    error = function(cond) {oid})
+
 
   # Parameter Checks
   vldvals <- c("diagnostics", "residuals", "fitplot", 'qqplot', 'rfplot',

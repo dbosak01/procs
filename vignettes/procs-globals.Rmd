@@ -1,0 +1,106 @@
+---
+title: "Global Options"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Global Options}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+
+```
+The **procs** packages contains some global options that may be helpful 
+in some scenarios.  
+
+### Turn On/Off Interactive Report 
+
+By default, several **procs** functions print an interactive report to the 
+RStudio viewer.  For instance, `proc_freq()`, `proc_ttest()`, and `proc_reg()`
+all print tables and even plots interactively. These functions all have options to
+restrict printing, usually called "noprint".  
+
+However, sometimes it is more
+convenient to restrict printing for all **procs** functions, rather than
+turn them off one by one. In this scenario, you can turn the interactive display
+off globally in the following manner:
+```{r eval=FALSE, echo=TRUE}
+library(procs)
+
+# Turn printing off
+options("procs.print" = FALSE)
+
+```
+
+The above option will restrict printing for any **procs** package function.
+
+To restore the interactive reports, either set the "procs.print" value to TRUE,
+or remove the option entirely by setting it to NULL:
+```{r eval=FALSE, echo=TRUE}
+# Turn printing on 
+options("procs.print" = TRUE)
+
+# Delete printing option
+options("procs.print" = NULL)
+
+```
+
+### Control Sorting Behavior
+
+The `proc_sort()` function sorts a data frame.  By default, the function
+sorts the "by" parameter variables in ascending order, and NA values are 
+sorted to the bottom.  The "na.sort" parameter contains options on how 
+NA values are sorted.  The parameter takes four possible values: 
+NULL, "first", "last", and "sas".  The "first" and "last" settings will
+sort NA values first or last, respectively.  The "sas" setting will
+sort NA values first for ascending sorts and last for descending sorts.
+
+You can control the sort behavior globally with the "procs.na.sort" option.
+Like this:
+```{r eval=FALSE, echo=TRUE}
+# Sort NAs first
+options("procs.na.sort" = "first")
+
+# Sort NAs last
+options("procs.print" = "last")
+
+# Sort to match SAS
+options("procs.print" = "sas")
+
+```
+
+The NULL setting on `proc_sort()` means to defer to the global setting.
+Otherwise, the local setting will override the global setting.  
+
+To remove the global setting, set the option to NULL:
+```{r eval=FALSE, echo=TRUE}
+# Delete global setting
+options("procs.na.sort" = NULL)
+
+```
+
+### Log Printing
+
+If you are using the **procs** package in combination with the **logr** package
+for logging, **procs** functions can print to the log automatically. You may
+allow or prevent log printing with the option "logr.output":
+
+```{r eval=FALSE, echo=TRUE}
+# Prevent automatic log printing 
+options("logr.output" = FALSE)
+
+# Allow automatic log printing 
+options("logr.output" = TRUE)
+
+# Delete logging option
+options("logr.output" = NULL)
+
+```
+Note that to enable automatic logging, you must also set the "logr.autolog" 
+option to TRUE.  The "logr.output" option only controls the automatic logging of
+functions within the [SASSY](https://r-sassy.org/) system of packages, and only
+when "logr.autolog" = TRUE.

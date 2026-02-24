@@ -273,3 +273,126 @@ test_that("sort16: parameter checks work.", {
 
 })
 
+test_that("sort17: na.sort parameter works.", {
+
+
+  spsrt <- read.table(header = TRUE, text = '
+                    ID	Name	Score
+                    1	David	 74
+                    2	Sam	   45
+                    3	Mary	 NA
+                    4	Dane	 23
+                    5	Jenny	 87
+                    6	Simran 27
+                    7	Priya	 72
+                    8	David	 45
+                    9	Ram	   54
+                    10	Bane	 87')
+
+  # "last"
+  res <- proc_sort(spsrt, by = Score, na.sort = "last")
+
+  expect_equal(is.na(res$Score[10]), TRUE)
+
+  # "first"
+  res <- proc_sort(spsrt, by = Score, na.sort = "first")
+
+  expect_equal(is.na(res$Score[1]), TRUE)
+
+
+  # "sas" ascending
+  res <- proc_sort(spsrt, by = Score, na.sort = "sas")
+
+  expect_equal(is.na(res$Score[1]), TRUE)
+
+
+  # "sas" decending
+  res <- proc_sort(spsrt, by = Score, order = "d", na.sort = "sas")
+
+  expect_equal(is.na(res$Score[10]), TRUE)
+
+
+  df <- data.frame(
+    id = c(1,2,3,4),
+    a  = c(NA, 2, 2, 1),
+    b  = c(1,  NA,  1, 2)
+  )
+
+  # First
+  res <- proc_sort(df, by = c("a", "b"), order = "d", na.sort = "first")
+  expect_equal(is.na(res$a[1]), TRUE)
+  expect_equal(is.na(res$b[2]), TRUE)
+
+  # Last
+  res <- proc_sort(df, by = c("a", "b"), order = "d", na.sort = "last")
+  expect_equal(is.na(res$a[4]), TRUE)
+  expect_equal(is.na(res$b[2]), TRUE)
+
+
+  # SAS desc
+  res <- proc_sort(df, by = c("a", "b"), order = c("d", "a"), na.sort = "sas")
+
+  expect_equal(is.na(res$a[4]), TRUE)
+  expect_equal(is.na(res$b[1]), TRUE)
+
+
+
+  df <- data.frame(
+    id = c(1,2,3,4),
+    a  = c(NA, NA, 2, 1),
+    b  = c(NA,  2,  1, 2)
+  )
+
+
+  # SAS desc - Good
+  res <- proc_sort(df, by = c("a", "b"), order = c("d", "d"), na.sort = "sas")
+
+  expect_equal(is.na(res$a[4]), TRUE)
+  expect_equal(is.na(res$a[3]), TRUE)
+  expect_equal(is.na(res$b[4]), TRUE)
+
+
+  # SAS desc  - Good
+  res <- proc_sort(df, by = c("a", "b"), order = c("a", "a"), na.sort = "sas")
+
+  expect_equal(is.na(res$a[1]), TRUE)
+  expect_equal(is.na(res$a[2]), TRUE)
+  expect_equal(is.na(res$b[1]), TRUE)
+
+  # SAS desc - Also Good!
+  res <- proc_sort(df, by = c("a", "b"), order = c("a", "d"), na.sort = "sas")
+
+  expect_equal(is.na(res$a[1]), TRUE)
+  expect_equal(is.na(res$a[2]), TRUE)
+  expect_equal(is.na(res$b[2]), TRUE) # ? Yes, actually correct
+
+  # SAS desc - Hurray!
+  res <- proc_sort(df, by = c("a", "b"), order = c("d", "a"), na.sort = "sas")
+
+  expect_equal(is.na(res$a[4]), TRUE)
+  expect_equal(is.na(res$a[3]), TRUE)
+  expect_equal(is.na(res$b[3]), TRUE) # ? Yes, actually correct
+
+
+  # User data
+  df <- data.frame(
+    id = c(1,2,3,4),
+    a  = c(NA, 2, NA, 1),
+    b  = c(2,  1,  1, 2)
+  )
+
+  # User test
+  res <- proc_sort(df, by = c("a", "b"), na.sort = "sas")
+
+  expect_equal(is.na(res$a[1]), TRUE)
+  expect_equal(is.na(res$a[2]), TRUE)
+
+
+  # Unquoted
+  res <- proc_sort(df, by = c("a", "b"), na.sort = sas)
+
+  expect_equal(is.na(res$a[1]), TRUE)
+  expect_equal(is.na(res$a[2]), TRUE)
+
+})
+

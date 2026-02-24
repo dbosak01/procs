@@ -1740,3 +1740,85 @@ test_that("means66: Some other cases with Weight", {
                           output = out,
                           weight = "Flavor"))
 })
+
+
+test_that("means67: Vardef options with weight and class work as expected.", {
+
+  dat2 <- read.table(header = TRUE, text = '
+                Name      Assessment     Score   Weight
+                Smith     Quiz1          84      0.05
+                Smith     Quiz2          25      0.05
+                Smith     Midterm        85      0.35
+                Smith     Quiz3           0      0.05
+                Smith     Quiz4          62      0.05
+                Smith     Final          93      0.45
+                Wang      Quiz1         100      0.05
+                Wang      Quiz2          95      0.05
+                Wang      Midterm        98      0.35
+                Wang      Quiz3         105      0.05
+                Wang      Quiz4          87      0.05
+                Wang      Final          96      0.45')
+
+  # No weight - OK
+  res1 <- proc_means(dat2, var = Score, # weight = Weight,
+                     class = Name, options = c("nway"),
+                     stats = v(n, mean, median, std, min, max, vari))
+
+  expect_equal(as.numeric(res1$MEAN), c(58.166666667, 96.83333333))
+  expect_equal(as.numeric(res1$MEDIAN), c(73.0, 97.0))
+  expect_equal(as.numeric(res1$STD), c(37.6797912, 5.9805239))
+  expect_equal(as.numeric(res1$VARI), c(1419.766666667, 35.766666667))
+
+  # Default - No vardef option. OK
+  res1 <- proc_means(dat2, var = Score, weight = Weight,
+                     class = Name, options = c("nway"),
+                     stats = v(n, mean, median, std, min, max, vari))
+
+  expect_equal(as.numeric(res1$MEAN), c(80.150, 96.850))
+  expect_equal(as.numeric(res1$MEDIAN), c(85.0, 96.0))
+  expect_equal(as.numeric(res1$STD), c(10.7053958, 1.3876239))
+  expect_equal(as.numeric(res1$VARI), c(114.60550, 1.92550))
+
+  # vardef = wgt - OK
+  res1 <- proc_means(dat2, var = Score, weight = Weight,
+                     class = Name, options = c("vardef" = "wgt", "nway"),
+                     stats = v(n, mean, median, std, min, max, vari))
+
+  expect_equal(as.numeric(res1$MEAN), c(80.150, 96.850))
+  expect_equal(as.numeric(res1$MEDIAN), c(85.0, 96.0))
+  expect_equal(as.numeric(res1$STD), c(23.9379928, 3.1028213))
+  expect_equal(as.numeric(res1$VARI), c(573.0275, 9.62750))
+
+
+  # vardef = df  - * Error here
+  res1 <- proc_means(dat2, var = Score, weight = Weight,
+                     class = Name, options = c("vardef" = "df", "nway"),
+                     stats = v(n, mean, median, std, min, max, vari))
+
+  expect_equal(as.numeric(res1$MEAN), c(80.150, 96.850))
+  expect_equal(as.numeric(res1$MEDIAN), c(85.0, 96.0))
+  expect_equal(as.numeric(res1$STD), c(10.7053958, 1.3876239))
+  expect_equal(as.numeric(res1$VARI), c(114.60550, 1.92550))
+
+  # vardef = wdf - No variance stats.  No std. OK.
+  res1 <- proc_means(dat2, var = Score, weight = Weight,
+                     class = Name, options = c("vardef" = "wdf", "nway"),
+                     stats = v(n, mean, median, std, min, max, vari))
+
+  expect_equal(as.numeric(res1$MEAN), c(80.150, 96.850))
+  expect_equal(as.numeric(res1$MEDIAN), c(85.0, 96.0))
+  expect_equal(as.numeric(res1$STD), as.numeric(c(NA, NA)))
+  expect_equal(as.numeric(res1$VARI), as.numeric(c(NA, NA)))
+
+
+  # vardef = n  - OK
+  res1 <- proc_means(dat2, var = Score, weight = Weight,
+                     class = Name, options = c("vardef" = "n", "nway"),
+                     stats = v(n, mean, median, std, min, max, vari))
+
+  expect_equal(as.numeric(res1$MEAN), c(80.150, 96.850))
+  expect_equal(as.numeric(res1$MEDIAN), c(85.0, 96.0))
+  expect_equal(as.numeric(res1$STD), c(9.7726446, 1.2667215))
+  expect_equal(as.numeric(res1$VARI), c(95.5045833, 1.6045833))
+
+})

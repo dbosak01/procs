@@ -449,7 +449,7 @@ has_option <- function(options, name) {
 }
 
 
-get_option <- function(options, name, default = NULL) {
+get_option <- function(options, name, default = NULL, evl = TRUE) {
 
   ret <- NULL
 
@@ -466,7 +466,9 @@ get_option <- function(options, name, default = NULL) {
         names(options) <- tolower(nms)
         # See if name exists
         vl <- options[[tolower(name)]]
-        if (!is.null(vl)) {
+        if (evl == FALSE) {
+          ret <- gsub('"', "", vl, fixed = TRUE)
+        } else if (!is.null(vl)) {
           ret <- tryCatch(eval(str2expression(vl)),
                           error = function(cond){vl})
         }
