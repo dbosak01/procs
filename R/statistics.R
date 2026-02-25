@@ -265,8 +265,21 @@ get_clmstd <- function(x, df, wgt=NULL, narm = TRUE, alpha = 0.05, onesided = FA
 }
 
 
+
 #' @noRd
-get_mode <- function(x, narm = TRUE) {
+get_mode <- function(x) {
+
+  uniqv <- unique(x)
+  res <- uniqv[which.max(tabulate(match(x, uniqv)))]
+
+  return(res)
+}
+
+
+# Not sure why this was changed.  Does not match SAS or
+# previous versions of procs.
+#' @noRd
+get_mode_diyu <- function(x, narm = TRUE) {
   if (narm)
     x <- x[!is.na(x)]
   uniqv <- unique(x)
@@ -281,6 +294,8 @@ get_mode <- function(x, narm = TRUE) {
 
   return(res)
 }
+
+
 
 
 get_fisher <- function(x, y, wgt = NULL, bylbl = "", output = FALSE) {
