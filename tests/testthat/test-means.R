@@ -1706,7 +1706,7 @@ test_that("means64: Weight works for stats option: t clm uclm lclm prt probt", {
 
   expect_equal(nrow(res1), 3)
   expect_equal(ncol(res1), 9)
-  expect_equal(as.numeric(res1[1,5:7]),c(35.658376846,48.598033410,13.62869969))
+  expect_equal(as.numeric(res1[1,5:7]),c(13.62869969, 35.658376846,48.598033410))
 })
 
 test_that("means64: Weight works for stats option: skew kurt", {
