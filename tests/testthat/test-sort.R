@@ -311,6 +311,17 @@ test_that("sort17: na.sort parameter works.", {
 
   expect_equal(is.na(res$Score[10]), TRUE)
 
+  # Test global options
+  options("procs.na.sort" = "sas")
+
+  # "sas" ascending
+  res <- proc_sort(spsrt, by = Score)
+
+  expect_equal(is.na(res$Score[1]), TRUE)
+
+
+  options("procs.na.sort" = NULL)
+
 
   df <- data.frame(
     id = c(1,2,3,4),

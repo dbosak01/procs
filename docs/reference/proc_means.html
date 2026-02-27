@@ -197,7 +197,8 @@ off columns on the output datasets.  The "alpha = " option will set the alpha
 value for confidence limit statistics.  The default is 95% (alpha = 0.05).
 The "maxdec = " option sets the maximum number of decimal places displayed
 on report output. The "nway" option returns only the highest type values.
-The "vardef=" option specifies the variance divisor.</p></dd>
+The "vardef=" option specifies the variance divisor. Note that the selected
+variance divisor can effect the calculations for several statistics.</p></dd>
 
 
 <dt id="arg-titles">titles<a class="anchor" aria-label="anchor" href="#arg-titles"></a></dt>
@@ -336,13 +337,17 @@ dataset.</p></li>
 <li><p><strong>nway</strong>: Returns only the highest level TYPE combination.  By
 default, the function returns all TYPE combinations.</p></li>
 <li><p><strong>vardef</strong>: Controls the denominator used in variance-related
-statistics. This option supports several denominator definitions:
+statistics. This option supports the following denominator definitions:
 </p><ul><li><p><strong>DF</strong>: Uses \(n - 1\), the sample degrees of freedom.</p></li>
 <li><p><strong>N</strong>: Uses \(n\), the total count of observations.</p></li>
 <li><p><strong>WEIGHT/WGT</strong>: Uses the sum of weights.</p></li>
 <li><p><strong>WDF</strong>: Uses the sum of weights minus one.</p></li>
 </ul>
-By default, this option use <strong>DF</strong>.</li>
+By default, this option use <strong>DF</strong>. The variance divisor effects many
+statistics, as many statistics use the variance in their calculations.
+Also note that some divisors are not supported by some statistics.  For those
+statistics that are not supported by a particular divisor, they will be
+returned as NA.</li>
 </ul></div>
     <div id="type-and-freq-variables">
     <h2>TYPE and FREQ Variables</h2>

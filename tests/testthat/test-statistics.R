@@ -447,7 +447,23 @@ test_that("stat16: get_weighted_quantile() works as expected.", {
 
 })
 
+test_that("stat17: get_variance() works as expected.", {
 
+
+
+  x3 <- c(5, 8, 2, 9, 4, 7, 6, 3, 10, 1)
+
+  # Function result
+  res <- get_variance(x3, length(x3) - 1)
+
+  # Hand calculation
+  x4 <- sum((x3 - mean(x3)) ^ 2)/(length(x3) - 1)
+
+  expect_equal(res, x4)
+
+
+
+})
 
 
 # Matches SAS?

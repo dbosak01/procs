@@ -133,14 +133,18 @@
 #' default, the function returns all TYPE combinations.
 #' }
 #' \item{\strong{vardef}: Controls the denominator used in variance-related
-#' statistics. This option supports several denominator definitions:
+#' statistics. This option supports the following denominator definitions:
 #'   \itemize{
 #'     \item{\strong{DF}: Uses \(n - 1\), the sample degrees of freedom.}
 #'     \item{\strong{N}: Uses \(n\), the total count of observations.}
 #'     \item{\strong{WEIGHT/WGT}: Uses the sum of weights.}
 #'     \item{\strong{WDF}: Uses the sum of weights minus one.}
 #'   }
-#' By default, this option use \strong{DF}.
+#' By default, this option use \strong{DF}. The variance divisor effects many
+#' statistics, as many statistics use the variance in their calculations.
+#' Also note that some divisors are not supported by some statistics.  For those
+#' statistics that are not supported by a particular divisor, they will be
+#' returned as NA.
 #' }
 #' }
 #' @section TYPE and FREQ Variables:
@@ -255,7 +259,8 @@
 #' value for confidence limit statistics.  The default is 95% (alpha = 0.05).
 #' The "maxdec = " option sets the maximum number of decimal places displayed
 #' on report output. The "nway" option returns only the highest type values.
-#' The "vardef=" option specifies the variance divisor.
+#' The "vardef=" option specifies the variance divisor. Note that the selected
+#' variance divisor can effect the calculations for several statistics.
 #' @param titles A vector of one or more titles to use for the report output.
 #' @return Normally, the requested summary statistics are shown interactively
 #' in the viewer, and output results are returned as a data frame.
@@ -798,7 +803,8 @@ get_summaries <- function(data, var, weight=NULL, stats, missing = FALSE,
         var <- var[keep]
 
       } else if (vardef == "weight" || vardef == "wdf") {
-        # If weight is not specified, but vardef is weight or wdf, then we will use equal weights for all non-missing values.
+        # If weight is not specified, but vardef is weight or wdf, then we will
+        # use equal weights for all non-missing values.
         keep <- !is.na(var_all)
         w <- rep(1, sum(keep))
         var <- var[keep]
@@ -945,7 +951,8 @@ get_summaries <- function(data, var, weight=NULL, stats, missing = FALSE,
 
 
         # Check for two-sided CLM
-        if (st == "clm" || all(c("lclm", "uclm") %in% sts)) {
+        if (st == "clm" ||
+            (all(c("lclm", "uclm") %in% sts) & st == "lclm")) {
 
           alph <- get_alpha(opts)
           tmp <- get_clm(var, denom, w, narm, alph)
@@ -960,7 +967,7 @@ get_summaries <- function(data, var, weight=NULL, stats, missing = FALSE,
           }
 
 
-        } else {
+        } else if (!all(c("lclm", "uclm") %in% sts)) {
 
           # Check for one-sided LCLM
           if (st == "lclm") {

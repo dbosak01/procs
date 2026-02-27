@@ -79,7 +79,8 @@ off columns on the output datasets.  The "alpha = " option will set the alpha
 value for confidence limit statistics.  The default is 95\% (alpha = 0.05).
 The "maxdec = " option sets the maximum number of decimal places displayed
 on report output. The "nway" option returns only the highest type values.
-The "vardef=" option specifies the variance divisor.}
+The "vardef=" option specifies the variance divisor. Note that the selected
+variance divisor can effect the calculations for several statistics.}
 
 \item{titles}{A vector of one or more titles to use for the report output.}
 }
@@ -232,14 +233,18 @@ dataset.
 default, the function returns all TYPE combinations.
 }
 \item{\strong{vardef}: Controls the denominator used in variance-related
-statistics. This option supports several denominator definitions:
+statistics. This option supports the following denominator definitions:
 \itemize{
 \item{\strong{DF}: Uses \(n - 1\), the sample degrees of freedom.}
 \item{\strong{N}: Uses \(n\), the total count of observations.}
 \item{\strong{WEIGHT/WGT}: Uses the sum of weights.}
 \item{\strong{WDF}: Uses the sum of weights minus one.}
 }
-By default, this option use \strong{DF}.
+By default, this option use \strong{DF}. The variance divisor effects many
+statistics, as many statistics use the variance in their calculations.
+Also note that some divisors are not supported by some statistics.  For those
+statistics that are not supported by a particular divisor, they will be
+returned as NA.
 }
 }
 }
