@@ -1,6 +1,6 @@
 
 
-base_path <- "c:/packages/procs/tests/testthat"
+base_path <- file.path(getwd(), "tests/testthat")
 data_dir <- base_path
 
 base_path <- tempdir()

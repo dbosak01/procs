@@ -1,4 +1,4 @@
-base_path <- "c:/packages/procs/tests/testthat"
+base_path <- file.path(getwd(), "tests/testthat")
 data_dir <- base_path
 
 base_path <- tempdir()
@@ -1825,7 +1825,7 @@ test_that("means67: Vardef options with weight and class work as expected.", {
 
 
 # More comparisons to SAS
-test_that("means67: Vardef options with other statistics work as expected.", {
+test_that("means68: Vardef options with other statistics work as expected.", {
 
   # NAs in Score and Weight
   dat2 <- read.table(header = TRUE, text = '
@@ -1948,6 +1948,104 @@ test_that("means67: Vardef options with other statistics work as expected.", {
   expect_equal(as.numeric(res1$CV), c(8.1196056, 0.9554001))
 
 })
+
+
+
+# More comparisons to SAS
+test_that("means69: Vardef options with other statistics no weight work as expected.", {
+
+  # NAs in Score and Weight
+  dat2 <- read.table(header = TRUE, text = '
+                Name      Assessment     Score   Weight
+                Smith     Quiz1          85      0.05
+                Smith     Quiz2          25      0.05
+                Smith     Midterm        85      0.35
+                Smith     Quiz3          NA      0.05
+                Smith     Quiz4          62      0.05
+                Smith     Final          93      0.45
+                Wang      Quiz1         100      0.05
+                Wang      Quiz2          96      0.05
+                Wang      Midterm        98      0.35
+                Wang      Quiz3         105      0.05
+                Wang      Quiz4          87      NA
+                Wang      Final          96      0.45')
+
+
+
+  # vardef = wgt - OK
+  res1 <- proc_means(dat2, var = Score,
+                     class = Name, options = c("vardef" = "wgt", "nway"),
+                     stats = v(nobs, n, mean, median, mode, std, vari, stderr, clm, cv))
+
+  expect_equal(as.numeric(res1$NOBS), c(6, 6))
+  expect_equal(as.numeric(res1$N), c(5, 6))
+  expect_equal(as.numeric(res1$MEAN), c(70.0, 97.0))
+  expect_equal(as.numeric(res1$MEDIAN), c(85.0, 97.0))
+  expect_equal(as.numeric(res1$MODE), c(85.0, 96.0))
+  expect_equal(as.numeric(res1$STD), c(24.7709507, 5.4160256))
+  expect_equal(as.numeric(res1$VARI), c(613.60, 29.3333333))
+  expect_equal(as.numeric(res1$STDERR), as.numeric(c(NA, NA)))
+  expect_equal(as.numeric(res1$LCLM), as.numeric(c(NA, NA)))
+  expect_equal(as.numeric(res1$UCLM), as.numeric(c(NA, NA)))
+  expect_equal(as.numeric(res1$CV), c(35.3870725, 5.5835315))
+
+
+  # Weight - vardef = DF
+  res1 <- proc_means(dat2, var = Score,
+                     class = Name, options = c("vardef" = "DF", "nway"),
+                     stats = v(nobs, n, mean, median, mode, std, vari, stderr, clm, cv))
+
+  expect_equal(as.numeric(res1$NOBS), c(6, 6))
+  expect_equal(as.numeric(res1$N), c(5, 6))
+  expect_equal(as.numeric(res1$MEAN), c(70.0, 97.0))
+  expect_equal(as.numeric(res1$MEDIAN), c(85.0, 97.0))
+  expect_equal(as.numeric(res1$MODE), c(85.0, 96.0))
+  expect_equal(as.numeric(res1$STD), c(27.6947648, 5.9329588))
+  expect_equal(as.numeric(res1$VARI), c(767.0, 35.2))
+  expect_equal(as.numeric(res1$STDERR), c(12.3854754, 2.4221203))
+  expect_equal(as.numeric(res1$LCLM), c(35.6124075, 90.7737416))
+  expect_equal(as.numeric(res1$UCLM), c(104.3875925, 103.2262584))
+  expect_equal(as.numeric(res1$CV), c(39.5639498, 6.1164524))
+
+  # vardef = wdf - OK.
+  res1 <- proc_means(dat2, var = Score,
+                     class = Name, options = c("vardef" = "wdf", "nway"),
+                     stats = v(nobs, n, mean, median, mode, std, vari, stderr, clm, cv))
+
+  expect_equal(as.numeric(res1$NOBS), c(6, 6))
+  expect_equal(as.numeric(res1$N), c(5, 6))
+  expect_equal(as.numeric(res1$MEAN), c(70.0, 97.0))
+  expect_equal(as.numeric(res1$MEDIAN), c(85.0, 97.0))
+  expect_equal(as.numeric(res1$MODE), c(85.0, 96.0))
+  expect_equal(as.numeric(res1$STD), c(27.6947648, 5.9329588))
+  expect_equal(as.numeric(res1$VARI), c(767.0, 35.2))
+  expect_equal(as.numeric(res1$STDERR), as.numeric(c(NA, NA)))
+  expect_equal(as.numeric(res1$LCLM), as.numeric(c(NA, NA)))
+  expect_equal(as.numeric(res1$UCLM), as.numeric(c(NA, NA)))
+  expect_equal(as.numeric(res1$CV), c(39.5639498, 6.1164524))
+
+
+  # vardef = n  - OK
+  res1 <- proc_means(dat2, var = Score,
+                     class = Name, options = c("vardef" = "n", "nway"),
+                     stats = v(nobs, n, mean, median, mode, std, vari, stderr, clm, cv))
+
+  expect_equal(as.numeric(res1$NOBS), c(6, 6))
+  expect_equal(as.numeric(res1$N), c(5, 6))
+  expect_equal(as.numeric(res1$MEAN), c(70.0, 97.0))
+  expect_equal(as.numeric(res1$MEDIAN), c(85.0, 97.0))
+  expect_equal(as.numeric(res1$MODE), c(85.0, 96.0))
+  expect_equal(as.numeric(res1$STD), c(24.7709507, 5.4160256))
+  expect_equal(as.numeric(res1$VARI), c(613.60, 29.3333333))
+  expect_equal(as.numeric(res1$STDERR), as.numeric(c(NA, NA)))
+  expect_equal(as.numeric(res1$LCLM), as.numeric(c(NA, NA)))
+  expect_equal(as.numeric(res1$UCLM), as.numeric(c(NA, NA)))
+  expect_equal(as.numeric(res1$CV), c(35.3870725, 5.5835315))
+
+
+})
+
+# T, P, etc. with vardef options
 
 
 
