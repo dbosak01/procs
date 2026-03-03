@@ -851,18 +851,18 @@ get_summaries <- function(data, var, weight=NULL, stats, missing = FALSE,
         }
 
         if (st == "max") {
-          if (all(is.na(var)))
+          if (all(is.na(var_all)))
             rw[["MAX"]] <- NA
           else
-            rw[["MAX"]] <- max(var, na.rm = narm)
+            rw[["MAX"]] <- max(var_all, na.rm = narm)
         }
 
         if (st == "min") {
 
-          if (all(is.na(var)))
+          if (all(is.na(var_all)))
             rw[["MIN"]] <- NA
           else
-            rw[["MIN"]] <- min(var, na.rm = narm)
+            rw[["MIN"]] <- min(var_all, na.rm = narm)
         }
 
         if (st == "median") {
