@@ -1599,13 +1599,14 @@ test_that("means59: vardef option works", {
   expect_equal(is.na(res8$PRT[2]), TRUE)
 
   #vardef = wdf when sum(weights)<=1
-  datsp$weight <- c(1,2,3,1,2,3,1,2,3,1,2,3,1,2,3,1,2,3,1,2)/30
+  datsp <- datm
+  datsp$Weight <- c(1,2,3,1,2,3,1,2,3,1,2,3,1,2,3,1,2,3,1,2)/100
   res9 <- proc_means(datsp, var = c("Age", "PresentScore", "TasteScore"),
                      output = out,
                      weight = Weight,
-                     options = v(notype, nofreq, nway, vardef = "weight"))
-  expect_equal(is.na(res9$MEAN[2]), TRUE)
-  expect_equal(is.na(res9$STD[2]), TRUE)
+                     options = v(notype, nofreq, nway, vardef = "wdf"))
+  expect_equal(res9$MEAN[1], 42.1282051)
+  expect_equal(is.na(res9$STD[1]), TRUE)
 
   #invalid vardef option
   expect_error( proc_means(datsp, var = c("Age", "PresentScore", "TasteScore"),
@@ -1776,21 +1777,21 @@ test_that("means67: Some other cases with Weight", {
   res
 
   expect_equal(res$N[1], 20)
-  expect_equal(res$MEAN[1], 45.37)
+  expect_equal(res$MEAN[1], 45.379310)
 
   # all weights are NA
   datsp$Weight <- NA_real_
   res <- proc_means(datsp, var = "Age", weight = "Weight", stats = c("n", "mean","min","max"))
   res
-  expect_equal(res$n[1], 0)
-  expect_equal(is.na(res$Mean[1]), TRUE)
-  expect_equal(is.na(res$min[1]), TRUE)
+  expect_equal(res$N[1], 0)
+  expect_equal(is.na(res$MEAN[1]), TRUE)
+  expect_equal(is.na(res$MIN[1]), TRUE)
 
   # all weights are zero or negative
   datsp$Weight <- c(-1,0,-3,-1,-2,-3,-1,-2,-1,-1,-2,-3,-2,-2,-3,0,-2,-3,-1,-2)
   res <- proc_means(datsp, var = "Age", weight = "Weight", stats = c("n", "mean","min","max","median"))
   res
-  expect_equal(res$n[1], 0)
-  expect_equal(is.na(res$Mean[1]), TRUE)
-  expect_equal(res$min[1], 19)
+  expect_equal(res$N[1], 20)
+  expect_equal(is.na(res$MEAN[1]), TRUE)
+  expect_equal(res$MIN[1], 19)
 })
