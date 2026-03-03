@@ -405,5 +405,16 @@ test_that("sort17: na.sort parameter works.", {
   expect_equal(is.na(res$a[1]), TRUE)
   expect_equal(is.na(res$a[2]), TRUE)
 
+
+  dat <- data.frame(
+    x = c(1, NA, 3)
+  )
+
+  first <- "sas"
+
+  proc_sort(dat, by = x, na.sort = first)
+
+
+
 })
 

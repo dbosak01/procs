@@ -103,6 +103,7 @@
 #' Default is FALSE. If this parameter is TRUE, a vertical line will be created
 #' on some charts to show the value specified for the "h0=" option on
 #' \code{\link{proc_ttest}}.
+#' @seealso [proc_ttest()]
 #' @examples
 #' library(procs)
 #'

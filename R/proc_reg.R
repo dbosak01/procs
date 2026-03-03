@@ -283,6 +283,7 @@
 #' will return a NULL.
 #' @import fmtr
 #' @import tibble
+#' @seealso [regplot()]
 #' @export
 #' @examples
 #' # Turn off printing for CRAN checks

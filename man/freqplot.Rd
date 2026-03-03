@@ -148,3 +148,6 @@ res <- proc_freq(dt, tables = v(Hair * Eye, Eye * Hair),
 res
 
 }
+\seealso{
+\code{\link[=proc_freq]{proc_freq()}}
+}

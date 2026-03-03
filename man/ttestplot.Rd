@@ -171,3 +171,6 @@ proc_ttest(sleep,
            plots = ttestplot("summary", panel = FALSE))
 
 }
+\seealso{
+\code{\link[=proc_ttest]{proc_ttest()}}
+}

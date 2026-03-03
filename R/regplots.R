@@ -175,6 +175,7 @@
 #' which value is assigned to the label.  By default, the row number will
 #' be assigned.  You may also assign a column name from the input dataset
 #' to this parameter to use as the label value.
+#' @seealso [proc_reg()]
 #' @examples
 #' library(procs)
 #'

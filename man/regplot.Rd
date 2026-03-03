@@ -258,3 +258,6 @@ res <- proc_reg(iris, model = c("Sepal.Length = Petal.Length",
 # View results
 res
 }
+\seealso{
+\code{\link[=proc_reg]{proc_reg()}}
+}

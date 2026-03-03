@@ -96,6 +96,7 @@
 #' \code{\link{proc_freq}} for evaluation and rendering. Data for the
 #' frequency plot comes directly from the \code{\link{proc_freq}} reporting
 #' data frames.
+#' @seealso [proc_freq()]
 #' @examples
 #' library(procs)
 #'

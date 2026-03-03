@@ -208,6 +208,7 @@
 #' \code{output} parameter.
 #' @import fmtr
 #' @import tibble
+#' @seealso [ttestplot()]
 #' @export
 #' @examples
 #' # Turn off printing for CRAN checks

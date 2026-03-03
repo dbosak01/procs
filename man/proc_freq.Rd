@@ -549,5 +549,6 @@ res
 \seealso{
 For summary statistics, see \code{\link{proc_means}}.  To pivot
 or transpose the data coming from \code{proc_freq},
-see \code{\link{proc_transpose}}.
+see \code{\link{proc_transpose}}. For frequency plots,
+see \code{\link{freqplot}}.
 }

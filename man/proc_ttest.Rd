@@ -406,3 +406,6 @@ res6
 # - height: 4.5
 # - width: 6
 }
+\seealso{
+\code{\link[=ttestplot]{ttestplot()}}
+}
