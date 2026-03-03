@@ -1579,24 +1579,40 @@ test_that("means59: vardef option works", {
 
 
   #vardf = wdf/weight when no weight variable specified
-  res5 <- proc_means(datsp, var = c("Age", "PresentScore", "TasteScore"),
-                     output = out,
-                     options = v(notype, nofreq, nway, vardef = "wdf"))
   res6 <- proc_means(datsp, var = c("Age", "PresentScore", "TasteScore"),
                      output = out,
+                     options = v(notype, nofreq, nway, vardef = "wdf"))
+  res7 <- proc_means(datsp, var = c("Age", "PresentScore", "TasteScore"),
+                     output = out,
                      options = v(notype, nofreq, nway, vardef = "weight"))
-  expect_equal(res5$STD[2], 9.3767630)
-  expect_equal(res6$STD[2], 9.1393381)
+  expect_equal(res6$STD[2], 9.3767630)
+  expect_equal(res7$STD[2], 9.1393381)
 
   #return NA for CLM, t, prt when vardef != df
-  res7 <- proc_means(datsp, var = c("Age", "PresentScore", "TasteScore"),
+  res8 <- proc_means(datsp, var = c("Age", "PresentScore", "TasteScore"),
                      stats = c("mean", "t", "clm","prt"),
                      output = out,
                      options = v(notype, nofreq, nway, vardef = "n"))
-  expect_equal(is.na(res7$LCLM[2]), TRUE)
-  expect_equal(is.na(res7$UCLM[2]), TRUE)
-  expect_equal(is.na(res7$T[2]), TRUE)
-  expect_equal(is.na(res7$PRT[2]), TRUE)
+  expect_equal(is.na(res8$LCLM[2]), TRUE)
+  expect_equal(is.na(res8$UCLM[2]), TRUE)
+  expect_equal(is.na(res8$T[2]), TRUE)
+  expect_equal(is.na(res8$PRT[2]), TRUE)
+
+  #vardef = wdf when sum(weights)<=1
+  datsp <- datm
+  datsp$Weight <- c(1,2,3,1,2,3,1,2,3,1,2,3,1,2,3,1,2,3,1,2)/100
+  res9 <- proc_means(datsp, var = c("Age", "PresentScore", "TasteScore"),
+                     output = out,
+                     weight = Weight,
+                     options = v(notype, nofreq, nway, vardef = "wdf"))
+  expect_equal(res9$MEAN[1], 42.1282051)
+  expect_equal(is.na(res9$STD[1]), TRUE)
+
+  #invalid vardef option
+  expect_error( proc_means(datsp, var = c("Age", "PresentScore", "TasteScore"),
+                           output = out,
+                           weight = Weight,
+                           options = v(notype, nofreq, nway, vardef = "abc")))
 })
 
 test_that("means60: Weight works for stats option: n nmiss nobs min max range sum", {
@@ -1701,7 +1717,7 @@ test_that("means64: Weight works for stats option: t clm uclm lclm prt probt", {
   res1 <- proc_means(datsp, var = c("Age", "PresentScore", "TasteScore"),
                      stats = c("n", "t", "clm", "uclm", "lclm", "prt", "probt"),
                      output = out,
-                     weight = "Weight",)
+                     weight = "Weight")
   res1
 
   expect_equal(nrow(res1), 3)
@@ -1716,7 +1732,7 @@ test_that("means64: Weight works for stats option: skew kurt", {
   res1 <- proc_means(datsp, var = c("Age", "PresentScore", "TasteScore"),
                      stats = c("n", "skew", "kurt"),
                      output = out,
-                     weight = "Weight",)
+                     weight = "Weight")
   res1
   #expect NA
   expect_equal(nrow(res1), 3)
@@ -1725,7 +1741,21 @@ test_that("means64: Weight works for stats option: skew kurt", {
   expect_equal(is.na(res1[1,6]),TRUE)
 })
 
-test_that("means66: Some other cases with Weight", {
+test_that("means66: Vardef with Weight", {
+
+  #vardef = wdf/weight when no weight variable specified
+  datsp <- datm
+  res <- proc_means(datsp, var = c("Age", "PresentScore", "TasteScore"),
+                     output = out,
+                     options = v(notype, nofreq, nway, vardef = "wdf"))
+  res
+
+  expect_equal(res$STD[2], 9.3767630)
+  expect_equal(res$MEAN[2], 76.15)
+
+})
+
+test_that("means67: Some other cases with Weight", {
 
   #weight variable is not in data
   datsp <- datm
@@ -1739,6 +1769,31 @@ test_that("means66: Some other cases with Weight", {
                           stats = c("n"),
                           output = out,
                           weight = "Flavor"))
+
+  # contains negative and zero weights
+  datsp$Weight <- c(1,0,3,1,2,3,1,2,-1,1,2,3,-2,2,3,0,2,-3,1,2)
+
+  res <- proc_means(datsp, var = "Age", weight = "Weight", stats = c("n", "mean"))
+  res
+
+  expect_equal(res$N[1], 20)
+  expect_equal(res$MEAN[1], 45.379310)
+
+  # all weights are NA
+  datsp$Weight <- NA_real_
+  res <- proc_means(datsp, var = "Age", weight = "Weight", stats = c("n", "mean","min","max"))
+  res
+  expect_equal(res$N[1], 0)
+  expect_equal(is.na(res$MEAN[1]), TRUE)
+  expect_equal(is.na(res$MIN[1]), TRUE)
+
+  # all weights are zero or negative
+  datsp$Weight <- c(-1,0,-3,-1,-2,-3,-1,-2,-1,-1,-2,-3,-2,-2,-3,0,-2,-3,-1,-2)
+  res <- proc_means(datsp, var = "Age", weight = "Weight", stats = c("n", "mean","min","max","median"))
+  res
+  expect_equal(res$N[1], 20)
+  expect_equal(is.na(res$MEAN[1]), TRUE)
+  expect_equal(res$MIN[1], 19)
 })
 
 
