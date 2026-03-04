@@ -418,7 +418,7 @@ test_that("sort17: na.sort parameter works.", {
 
 })
 
-test_that("sort17: na.sort parameter works.", {
+test_that("sort18: na.sort parameter works.", {
 
 
   spsrt <- read.table(header = TRUE, text = '
