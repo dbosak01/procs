@@ -276,8 +276,7 @@ get_mode <- function(x) {
 }
 
 
-# Not sure why this was changed.  Does not match SAS or
-# previous versions of procs.
+# Not sure why this was changed.
 #' @noRd
 get_mode_diyu <- function(x, narm = TRUE) {
   if (narm)

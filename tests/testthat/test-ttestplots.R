@@ -638,3 +638,21 @@ test_that("ttestplot13: showh0 parameter", {
   expect_equal("plot_spec" %in% class(res[[5]][[1]]), TRUE)
 
 })
+
+
+# Work on this
+test_that("ttestplot14: qqplot matches SAS", {
+
+  # ttest 010
+  res <- proc_ttest(cls,
+             var = "Height",
+             class = "Sex",
+             output = report,
+             plot = TRUE,
+             options = c("alpha" = 0.1))
+
+  expect_equal(length(res), 5)
+  expect_equal("plot_spec" %in% class(res[[5]][[1]]), TRUE)
+
+
+})
