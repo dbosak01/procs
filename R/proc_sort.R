@@ -212,6 +212,7 @@ proc_sort <- function(data,  by = NULL, keep = NULL, order = "ascending",
 
   }
 
+
   if (is.null(na.sort)) {
     # Get any global sort settings
     osrt <- options("procs.na.sort")
@@ -219,6 +220,14 @@ proc_sort <- function(data,  by = NULL, keep = NULL, order = "ascending",
       na.sort <- osrt$procs.na.sort
     } else {
       na.sort <- "last"
+    }
+  }
+
+  # Check na.sort
+  if (!is.null(na.sort)) {
+    if (!na.sort %in% c("first", "last", "sas")) {
+      stop(paste0("Value '", na.sort, "' for na.sort is invalid.\n",
+                  "Valid values are: 'first', 'last', 'sas' or NULL."))
     }
   }
 

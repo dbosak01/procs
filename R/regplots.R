@@ -627,24 +627,48 @@ render_diagnostics <- function(dat, res, mdl, plt, alph) {
   # Set margins
   par(mar = c(4, 4, 0, 0) + 0.1)
 
-  # Get y scale
-  mx <- max(abs(rdt)) * 1.125  #1.0025
-  scl <- c(-mx, mx)
+  # Prepare Y data
+  ydat <- sort(rdt)
+  n <- length(ydat)
 
-  # Draw plot
-  qqnorm(rdt,
-         main = "",
-         xlab = "",
-         ylab = "",
-         pch  = 1,          # open circles
-         col  = "#05379B",
-         cex = 1.3,
-         ylim = scl,
-         axes = FALSE)
+  # SAS (Blom) plotting position formula: (i - 0.375) / (n + 0.25)
+  i <- 1:n
+  p_sas <- (i - 0.375) / (n + 0.25)
 
-  # Add diagonal line
-  usr <- par("usr")
-  segments(usr[1], usr[3], usr[2], usr[4], col = "grey60")
+  # Convert to theoretical normal quantiles
+  xdat <- qnorm(p_sas)
+
+  # Plot manually
+  plot(xdat, ydat,
+       main = "",
+       xlab = "",
+       ylab = "",
+       pch = 1,
+       col = "#05379B",
+       cex = 1.3,
+       axes = FALSE)
+
+  # Slope = Standard Deviation, Intercept = Mean
+  abline(a = mean(ydat), b = sd(ydat), col = "grey60")
+
+  # # Get y scale
+  # mx <- max(abs(rdt)) * 1.125  #1.0025
+  # scl <- c(-mx, mx)
+  #
+  # # Draw plot
+  # qqnorm(rdt,
+  #        main = "",
+  #        xlab = "",
+  #        ylab = "",
+  #        pch  = 1,          # open circles
+  #        col  = "#05379B",
+  #        cex = 1.3,
+  #        ylim = scl,
+  #        axes = FALSE)
+  #
+  # # Add diagonal line
+  # usr <- par("usr")
+  # segments(usr[1], usr[3], usr[2], usr[4], col = "grey60")
 
   # Add custom axes
   axis(side = 1, col.ticks = "grey55", mgp = c(3, .5, 0), tck = -0.015)
@@ -731,7 +755,7 @@ render_diagnostics <- function(dat, res, mdl, plt, alph) {
   ## Open circles at the top of each spike
   points(seq_along(cd), cd,
          pch = 1,
-         col = "#05379B", cex = 1.25)
+         col = "#05379B", cex = 1.3)
 
   ## Reference line (PROC REG default)
   abline(h = cutoff, col = "grey60", lwd = 1)
@@ -1941,24 +1965,29 @@ render_qqplot <- function(dat, res, mdl) {
   # Set margins
   par(mar = c(4, 5, 2, .75) + 0.1)
 
-  # Get y scale
- mx <- max(abs(rdt)) * 1.125  #1.0025
- scl <- c(-mx, mx)
+  # Prepare Y data
+  ydat <- sort(rdt)
+  n <- length(ydat)
 
- # Draw plot
-  qqnorm(rdt,
-         main = paste0("Q-Q Plot of Residuals for ", dvr),
-         xlab = "",
-         ylab = "Residual",
-         pch  = 1,          # open circles
-         col  = "#05379B",
-         cex = 1.3,
-         ylim = scl,
-         axes = FALSE)
+  # SAS (Blom) plotting position formula: (i - 0.375) / (n + 0.25)
+  i <- 1:n
+  p_sas <- (i - 0.375) / (n + 0.25)
 
-  # Add diagonal line
-  usr <- par("usr")
-  segments(usr[1], usr[3], usr[2], usr[4], col = "grey60")
+  # Convert to theoretical normal quantiles
+  xdat <- qnorm(p_sas)
+
+  # Plot manually
+  plot(xdat, ydat,
+       main = paste0("Q-Q Plot of Residuals for ", dvr),
+       xlab = "",
+       ylab = "Residual",
+       pch = 1,
+       col = "#05379B",
+       cex = 1.3,
+       axes = FALSE)
+
+  # Slope = Standard Deviation, Intercept = Mean
+  abline(a = mean(ydat), b = sd(ydat), col = "grey60")
 
   # Add custom axes
   axis(side = 1, col.ticks = "grey55", mgp = c(3, .5, 0), tck = -0.015)

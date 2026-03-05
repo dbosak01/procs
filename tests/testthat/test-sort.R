@@ -427,3 +427,25 @@ test_that("returns empty data.frame unchanged when input has 0 rows", {
     expect_equal(nrow(out), 0L)
   })
 })
+test_that("sort18: na.sort parameter works.", {
+
+
+  spsrt <- read.table(header = TRUE, text = '
+                    ID	Name	Score
+                    1	David	 74
+                    2	Sam	   45
+                    3	Mary	 NA
+                    4	Dane	 23
+                    5	Jenny	 87
+                    6	Simran 27
+                    7	Priya	 72
+                    8	David	 45
+                    9	Ram	   54
+                    10	Bane	 87')
+
+  # "last"
+  expect_error(proc_sort(spsrt, by = Score, na.sort = "fork"))
+
+
+})
+
