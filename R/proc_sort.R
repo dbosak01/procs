@@ -152,8 +152,7 @@ proc_sort <- function(data,  by = NULL, keep = NULL, order = "ascending",
 
   # Deal with single value unquoted parameter values
   oorder <- deparse(substitute(order, env = environment()))
-  order <- tryCatch({if (typeof(order) %in% c("character", "NULL")) order else oorder},
-                 error = function(cond) {oorder})
+  order <- if (typeof(order) %in% c("character", "NULL")) order else oorder
 
   # Deal with single value unquoted option values
   oopt <- deparse(substitute(options, env = environment()))
@@ -177,7 +176,7 @@ proc_sort <- function(data,  by = NULL, keep = NULL, order = "ascending",
   }
 
   if (nrow(data) == 0) {
-    stop("Input data has no rows.")
+    return(data)
   }
 
   if (!is.null(order)) {

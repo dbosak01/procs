@@ -418,3 +418,12 @@ test_that("sort17: na.sort parameter works.", {
 
 })
 
+test_that("returns empty data.frame unchanged when input has 0 rows", {
+  df <- data.frame(X = character())
+
+  expect_silent({
+    out <- proc_sort(df, by = X)
+    expect_identical(out, df)
+    expect_equal(nrow(out), 0L)
+  })
+})
