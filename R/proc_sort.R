@@ -177,7 +177,7 @@ proc_sort <- function(data,  by = NULL, keep = NULL, order = "ascending",
   }
 
   if (nrow(data) == 0) {
-    stop("Input data has no rows.")
+    return(data)
   }
 
   if (!is.null(order)) {
