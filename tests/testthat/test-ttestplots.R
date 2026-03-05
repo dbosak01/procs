@@ -641,9 +641,20 @@ test_that("ttestplot13: showh0 parameter", {
 
 
 # Work on this
-test_that("ttestplot14: qqplot matches SAS", {
+test_that("ttestplot14: troublesome plots match SAS", {
 
-  # ttest 010
+  # qqplot1 - Got it!
+  res <- proc_ttest(cls,
+                    var = c("Height"),
+                    options = c("h0" = 65, "alpha" = 0.05),
+                    output = report,
+                    plots = ttestplot("qqplot"))
+
+
+  expect_equal(length(res), 4)
+  expect_equal("plot_spec" %in% class(res[[4]][[1]]), TRUE)
+
+  # qqplot2 - Hurray!
   res <- proc_ttest(cls,
              var = "Height",
              class = "Sex",
@@ -653,6 +664,16 @@ test_that("ttestplot14: qqplot matches SAS", {
 
   expect_equal(length(res), 5)
   expect_equal("plot_spec" %in% class(res[[5]][[1]]), TRUE)
+
+
+  # histogram  - Sorry!  Still not working!
+  res <- proc_ttest(cls,
+                    var = c("Age"),
+                    options = c("h0" = 65, "alpha" = 0.05),
+                    output = report,
+                    plots = ttestplot("histogram"))
+
+
 
 
 })

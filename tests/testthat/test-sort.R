@@ -438,7 +438,5 @@ test_that("sort18: na.sort parameter works.", {
   expect_error(proc_sort(spsrt, by = Score, na.sort = "fork"))
 
 
-
-
 })
 

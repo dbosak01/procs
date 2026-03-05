@@ -233,8 +233,7 @@ test_that("regplot4: works for multiple plots.", {
 })
 
 
-# Dots not lining up exactly with SAS.  Close but not perfect.
-# Needs work.  Something still wrong.
+# Got these matching!
 test_that("regplot5: works for qqplot", {
 
 

@@ -1299,21 +1299,7 @@ render_histogram2 <- function(dat, var, plt, class) {
        axes = FALSE)
 
   # Normal curve overlay (scaled to percent)
-  # x <- seq(min(dt1) * 2, max(dt1) * 2, length.out = 300)
-  # x <- seq(scl[1], scl[2], length.out = 300)
-  #
-  # y_norm <- dnorm(x, mean = mu, sd = sdx)
-  # y_norm <- y_norm / max(y_norm) * max(h$counts)
-  #
-  # lines(x, y_norm, col = "steelblue4", lwd = 2)
   lines(grid, y_norm_percent, col = "steelblue4", lwd = 2)
-
-  # Kernel density overlay (scaled to percent)
-  # dens <- density(dt1)
-  #
-  # y_kern <- dens$y / max(dens$y) * max(h$counts)
-  #
-  # lines(dens$x, y_kern, col = "orangered2", lwd = 2)
 
   # Bandwidth (Silverman / SAS)
   bw <- 1.06 * sdx * n^(-1/5)
@@ -1390,23 +1376,7 @@ render_histogram2 <- function(dat, var, plt, class) {
        axes = FALSE)
 
   # Normal curve overlay (scaled to percent)
-  # x <- seq(min(dt2) * 2, max(dt2) * 2, length.out = 300)
-  # x <- seq(scl[1], scl[2], length.out = 300)
-  #
-  # y_norm <- dnorm(x, mean = mu, sd = sdx)
-  # y_norm <- y_norm / max(y_norm) * max(h$counts)
-  #
-  # lines(x, y_norm, col = "steelblue4", lwd = 2)
-
   lines(grid, y_norm_percent, col = "steelblue4", lwd = 2)
-
-  # Kernel density overlay (scaled to percent)
-  # dens <- density(dt2)
-  #
-  # y_kern <- dens$y / max(dens$y) * max(h$counts)
-  #
-  # lines(dens$x, y_kern, col = "orangered2", lwd = 2)
-
 
   # Bandwidth (Silverman / SAS)
   bw <- 1.06 * sdx * n^(-1/5)   # 1.06
@@ -1483,218 +1453,6 @@ render_histogram2 <- function(dat, var, plt, class) {
 
 }
 
-#' @noRd
-render_histogram2_back <- function(dat, var, plt, class) {
-
-  op <- par("mar")
-  om <- par("oma")
-
-  # Create temp file path
-  pth <- tempfile(fileext = ".jpg")
-
-  # Standard height and width
-  hti <- 4.5  # Height in inches
-  wdi <- 6  # Width in inches
-  bml <- 6  # bottom margin lines
-
-  # Convert inches to pixels
-  ht <- hti * 96
-  wd <- wdi * 96
-
-  # Convert to data frame
-  dat <- as.data.frame(dat)
-  dat <- sort(dat, by = class)
-
-  # Get analysis variables
-  cvls <- unique(dat[[class]])
-  vl1 <- cvls[1]
-  vl2 <- cvls[2]
-
-  # Prepare data
-  dt1 <- dat[dat[[class]] == vl1, var]
-  dt2 <- dat[dat[[class]] == vl2, var]
-
-  # Use calculated breaks to get scale
-  scl <- range(dat[[var]])
-  scl <- c(scl[1] * .8, scl[2] * 1.2)
-
-  # Output to image file
-  jpeg(pth, width = wd, height = ht, quality = 100, units = "px")
-
-  # Set margins
-  par(oma = c(5, 1, 2, .75) + 0.1,
-      mar = c(0, 3, 0, 0) + 0.1,
-      mfrow = c(2, 1))
-
-
-  #******************************
-  #*  Histogram 1
-  #******************************
-
-  # Calculate stats
-  n   <- length(dt1)
-  mu  <- mean(dt1)
-  sdx <- sd(dt1)
-
-  # Histogram (Percent scale)
-  h <- hist(dt1,
-            breaks = "Sturges",
-            plot = FALSE)
-
-  # Convert counts to percent
-  h$counts <- h$counts / sum(h$counts) * 100
-
-
-
-  # Create plot using histogram values
-  plot(h,
-       col = "#CAD5E5", #"grey85",
-       border = "grey20",
-       main = "",
-       xlab = "",
-       ylab = "Percent",
-       xlim = scl,
-       ylim = c(0, max(h$counts) * 1.05),
-       axes = FALSE)
-
-  # Normal curve overlay (scaled to percent)
-  x <- seq(min(dt1) * 2, max(dt1) * 2, length.out = 300)
-  x <- seq(scl[1], scl[2], length.out = 300)
-
-  y_norm <- dnorm(x, mean = mu, sd = sdx)
-  y_norm <- y_norm / max(y_norm) * max(h$counts)
-
-  lines(x, y_norm, col = "steelblue4", lwd = 2)
-
-  # Kernel density overlay (scaled to percent)
-  dens <- density(dt1)
-
-  y_kern <- dens$y / max(dens$y) * max(h$counts)
-
-  lines(dens$x, y_kern, col = "orangered2", lwd = 2)
-
-  # Add custom axes
-  axis(side = 2, las = 1, col.ticks = "grey55",
-       mgp = c(3, .5, 0), tck = -0.015)
-
-  # Add y label
-  mtext("Percent", side = 2, line = 2.5)
-
-  # Add class label
-  legend("topleft", legend = vl1, bty = "n",
-         x.intersp = 0,  # Spacing between group label and box
-         y.intersp = 0,  # Spacing between content and borders
-         cex = .9
-  )
-
-  # Frame
-  box(col = "grey70", lwd = 1)
-
-  #******************************
-  #*  Histogram 2
-  #******************************
-
-  # Calculate stats
-  n   <- length(dt2)
-  mu  <- mean(dt2)
-  sdx <- sd(dt2)
-
-  # Histogram (Percent scale)
-  h <- hist(dt2,
-            breaks = "Sturges",
-            plot = FALSE)
-
-  # Convert counts to percent
-  h$counts <- h$counts / sum(h$counts) * 100
-
-  # Create plot using histogram values
-  plot(h,
-       col = "#CAD5E5", #"grey85",
-       border = "grey20",
-       main = "",
-       xlab = "",
-       ylab = "Percent",
-       xlim = scl,
-       ylim = c(0, max(h$counts) * 1.05),
-       axes = FALSE)
-
-  # Normal curve overlay (scaled to percent)
-  x <- seq(min(dt2) * 2, max(dt2) * 2, length.out = 300)
-  x <- seq(scl[1], scl[2], length.out = 300)
-
-  y_norm <- dnorm(x, mean = mu, sd = sdx)
-  y_norm <- y_norm / max(y_norm) * max(h$counts)
-
-  lines(x, y_norm, col = "steelblue4", lwd = 2)
-
-  # Kernel density overlay (scaled to percent)
-  dens <- density(dt2)
-
-  y_kern <- dens$y / max(dens$y) * max(h$counts)
-
-  lines(dens$x, y_kern, col = "orangered2", lwd = 2)
-
-  # Add custom axes
-  axis(side = 1, col.ticks = "grey55", # at = xtks, labels = TRUE,
-       mgp = c(3, .5, 0), tck = -0.015, cex.axis = .75)
-  axis(side = 2, las = 1, col.ticks = "grey55",
-       mgp = c(3, .5, 0), tck = -0.015)
-
-  # Add y label
-  mtext("Percent", side = 2, line = 2.5)
-
-  # Add class label
-  legend("topleft", legend = vl2, bty = "n",
-         x.intersp = 0,  # Spacing between group label and box
-         y.intersp = 0,  # Spacing between content and borders
-         cex = .9
-  )
-
-  # Frame
-  box(col = "grey70", lwd = 1)
-
-
-  #******************************
-  #*  Clean up
-  #******************************
-
-  box("outer", col = "grey70", lwd = 1)
-
-  # Add titles
-  mtext(paste0("Distribution of ", var), side = 3, line = par("oma")[3] - 1.75,
-        outer = TRUE, font = 2, cex = 1.25)
-
-  # Add x axis label
-  mtext(var, side = 1, line = par("oma")[1] - 3.5, outer = TRUE)
-
-  # Add legend
-  mpos <- legend("bottom",
-                 legend = c("Normal ",
-                            "Kernel"),
-                 col = c("steelblue4", "orangered2"),
-                 lwd = 2,
-                 cex = .9,
-                 horiz = TRUE,
-                 bty = "o",
-                 box.col = "grey", # Grey border to match SAS
-                 x.intersp = 1,  # Spacing between group label and box
-                 y.intersp = 0,  # Spacing between content and borders
-                 text.width = NA,  # Compute label widths dynamically
-                 inset = c(0, -.38),
-                 xpd = NA)
-
-  # Restore margins
-  par(mar = op,  mfrow = c(1, 1), oma = om)
-
-  # Close device context
-  dev.off()
-
-  # Put plot in reporter plot object
-  ret <- create_plot(pth, height = hti, width = wdi)
-
-  return(ret)
-
-}
 
 
 # Legend moves to left if mean too far to the right
@@ -2402,7 +2160,6 @@ render_interval2 <- function(dat, var, plt, res) {
 #' @noRd
 render_tqqplot1 <- function(dat, var, plt) {
 
-
   op <- par("mar")
 
   # Create temp file path
@@ -2420,12 +2177,7 @@ render_tqqplot1 <- function(dat, var, plt) {
   # Output to image file
   jpeg(pth, width = wd, height = ht, quality = 100, units = "px")
 
-  # Get analysis variables
-  # vrs <- get_vars(mdl)
-  # dvr <- vrs$dvar
-  # ivr <- vrs$ivar
-
-  # Prepare data
+  # Extract data
   rdt <- dat[[var]]
 
   # Assign label
@@ -2439,28 +2191,29 @@ render_tqqplot1 <- function(dat, var, plt) {
   # Set margins
   par(mar = c(4, 5, 2, .75) + 0.1)
 
-  # Get y scale
-  # mx <- max(abs(rdt)) * 1.125  #1.0025
-  # scl <- c(-mx, mx)
+  # Prepare Y data
+  ydat <- sort(rdt)
+  n <- length(ydat)
 
-  # Draw plot
-  qqnorm(rdt,
-         main = paste0("Q-Q Plot of", tlbl),
-         xlab = "",
-         ylab = ylbl,
-         pch  = 1,          # open circles
-         col  = "#05379B",
-         cex = 1.3,
-        # ylim = scl,
-       #  asp = 1,
-         axes = FALSE)
+  # SAS (Blom) plotting position formula: (i - 0.375) / (n + 0.25)
+  i <- 1:n
+  p_sas <- (i - 0.375) / (n + 0.25)
 
-  # Add diagonal line
-  # This line is a problem.  Right now just putting it diagonal
-  # between the corners.  All qqline() functions are worse.
-  usr <- par("usr")
-  segments(usr[1], usr[3], usr[2], usr[4], col = "grey60")
-  # qqline(rdt, col = "grey60", lwd = 1, qtype = 3)
+  # Convert to theoretical normal quantiles
+  xdat <- qnorm(p_sas)
+
+  # Plot manually
+  plot(xdat, ydat,
+       main = paste0("Q-Q Plot of", tlbl),
+       xlab = "",
+       ylab = ylbl,
+       pch = 1,
+       col = "#05379B",
+       cex = 1.3,
+       axes = FALSE)
+
+  # Slope = Standard Deviation, Intercept = Mean
+  abline(a = mean(ydat), b = sd(ydat), col = "grey60")
 
   # Add custom axes
   axis(side = 1, col.ticks = "grey55", mgp = c(3, .5, 0), tck = -0.015)
@@ -2485,6 +2238,95 @@ render_tqqplot1 <- function(dat, var, plt) {
 
 
 }
+
+#
+# render_tqqplot1_back <- function(dat, var, plt) {
+#
+#
+#   op <- par("mar")
+#
+#   # Create temp file path
+#   pth <- tempfile(fileext = ".jpg")
+#
+#   # Standard height and width
+#   hti <- 4.5  # Height in inches
+#   wdi <- 6  # Width in inches
+#   bml <- 6  # bottom margin lines
+#
+#   # Convert inches to pixels
+#   ht <- hti * 96
+#   wd <- wdi * 96
+#
+#   # Output to image file
+#   jpeg(pth, width = wd, height = ht, quality = 100, units = "px")
+#
+#   # Get analysis variables
+#   # vrs <- get_vars(mdl)
+#   # dvr <- vrs$dvar
+#   # ivr <- vrs$ivar
+#
+#   # Prepare data
+#   rdt <- dat[[var]]
+#
+#   # Assign label
+#   ylbl <- var
+#   tlbl <- paste(" ", var)
+#   if (!is.null(plt$varlbl)) {
+#     ylbl <- "Difference"
+#     tlbl <- paste0(": ", plt$varlbl)
+#   }
+#
+#   # Set margins
+#   par(mar = c(4, 5, 2, .75) + 0.1)
+#
+#   # Get y scale
+#   # mx <- max(abs(rdt)) * 1.125  #1.0025
+#   # scl <- c(-mx, mx)
+#
+#   # Draw plot
+#   qqnorm(rdt,
+#          main = paste0("Q-Q Plot of", tlbl),
+#          xlab = "",
+#          ylab = ylbl,
+#          pch  = 1,          # open circles
+#          col  = "#05379B",
+#          cex = 1.3,
+#          # asp = 1,
+#          # ylim = scl,
+#          #  asp = 1,
+#          axes = FALSE)
+#
+#   # Add diagonal line
+#   # This line is a problem.  Right now just putting it diagonal
+#   # between the corners.  All qqline() functions are worse.
+#   usr <- par("usr")
+#   segments(usr[1], usr[3], usr[2], usr[4], col = "grey60")
+#   # qqline(rdt, col = "grey60", lwd = 1, qtype = 3)
+#
+#   # Add custom axes
+#   axis(side = 1, col.ticks = "grey55", mgp = c(3, .5, 0), tck = -0.015)
+#   axis(side = 2, las = 1, col.ticks = "grey55", mgp = c(3, .5, 0), tck = -0.015)
+#
+#   # X Axis label
+#   mtext("Quantile", side = 1, line = par("mar")[1] - 2)
+#
+#   # Frame
+#   box(col = "grey70", lwd = 1)
+#   box("figure", col = "grey70", lwd = 1)
+#
+#   par(mar = op)
+#
+#   # Close device context
+#   dev.off()
+#
+#   # Put plot in reporter plot object
+#   ret <- create_plot(pth, height = hti, width = wdi)
+#
+#   return(ret)
+#
+#
+# }
+
 
 
 #' @noRd
@@ -2529,27 +2371,29 @@ render_tqqplot2 <- function(dat, var, plt, class) {
   #* QQPlot 1
   #*******************************
 
-  # Get y scale
-  # mx <- max(abs(rdt)) * 1.125  #1.0025
-  # scl <- c(-mx, mx)
+  # Prepare Y data
+  ydat <- sort(dt1)
+  n <- length(ydat)
 
-  # Draw plot
-  qqnorm(dt1,
-         main = "",
-         xlab = "",
-         ylab = "",
-         pch  = 1,          # open circles
-         col  = "#05379B",
-         cex = 1,
-         # ylim = scl,
-         axes = FALSE)
+  # SAS (Blom) plotting position formula: (i - 0.375) / (n + 0.25)
+  i <- 1:n
+  p_sas <- (i - 0.375) / (n + 0.25)
 
-  # Add diagonal line
-  # This line is a problem.  Right now just putting it diagonal
-  # between the corners.  All qqline() functions are worse.
-  usr <- par("usr")
-  segments(usr[1], usr[3], usr[2], usr[4], col = "grey60")
-  # qqline(dt1, col = "grey60", lwd = 1, qtype = 3)
+  # Convert to theoretical normal quantiles
+  xdat <- qnorm(p_sas)
+
+  # Plot manually
+  plot(xdat, ydat,
+       main = "",
+       xlab = "",
+       ylab = "",
+       pch = 1,
+       col = "#05379B",
+       cex = 1,
+       axes = FALSE)
+
+  # Slope = Standard Deviation, Intercept = Mean
+  abline(a = mean(ydat), b = sd(ydat), col = "grey60")
 
   # Add custom axes
   axis(side = 1, col.ticks = "grey55", mgp = c(3, .5, 0), tck = -0.015)
@@ -2575,27 +2419,29 @@ render_tqqplot2 <- function(dat, var, plt, class) {
   #* QQPlot 2
   #*******************************
 
-  # Get y scale
-  # mx <- max(abs(rdt)) * 1.125  #1.0025
-  # scl <- c(-mx, mx)
+  # Prepare Y data
+  ydat <- sort(dt2)
+  n <- length(ydat)
 
-  # Draw plot
-  qqnorm(dt2,
-         main = "",
-         xlab = "",
-         ylab = "",
-         pch  = 1,          # open circles
-         col  = "#05379B",
-         cex = 1,
-         # ylim = scl,
-         axes = FALSE)
+  # SAS (Blom) plotting position formula: (i - 0.375) / (n + 0.25)
+  i <- 1:n
+  p_sas <- (i - 0.375) / (n + 0.25)
 
-  # Add diagonal line
-  # This line is a problem.  Right now just putting it diagonal
-  # between the corners.  All qqline() functions are worse.
-  usr <- par("usr")
-  segments(usr[1], usr[3], usr[2], usr[4], col = "grey60")
-  # qqline(dt1, col = "grey60", lwd = 1, qtype = 3)
+  # Convert to theoretical normal quantiles
+  xdat <- qnorm(p_sas)
+
+  # Plot manually
+  plot(xdat, ydat,
+       main = "",
+       xlab = "",
+       ylab = "",
+       pch = 1,
+       col = "#05379B",
+       cex = 1,
+       axes = FALSE)
+
+  # Slope = Standard Deviation, Intercept = Mean
+  abline(a = mean(ydat), b = sd(ydat), col = "grey60")
 
   # Add custom axes
   axis(side = 1, col.ticks = "grey55", mgp = c(3, .5, 0), tck = -0.015)
@@ -2966,6 +2812,29 @@ boxplot_stats2 <- function(dt1, dt2, nms1, nms2, fvls) {
   return(bp)
 
 }
+
+
+
+get_sas_bins <- function(dat) {
+
+  # 1. Count your non-missing observations
+  n <- length(na.omit(dat))
+
+  # 2. Apply the Terrell-Scott formula
+  k_sas <- ceiling((2 * n)^(1/3))
+
+  # 3. Calculate the raw bin width (w)
+  data_range <- diff(range(dat))
+  w_raw <- data_range / k_sas
+
+  # 'pretty' finds the 'nice' break points SAS-style
+  ret <- pretty(dat, n = k_sas)
+
+
+  return(ret)
+}
+
+
 
 # breaks <- pretty(range(mdt), n = nclass.Sturges(mdt), min.n = 1, high.u.bias = 3)
 
