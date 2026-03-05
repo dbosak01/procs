@@ -152,7 +152,8 @@ proc_sort <- function(data,  by = NULL, keep = NULL, order = "ascending",
 
   # Deal with single value unquoted parameter values
   oorder <- deparse(substitute(order, env = environment()))
-  order <- if (typeof(order) %in% c("character", "NULL")) order else oorder
+  order <- tryCatch({if (typeof(order) %in% c("character", "NULL")) order else oorder},
+                 error = function(cond) {oorder})
 
   # Deal with single value unquoted option values
   oopt <- deparse(substitute(options, env = environment()))
