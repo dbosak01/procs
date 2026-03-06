@@ -277,22 +277,22 @@ get_mode <- function(x) {
 
 
 # Not sure why this was changed.
-#' @noRd
-get_mode_diyu <- function(x, narm = TRUE) {
-  if (narm)
-    x <- x[!is.na(x)]
-  uniqv <- unique(x)
-  counts <- tabulate(match(x, uniqv))
-
-  if (sum(counts == max(counts)) > 1) {
-    # If there are multiple modes, return NA
-    res <- NA
-  } else {
-    res <- uniqv[which.max(counts)]
-  }
-
-  return(res)
-}
+# @noRd
+# get_mode_diyu <- function(x, narm = TRUE) {
+#   if (narm)
+#     x <- x[!is.na(x)]
+#   uniqv <- unique(x)
+#   counts <- tabulate(match(x, uniqv))
+#
+#   if (sum(counts == max(counts)) > 1) {
+#     # If there are multiple modes, return NA
+#     res <- NA
+#   } else {
+#     res <- uniqv[which.max(counts)]
+#   }
+#
+#   return(res)
+# }
 
 
 
@@ -477,75 +477,75 @@ get_chisq <- function(x, y, wgt = NULL, bylbl = "", output = FALSE) {
 }
 
 
-get_chisq_back <- function(x, y, wgt = NULL, corrct = FALSE, bylbl = "", output = FALSE) {
-
-
-  if (!is.null(wgt)) {
-
-    tb <- xtabs(wgt~x + y)
-
-
-
-  } else {
-
-    cnt <- rep(1, length(x))
-
-    tb <- xtabs(cnt~x + y)
-
-  }
-
-  res <- suppressWarnings(chisq.test(tb, correct = corrct))
-
-  if (output) {
-
-    ret <- data.frame(CHISQ = res[["statistic"]],
-                      CHISQ.DF = res[["parameter"]],
-                      CHISQ.P = res[["p.value"]],
-                      stringsAsFactors = FALSE)
-
-
-    # Add by variables if exist
-    if (length(bylbl) > 0) {
-      bv <- bylbl[[1]]
-      if (!is.null(bv)) {
-        lst <- list()
-        nms <- names(bv)
-        if (length(nms) > 0) {
-          for (nm in nms) {
-            lst[[nm]] <- bv[[nm]]
-          }
-          bvds <- as.data.frame(lst, stringsAsFactors = FALSE)
-          names(bvds) <- nms
-          ret <- cbind(bvds, ret)
-        }
-
-      }
-    }
-
-    rownames(ret) <- NULL
-
-  } else {
-
-    mes <- c("Chi-Square", "DF", "PR>ChiSq")
-    val <- c(res[["statistic"]], res[["parameter"]], res[["p.value"]])
-
-    names(val) <- NULL
-
-    ret <- data.frame(Measure = mes, Value = val, stringsAsFactors = FALSE)
-
-    fmt <- flist("%.4f", "%d", pfmt, type = "row")
-
-    attr(ret$Value, "format") <- fmt
-
-
-    spn <- list(span(1, 2, paste0(bylbl, "Chi-Square Test"), level = 1))
-    attr(ret, "spans") <- spn
-  }
-
-
-  return(ret)
-
-}
+# get_chisq_back <- function(x, y, wgt = NULL, corrct = FALSE, bylbl = "", output = FALSE) {
+#
+#
+#   if (!is.null(wgt)) {
+#
+#     tb <- xtabs(wgt~x + y)
+#
+#
+#
+#   } else {
+#
+#     cnt <- rep(1, length(x))
+#
+#     tb <- xtabs(cnt~x + y)
+#
+#   }
+#
+#   res <- suppressWarnings(chisq.test(tb, correct = corrct))
+#
+#   if (output) {
+#
+#     ret <- data.frame(CHISQ = res[["statistic"]],
+#                       CHISQ.DF = res[["parameter"]],
+#                       CHISQ.P = res[["p.value"]],
+#                       stringsAsFactors = FALSE)
+#
+#
+#     # Add by variables if exist
+#     if (length(bylbl) > 0) {
+#       bv <- bylbl[[1]]
+#       if (!is.null(bv)) {
+#         lst <- list()
+#         nms <- names(bv)
+#         if (length(nms) > 0) {
+#           for (nm in nms) {
+#             lst[[nm]] <- bv[[nm]]
+#           }
+#           bvds <- as.data.frame(lst, stringsAsFactors = FALSE)
+#           names(bvds) <- nms
+#           ret <- cbind(bvds, ret)
+#         }
+#
+#       }
+#     }
+#
+#     rownames(ret) <- NULL
+#
+#   } else {
+#
+#     mes <- c("Chi-Square", "DF", "PR>ChiSq")
+#     val <- c(res[["statistic"]], res[["parameter"]], res[["p.value"]])
+#
+#     names(val) <- NULL
+#
+#     ret <- data.frame(Measure = mes, Value = val, stringsAsFactors = FALSE)
+#
+#     fmt <- flist("%.4f", "%d", pfmt, type = "row")
+#
+#     attr(ret$Value, "format") <- fmt
+#
+#
+#     spn <- list(span(1, 2, paste0(bylbl, "Chi-Square Test"), level = 1))
+#     attr(ret, "spans") <- spn
+#   }
+#
+#
+#   return(ret)
+#
+# }
 
 #' @noRd
 get_skewness <- function(x, df, narm = TRUE) {
@@ -574,25 +574,25 @@ get_skewness <- function(x, df, narm = TRUE) {
 }
 
 
-get_skewness_back <- function(x, narm = TRUE) {
-
-  ret <- NULL
-
-  if(any(ina <- is.na(x))) {
-    if(narm)
-      x <- x[!ina]
-  }
-
-  n <- length(x)
-  if(n < 3)
-    stop("Skewness requires at least 3 complete observations.")
-
-  x <- x - mean(x)
-  y <- sqrt(n) * sum(x ^ 3, na.rm = narm) / (sum(x ^ 2, na.rm = narm) ^ (3/2))
-  ret <- y * sqrt(n * (n - 1)) / (n - 2)
-
-  return(ret)
-}
+# get_skewness_back <- function(x, narm = TRUE) {
+#
+#   ret <- NULL
+#
+#   if(any(ina <- is.na(x))) {
+#     if(narm)
+#       x <- x[!ina]
+#   }
+#
+#   n <- length(x)
+#   if(n < 3)
+#     stop("Skewness requires at least 3 complete observations.")
+#
+#   x <- x - mean(x)
+#   y <- sqrt(n) * sum(x ^ 3, na.rm = narm) / (sum(x ^ 2, na.rm = narm) ^ (3/2))
+#   ret <- y * sqrt(n * (n - 1)) / (n - 2)
+#
+#   return(ret)
+# }
 
 
 #' @noRd
@@ -622,27 +622,27 @@ get_kurtosis <- function(x, df, narm = TRUE) {
 }
 
 
-get_kurtosis_back <- function(x, narm = TRUE) {
-
-  ret <- NULL
-
-  if(any(ina <- is.na(x))) {
-    if(narm)
-      x <- x[!ina]
-  }
-
-  n <- length(x)
-
-  if(n < 4)
-    stop("Kurtosis requires at least 4 complete observations.")
-
-  x <- x - mean(x)
-  r <- n * sum(x ^ 4, na.rm = narm) / (sum(x ^ 2, na.rm = narm) ^ 2)
-
-  ret <- ((n + 1) * (r - 3) + 6) * (n - 1) / ((n - 2) * (n - 3))
-
-  return(ret)
-}
+# get_kurtosis_back <- function(x, narm = TRUE) {
+#
+#   ret <- NULL
+#
+#   if(any(ina <- is.na(x))) {
+#     if(narm)
+#       x <- x[!ina]
+#   }
+#
+#   n <- length(x)
+#
+#   if(n < 4)
+#     stop("Kurtosis requires at least 4 complete observations.")
+#
+#   x <- x - mean(x)
+#   r <- n * sum(x ^ 4, na.rm = narm) / (sum(x ^ 2, na.rm = narm) ^ 2)
+#
+#   ret <- ((n + 1) * (r - 3) + 6) * (n - 1) / ((n - 2) * (n - 3))
+#
+#   return(ret)
+# }
 
 
 # get_cmh <- function(x, y, wgt = NULL, corrct = FALSE, bylbl = "", output = FALSE) {

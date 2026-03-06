@@ -340,7 +340,7 @@ render_regplot <- function (dat, res, mdl, plt, alph) {
 
       typs <- c("residualhistogram", "residualbypredicted", "rstudentbypredicted",
                 "observedbypredicted", "cooksd", "rstudentbyleverage", 'qqplot', 'rfplot',
-                "residualboxplot", "dffits", "diagnostics", "residuals", "fitplot")
+                "residualboxplot", "diagnostics", "dffits", "dfbetas", "residuals", "fitplot")
     }
 
     # "Unpack" logic
