@@ -266,10 +266,11 @@ test_that("sort15: as.character parameter works as expected.", {
 
 test_that("sort16: parameter checks work.", {
 
-
   expect_error(proc_sort("bork", by = c("sex")))
-  expect_error(proc_sort(prt[0, ], by = c("sex")))
   expect_error(proc_sort(prt, by = c("fork")))
+
+  # No longer throws error
+  # expect_error(proc_sort(prt[0, ], by = c("sex")))
 
 })
 
@@ -418,16 +419,8 @@ test_that("sort17: na.sort parameter works.", {
 
 })
 
-test_that("returns empty data.frame unchanged when input has 0 rows", {
-  df <- data.frame(X = character())
 
-  expect_silent({
-    out <- proc_sort(df, by = X)
-    expect_identical(out, df)
-    expect_equal(nrow(out), 0L)
-  })
-})
-test_that("sort18: na.sort parameter works.", {
+test_that("sort18: na.sort parameter checks work.", {
 
 
   spsrt <- read.table(header = TRUE, text = '
@@ -446,6 +439,18 @@ test_that("sort18: na.sort parameter works.", {
   # "last"
   expect_error(proc_sort(spsrt, by = Score, na.sort = "fork"))
 
+
+})
+
+test_that("sort19: Returns empty data.frame unchanged when input has 0 rows", {
+
+  df <- data.frame(X = character())
+
+  expect_silent({
+    out <- proc_sort(df, by = X)
+    expect_identical(out, df)
+    expect_equal(nrow(out), 0L)
+  })
 
 })
 
