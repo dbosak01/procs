@@ -674,6 +674,97 @@ test_that("ttestplot14: troublesome plots match SAS", {
                     plots = ttestplot("histogram"))
 
 
+  # Boxplot1 - needs outlier.  Got it!
+  res <- proc_ttest(cls,
+                    paired = "Height * Weight",
+                    output = report,
+                    plot = "boxplot")
+
+  expect_equal(length(res), 4)
+  expect_equal("plot_spec" %in% class(res[[4]][[1]]), TRUE)
+
+
+  # Boxplot2 - needs outlier.  Got it!
+  res <- proc_ttest(cls,
+                    var = "Weight",
+                    class = "Sex",
+                    output = report,
+                    plot = "boxplot")
+
+  expect_equal(length(res), 5)
+  expect_equal("plot_spec" %in% class(res[[5]][[1]]), TRUE)
+
+})
+
+# Good
+test_that("ttestplot15: Label and ID parameters work as expected.", {
+
+  # Boxplot1 - label FALSE
+  res <- proc_ttest(cls,
+                    paired = "Height * Weight",
+                    output = report,
+                    plot = ttestplot(c("summary", "boxplot"),
+                                     label = FALSE))
+
+  expect_equal(length(res), 4)
+  expect_equal("plot_spec" %in% class(res[[4]][[1]]), TRUE)
+
+
+  # Boxplot1 - label TRUE
+  res <- proc_ttest(cls,
+                    paired = "Height * Weight",
+                    output = report,
+                    plot = ttestplot(c("summary", "boxplot"),
+                                     label = TRUE))
+
+  expect_equal(length(res), 4)
+  expect_equal("plot_spec" %in% class(res[[4]][[1]]), TRUE)
+
+
+  # Boxplot1 - id value
+  res <- proc_ttest(cls,
+                    paired = "Height * Weight",
+                    output = report,
+                    plot = ttestplot(c("summary", "boxplot"),
+                                     label = TRUE, id = "Name"))
+
+  expect_equal(length(res), 4)
+  expect_equal("plot_spec" %in% class(res[[4]][[1]]), TRUE)
+
+
+  # Boxplot2 - label FALSE
+  res <- proc_ttest(cls,
+                    var = "Weight",
+                    class = "Sex",
+                    output = report,
+                    plot = ttestplot(c("summary", "boxplot"),
+                                     label = FALSE))
+
+  expect_equal(length(res), 5)
+  expect_equal("plot_spec" %in% class(res[[5]][[1]]), TRUE)
+
+
+  # Boxplot2 - label TRUE
+  res <- proc_ttest(cls,
+                    var = "Weight",
+                    class = "Sex",
+                    output = report,
+                    plot = ttestplot(c("summary", "boxplot"),
+                                     label = TRUE))
+
+  expect_equal(length(res), 5)
+  expect_equal("plot_spec" %in% class(res[[5]][[1]]), TRUE)
+
+  # Boxplot2 - id value
+  res <- proc_ttest(cls,
+                    var = "Weight",
+                    class = "Sex",
+                    output = report,
+                    plot = ttestplot(c("summary", "boxplot"),
+                                     label = TRUE, id = "Name"))
+
+  expect_equal(length(res), 5)
+  expect_equal("plot_spec" %in% class(res[[5]][[1]]), TRUE)
 
 
 })

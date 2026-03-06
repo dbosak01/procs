@@ -57,6 +57,7 @@ Authors:
 
 Other contributors:
 \itemize{
+  \item Athenkosi Nkonyeni \email{athenkosi.nkonyeni@outlook.com} [contributor]
   \item Kevin Kramer \email{kkrame02@amgen.com} [contributor]
   \item Brian Varney \email{brian.varney@experis.com} [contributor]
   \item Duong Tran \email{trand000@aol.com} [contributor]

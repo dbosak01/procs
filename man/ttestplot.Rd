@@ -4,7 +4,13 @@
 \alias{ttestplot}
 \title{Request T-Test Plots}
 \usage{
-ttestplot(type = "default", panel = TRUE, showh0 = FALSE)
+ttestplot(
+  type = "default",
+  panel = TRUE,
+  showh0 = FALSE,
+  label = TRUE,
+  id = NULL
+)
 }
 \arguments{
 \item{type}{The type(s) of plot to create. Multiple types should be passed
@@ -22,6 +28,15 @@ equivalent to the "unpack" keyword in SAS.}
 Default is FALSE. If this parameter is TRUE, a vertical line will be created
 on some charts to show the value specified for the "h0=" option on
 \code{\link{proc_ttest}}.}
+
+\item{label}{Whether or not to label outlier values. Valid values
+are TRUE or FALSE.  Default is TRUE. If TRUE, this option will assign
+labels to outlier values on the "summary" and "boxplot" charts.}
+
+\item{id}{If the \code{label} parameter is TRUE, this parameter determines
+which value is assigned to the label.  By default, the row number will
+be assigned.  You may also assign a column name from the input dataset
+to this parameter to use as the label value.}
 }
 \description{
 A function to request T-test plots on a call to

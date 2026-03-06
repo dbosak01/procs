@@ -8,6 +8,7 @@
 * Added "weight" parameter to `proc_means()`.
 * Added "vardef" option to `proc_means()`.
 * Added "na.sort" parameter to `proc_sort()`.
+* Changed `proc_sort()` to accept an empty data frame.
 * Updates to documentation.
 
 # procs 1.0.7

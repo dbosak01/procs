@@ -103,6 +103,13 @@
 #' Default is FALSE. If this parameter is TRUE, a vertical line will be created
 #' on some charts to show the value specified for the "h0=" option on
 #' \code{\link{proc_ttest}}.
+#' @param label Whether or not to label outlier values. Valid values
+#' are TRUE or FALSE.  Default is TRUE. If TRUE, this option will assign
+#' labels to outlier values on the "summary" and "boxplot" charts.
+#' @param id If the \code{label} parameter is TRUE, this parameter determines
+#' which value is assigned to the label.  By default, the row number will
+#' be assigned.  You may also assign a column name from the input dataset
+#' to this parameter to use as the label value.
 #' @seealso [proc_ttest()]
 #' @examples
 #' library(procs)
@@ -160,7 +167,7 @@
 #'            plots = ttestplot("summary", panel = FALSE))
 #'
 #' @export
-ttestplot <- function(type = "default", panel = TRUE, showh0 = FALSE) {
+ttestplot <- function(type = "default", panel = TRUE, showh0 = FALSE, label = TRUE, id = NULL) {
 
   # Non-standard evaluation
   otype <- deparse(substitute(type, env = environment()))
@@ -198,7 +205,9 @@ ttestplot <- function(type = "default", panel = TRUE, showh0 = FALSE) {
   ret$type <- tolower(type)
   ret$panel <- panel
   ret$showh0 <- showh0
-  ret$alph <- 0.95   # default fow now
+  ret$label <- label
+  ret$id <- id
+  ret$alph <- 0.95   # default for now
   ret$h0 <- 0        # default for now
 
   return(ret)
@@ -586,10 +595,17 @@ render_summary1 <- function(dat, var, plt) {
            cex = 1.25)
 
     # Add labels
-    text(bp$out, rep(1, length(bp$out)),
-         labels = bp$onm,
-         cex = .9,
-         pos = 1)
+    if (plt$label) {
+      if (is.null(plt$id)) {
+        olbls <- bp$onm
+      } else {
+        olbls <- dat[[plt$id]][as.integer(bp$onm)]
+      }
+      text(bp$out, rep(1, length(bp$out)),
+           labels = olbls,
+           cex = .9,
+           pos = 1)
+    }
 
   }
 
@@ -689,6 +705,11 @@ render_summary2 <- function(dat, var, plt, class) {
 
   # Convert to data frame just in case it is a tibble
   dat <- as.data.frame(dat)
+  if (!is.null(plt$id)) {
+    lbls <- dat[[plt$id]]
+  } else {
+    lbls <- NULL
+  }
 
   # Add rownumbers
   rownames(dat) <- seq(1, nrow(dat))
@@ -983,10 +1004,17 @@ render_summary2 <- function(dat, var, plt, class) {
            cex = 1.25)
 
     # Add labels
-    text(bp$out1, rep(2, length(bp$out1)),
-         labels = bp$onm1,
-         cex = .9,
-         pos = 1)
+    if (plt$label) {
+      if (is.null(plt$id)) {
+        olbls1 <- bp$onm1
+      } else {
+        olbls1 <- lbls[as.integer(bp$onm1)]
+      }
+      text(bp$out1, rep(2, length(bp$out1)),
+           labels = olbls1,
+           cex = .9,
+           pos = 1)
+    }
   }
 
   # Outliers for second class value
@@ -998,10 +1026,17 @@ render_summary2 <- function(dat, var, plt, class) {
            lwd = 1.6,
            cex = 1.25)
     # Add labels
-    text(bp$out2, rep(1, length(bp$out2)),
-         labels = bp$onm2,
-         cex = .9,
-         pos = 1)
+    if (plt$label) {
+      if (is.null(plt$id)) {
+        olbls2 <- bp$onm2
+      } else {
+        olbls2 <- lbls[as.integer(bp$onm2)]
+      }
+      text(bp$out2, rep(1, length(bp$out2)),
+           labels = olbls2,
+           cex = .9,
+           pos = 1)
+    }
   }
 
   # Frame
@@ -1500,6 +1535,17 @@ render_boxplot1 <- function(dat, var, plt) {
     xscl <- get_scale(dt, .05)
   }
 
+  # Get boxplot stats
+  bp <- boxplot_stats1(dt)
+  if (length(bp$out) > 0) {
+    if (min(bp$out) < xscl[1]) {
+      xscl[1] <- min(bp$out) * 1.05
+    }
+    if (max(bp$out) > xscl[2]) {
+      xscl[2] <- max(bp$out) * 1.05
+    }
+  }
+
   # Get stats
   n  <- length(dt)
   mu <- mean(dt)
@@ -1555,9 +1601,6 @@ render_boxplot1 <- function(dat, var, plt) {
     abline(v = plt$h0, col = "grey70", lwd = 2)
   }
 
-  # Get boxplot stats
-  bp <- boxplot_stats1(dt)
-
   # Boxplot (horizontal)
   bxp(bp,
           horizontal = TRUE,
@@ -1590,10 +1633,17 @@ render_boxplot1 <- function(dat, var, plt) {
            cex = 1.25)
 
     # Add labels
-    text(bp$out, rep(1, length(bp$out)),
-         labels = bp$onm,
-         cex = .9,
-         pos = 1)
+    if (plt$label) {
+      if (is.null(plt$id)) {
+        olbls <- bp$onm
+      } else {
+        olbls <- dat[[plt$id]][as.integer(bp$onm)]
+      }
+      text(bp$out, rep(1, length(bp$out)),
+           labels = olbls,
+           cex = .9,
+           pos = 1)
+    }
 
   }
 
@@ -1684,6 +1734,11 @@ render_boxplot2 <- function(dat, var, plt, class) {
 
   # Convert to data frame just in case it is a tibble
   dat <- as.data.frame(dat)
+  if (!is.null(plt$id)) {
+    lbls <- dat[[plt$id]]
+  } else {
+    lbls <- NULL
+  }
 
   # Add rownumbers
   rownames(dat) <- seq(1, nrow(dat))
@@ -1709,9 +1764,45 @@ render_boxplot2 <- function(dat, var, plt, class) {
   nms1 <- rwnms[dat[[fvr]] == fvls[1]]
   dt2 <- dat[dat[[fvr]] == fvls[2], var]
   nms2 <- rwnms[dat[[fvr]] == fvls[2]]
+  dat1 <- dat[dat[[fvr]] == fvls[1], ]
+  dat2 <- dat[dat[[fvr]] == fvls[2], ]
 
   # Get x scale
   # xscl <- get_scale(dt, .05)
+  if (plt$showh0) {
+    xscl1 <- get_scale(dt1, .05, plt$h0)
+  } else {
+    xscl1 <- get_scale(dt1, .05)
+  }
+  if (plt$showh0) {
+    xscl2 <- get_scale(dt2, .05, plt$h0)
+  } else {
+    xscl2 <- get_scale(dt2, .05)
+  }
+
+  # Get combined scale
+  xscl <- c()
+  xscl[1] <- min(xscl1[1], xscl2[1])
+  xscl[2] <- max(xscl1[2], xscl2[2])
+
+  # Get boxplot stats for 2 plots
+  bp <- boxplot_stats2(dt1, dt2, nms1, nms2, fvls)
+  if (length(bp$out1) > 0) {
+    if (min(bp$out1) < xscl[1]) {
+      xscl[1] <- min(bp$out1) * 1.05
+    }
+    if (max(bp$out1) > xscl[2]) {
+      xscl[2] <- max(bp$out1) * 1.05
+    }
+  }
+  if (length(bp$out2) > 0) {
+    if (min(bp$out2) < xscl[1]) {
+      xscl[1] <- min(bp$out2) * 1.05
+    }
+    if (max(bp$out2) > xscl[2]) {
+      xscl[2] <- max(bp$out2) * 1.05
+    }
+  }
 
   # Calculate
   n1  <- length(dt1)
@@ -1723,6 +1814,7 @@ render_boxplot2 <- function(dat, var, plt, class) {
 
   # Draw empty plot first, so we can put ablines() behind the boxes
   plot(dt, rep(1, length(dt)),
+       xlim = xscl,
        ylim = c(.5, 2.5),
        type = "n",
        xlab = "",
@@ -1760,8 +1852,7 @@ render_boxplot2 <- function(dat, var, plt, class) {
   # Orientation lines
   abline(v = aval, col = "grey90", lwd = 1)
 
-  # Get boxplot stats for 2 plots
-  bp <- boxplot_stats2(dt1, dt2, nms1, nms2, fvls)
+
 
 
   # Boxplot (horizontal)
@@ -1796,10 +1887,17 @@ render_boxplot2 <- function(dat, var, plt, class) {
            cex = 1.25)
 
     # Add labels
-    text(bp$out1, rep(2, length(bp$out1)),
-         labels = bp$onm1,
-         cex = .9,
-         pos = 1)
+    if (plt$label) {
+      if (is.null(plt$id)) {
+        olbls1 <- bp$onm1
+      } else {
+        olbls1 <- lbls[as.integer(bp$onm1)]
+      }
+      text(bp$out1, rep(2, length(bp$out1)),
+           labels = olbls1,
+           cex = .9,
+           pos = 1)
+    }
   }
 
   # Outliers for second class value
@@ -1810,11 +1908,19 @@ render_boxplot2 <- function(dat, var, plt, class) {
            col = "grey20",
            lwd = 1.6,
            cex = 1.25)
+
     # Add labels
-    text(bp$out2, rep(1, length(bp$out2)),
-         labels = bp$onm2,
-         cex = .9,
-         pos = 1)
+    if (plt$label) {
+      if (is.null(plt$id)) {
+        olbls2 <- bp$onm2
+      } else {
+        olbls2 <- lbls[as.integer(bp$onm2)]
+      }
+      text(bp$out2, rep(1, length(bp$out2)),
+           labels = olbls2,
+           cex = .9,
+           pos = 1)
+    }
   }
 
 
@@ -2814,7 +2920,7 @@ boxplot_stats2 <- function(dt1, dt2, nms1, nms2, fvls) {
 }
 
 
-
+# Doesn't work
 get_sas_bins <- function(dat) {
 
   # 1. Count your non-missing observations
@@ -2834,22 +2940,3 @@ get_sas_bins <- function(dat) {
   return(ret)
 }
 
-
-
-# breaks <- pretty(range(mdt), n = nclass.Sturges(mdt), min.n = 1, high.u.bias = 3)
-
-
-# breaks <- pretty(range(mdt), n = nclass.Sturges(mdt), min.n = 1, high.u.bias = 3)
-#
-# breaks <- pretty(range(cls$Weight), n = nclass.Sturges(cls$Weight), min.n = 1, high.u.bias = 3)
-#
-#
-#
-# breaks <- pretty(range(mdt), n = nclass.Sturges(mdt), min.n = 1, high.u.bias = 3)
-#
-# get_bins <- function(x, maxbins = 6) {
-#
-#   cbns <- nclass.Sturges(x)
-#
-#
-# }
