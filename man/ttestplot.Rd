@@ -17,7 +17,7 @@ ttestplot(
 as a vector of strings.  Valid values are "agreement", "boxplot", "histogram",
 "interval", "profiles", "qqplot", "summary".  The default value is "default", which
 will produce default plots appropriate for the analysis.  You may use the
-\code{\link{v}} function to pass the plot keywords unquoted.}
+\code{\link[common]{v}} function to pass the plot keywords unquoted.}
 
 \item{panel}{Whether or not to display the summary plot combined into
 in a single panel.  Default is TRUE.  A value of FALSE will create
