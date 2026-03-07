@@ -1626,8 +1626,7 @@ test_that("means60: Weight works for stats option: n nmiss nobs min max range su
   res1 <- proc_means(datsp, var = c("x"),
                      stats = c("n", "nmiss", "nobs", "min", "max", "range", "sum"),
                      output = out,
-                     weight = "w"
-  )
+                     weight = "w")
   res1
   expect_equal(nrow(res1), 1)
   expect_equal(ncol(res1), 10)
@@ -2101,6 +2100,80 @@ test_that("means69: Vardef options with other statistics no weight work as expec
 })
 
 # T, P, etc. with vardef options
+# More comparisons to SAS
+test_that("means70: Vardef options with other statistics no weight work as expected.", {
 
+  # NAs in Score and Weight
+  dat2 <- read.table(header = TRUE, text = '
+                Name      Assessment     Score   Weight
+                Smith     Quiz1          85      0.05
+                Smith     Quiz2          25      0.05
+                Smith     Midterm        85      0.35
+                Smith     Quiz3          NA      0.05
+                Smith     Quiz4          62      0.05
+                Smith     Final          93      0.45
+                Wang      Quiz1         100      0.05
+                Wang      Quiz2          96      0.05
+                Wang      Midterm        98      0.35
+                Wang      Quiz3         105      0.05
+                Wang      Quiz4          87      NA
+                Wang      Final          96      0.45')
+
+
+
+  # Default - no weight
+  res1 <- proc_means(dat2, var = Score,
+                     class = Name, options = c("vardef" = "df", "nway"),
+                     stats = v(nobs, n, p10, p25, p75, p90, t, prt, skew, kurt))
+
+  expect_equal(as.numeric(res1$NOBS), c(6, 6))
+  expect_equal(as.numeric(res1$N), c(5, 6))
+  expect_equal(as.numeric(res1$P10), c(25.0, 87.0))
+  expect_equal(as.numeric(res1$P25), c(62.0, 96.0))
+  expect_equal(as.numeric(res1$P75), c(85.0, 100))
+  expect_equal(as.numeric(res1$P90), c(93.0, 105.0))
+  expect_equal(as.numeric(res1$`T`), c(5.651781457, 40.047556956))
+  expect_equal(roundup(as.numeric(res1$PRT), 9), c(0.004828366, 0.000000183))
+  expect_equal(as.numeric(res1$SKEW), c(-1.4264271, -0.6636655))
+  expect_equal(as.numeric(res1$KURT), c(1.5314803, 1.7610408))
+
+
+
+  # DF - with weight
+  res1 <- proc_means(dat2, var = Score,
+                     class = Name, options = c("vardef" = "df", "nway"),
+                     weight = Weight,
+                     stats = v(nobs, n, p10, p25, p75, p90, t, prt, skew, kurt))
+
+  expect_equal(as.numeric(res1$NOBS), c(6, 6))
+  expect_equal(as.numeric(res1$N), c(5, 5))
+  expect_equal(as.numeric(res1$P10), c(62, 96))
+  expect_equal(as.numeric(res1$P25), c(85, 96))
+  expect_equal(as.numeric(res1$P75), c(93, 98))
+  expect_equal(as.numeric(res1$P90), c(93, 100))
+  expect_equal(as.numeric(res1$`T`), c(10.736725813, 91.247610199))
+  expect_equal(roundup(as.numeric(res1$PRT), 9), c(0.000426537, 0.000000086))
+  expect_equal(as.numeric(res1$SKEW), as.numeric(c(NA, NA)))
+  expect_equal(as.numeric(res1$KURT), as.numeric(c(NA, NA)))
+
+
+  # Default - no weight
+  res1 <- proc_means(dat2, var = Score,
+                     class = Name, options = c("vardef" = "wgt", "nway"),
+                     weight = Weight,
+                     stats = v(nobs, n, p10, p25, p75, p90, t, prt, skew, kurt))
+
+  expect_equal(as.numeric(res1$NOBS), c(6, 6))
+  expect_equal(as.numeric(res1$N), c(5, 5))
+  expect_equal(as.numeric(res1$P10), c(62, 96))
+  expect_equal(as.numeric(res1$P25), c(85, 96))
+  expect_equal(as.numeric(res1$P75), c(93, 98))
+  expect_equal(as.numeric(res1$P90), c(93, 100))
+  expect_equal(as.numeric(res1$`T`), as.numeric(c(NA, NA)))
+  expect_equal(roundup(as.numeric(res1$PRT), 9), as.numeric(c(NA, NA)))
+  expect_equal(as.numeric(res1$SKEW), as.numeric(c(NA, NA)))
+  expect_equal(as.numeric(res1$KURT), as.numeric(c(NA, NA)))
+
+})
 
 

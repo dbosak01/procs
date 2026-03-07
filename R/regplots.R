@@ -336,6 +336,7 @@ render_regplot <- function (dat, res, mdl, plt, alph) {
 
     typs <- plt$type
 
+    # All logic
     if (all(typs == "all")) {
 
       typs <- c("residualhistogram", "residualbypredicted", "rstudentbypredicted",
@@ -650,25 +651,6 @@ render_diagnostics <- function(dat, res, mdl, plt, alph) {
 
   # Slope = Standard Deviation, Intercept = Mean
   abline(a = mean(ydat), b = sd(ydat), col = "grey60")
-
-  # # Get y scale
-  # mx <- max(abs(rdt)) * 1.125  #1.0025
-  # scl <- c(-mx, mx)
-  #
-  # # Draw plot
-  # qqnorm(rdt,
-  #        main = "",
-  #        xlab = "",
-  #        ylab = "",
-  #        pch  = 1,          # open circles
-  #        col  = "#05379B",
-  #        cex = 1.3,
-  #        ylim = scl,
-  #        axes = FALSE)
-  #
-  # # Add diagonal line
-  # usr <- par("usr")
-  # segments(usr[1], usr[3], usr[2], usr[4], col = "grey60")
 
   # Add custom axes
   axis(side = 1, col.ticks = "grey55", mgp = c(3, .5, 0), tck = -0.015)
