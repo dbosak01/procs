@@ -130,8 +130,8 @@
 </h2>
 <p>The following example shows a complete program. The example
 illustrates how <strong>procs</strong> functions work together, and
-interact with other <strong>sassy</strong> functions to create a
-demographics table with p-value statistics.</p>
+interact with other <strong>sassy</strong> functions to create a basic
+demographics table.</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://sassy.r-sassy.org" class="external-link">sassy</a></span><span class="op">)</span></span>
 <span></span>
@@ -161,31 +161,31 @@ demographics table with p-value statistics.</p>
 <span>                <span class="fu">condition</span><span class="op">(</span><span class="va">x</span> <span class="op">&gt;=</span><span class="fl">40</span> <span class="op">&amp;</span> <span class="va">x</span> <span class="op">&lt;=</span><span class="fl">49</span>, <span class="st">"40 to 49"</span><span class="op">)</span>,</span>
 <span>                <span class="fu">condition</span><span class="op">(</span><span class="va">x</span> <span class="op">&gt;=</span> <span class="fl">50</span>, <span class="st">"&gt;= 50"</span><span class="op">)</span>,</span>
 <span>                <span class="fu">condition</span><span class="op">(</span><span class="cn">TRUE</span>, <span class="st">"Out of range"</span><span class="op">)</span>,</span>
-<span>                as.factor <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span> </span>
+<span>                as.factor <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu">put</span><span class="op">(</span><span class="st">"Sex decodes"</span><span class="op">)</span></span>
 <span><span class="va">fmt_sex</span> <span class="op">&lt;-</span> <span class="fu">value</span><span class="op">(</span><span class="fu">condition</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/NA.html" class="external-link">is.na</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span>, <span class="st">"Missing"</span><span class="op">)</span>,</span>
 <span>                 <span class="fu">condition</span><span class="op">(</span><span class="va">x</span> <span class="op">==</span> <span class="st">"M"</span>, <span class="st">"Male"</span><span class="op">)</span>,</span>
 <span>                 <span class="fu">condition</span><span class="op">(</span><span class="va">x</span> <span class="op">==</span> <span class="st">"F"</span>, <span class="st">"Female"</span><span class="op">)</span>,</span>
 <span>                 <span class="fu">condition</span><span class="op">(</span><span class="cn">TRUE</span>, <span class="st">"Other"</span><span class="op">)</span>,</span>
-<span>                 as.factor <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span> </span>
+<span>                 as.factor <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu">put</span><span class="op">(</span><span class="st">"Race decodes"</span><span class="op">)</span></span>
 <span><span class="va">fmt_race</span> <span class="op">&lt;-</span> <span class="fu">value</span><span class="op">(</span><span class="fu">condition</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/NA.html" class="external-link">is.na</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span>, <span class="st">"Missing"</span><span class="op">)</span>,</span>
 <span>                  <span class="fu">condition</span><span class="op">(</span><span class="va">x</span> <span class="op">==</span> <span class="st">"WHITE"</span>, <span class="st">"White"</span><span class="op">)</span>,</span>
 <span>                  <span class="fu">condition</span><span class="op">(</span><span class="va">x</span> <span class="op">==</span> <span class="st">"BLACK"</span>, <span class="st">"Black or African American"</span><span class="op">)</span>,</span>
-<span>                  <span class="fu">condition</span><span class="op">(</span><span class="cn">TRUE</span>, <span class="st">"Other"</span><span class="op">)</span>, </span>
+<span>                  <span class="fu">condition</span><span class="op">(</span><span class="cn">TRUE</span>, <span class="st">"Other"</span><span class="op">)</span>,</span>
 <span>                  as.factor <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span></span>
 <span></span>
 <span><span class="fu">put</span><span class="op">(</span><span class="st">"Compile format catalog"</span><span class="op">)</span></span>
-<span><span class="va">fc</span> <span class="op">&lt;-</span> <span class="fu">fcat</span><span class="op">(</span>MEAN <span class="op">=</span> <span class="st">"%.1f"</span>, STD <span class="op">=</span> <span class="st">"(%.2f)"</span>, </span>
+<span><span class="va">fc</span> <span class="op">&lt;-</span> <span class="fu">fcat</span><span class="op">(</span>MEAN <span class="op">=</span> <span class="st">"%.1f"</span>, STD <span class="op">=</span> <span class="st">"(%.2f)"</span>,</span>
 <span>           Q1 <span class="op">=</span> <span class="st">"%.1f"</span>, Q3 <span class="op">=</span> <span class="st">"%.1f"</span>,</span>
-<span>           MIN <span class="op">=</span> <span class="st">"%d"</span>, MAX <span class="op">=</span> <span class="st">"%d"</span>, </span>
+<span>           MIN <span class="op">=</span> <span class="st">"%d"</span>, MAX <span class="op">=</span> <span class="st">"%d"</span>,</span>
 <span>           CNT <span class="op">=</span> <span class="st">"%2d"</span>, PCT <span class="op">=</span> <span class="st">"(%5.1f%%)"</span>,</span>
 <span>           AGECAT <span class="op">=</span> <span class="va">agecat</span>,</span>
 <span>           SEX <span class="op">=</span> <span class="va">fmt_sex</span>,</span>
-<span>           RACE <span class="op">=</span> <span class="va">fmt_race</span><span class="op">)</span> </span>
+<span>           RACE <span class="op">=</span> <span class="va">fmt_race</span><span class="op">)</span></span>
 <span></span>
 <span></span>
 <span><span class="co"># Load and Prepare Data ---------------------------------------------------</span></span>
@@ -196,32 +196,32 @@ demographics table with p-value statistics.</p>
 <span><span class="fu">put</span><span class="op">(</span><span class="st">"Create sample ADSL data."</span><span class="op">)</span></span>
 <span><span class="va">adsl</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/utils/read.table.html" class="external-link">read.table</a></span><span class="op">(</span>header <span class="op">=</span> <span class="cn">TRUE</span>, text <span class="op">=</span> <span class="st">'</span></span>
 <span><span class="st">  SUBJID  ARM    SEX  RACE    AGE</span></span>
-<span><span class="st">  "001"   "ARM A" "F"  "WHITE" 19 </span></span>
-<span><span class="st">  "002"   "ARM B" "F"  "WHITE" 21 </span></span>
-<span><span class="st">  "003"   "ARM C" "F"  "WHITE" 23 </span></span>
-<span><span class="st">  "004"   "ARM D" "F"  "BLACK" 28 </span></span>
-<span><span class="st">  "005"   "ARM A" "M"  "WHITE" 37  </span></span>
-<span><span class="st">  "006"   "ARM B" "M"  "WHITE" 34 </span></span>
-<span><span class="st">  "007"   "ARM C" "M"  "WHITE" 36  </span></span>
-<span><span class="st">  "008"   "ARM D" "M"  "WHITE" 30   </span></span>
-<span><span class="st">  "009"   "ARM A" "F"  "WHITE" 39  </span></span>
-<span><span class="st">  "010"   "ARM B" "F"  "WHITE" 31  </span></span>
-<span><span class="st">  "011"   "ARM C" "F"  "BLACK" 33 </span></span>
-<span><span class="st">  "012"   "ARM D" "F"  "WHITE" 38 </span></span>
-<span><span class="st">  "013"   "ARM A" "M"  "BLACK" 37 </span></span>
-<span><span class="st">  "014"   "ARM B" "M"  "WHITE" 34  </span></span>
+<span><span class="st">  "001"   "ARM A" "F"  "WHITE" 19</span></span>
+<span><span class="st">  "002"   "ARM B" "F"  "WHITE" 21</span></span>
+<span><span class="st">  "003"   "ARM C" "F"  "WHITE" 23</span></span>
+<span><span class="st">  "004"   "ARM D" "F"  "BLACK" 28</span></span>
+<span><span class="st">  "005"   "ARM A" "M"  "WHITE" 37</span></span>
+<span><span class="st">  "006"   "ARM B" "M"  "WHITE" 34</span></span>
+<span><span class="st">  "007"   "ARM C" "M"  "WHITE" 36</span></span>
+<span><span class="st">  "008"   "ARM D" "M"  "WHITE" 30</span></span>
+<span><span class="st">  "009"   "ARM A" "F"  "WHITE" 39</span></span>
+<span><span class="st">  "010"   "ARM B" "F"  "WHITE" 31</span></span>
+<span><span class="st">  "011"   "ARM C" "F"  "BLACK" 33</span></span>
+<span><span class="st">  "012"   "ARM D" "F"  "WHITE" 38</span></span>
+<span><span class="st">  "013"   "ARM A" "M"  "BLACK" 37</span></span>
+<span><span class="st">  "014"   "ARM B" "M"  "WHITE" 34</span></span>
 <span><span class="st">  "015"   "ARM C" "M"  "WHITE" 36</span></span>
-<span><span class="st">  "016"   "ARM A" "M"  "WHITE" 40'</span><span class="op">)</span>  </span>
+<span><span class="st">  "016"   "ARM A" "M"  "WHITE" 40'</span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu">put</span><span class="op">(</span><span class="st">"Categorize AGE"</span><span class="op">)</span></span>
-<span><span class="va">adsl</span><span class="op">$</span><span class="va">AGECAT</span> <span class="op">&lt;-</span> <span class="fu">fapply</span><span class="op">(</span><span class="va">adsl</span><span class="op">$</span><span class="va">AGE</span>, <span class="va">agecat</span><span class="op">)</span> </span>
+<span><span class="va">adsl</span><span class="op">$</span><span class="va">AGECAT</span> <span class="op">&lt;-</span> <span class="fu">fapply</span><span class="op">(</span><span class="va">adsl</span><span class="op">$</span><span class="va">AGE</span>, <span class="va">agecat</span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu">put</span><span class="op">(</span><span class="st">"Log starting dataset"</span><span class="op">)</span></span>
 <span><span class="fu">put</span><span class="op">(</span><span class="va">adsl</span><span class="op">)</span></span>
 <span></span>
 <span></span>
 <span><span class="fu">put</span><span class="op">(</span><span class="st">"Get ARM population counts"</span><span class="op">)</span></span>
-<span><span class="fu"><a href="../reference/proc_freq.html">proc_freq</a></span><span class="op">(</span><span class="va">adsl</span>, tables <span class="op">=</span> <span class="va">ARM</span>, </span>
+<span><span class="fu"><a href="../reference/proc_freq.html">proc_freq</a></span><span class="op">(</span><span class="va">adsl</span>, tables <span class="op">=</span> <span class="va">ARM</span>,</span>
 <span>          output <span class="op">=</span> <span class="va">long</span>,</span>
 <span>          options <span class="op">=</span> <span class="fu"><a href="https://common.r-sassy.org/reference/v.html" class="external-link">v</a></span><span class="op">(</span><span class="va">nopercent</span>, <span class="va">nonobs</span><span class="op">)</span><span class="op">)</span> <span class="op">-&gt;</span> <span class="va">arm_pop</span></span>
 <span></span>
@@ -232,50 +232,26 @@ demographics table with p-value statistics.</p>
 <span><span class="fu">put</span><span class="op">(</span><span class="st">"Call means procedure to get summary statistics for age"</span><span class="op">)</span></span>
 <span><span class="fu"><a href="../reference/proc_means.html">proc_means</a></span><span class="op">(</span><span class="va">adsl</span>, var <span class="op">=</span> <span class="va">AGE</span>,</span>
 <span>           stats <span class="op">=</span> <span class="fu"><a href="https://common.r-sassy.org/reference/v.html" class="external-link">v</a></span><span class="op">(</span><span class="va">n</span>, <span class="va">mean</span>, <span class="va">std</span>, <span class="va">median</span>, <span class="va">q1</span>, <span class="va">q3</span>, <span class="va">min</span>, <span class="va">max</span><span class="op">)</span>,</span>
-<span>           by <span class="op">=</span> <span class="va">ARM</span>, </span>
-<span>           options <span class="op">=</span> <span class="fu"><a href="https://common.r-sassy.org/reference/v.html" class="external-link">v</a></span><span class="op">(</span><span class="va">notype</span>, <span class="va">nofreq</span><span class="op">)</span><span class="op">)</span> <span class="op">-&gt;</span> <span class="va">age_stats</span> </span>
+<span>           by <span class="op">=</span> <span class="va">ARM</span>,</span>
+<span>           options <span class="op">=</span> <span class="fu"><a href="https://common.r-sassy.org/reference/v.html" class="external-link">v</a></span><span class="op">(</span><span class="va">notype</span>, <span class="va">nofreq</span><span class="op">)</span><span class="op">)</span> <span class="op">-&gt;</span> <span class="va">age_stats</span></span>
 <span></span>
 <span><span class="fu">put</span><span class="op">(</span><span class="st">"Combine stats"</span><span class="op">)</span></span>
-<span><span class="fu">datastep</span><span class="op">(</span><span class="va">age_stats</span>, </span>
+<span><span class="fu">datastep</span><span class="op">(</span><span class="va">age_stats</span>,</span>
 <span>         format <span class="op">=</span> <span class="va">fc</span>,</span>
-<span>         drop <span class="op">=</span> <span class="fu"><a href="https://common.r-sassy.org/reference/find.names.html" class="external-link">find.names</a></span><span class="op">(</span><span class="va">age_stats</span>, start <span class="op">=</span> <span class="fl">4</span><span class="op">)</span>, </span>
+<span>         drop <span class="op">=</span> <span class="fu"><a href="https://common.r-sassy.org/reference/find.names.html" class="external-link">find.names</a></span><span class="op">(</span><span class="va">age_stats</span>, start <span class="op">=</span> <span class="fl">4</span><span class="op">)</span>,</span>
 <span>         <span class="op">{</span></span>
 <span>           <span class="va">`Mean (SD)`</span> <span class="op">&lt;-</span> <span class="fu">fapply2</span><span class="op">(</span><span class="va">MEAN</span>, <span class="va">STD</span><span class="op">)</span></span>
 <span>           <span class="va">Median</span> <span class="op">&lt;-</span> <span class="va">MEDIAN</span></span>
 <span>           <span class="va">`Q1 - Q3`</span> <span class="op">&lt;-</span> <span class="fu">fapply2</span><span class="op">(</span><span class="va">Q1</span>, <span class="va">Q3</span>, sep <span class="op">=</span> <span class="st">" - "</span><span class="op">)</span></span>
 <span>           <span class="va">`Min - Max`</span> <span class="op">&lt;-</span> <span class="fu">fapply2</span><span class="op">(</span><span class="va">MIN</span>, <span class="va">MAX</span>, sep <span class="op">=</span> <span class="st">" - "</span><span class="op">)</span></span>
-<span>           </span>
-<span>           </span>
+<span></span>
 <span>         <span class="op">}</span><span class="op">)</span> <span class="op">-&gt;</span> <span class="va">age_comb</span></span>
 <span></span>
 <span><span class="fu">put</span><span class="op">(</span><span class="st">"Transpose ARMs into columns"</span><span class="op">)</span></span>
-<span><span class="fu"><a href="../reference/proc_transpose.html">proc_transpose</a></span><span class="op">(</span><span class="va">age_comb</span>, </span>
+<span><span class="fu"><a href="../reference/proc_transpose.html">proc_transpose</a></span><span class="op">(</span><span class="va">age_comb</span>,</span>
 <span>               var <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">age_comb</span><span class="op">)</span>,</span>
-<span>               copy <span class="op">=</span> <span class="va">VAR</span>, id <span class="op">=</span> <span class="va">BY</span>, </span>
-<span>               name <span class="op">=</span> <span class="va">LABEL</span><span class="op">)</span> <span class="op">-&gt;</span> <span class="va">age_trans</span></span>
-<span></span>
-<span></span>
-<span><span class="fu">put</span><span class="op">(</span><span class="st">"Calculate aov"</span><span class="op">)</span></span>
-<span><span class="va">age_aov</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/aov.html" class="external-link">aov</a></span><span class="op">(</span><span class="va">AGE</span> <span class="op">~</span> <span class="va">ARM</span>, data <span class="op">=</span> <span class="va">adsl</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
-<span>  <span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="op">)</span> </span>
-<span></span>
-<span><span class="fu">put</span><span class="op">(</span><span class="st">"Get aov into proper data frame"</span><span class="op">)</span> </span>
-<span></span>
-<span><span class="va">age_aov</span> <span class="op">&lt;-</span> <span class="va">age_aov</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">[</span><span class="fl">1</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"F value"</span>, <span class="st">"Pr(&gt;F)"</span><span class="op">)</span><span class="op">]</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">age_aov</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"AOV.F"</span>, <span class="st">"AOV.P"</span><span class="op">)</span></span>
-<span><span class="va">age_aov</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/as.data.frame.html" class="external-link">as.data.frame</a></span><span class="op">(</span><span class="va">age_aov</span><span class="op">)</span> <span class="op">|&gt;</span> <span class="fu">put</span><span class="op">(</span><span class="op">)</span></span>
-<span></span>
-<span><span class="fu">put</span><span class="op">(</span><span class="st">"Combine aov statistics"</span><span class="op">)</span></span>
-<span><span class="fu">datastep</span><span class="op">(</span><span class="va">age_aov</span>, </span>
-<span>         keep <span class="op">=</span> <span class="va">PVALUE</span>,</span>
-<span>         format <span class="op">=</span> <span class="va">fc</span>,</span>
-<span>         <span class="op">{</span></span>
-<span>           <span class="va">PVALUE</span> <span class="op">&lt;-</span> <span class="fu">fapply2</span><span class="op">(</span><span class="va">AOV.F</span>, <span class="va">AOV.P</span><span class="op">)</span></span>
-<span>           </span>
-<span>         <span class="op">}</span><span class="op">)</span> <span class="op">-&gt;</span> <span class="va">age_aov_comb</span> </span>
-<span></span>
-<span><span class="fu">put</span><span class="op">(</span><span class="st">"Append aov"</span><span class="op">)</span></span>
-<span><span class="fu">datastep</span><span class="op">(</span><span class="va">age_trans</span>, merge <span class="op">=</span> <span class="va">age_aov_comb</span>, <span class="op">{</span><span class="op">}</span><span class="op">)</span> <span class="op">-&gt;</span> <span class="va">age_block</span></span>
+<span>               copy <span class="op">=</span> <span class="va">VAR</span>, id <span class="op">=</span> <span class="va">BY</span>,</span>
+<span>               name <span class="op">=</span> <span class="va">LABEL</span><span class="op">)</span> <span class="op">-&gt;</span> <span class="va">age_block</span></span>
 <span></span>
 <span></span>
 <span><span class="co"># Sex Block ---------------------------------------------------------------</span></span>
@@ -285,54 +261,36 @@ demographics table with p-value statistics.</p>
 <span><span class="fu">put</span><span class="op">(</span><span class="st">"Get sex frequency counts"</span><span class="op">)</span></span>
 <span><span class="fu"><a href="../reference/proc_freq.html">proc_freq</a></span><span class="op">(</span><span class="va">adsl</span>, tables <span class="op">=</span> <span class="va">SEX</span>,</span>
 <span>          by <span class="op">=</span> <span class="va">ARM</span>,</span>
-<span>          options <span class="op">=</span> <span class="va">nonobs</span><span class="op">)</span> <span class="op">-&gt;</span> <span class="va">sex_freq</span> </span>
+<span>          options <span class="op">=</span> <span class="va">nonobs</span><span class="op">)</span> <span class="op">-&gt;</span> <span class="va">sex_freq</span></span>
 <span></span>
 <span></span>
 <span><span class="fu">put</span><span class="op">(</span><span class="st">"Combine counts and percents."</span><span class="op">)</span></span>
-<span><span class="fu">datastep</span><span class="op">(</span><span class="va">sex_freq</span>, </span>
-<span>         format <span class="op">=</span> <span class="va">fc</span>, </span>
+<span><span class="fu">datastep</span><span class="op">(</span><span class="va">sex_freq</span>,</span>
+<span>         format <span class="op">=</span> <span class="va">fc</span>,</span>
 <span>         rename <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>CAT <span class="op">=</span> <span class="st">"LABEL"</span><span class="op">)</span>,</span>
-<span>         drop <span class="op">=</span> <span class="fu"><a href="https://common.r-sassy.org/reference/v.html" class="external-link">v</a></span><span class="op">(</span><span class="va">CNT</span>, <span class="va">PCT</span><span class="op">)</span>, </span>
+<span>         drop <span class="op">=</span> <span class="fu"><a href="https://common.r-sassy.org/reference/v.html" class="external-link">v</a></span><span class="op">(</span><span class="va">CNT</span>, <span class="va">PCT</span><span class="op">)</span>,</span>
 <span>         <span class="op">{</span></span>
-<span>           </span>
+<span></span>
 <span>           <span class="va">CNTPCT</span> <span class="op">&lt;-</span> <span class="fu">fapply2</span><span class="op">(</span><span class="va">CNT</span>, <span class="va">PCT</span><span class="op">)</span></span>
-<span>           </span>
-<span>         <span class="op">}</span><span class="op">)</span> <span class="op">-&gt;</span> <span class="va">sex_comb</span> </span>
+<span></span>
+<span>         <span class="op">}</span><span class="op">)</span> <span class="op">-&gt;</span> <span class="va">sex_comb</span></span>
 <span></span>
 <span><span class="fu">put</span><span class="op">(</span><span class="st">"Transpose ARMs into columns"</span><span class="op">)</span></span>
-<span><span class="fu"><a href="../reference/proc_transpose.html">proc_transpose</a></span><span class="op">(</span><span class="va">sex_comb</span>, id <span class="op">=</span> <span class="va">BY</span>, </span>
+<span><span class="fu"><a href="../reference/proc_transpose.html">proc_transpose</a></span><span class="op">(</span><span class="va">sex_comb</span>, id <span class="op">=</span> <span class="va">BY</span>,</span>
 <span>               var <span class="op">=</span> <span class="va">CNTPCT</span>,</span>
 <span>               copy <span class="op">=</span> <span class="va">VAR</span>, by <span class="op">=</span> <span class="va">LABEL</span><span class="op">)</span> <span class="op">-&gt;</span> <span class="va">sex_trans</span></span>
 <span></span>
 <span><span class="fu">put</span><span class="op">(</span><span class="st">"Clean up"</span><span class="op">)</span></span>
-<span><span class="fu">datastep</span><span class="op">(</span><span class="va">sex_trans</span>, drop <span class="op">=</span> <span class="va">NAME</span>, </span>
+<span><span class="fu">datastep</span><span class="op">(</span><span class="va">sex_trans</span>, drop <span class="op">=</span> <span class="va">NAME</span>,</span>
 <span>         <span class="op">{</span></span>
-<span>           </span>
+<span></span>
 <span>           <span class="va">LABEL</span> <span class="op">&lt;-</span> <span class="fu">fapply</span><span class="op">(</span><span class="va">LABEL</span>, <span class="va">fc</span><span class="op">$</span><span class="va">SEX</span><span class="op">)</span></span>
-<span>           </span>
+<span></span>
 <span>         <span class="op">}</span><span class="op">)</span> <span class="op">-&gt;</span> <span class="va">sex_cnts</span></span>
 <span></span>
 <span><span class="fu">put</span><span class="op">(</span><span class="st">"Sort by label"</span><span class="op">)</span></span>
-<span><span class="fu"><a href="../reference/proc_sort.html">proc_sort</a></span><span class="op">(</span><span class="va">sex_cnts</span>, by <span class="op">=</span> <span class="va">LABEL</span><span class="op">)</span> <span class="op">-&gt;</span> <span class="va">sex_cnts</span></span>
+<span><span class="fu"><a href="../reference/proc_sort.html">proc_sort</a></span><span class="op">(</span><span class="va">sex_cnts</span>, by <span class="op">=</span> <span class="va">LABEL</span><span class="op">)</span> <span class="op">-&gt;</span> <span class="va">sex_block</span></span>
 <span></span>
-<span></span>
-<span><span class="fu">put</span><span class="op">(</span><span class="st">"Get sex chisq"</span><span class="op">)</span></span>
-<span><span class="fu"><a href="../reference/proc_freq.html">proc_freq</a></span><span class="op">(</span><span class="va">adsl</span>, tables <span class="op">=</span> <span class="fu"><a href="https://common.r-sassy.org/reference/v.html" class="external-link">v</a></span><span class="op">(</span><span class="va">SEX</span> <span class="op">*</span> <span class="va">ARM</span><span class="op">)</span>,</span>
-<span>          options <span class="op">=</span> <span class="fu"><a href="https://common.r-sassy.org/reference/v.html" class="external-link">v</a></span><span class="op">(</span><span class="va">chisq</span>, <span class="va">notable</span><span class="op">)</span><span class="op">)</span> <span class="op">-&gt;</span> <span class="va">sex_chisq</span></span>
-<span></span>
-<span><span class="fu">put</span><span class="op">(</span><span class="st">"Combine chisq statistics"</span><span class="op">)</span></span>
-<span><span class="fu">datastep</span><span class="op">(</span><span class="va">sex_chisq</span>,</span>
-<span>         format <span class="op">=</span> <span class="va">fc</span>,</span>
-<span>         keep <span class="op">=</span> <span class="va">PVALUE</span>, </span>
-<span>         <span class="op">{</span></span>
-<span>           </span>
-<span>           <span class="va">PVALUE</span> <span class="op">=</span> <span class="fu">fapply2</span><span class="op">(</span><span class="va">VAL</span>, <span class="va">PROB</span><span class="op">)</span></span>
-<span>         <span class="op">}</span><span class="op">)</span> <span class="op">-&gt;</span> <span class="va">sex_chisq_comb</span> </span>
-<span></span>
-<span><span class="fu">put</span><span class="op">(</span><span class="st">"Append chisq"</span><span class="op">)</span></span>
-<span><span class="fu">datastep</span><span class="op">(</span><span class="va">sex_cnts</span>, </span>
-<span>         merge <span class="op">=</span> <span class="va">sex_chisq_comb</span>, </span>
-<span>         <span class="op">{</span><span class="op">}</span><span class="op">)</span> <span class="op">-&gt;</span> <span class="va">sex_block</span></span>
 <span></span>
 <span></span>
 <span><span class="co"># Race block --------------------------------------------------------------</span></span>
@@ -343,19 +301,19 @@ demographics table with p-value statistics.</p>
 <span><span class="fu">put</span><span class="op">(</span><span class="st">"Get race frequency counts"</span><span class="op">)</span></span>
 <span><span class="fu"><a href="../reference/proc_freq.html">proc_freq</a></span><span class="op">(</span><span class="va">adsl</span>, tables <span class="op">=</span> <span class="va">RACE</span>,</span>
 <span>          by <span class="op">=</span> <span class="va">ARM</span>,</span>
-<span>          options <span class="op">=</span> <span class="va">nonobs</span><span class="op">)</span> <span class="op">-&gt;</span> <span class="va">race_freq</span> </span>
+<span>          options <span class="op">=</span> <span class="va">nonobs</span><span class="op">)</span> <span class="op">-&gt;</span> <span class="va">race_freq</span></span>
 <span></span>
 <span></span>
 <span><span class="fu">put</span><span class="op">(</span><span class="st">"Combine counts and percents."</span><span class="op">)</span></span>
-<span><span class="fu">datastep</span><span class="op">(</span><span class="va">race_freq</span>, </span>
-<span>         format <span class="op">=</span> <span class="va">fc</span>, </span>
+<span><span class="fu">datastep</span><span class="op">(</span><span class="va">race_freq</span>,</span>
+<span>         format <span class="op">=</span> <span class="va">fc</span>,</span>
 <span>         rename <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>CAT <span class="op">=</span> <span class="st">"LABEL"</span><span class="op">)</span>,</span>
-<span>         drop <span class="op">=</span> <span class="fu"><a href="https://common.r-sassy.org/reference/v.html" class="external-link">v</a></span><span class="op">(</span><span class="va">CNT</span>, <span class="va">PCT</span><span class="op">)</span>, </span>
+<span>         drop <span class="op">=</span> <span class="fu"><a href="https://common.r-sassy.org/reference/v.html" class="external-link">v</a></span><span class="op">(</span><span class="va">CNT</span>, <span class="va">PCT</span><span class="op">)</span>,</span>
 <span>         <span class="op">{</span></span>
-<span>           </span>
+<span></span>
 <span>           <span class="va">CNTPCT</span> <span class="op">&lt;-</span> <span class="fu">fapply2</span><span class="op">(</span><span class="va">CNT</span>, <span class="va">PCT</span><span class="op">)</span></span>
-<span>           </span>
-<span>         <span class="op">}</span><span class="op">)</span> <span class="op">-&gt;</span> <span class="va">race_comb</span> </span>
+<span></span>
+<span>         <span class="op">}</span><span class="op">)</span> <span class="op">-&gt;</span> <span class="va">race_comb</span></span>
 <span></span>
 <span><span class="fu">put</span><span class="op">(</span><span class="st">"Transpose ARMs into columns"</span><span class="op">)</span></span>
 <span><span class="fu"><a href="../reference/proc_transpose.html">proc_transpose</a></span><span class="op">(</span><span class="va">race_comb</span>, id <span class="op">=</span> <span class="va">BY</span>, var <span class="op">=</span> <span class="va">CNTPCT</span>,</span>
@@ -368,27 +326,12 @@ demographics table with p-value statistics.</p>
 <span>         <span class="op">{</span></span>
 <span>           <span class="va">LABEL</span> <span class="op">&lt;-</span> <span class="fu">fapply</span><span class="op">(</span><span class="va">LABEL</span>, <span class="va">fc</span><span class="op">$</span><span class="va">RACE</span><span class="op">)</span></span>
 <span>           <span class="va">LABEL</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">factor</a></span><span class="op">(</span><span class="va">LABEL</span>, levels <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/levels.html" class="external-link">levels</a></span><span class="op">(</span><span class="va">fc</span><span class="op">$</span><span class="va">RACE</span><span class="op">)</span><span class="op">)</span></span>
-<span>           </span>
-<span>         <span class="op">}</span><span class="op">)</span> <span class="op">-&gt;</span> <span class="va">race_cnts</span> </span>
+<span></span>
+<span>         <span class="op">}</span><span class="op">)</span> <span class="op">-&gt;</span> <span class="va">race_cnts</span></span>
 <span></span>
 <span><span class="fu">put</span><span class="op">(</span><span class="st">"Sort by label"</span><span class="op">)</span></span>
 <span><span class="fu"><a href="../reference/proc_sort.html">proc_sort</a></span><span class="op">(</span><span class="va">race_cnts</span>, by <span class="op">=</span> <span class="va">LABEL</span><span class="op">)</span> <span class="op">-&gt;</span> <span class="va">race_block</span></span>
 <span></span>
-<span><span class="fu">put</span><span class="op">(</span><span class="st">"Get race chisq"</span><span class="op">)</span></span>
-<span><span class="fu"><a href="../reference/proc_freq.html">proc_freq</a></span><span class="op">(</span><span class="va">adsl</span>, tables <span class="op">=</span> <span class="va">RACE</span> <span class="op">*</span> <span class="va">ARM</span>,</span>
-<span>          options <span class="op">=</span> <span class="fu"><a href="https://common.r-sassy.org/reference/v.html" class="external-link">v</a></span><span class="op">(</span><span class="va">chisq</span>, <span class="va">notable</span><span class="op">)</span><span class="op">)</span> <span class="op">-&gt;</span> <span class="va">race_chisq</span> </span>
-<span></span>
-<span><span class="fu">put</span><span class="op">(</span><span class="st">"Combine chisq statistics"</span><span class="op">)</span></span>
-<span><span class="fu">datastep</span><span class="op">(</span><span class="va">race_chisq</span>,</span>
-<span>         format <span class="op">=</span> <span class="va">fc</span>,</span>
-<span>         keep <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"PVALUE"</span><span class="op">)</span>, </span>
-<span>         <span class="op">{</span></span>
-<span>           </span>
-<span>           <span class="va">PVALUE</span> <span class="op">=</span> <span class="fu">fapply2</span><span class="op">(</span><span class="va">CHISQ</span>, <span class="va">CHISQ.P</span><span class="op">)</span></span>
-<span>         <span class="op">}</span><span class="op">)</span> <span class="op">-&gt;</span> <span class="va">race_chisq_comb</span></span>
-<span></span>
-<span><span class="fu">put</span><span class="op">(</span><span class="st">"Append chisq"</span><span class="op">)</span></span>
-<span><span class="fu">datastep</span><span class="op">(</span><span class="va">race_cnts</span>, merge <span class="op">=</span> <span class="va">race_chisq_comb</span>, <span class="op">{</span><span class="op">}</span><span class="op">)</span> <span class="op">-&gt;</span> <span class="va">race_block</span></span>
 <span></span>
 <span><span class="co"># Age Group Block ----------------------------------------------------------</span></span>
 <span></span>
@@ -412,38 +355,23 @@ demographics table with p-value statistics.</p>
 <span></span>
 <span></span>
 <span><span class="fu">put</span><span class="op">(</span><span class="st">"Sort by age group factor"</span><span class="op">)</span></span>
-<span><span class="fu"><a href="../reference/proc_sort.html">proc_sort</a></span><span class="op">(</span><span class="va">ageg_comb</span>, by <span class="op">=</span> <span class="fu"><a href="https://common.r-sassy.org/reference/v.html" class="external-link">v</a></span><span class="op">(</span><span class="va">BY</span>, <span class="va">LABEL</span><span class="op">)</span><span class="op">)</span> <span class="op">-&gt;</span> <span class="va">ageg_sort</span> </span>
+<span><span class="fu"><a href="../reference/proc_sort.html">proc_sort</a></span><span class="op">(</span><span class="va">ageg_comb</span>, by <span class="op">=</span> <span class="fu"><a href="https://common.r-sassy.org/reference/v.html" class="external-link">v</a></span><span class="op">(</span><span class="va">BY</span>, <span class="va">LABEL</span><span class="op">)</span><span class="op">)</span> <span class="op">-&gt;</span> <span class="va">ageg_sort</span></span>
 <span></span>
 <span><span class="fu">put</span><span class="op">(</span><span class="st">"Tranpose age group block"</span><span class="op">)</span></span>
 <span><span class="fu"><a href="../reference/proc_transpose.html">proc_transpose</a></span><span class="op">(</span><span class="va">ageg_sort</span>,</span>
 <span>               var <span class="op">=</span> <span class="va">CNTPCT</span>,</span>
 <span>               copy <span class="op">=</span> <span class="va">VAR</span>,</span>
 <span>               id <span class="op">=</span> <span class="va">BY</span>,</span>
-<span>               by <span class="op">=</span> <span class="va">LABEL</span><span class="op">)</span> <span class="op">-&gt;</span> <span class="va">ageg_trans</span> </span>
+<span>               by <span class="op">=</span> <span class="va">LABEL</span><span class="op">)</span> <span class="op">-&gt;</span> <span class="va">ageg_trans</span></span>
 <span></span>
 <span><span class="fu">put</span><span class="op">(</span><span class="st">"Some clean up"</span><span class="op">)</span></span>
 <span><span class="fu">datastep</span><span class="op">(</span><span class="va">ageg_trans</span>,</span>
 <span>         drop <span class="op">=</span> <span class="va">NAME</span>,</span>
 <span>         <span class="op">{</span><span class="op">}</span><span class="op">)</span> <span class="op">-&gt;</span> <span class="va">ageg_block</span></span>
 <span></span>
-<span><span class="fu">put</span><span class="op">(</span><span class="st">"Get ageg chisq"</span><span class="op">)</span></span>
-<span><span class="fu"><a href="../reference/proc_freq.html">proc_freq</a></span><span class="op">(</span><span class="va">adsl</span>, tables <span class="op">=</span> <span class="va">AGECAT</span> <span class="op">*</span> <span class="va">ARM</span>,</span>
-<span>          options <span class="op">=</span> <span class="fu"><a href="https://common.r-sassy.org/reference/v.html" class="external-link">v</a></span><span class="op">(</span><span class="va">chisq</span>, <span class="va">notable</span><span class="op">)</span><span class="op">)</span> <span class="op">-&gt;</span> <span class="va">ageg_chisq</span> </span>
-<span></span>
-<span><span class="fu">put</span><span class="op">(</span><span class="st">"Combine chisq statistics"</span><span class="op">)</span></span>
-<span><span class="fu">datastep</span><span class="op">(</span><span class="va">ageg_chisq</span>,</span>
-<span>         format <span class="op">=</span> <span class="va">fc</span>,</span>
-<span>         keep <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"PVALUE"</span><span class="op">)</span>, </span>
-<span>         <span class="op">{</span></span>
-<span>           <span class="va">PVALUE</span> <span class="op">=</span> <span class="fu">fapply2</span><span class="op">(</span><span class="va">VAL</span>, <span class="va">PROB</span><span class="op">)</span></span>
-<span>         <span class="op">}</span><span class="op">)</span> <span class="op">-&gt;</span> <span class="va">ageg_chisq_comb</span> </span>
-<span></span>
-<span><span class="fu">put</span><span class="op">(</span><span class="st">"Append chisq"</span><span class="op">)</span></span>
-<span><span class="fu">datastep</span><span class="op">(</span><span class="va">ageg_cnts</span>, merge <span class="op">=</span> <span class="va">ageg_chisq_comb</span>, </span>
-<span>         <span class="op">{</span><span class="op">}</span><span class="op">)</span> <span class="op">-&gt;</span> <span class="va">ageg_block</span></span>
 <span></span>
 <span><span class="fu">put</span><span class="op">(</span><span class="st">"Combine blocks into final data frame"</span><span class="op">)</span></span>
-<span><span class="fu">datastep</span><span class="op">(</span><span class="va">age_block</span>, </span>
+<span><span class="fu">datastep</span><span class="op">(</span><span class="va">age_block</span>,</span>
 <span>         set <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="va">ageg_block</span>, <span class="va">sex_block</span>, <span class="va">race_block</span><span class="op">)</span>,</span>
 <span>         <span class="op">{</span><span class="op">}</span><span class="op">)</span> <span class="op">-&gt;</span> <span class="va">final</span></span>
 <span></span>
@@ -453,33 +381,30 @@ demographics table with p-value statistics.</p>
 <span></span>
 <span><span class="va">var_fmt</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"AGE"</span> <span class="op">=</span> <span class="st">"Age"</span>, <span class="st">"AGECAT"</span> <span class="op">=</span> <span class="st">"Age Group"</span>, <span class="st">"SEX"</span> <span class="op">=</span> <span class="st">"Sex"</span>, <span class="st">"RACE"</span> <span class="op">=</span> <span class="st">"Race"</span><span class="op">)</span></span>
 <span></span>
-<span><span class="va">plbl</span> <span class="op">&lt;-</span> <span class="st">"Tests of Association{supsc('1')}\n Value (P-Value)"</span></span>
-<span></span>
 <span><span class="co"># Create Table</span></span>
-<span><span class="va">tbl</span> <span class="op">&lt;-</span> <span class="fu">create_table</span><span class="op">(</span><span class="va">final</span>, first_row_blank <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span> <span class="op">|&gt;</span>  </span>
-<span>  <span class="fu">column_defaults</span><span class="op">(</span>from <span class="op">=</span> <span class="va">`ARM A`</span>, to <span class="op">=</span> <span class="va">`ARM D`</span>, align <span class="op">=</span> <span class="st">"center"</span>, width <span class="op">=</span> <span class="fl">1.1</span><span class="op">)</span> <span class="op">|&gt;</span>  </span>
-<span>  <span class="fu">stub</span><span class="op">(</span>vars <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"VAR"</span>, <span class="st">"LABEL"</span><span class="op">)</span>, <span class="st">"Variable"</span>, width <span class="op">=</span> <span class="fl">2.5</span><span class="op">)</span> <span class="op">|&gt;</span>  </span>
-<span>  <span class="fu">define</span><span class="op">(</span><span class="va">VAR</span>, blank_after <span class="op">=</span> <span class="cn">TRUE</span>, dedupe <span class="op">=</span> <span class="cn">TRUE</span>, label <span class="op">=</span> <span class="st">"Variable"</span>,</span>
-<span>         format <span class="op">=</span> <span class="va">var_fmt</span>,label_row <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span> <span class="op">|&gt;</span>  </span>
-<span>  <span class="fu">define</span><span class="op">(</span><span class="va">LABEL</span>, indent <span class="op">=</span> <span class="fl">.25</span>, label <span class="op">=</span> <span class="st">"Demographic Category"</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
-<span>  <span class="fu">define</span><span class="op">(</span><span class="va">`ARM A`</span>,  label <span class="op">=</span> <span class="st">"Placebo"</span>, n <span class="op">=</span> <span class="va">arm_pop</span><span class="op">[</span><span class="st">"ARM A"</span><span class="op">]</span><span class="op">)</span> <span class="op">|&gt;</span>  </span>
-<span>  <span class="fu">define</span><span class="op">(</span><span class="va">`ARM B`</span>,  label <span class="op">=</span> <span class="st">"Drug 50mg"</span>, n <span class="op">=</span> <span class="va">arm_pop</span><span class="op">[</span><span class="st">"ARM B"</span><span class="op">]</span><span class="op">)</span> <span class="op">|&gt;</span>  </span>
-<span>  <span class="fu">define</span><span class="op">(</span><span class="va">`ARM C`</span>,  label <span class="op">=</span> <span class="st">"Drug 100mg"</span>, n <span class="op">=</span> <span class="va">arm_pop</span><span class="op">[</span><span class="st">"ARM C"</span><span class="op">]</span><span class="op">)</span> <span class="op">|&gt;</span>  </span>
-<span>  <span class="fu">define</span><span class="op">(</span><span class="va">`ARM D`</span>,  label <span class="op">=</span> <span class="st">"Competitor"</span>, n <span class="op">=</span> <span class="va">arm_pop</span><span class="op">[</span><span class="st">"ARM D"</span><span class="op">]</span><span class="op">)</span> <span class="op">|&gt;</span>  </span>
-<span>  <span class="fu">define</span><span class="op">(</span><span class="va">PVALUE</span>, label <span class="op">=</span> <span class="va">plbl</span>, width <span class="op">=</span> <span class="fl">2</span>, dedupe <span class="op">=</span> <span class="cn">TRUE</span>, align <span class="op">=</span> <span class="st">"center"</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
-<span>  <span class="fu">titles</span><span class="op">(</span><span class="st">"Table 1.0"</span>, <span class="st">"Analysis of Demographic Characteristics"</span>, </span>
-<span>         <span class="st">"Safety Population"</span>, bold <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
+<span><span class="va">tbl</span> <span class="op">&lt;-</span> <span class="fu">create_table</span><span class="op">(</span><span class="va">final</span>, header_bold <span class="op">=</span> <span class="cn">TRUE</span>, borders <span class="op">=</span> <span class="st">"top"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu">column_defaults</span><span class="op">(</span>from <span class="op">=</span> <span class="va">`ARM A`</span>, to <span class="op">=</span> <span class="va">`ARM D`</span>, align <span class="op">=</span> <span class="st">"center"</span>, width <span class="op">=</span> <span class="fl">1.1</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu">stub</span><span class="op">(</span>vars <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"VAR"</span>, <span class="st">"LABEL"</span><span class="op">)</span>, <span class="st">"Variable"</span>, width <span class="op">=</span> <span class="fl">2.5</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu">define</span><span class="op">(</span><span class="va">VAR</span>, group_border <span class="op">=</span> <span class="cn">TRUE</span>, dedupe <span class="op">=</span> <span class="cn">TRUE</span>, label <span class="op">=</span> <span class="st">"Variable"</span>,</span>
+<span>         format <span class="op">=</span> <span class="va">var_fmt</span>,label_row <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu">define</span><span class="op">(</span><span class="va">LABEL</span>, indent <span class="op">=</span> <span class="fl">.25</span>, label <span class="op">=</span> <span class="st">"Demographic Category"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu">define</span><span class="op">(</span><span class="va">`ARM A`</span>,  label <span class="op">=</span> <span class="st">"Placebo"</span>, n <span class="op">=</span> <span class="va">arm_pop</span><span class="op">[</span><span class="st">"ARM A"</span><span class="op">]</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu">define</span><span class="op">(</span><span class="va">`ARM B`</span>,  label <span class="op">=</span> <span class="st">"Drug 50mg"</span>, n <span class="op">=</span> <span class="va">arm_pop</span><span class="op">[</span><span class="st">"ARM B"</span><span class="op">]</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu">define</span><span class="op">(</span><span class="va">`ARM C`</span>,  label <span class="op">=</span> <span class="st">"Drug 100mg"</span>, n <span class="op">=</span> <span class="va">arm_pop</span><span class="op">[</span><span class="st">"ARM C"</span><span class="op">]</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu">define</span><span class="op">(</span><span class="va">`ARM D`</span>,  label <span class="op">=</span> <span class="st">"Competitor"</span>, n <span class="op">=</span> <span class="va">arm_pop</span><span class="op">[</span><span class="st">"ARM D"</span><span class="op">]</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu">titles</span><span class="op">(</span><span class="st">"Table 1.0"</span>, <span class="st">"Analysis of Demographic Characteristics"</span>,</span>
+<span>         <span class="st">"Safety Population"</span>, bold <span class="op">=</span> <span class="cn">TRUE</span>, font_size <span class="op">=</span> <span class="fl">12</span>, </span>
+<span>         borders <span class="op">=</span> <span class="st">"top"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu">footnotes</span><span class="op">(</span><span class="st">"Program: DM_Table.R"</span>,</span>
 <span>            <span class="st">"NOTE: Denominator based on number of non-missing responses."</span>,</span>
-<span>            <span class="st">"{supsc('1')}Pearson's Chi-Square tests will be used for "</span></span>
-<span>            <span class="op"><a href="https://common.r-sassy.org/reference/grapes-p-grapes.html" class="external-link">%p%</a></span> <span class="st">"Categorical variables and ANOVA tests for continuous variables."</span><span class="op">)</span> </span>
+<span>            blank_row <span class="op">=</span> <span class="st">"none"</span>, font_size <span class="op">=</span> <span class="fl">10</span>, italics <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span></span>
-<span><span class="va">rpt</span> <span class="op">&lt;-</span> <span class="fu">create_report</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="va">tmp</span>, <span class="st">"ProcsDemoDM.rtf"</span><span class="op">)</span>, </span>
-<span>                     output_type <span class="op">=</span> <span class="st">"RTF"</span>, </span>
-<span>                     font <span class="op">=</span> <span class="st">"Times"</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
-<span>  <span class="fu">page_header</span><span class="op">(</span><span class="st">"Sponsor: Company"</span>, <span class="st">"Study: ABC"</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
-<span>  <span class="fu">set_margins</span><span class="op">(</span>top <span class="op">=</span> <span class="fl">1</span>, bottom <span class="op">=</span> <span class="fl">1</span><span class="op">)</span> <span class="op">|&gt;</span>  </span>
-<span>  <span class="fu">add_content</span><span class="op">(</span><span class="va">tbl</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
+<span><span class="va">rpt</span> <span class="op">&lt;-</span> <span class="fu">create_report</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="va">tmp</span>, <span class="st">"ProcsDemoDM.rtf"</span><span class="op">)</span>,</span>
+<span>                     output_type <span class="op">=</span> <span class="st">"RTF"</span>,</span>
+<span>                     font <span class="op">=</span> <span class="st">"Arial"</span>, font_size <span class="op">=</span> <span class="fl">11</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu">page_header</span><span class="op">(</span><span class="st">"Sponsor: Company"</span>, <span class="st">"Study: ABC"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu">set_margins</span><span class="op">(</span>top <span class="op">=</span> <span class="fl">1</span>, bottom <span class="op">=</span> <span class="fl">1</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu">add_content</span><span class="op">(</span><span class="va">tbl</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu">page_footer</span><span class="op">(</span><span class="st">"Date Produced: {Sys.Date()}"</span>, right <span class="op">=</span> <span class="st">"Page [pg] of [tpg]"</span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu">put</span><span class="op">(</span><span class="st">"Write out the report"</span><span class="op">)</span></span>
@@ -493,7 +418,7 @@ demographics table with p-value statistics.</p>
 <span></span>
 <span></span>
 <span><span class="co"># Uncomment to view report</span></span>
-<span><span class="co"># file.show(res$modified_path)</span></span>
+<span><span class="co"># file.show(res$path)</span></span>
 <span></span>
 <span><span class="co"># Uncomment to view log</span></span>
 <span><span class="co"># file.show(lf)</span></span></code></pre></div>
@@ -509,17 +434,20 @@ demographics table with p-value statistics.</p>
 </h2>
 <p>And here is the log:</p>
 <pre><code>=========================================================================
-Log Path: C:/Users/dbosa/AppData/Local/Temp/RtmpAXQUo8/log/example1.log
-Program Path: C:/Projects/Archytas/Westat/Tutorial2/Project/Chisq2.R
-Working Directory: C:/Projects/Archytas/Westat/Tutorial2/Project
+Log Path: C:/Users/dbosa/AppData/Local/Temp/RtmpsJ3ryu/log/example1.log
+Program Path: C:/Studies/Testing1/ProcEx1.R
+Working Directory: C:/Studies/Testing1
 User Name: dbosa
-R Version: 4.4.0 (2024-04-24 ucrt)
+R Version: 4.4.3 (2025-02-28 ucrt)
 Machine: SOCRATES x86-64
-Operating System: Windows 10 x64 build 22631
-Base Packages: stats graphics grDevices utils datasets methods base
-Other Packages: tidylog_1.0.2 procs_1.0.7 reporter_1.4.4 libr_1.3.3 logr_1.3.7
-fmtr_1.6.4 common_1.1.3 sassy_1.2.4
-Log Start Time: 2024-05-28 09:09:21.582908
+Operating System: Windows 10 x64 build 26200
+Base Packages: grid stats graphics grDevices utils datasets methods base
+Other Packages: tidylog_1.1.0 patchwork_1.3.0 magrittr_2.0.3 forestploter_1.1.2
+survminer_0.4.9 ggpubr_0.6.0 survival_3.8-3 broom_1.0.6 lubridate_1.9.3
+forcats_1.0.0 stringr_1.5.1 dplyr_1.1.4 purrr_1.0.2 readr_2.1.5 tidyr_1.3.1
+tibble_3.3.0 tidyverse_2.0.0 ggplot2_3.5.1 procs_1.0.8 reporter_1.4.6
+libr_1.3.9 logr_1.3.9 fmtr_1.7.2 common_1.1.5 sassy_1.2.9
+Log Start Time: 2026-03-08 11:35:27.204585
 =========================================================================
 
 =========================================================================
@@ -529,6 +457,7 @@ Prepare formats
 Age categories
 
 # A user-defined format: 5 conditions
+- as.factor: TRUE
   Name Type        Expression        Label Order
 1  obj    U x &gt;= 18 &amp; x &lt;= 29     18 to 29    NA
 2  obj    U x &gt;= 30 &amp; x &lt;= 39     30 to 39    NA
@@ -539,6 +468,7 @@ Age categories
 Sex decodes
 
 # A user-defined format: 4 conditions
+- as.factor: TRUE
   Name Type Expression   Label Order
 1  obj    U   is.na(x) Missing    NA
 2  obj    U   x == "M"    Male    NA
@@ -548,6 +478,7 @@ Sex decodes
 Race decodes
 
 # A user-defined format: 4 conditions
+- as.factor: TRUE
   Name Type   Expression                     Label Order
 1  obj    U     is.na(x)                   Missing    NA
 2  obj    U x == "WHITE"                     White    NA
@@ -769,23 +700,17 @@ proc_transpose: input data set 8 rows and 4 columns
                 name: NAME
                 output dataset 2 rows and 7 columns
 
-   VAR LABEL   NAME       ARM A       ARM B       ARM C
-1 RACE BLACK CNTPCT  1 ( 20.0%)  0 (  0.0%)  1 ( 25.0%)
-2 RACE WHITE CNTPCT  4 ( 80.0%)  4 (100.0%)  3 ( 75.0%)
-        ARM D
-1  1 ( 33.3%)
-2  2 ( 66.7%)
+   VAR LABEL   NAME       ARM A       ARM B       ARM C       ARM D
+1 RACE BLACK CNTPCT  1 ( 20.0%)  0 (  0.0%)  1 ( 25.0%)  1 ( 33.3%)
+2 RACE WHITE CNTPCT  4 ( 80.0%)  4 (100.0%)  3 ( 75.0%)  2 ( 66.7%)
 
 Clean up
 
 datastep: columns decreased from 7 to 6
 
-   VAR                     LABEL       ARM A       ARM B
-1 RACE Black or African American  1 ( 20.0%)  0 (  0.0%)
-2 RACE                     White  4 ( 80.0%)  4 (100.0%)
-        ARM C       ARM D
-1  1 ( 25.0%)  1 ( 33.3%)
-2  3 ( 75.0%)  2 ( 66.7%)
+   VAR                     LABEL       ARM A       ARM B       ARM C       ARM D
+1 RACE Black or African American  1 ( 20.0%)  0 (  0.0%)  1 ( 25.0%)  1 ( 33.3%)
+2 RACE                     White  4 ( 80.0%)  4 (100.0%)  3 ( 75.0%)  2 ( 66.7%)
 
 Sort by label
 
@@ -795,12 +720,9 @@ proc_sort: input data set 2 rows and 6 columns
            order: a
            output data set 2 rows and 6 columns
 
-   VAR                     LABEL       ARM A       ARM B
-2 RACE                     White  4 ( 80.0%)  4 (100.0%)
-1 RACE Black or African American  1 ( 20.0%)  0 (  0.0%)
-        ARM C       ARM D
-2  3 ( 75.0%)  2 ( 66.7%)
-1  1 ( 25.0%)  1 ( 33.3%)
+   VAR                     LABEL       ARM A       ARM B       ARM C       ARM D
+2 RACE                     White  4 ( 80.0%)  4 (100.0%)  3 ( 75.0%)  2 ( 66.7%)
+1 RACE Black or African American  1 ( 20.0%)  0 (  0.0%)  1 ( 25.0%)  1 ( 33.3%)
 
 =========================================================================
 Create frequency counts for Age Group
@@ -814,118 +736,131 @@ proc_freq: input data set 16 rows and 6 columns
            view: TRUE
            output: 1 datasets
 
-      BY    VAR      CAT CNT      PCT
-1  ARM A AGECAT 18 to 29   1 20.00000
-2  ARM A AGECAT 30 to 39   3 60.00000
-3  ARM A AGECAT 40 to 49   1 20.00000
-4  ARM B AGECAT 18 to 29   1 25.00000
-5  ARM B AGECAT 30 to 39   3 75.00000
-6  ARM B AGECAT 40 to 49   0  0.00000
-7  ARM C AGECAT 18 to 29   1 25.00000
-8  ARM C AGECAT 30 to 39   3 75.00000
-9  ARM C AGECAT 40 to 49   0  0.00000
-10 ARM D AGECAT 18 to 29   1 33.33333
-11 ARM D AGECAT 30 to 39   2 66.66667
-12 ARM D AGECAT 40 to 49   0  0.00000
+      BY    VAR          CAT CNT      PCT
+1  ARM A AGECAT     18 to 29   1 20.00000
+2  ARM A AGECAT     30 to 39   3 60.00000
+3  ARM A AGECAT     40 to 49   1 20.00000
+4  ARM A AGECAT        &gt;= 50   0  0.00000
+5  ARM A AGECAT Out of range   0  0.00000
+6  ARM B AGECAT     18 to 29   1 25.00000
+7  ARM B AGECAT     30 to 39   3 75.00000
+8  ARM B AGECAT     40 to 49   0  0.00000
+9  ARM B AGECAT        &gt;= 50   0  0.00000
+10 ARM B AGECAT Out of range   0  0.00000
+11 ARM C AGECAT     18 to 29   1 25.00000
+12 ARM C AGECAT     30 to 39   3 75.00000
+13 ARM C AGECAT     40 to 49   0  0.00000
+14 ARM C AGECAT        &gt;= 50   0  0.00000
+15 ARM C AGECAT Out of range   0  0.00000
+16 ARM D AGECAT     18 to 29   1 33.33333
+17 ARM D AGECAT     30 to 39   2 66.66667
+18 ARM D AGECAT     40 to 49   0  0.00000
+19 ARM D AGECAT        &gt;= 50   0  0.00000
+20 ARM D AGECAT Out of range   0  0.00000
 
 Combine counts and percents and assign age group factor for sorting
 
 datastep: columns decreased from 5 to 4
 
-      VAR    LABEL    BY      CNTPCT
-1  AGECAT 18 to 29 ARM A  1 ( 20.0%)
-2  AGECAT 30 to 39 ARM A  3 ( 60.0%)
-3  AGECAT 40 to 49 ARM A  1 ( 20.0%)
-4  AGECAT 18 to 29 ARM B  1 ( 25.0%)
-5  AGECAT 30 to 39 ARM B  3 ( 75.0%)
-6  AGECAT 40 to 49 ARM B  0 (  0.0%)
-7  AGECAT 18 to 29 ARM C  1 ( 25.0%)
-8  AGECAT 30 to 39 ARM C  3 ( 75.0%)
-9  AGECAT 40 to 49 ARM C  0 (  0.0%)
-10 AGECAT 18 to 29 ARM D  1 ( 33.3%)
-11 AGECAT 30 to 39 ARM D  2 ( 66.7%)
-12 AGECAT 40 to 49 ARM D  0 (  0.0%)
+      VAR        LABEL    BY      CNTPCT
+1  AGECAT     18 to 29 ARM A  1 ( 20.0%)
+2  AGECAT     30 to 39 ARM A  3 ( 60.0%)
+3  AGECAT     40 to 49 ARM A  1 ( 20.0%)
+4  AGECAT        &gt;= 50 ARM A  0 (  0.0%)
+5  AGECAT Out of range ARM A  0 (  0.0%)
+6  AGECAT     18 to 29 ARM B  1 ( 25.0%)
+7  AGECAT     30 to 39 ARM B  3 ( 75.0%)
+8  AGECAT     40 to 49 ARM B  0 (  0.0%)
+9  AGECAT        &gt;= 50 ARM B  0 (  0.0%)
+10 AGECAT Out of range ARM B  0 (  0.0%)
+11 AGECAT     18 to 29 ARM C  1 ( 25.0%)
+12 AGECAT     30 to 39 ARM C  3 ( 75.0%)
+13 AGECAT     40 to 49 ARM C  0 (  0.0%)
+14 AGECAT        &gt;= 50 ARM C  0 (  0.0%)
+15 AGECAT Out of range ARM C  0 (  0.0%)
+16 AGECAT     18 to 29 ARM D  1 ( 33.3%)
+17 AGECAT     30 to 39 ARM D  2 ( 66.7%)
+18 AGECAT     40 to 49 ARM D  0 (  0.0%)
+19 AGECAT        &gt;= 50 ARM D  0 (  0.0%)
+20 AGECAT Out of range ARM D  0 (  0.0%)
 
 Sort by age group factor
 
-proc_sort: input data set 12 rows and 4 columns
+proc_sort: input data set 20 rows and 4 columns
            by: BY LABEL
            keep: VAR LABEL BY CNTPCT
            order: a a
-           output data set 12 rows and 4 columns
+           output data set 20 rows and 4 columns
 
-      VAR    LABEL    BY      CNTPCT
-1  AGECAT 18 to 29 ARM A  1 ( 20.0%)
-2  AGECAT 30 to 39 ARM A  3 ( 60.0%)
-3  AGECAT 40 to 49 ARM A  1 ( 20.0%)
-4  AGECAT 18 to 29 ARM B  1 ( 25.0%)
-5  AGECAT 30 to 39 ARM B  3 ( 75.0%)
-6  AGECAT 40 to 49 ARM B  0 (  0.0%)
-7  AGECAT 18 to 29 ARM C  1 ( 25.0%)
-8  AGECAT 30 to 39 ARM C  3 ( 75.0%)
-9  AGECAT 40 to 49 ARM C  0 (  0.0%)
-10 AGECAT 18 to 29 ARM D  1 ( 33.3%)
-11 AGECAT 30 to 39 ARM D  2 ( 66.7%)
-12 AGECAT 40 to 49 ARM D  0 (  0.0%)
+      VAR        LABEL    BY      CNTPCT
+1  AGECAT     18 to 29 ARM A  1 ( 20.0%)
+2  AGECAT     30 to 39 ARM A  3 ( 60.0%)
+3  AGECAT     40 to 49 ARM A  1 ( 20.0%)
+4  AGECAT        &gt;= 50 ARM A  0 (  0.0%)
+5  AGECAT Out of range ARM A  0 (  0.0%)
+6  AGECAT     18 to 29 ARM B  1 ( 25.0%)
+7  AGECAT     30 to 39 ARM B  3 ( 75.0%)
+8  AGECAT     40 to 49 ARM B  0 (  0.0%)
+9  AGECAT        &gt;= 50 ARM B  0 (  0.0%)
+10 AGECAT Out of range ARM B  0 (  0.0%)
+11 AGECAT     18 to 29 ARM C  1 ( 25.0%)
+12 AGECAT     30 to 39 ARM C  3 ( 75.0%)
+13 AGECAT     40 to 49 ARM C  0 (  0.0%)
+14 AGECAT        &gt;= 50 ARM C  0 (  0.0%)
+15 AGECAT Out of range ARM C  0 (  0.0%)
+16 AGECAT     18 to 29 ARM D  1 ( 33.3%)
+17 AGECAT     30 to 39 ARM D  2 ( 66.7%)
+18 AGECAT     40 to 49 ARM D  0 (  0.0%)
+19 AGECAT        &gt;= 50 ARM D  0 (  0.0%)
+20 AGECAT Out of range ARM D  0 (  0.0%)
 
 Tranpose age group block
 
-proc_transpose: input data set 12 rows and 4 columns
+proc_transpose: input data set 20 rows and 4 columns
                 by: LABEL
                 var: CNTPCT
                 id: BY
                 copy: VAR
                 name: NAME
-                output dataset 3 rows and 7 columns
+                output dataset 5 rows and 7 columns
 
-     VAR    LABEL   NAME       ARM A       ARM B       ARM C
-1 AGECAT 18 to 29 CNTPCT  1 ( 20.0%)  1 ( 25.0%)  1 ( 25.0%)
-2 AGECAT 30 to 39 CNTPCT  3 ( 60.0%)  3 ( 75.0%)  3 ( 75.0%)
-3 AGECAT 40 to 49 CNTPCT  1 ( 20.0%)  0 (  0.0%)  0 (  0.0%)
-        ARM D
-1  1 ( 33.3%)
-2  2 ( 66.7%)
-3  0 (  0.0%)
+     VAR        LABEL   NAME       ARM A       ARM B       ARM C       ARM D
+1 AGECAT     18 to 29 CNTPCT  1 ( 20.0%)  1 ( 25.0%)  1 ( 25.0%)  1 ( 33.3%)
+2 AGECAT     30 to 39 CNTPCT  3 ( 60.0%)  3 ( 75.0%)  3 ( 75.0%)  2 ( 66.7%)
+3 AGECAT     40 to 49 CNTPCT  1 ( 20.0%)  0 (  0.0%)  0 (  0.0%)  0 (  0.0%)
+4 AGECAT        &gt;= 50 CNTPCT  0 (  0.0%)  0 (  0.0%)  0 (  0.0%)  0 (  0.0%)
+5 AGECAT Out of range CNTPCT  0 (  0.0%)  0 (  0.0%)  0 (  0.0%)  0 (  0.0%)
 
 Some clean up
 
 datastep: columns decreased from 7 to 6
 
-     VAR    LABEL       ARM A       ARM B       ARM C       ARM D
-1 AGECAT 18 to 29  1 ( 20.0%)  1 ( 25.0%)  1 ( 25.0%)  1 ( 33.3%)
-2 AGECAT 30 to 39  3 ( 60.0%)  3 ( 75.0%)  3 ( 75.0%)  2 ( 66.7%)
-3 AGECAT 40 to 49  1 ( 20.0%)  0 (  0.0%)  0 (  0.0%)  0 (  0.0%)
+     VAR        LABEL       ARM A       ARM B       ARM C       ARM D
+1 AGECAT     18 to 29  1 ( 20.0%)  1 ( 25.0%)  1 ( 25.0%)  1 ( 33.3%)
+2 AGECAT     30 to 39  3 ( 60.0%)  3 ( 75.0%)  3 ( 75.0%)  2 ( 66.7%)
+3 AGECAT     40 to 49  1 ( 20.0%)  0 (  0.0%)  0 (  0.0%)  0 (  0.0%)
+4 AGECAT        &gt;= 50  0 (  0.0%)  0 (  0.0%)  0 (  0.0%)  0 (  0.0%)
+5 AGECAT Out of range  0 (  0.0%)  0 (  0.0%)  0 (  0.0%)  0 (  0.0%)
 
 Combine blocks into final data frame
 
 datastep: columns started with 6 and ended with 6
 
-      VAR                     LABEL       ARM A       ARM B
-1     AGE                         N           5           4
-2     AGE                 Mean (SD) 34.4 (8.71) 30.0 (6.16)
-3     AGE                    Median        37.0        32.5
-4     AGE                   Q1 - Q3 37.0 - 39.0 26.0 - 34.0
-5     AGE                 Min - Max     19 - 40     21 - 34
-6  AGECAT                  18 to 29  1 ( 20.0%)  1 ( 25.0%)
-7  AGECAT                  30 to 39  3 ( 60.0%)  3 ( 75.0%)
-8  AGECAT                  40 to 49  1 ( 20.0%)  0 (  0.0%)
-9     SEX                      Male  3 ( 60.0%)  2 ( 50.0%)
-10    SEX                    Female  2 ( 40.0%)  2 ( 50.0%)
-11   RACE                     White  4 ( 80.0%)  4 (100.0%)
-12   RACE Black or African American  1 ( 20.0%)  0 (  0.0%)
-         ARM C       ARM D
-1            4           3
-2  32.0 (6.16) 32.0 (5.29)
-3         34.5        30.0
-4  28.0 - 36.0 28.0 - 38.0
-5      23 - 36     28 - 38
-6   1 ( 25.0%)  1 ( 33.3%)
-7   3 ( 75.0%)  2 ( 66.7%)
-8   0 (  0.0%)  0 (  0.0%)
-9   2 ( 50.0%)  1 ( 33.3%)
-10  2 ( 50.0%)  2 ( 66.7%)
-11  3 ( 75.0%)  2 ( 66.7%)
-12  1 ( 25.0%)  1 ( 33.3%)
+      VAR                     LABEL       ARM A       ARM B       ARM C       ARM D
+1     AGE                         N           5           4           4           3
+2     AGE                 Mean (SD) 34.4 (8.71) 30.0 (6.16) 32.0 (6.16) 32.0 (5.29)
+3     AGE                    Median        37.0        32.5        34.5        30.0
+4     AGE                   Q1 - Q3 37.0 - 39.0 26.0 - 34.0 28.0 - 36.0 28.0 - 38.0
+5     AGE                 Min - Max     19 - 40     21 - 34     23 - 36     28 - 38
+6  AGECAT                  18 to 29  1 ( 20.0%)  1 ( 25.0%)  1 ( 25.0%)  1 ( 33.3%)
+7  AGECAT                  30 to 39  3 ( 60.0%)  3 ( 75.0%)  3 ( 75.0%)  2 ( 66.7%)
+8  AGECAT                  40 to 49  1 ( 20.0%)  0 (  0.0%)  0 (  0.0%)  0 (  0.0%)
+9  AGECAT                     &gt;= 50  0 (  0.0%)  0 (  0.0%)  0 (  0.0%)  0 (  0.0%)
+10 AGECAT              Out of range  0 (  0.0%)  0 (  0.0%)  0 (  0.0%)  0 (  0.0%)
+11    SEX                      Male  3 ( 60.0%)  2 ( 50.0%)  2 ( 50.0%)  1 ( 33.3%)
+12    SEX                    Female  2 ( 40.0%)  2 ( 50.0%)  2 ( 50.0%)  2 ( 66.7%)
+13   RACE                     White  4 ( 80.0%)  4 (100.0%)  3 ( 75.0%)  2 ( 66.7%)
+14   RACE Black or African American  1 ( 20.0%)  0 (  0.0%)  1 ( 25.0%)  1 ( 33.3%)
 
 =========================================================================
 Create and print report
@@ -934,17 +869,17 @@ Create and print report
 Write out the report
 
 # A report specification: 1 pages
-- file_path: 'C:\Users\dbosa\AppData\Local\Temp\RtmpAXQUo8/ProcsDemoDM.rtf'
+- file_path: 'C:\Users\dbosa\AppData\Local\Temp\RtmpsJ3ryu/ProcsDemoDM.rtf'
 - output_type: RTF
 - units: inches
 - orientation: landscape
 - margins: top 1 bottom 1 left 1 right 1
 - line size/count: 9/36
 - page_header: left=Sponsor: Company right=Study: ABC
-- page_footer: left=Date Produced: 2024-05-28 center= right=Page [pg] of [tpg]
+- page_footer: left=Date Produced: 2026-03-08 center= right=Page [pg] of [tpg]
 - content: 
 # A table specification:
-- data: data.frame 'final' 12 rows 6 cols
+- data: data.frame 'final' 14 rows 6 cols
 - show_cols: all
 - use_attributes: all
 - title 1: 'Table 1.0'
@@ -967,9 +902,10 @@ Clean Up
 Close log
 
 =========================================================================
-Log End Time: 2024-05-28 09:09:22.306942
+Log End Time: 2026-03-08 11:35:27.81961
 Log Elapsed Time: 0 00:00:00
 =========================================================================
+
 
 </code></pre>
 </div>

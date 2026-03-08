@@ -335,7 +335,7 @@ test_that("freqplot7: One-way proc_freq with plots dotplot option works.", {
 
 test_that("freqplot8: One-way proc_freq with plots scale options work.", {
 
-  if (dev) {
+  # if (dev) {
 
     # Percent scale
     res <- proc_freq(dat, tables = "Eyes",
@@ -379,10 +379,10 @@ test_that("freqplot8: One-way proc_freq with plots scale options work.", {
     expect_equal("data.frame" %in% class(res[[1]]), TRUE)
     expect_equal("plot_spec" %in% class(res[[2]]), TRUE)
 
-  } else {
-
-    expect_equal(TRUE, TRUE)
-  }
+  # } else {
+  #
+  #   expect_equal(TRUE, TRUE)
+  # }
 
 })
 
