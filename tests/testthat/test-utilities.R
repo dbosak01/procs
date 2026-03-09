@@ -71,7 +71,7 @@ test_that("utils0: show_viewer works as expected with local path.", {
 
 # This is really an interactive test.
 # Works if html shows up in RStudio viewer.
-test_that("utils1: show_viewer works as expected with temp path.", {
+test_that("utils1: show_viewer works as expected.", {
 
   if (dev == TRUE) {
 
@@ -105,7 +105,6 @@ test_that("utils1: show_viewer works as expected with temp path.", {
 
    expect_equal(TRUE, TRUE)
   }
-
 
 })
 

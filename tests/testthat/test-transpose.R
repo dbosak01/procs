@@ -689,3 +689,28 @@ test_that("transpose29: parameter checks work.", {
 
 })
 
+test_that("transpose30: Standard Eval works on transpose", {
+
+  stats <- proc_means(datm, stats = v(n, mean, median),
+                      by = Layers,
+                      options = v(out, nonobs, notype))
+
+  stats
+
+  res1 <- data.frame(Group = "Group1", stats)
+
+  res2 <- proc_transpose(res1, copy = "Group", by = "BY",
+                         name = "STAT", id = "VAR")
+
+  res2
+
+  expect_equal(nrow(res2), 9)
+  expect_equal(ncol(res2), 6)
+  expect_equal("Group" %in% names(res2), TRUE)
+  expect_equal(names(res2), c("Group", "BY", "STAT", "Age",
+                              "PresentScore", "TasteScore"))
+
+
+})
+
+
