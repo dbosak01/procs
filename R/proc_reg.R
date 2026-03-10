@@ -272,6 +272,8 @@
 #' plots are desired.  If there are multiple model requests, you can pass a single
 #' plot request which will apply to all models, or a list of plot requests that
 #' aligns one-to-one for each model formula.
+#' @param where An expression to filter the rows before statistics are calculated.
+#' Use the \code{\link[base]{expression}} function to define the filter.
 #' @return Normally, the requested regression statistics are shown interactively
 #' in the viewer, and output results are returned as a data frame.
 #' If you request "report" datasets, they will be returned as a list.
@@ -429,11 +431,11 @@ proc_reg <- function(data,
                      #var = NULL,
                      output = NULL,
                      # freq = NULL, ?
-                     # where = NULL, ?
                      weight = NULL,
                      options = NULL,
                      titles = NULL,
-                     plots = NULL
+                     plots = NULL,
+                     where = NULL
 ) {
 
   # SAS seems to always ignore these
@@ -592,6 +594,10 @@ proc_reg <- function(data,
 
   res <- NULL
 
+  # Where subset
+  if (!is.null(where)) {
+    data <- subset(data, eval(where))
+  }
 
   # Get report if requested
   if (view == TRUE | rptflg) {

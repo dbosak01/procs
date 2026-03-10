@@ -11,7 +11,8 @@ proc_sort(
   order = "ascending",
   options = NULL,
   as.character = FALSE,
-  na.sort = NULL
+  na.sort = NULL,
+  where = NULL
 )
 }
 \arguments{
@@ -49,6 +50,9 @@ keys.  The NA sort style may be controlled globally with
 on the local parameter will override the global setting. The default
 value is NULL, which defers to the global setting.  If the global setting
 is NULL, the parameter will default to "last".}
+
+\item{where}{An expression to filter the rows before the sort takes place.
+Use the \code{\link[base]{expression}} function to define the where clause.}
 }
 \value{
 The sorted dataset.  If a data frame was input, a

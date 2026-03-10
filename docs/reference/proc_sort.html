@@ -115,7 +115,8 @@ The parameters will accept either quoted or unquoted values.</p>
 <span>  order <span class="op">=</span> <span class="st">"ascending"</span>,</span>
 <span>  options <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  as.character <span class="op">=</span> <span class="cn">FALSE</span>,</span>
-<span>  na.sort <span class="op">=</span> <span class="cn">NULL</span></span>
+<span>  na.sort <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  where <span class="op">=</span> <span class="cn">NULL</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -170,6 +171,11 @@ keys.  The NA sort style may be controlled globally with
 on the local parameter will override the global setting. The default
 value is NULL, which defers to the global setting.  If the global setting
 is NULL, the parameter will default to "last".</p></dd>
+
+
+<dt id="arg-where">where<a class="anchor" aria-label="anchor" href="#arg-where"></a></dt>
+<dd><p>An expression to filter the rows before the sort takes place.
+Use the <code><a href="https://rdrr.io/r/base/expression.html" class="external-link">expression</a></code> function to define the where clause.</p></dd>
 
 </dl></div>
     <div id="value">

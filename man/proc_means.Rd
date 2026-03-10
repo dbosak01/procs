@@ -14,7 +14,8 @@ proc_means(
   class = NULL,
   weight = NULL,
   options = NULL,
-  titles = NULL
+  titles = NULL,
+  where = NULL
 )
 }
 \arguments{
@@ -83,6 +84,10 @@ The "vardef=" option specifies the variance divisor. Note that the selected
 variance divisor can effect the calculations for several statistics.}
 
 \item{titles}{A vector of one or more titles to use for the report output.}
+
+\item{where}{An expression to filter the rows before the statistics are
+calculated. Use the \code{\link[base]{expression}} function to define
+the filter.}
 }
 \value{
 Normally, the requested summary statistics are shown interactively

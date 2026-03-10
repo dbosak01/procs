@@ -113,7 +113,8 @@ the viewer interactively and returned from the function.</p>
 <span>  class <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  weight <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  options <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  titles <span class="op">=</span> <span class="cn">NULL</span></span>
+<span>  titles <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  where <span class="op">=</span> <span class="cn">NULL</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -203,6 +204,12 @@ variance divisor can effect the calculations for several statistics.</p></dd>
 
 <dt id="arg-titles">titles<a class="anchor" aria-label="anchor" href="#arg-titles"></a></dt>
 <dd><p>A vector of one or more titles to use for the report output.</p></dd>
+
+
+<dt id="arg-where">where<a class="anchor" aria-label="anchor" href="#arg-where"></a></dt>
+<dd><p>An expression to filter the rows before the statistics are
+calculated. Use the <code><a href="https://rdrr.io/r/base/expression.html" class="external-link">expression</a></code> function to define
+the filter.</p></dd>
 
 </dl></div>
     <div id="value">

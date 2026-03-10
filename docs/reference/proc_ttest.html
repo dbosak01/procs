@@ -115,7 +115,8 @@ the viewer interactively and returned from the function.</p>
 <span>  class <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  options <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  titles <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  plots <span class="op">=</span> <span class="cn">NULL</span></span>
+<span>  plots <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  where <span class="op">=</span> <span class="cn">NULL</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -210,6 +211,11 @@ variables to test, you may pass one plot request which applies to all tests,
 or multiple plot requests in a list. In the latter case, the plot requests
 should align one to one with the test variables. The default is NULL,
 meaning no plots will be generated.</p></dd>
+
+
+<dt id="arg-where">where<a class="anchor" aria-label="anchor" href="#arg-where"></a></dt>
+<dd><p>An expression to filter the rows before the T-test takes place.
+Use the <code><a href="https://rdrr.io/r/base/expression.html" class="external-link">expression</a></code> function to define the where clause.</p></dd>
 
 </dl></div>
     <div id="value">

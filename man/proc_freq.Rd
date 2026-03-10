@@ -14,7 +14,8 @@ proc_freq(
   options = NULL,
   titles = NULL,
   order = "internal",
-  plots = NULL
+  plots = NULL,
+  where = NULL
 )
 }
 \arguments{
@@ -72,6 +73,10 @@ plots are desired.  The value TRUE will give a default frequency plot for each
 table request.  If there are multiple table requests, you can pass a single
 plot request which will apply to all tables, or a list of plot requests that
 align one-to-one for each table request.}
+
+\item{where}{An expression to filter the rows before the frequencies are
+calculated. Use the \code{\link[base]{expression}} function to define
+the filter.}
 }
 \value{
 The function will return all requested datasets by default.  This is

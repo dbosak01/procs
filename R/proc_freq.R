@@ -287,6 +287,9 @@
 #' table request.  If there are multiple table requests, you can pass a single
 #' plot request which will apply to all tables, or a list of plot requests that
 #' align one-to-one for each table request.
+#' @param where An expression to filter the rows before the frequencies are
+#' calculated. Use the \code{\link[base]{expression}} function to define
+#' the filter.
 #' @return The function will return all requested datasets by default.  This is
 #' equivalent to the \code{output = "out"} option.  To return the datasets
 #' as created for the interactive report, pass the "report" output option.  If
@@ -510,7 +513,8 @@ proc_freq <- function(data,
                       options = NULL,
                       titles = NULL,
                       order = "internal",
-                      plots = NULL
+                      plots = NULL,
+                      where = NULL
                       ) {
 
   # Deal with single value unquoted parameter values
@@ -643,6 +647,10 @@ proc_freq <- function(data,
   else
     outreq <- NULL
 
+  # Deal with where expression
+  if (!is.null(where)) {
+    data <- subset(data, eval(where))
+  }
 
   rptflg <- FALSE
   rptnm <- ""

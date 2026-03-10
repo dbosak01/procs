@@ -14,7 +14,8 @@ proc_ttest(
   class = NULL,
   options = NULL,
   titles = NULL,
-  plots = NULL
+  plots = NULL,
+  where = NULL
 )
 }
 \arguments{
@@ -88,6 +89,9 @@ variables to test, you may pass one plot request which applies to all tests,
 or multiple plot requests in a list. In the latter case, the plot requests
 should align one to one with the test variables. The default is NULL,
 meaning no plots will be generated.}
+
+\item{where}{An expression to filter the rows before the T-test takes place.
+Use the \code{\link[base]{expression}} function to define the where clause.}
 }
 \value{
 Normally, the requested T-Test statistics are shown interactively

@@ -3032,3 +3032,12 @@ test_that("freq82: Order parameter on report output works two way list option.",
 
 })
 
+test_that("freq83: where expression works as expected.", {
+
+  res <- proc_freq(dat, tables = "Hair",
+                   where = expression(Hair != "fair"))
+
+  expect_equal("fair" %in% res$CAT, FALSE)
+
+})
+

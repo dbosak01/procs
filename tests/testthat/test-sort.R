@@ -454,3 +454,14 @@ test_that("sort19: Returns empty data.frame unchanged when input has 0 rows", {
 
 })
 
+
+test_that("sort20: where expression works as expected.", {
+
+  res <- proc_sort(prt,
+                   where = expression(sex == "boys"))
+
+
+  expect_equal(all(res$sex == "boys") , TRUE)
+
+
+})

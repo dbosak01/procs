@@ -14,7 +14,8 @@ proc_reg(
   weight = NULL,
   options = NULL,
   titles = NULL,
-  plots = NULL
+  plots = NULL,
+  where = NULL
 )
 }
 \arguments{
@@ -78,6 +79,9 @@ Default is NULL, meaning no
 plots are desired.  If there are multiple model requests, you can pass a single
 plot request which will apply to all models, or a list of plot requests that
 aligns one-to-one for each model formula.}
+
+\item{where}{An expression to filter the rows before statistics are calculated.
+Use the \code{\link[base]{expression}} function to define the filter.}
 }
 \value{
 Normally, the requested regression statistics are shown interactively

@@ -869,5 +869,24 @@ test_that("reg26: Additional stats parameters.", {
   expect_equal(res8$AIC[3], 95.580809248)
 })
 
+test_that("reg27: where expression works as expected.", {
 
+
+
+  res1 <- proc_reg(cls, model = Weight ~ Height,
+                   output = "report")
+
+  expect_equal(res1$NObs$NOBS, c(19, 19))
+
+
+
+  res2 <- proc_reg(cls, model = Weight ~ Height,
+                   output = "report",
+                   where = expression(Weight < 150))
+
+  expect_equal(res2$NObs$NOBS, c(18, 18))
+
+
+
+})
 

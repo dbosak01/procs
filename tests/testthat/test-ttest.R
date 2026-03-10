@@ -1187,6 +1187,24 @@ test_that("ttest28: Data with no rows generates error.", {
 })
 
 
+test_that("ttest29: where parameter works as expected.", {
+
+  res1 <- proc_ttest(cls,
+                     var = c("Weight"),
+                     class = "Sex",
+                     options = c(alpha = 0.1))
+
+  res2 <- proc_ttest(cls,
+                     var = c("Weight"),
+                     class = "Sex",
+                     options = c(alpha = 0.1),
+                     where = expression(Weight < 150))
+
+  expect_equal(res1$Statistics$N, c(9, 10, NA, NA))
+  expect_equal(res2$Statistics$N, c(9, 9, NA, NA))
+
+})
+
 
 
 # Not sure how to do this.  Can't get lognormal dist to match SAS.

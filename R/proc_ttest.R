@@ -199,6 +199,8 @@
 #' or multiple plot requests in a list. In the latter case, the plot requests
 #' should align one to one with the test variables. The default is NULL,
 #' meaning no plots will be generated.
+#' @param where An expression to filter the rows before the T-test takes place.
+#' Use the \code{\link[base]{expression}} function to define the where clause.
 #' @return Normally, the requested T-Test statistics are shown interactively
 #' in the viewer, and output results are returned as a list of data frames.
 #' You may then access individual datasets from the list using dollar sign ($)
@@ -387,7 +389,8 @@ proc_ttest <- function(data,
                        titles = NULL,
                        # sides = NULL, ?  Maybe put in options
                        # order = NULL, ?*
-                       plots = NULL
+                       plots = NULL,
+                       where = NULL
 ) {
 
   # SAS seems to always ignore these
@@ -555,6 +558,10 @@ proc_ttest <- function(data,
 
   res <- NULL
 
+  # Where subset
+  if (!is.null(where)) {
+    data <- subset(data, eval(where))
+  }
 
   # Get report if requested
   if (view == TRUE | rptflg) {

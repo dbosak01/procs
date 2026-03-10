@@ -2176,4 +2176,17 @@ test_that("means70: Vardef options with other statistics no weight work as expec
 
 })
 
+test_that("means71: where expression works as expected.", {
 
+  res <- proc_means(datm, var = "Age")
+
+
+  expect_equal(res$N, 20)
+
+
+  res <- proc_means(datm, var = "Age",
+                    where = expression(Age < 65))
+
+  expect_equal(res$N, 19)
+
+})
