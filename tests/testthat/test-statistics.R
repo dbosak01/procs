@@ -423,26 +423,26 @@ test_that("stat15: get_clmstd() works as expected.", {
 
 
 # A test for weighted quantiles
-test_that("stat16: get_weighted_quantile() works as expected.", {
+test_that("stat16: get_quantile() works as expected.", {
 
   #Unweighted median
   x1 <- c(4, 1, 9, 3, 7)
 
-  res1 <- get_weighted_quantile(x1, probs = 0.5)
+  res1 <- get_quantile(x1, probs = 0.5)
   expect_equal(as.numeric(res1), 4)
 
   #Weighted median
   x2 <- c(1, 2, 3)
   w2 <- c(1, 1, 10)
 
-  res2 <- get_weighted_quantile(x2, probs = 0.2, w2)
+  res2 <- get_quantile(x2, probs = 0.2, w2)
   expect_equal(as.numeric(res2), 3)
 
   #Weighted quantile with ≥10 values
   x3 <- c(5, 8, 2, 9, 4, 7, 6, 3, 10, 1)
   w3 <- c(1, 2, 1, 5, 1, 1, 1, 1, 3, 1)
 
-  res3 <- get_weighted_quantile(x3, probs = 0.75, w3)
+  res3 <- get_quantile(x3, probs = 0.75, w3)
   expect_equal(as.numeric(res3), 9)
 
 })

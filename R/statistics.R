@@ -170,7 +170,7 @@ get_t <- function(x, df, wgt=NULL, y = NULL, narm = TRUE, alpha = 0.05, paired =
 }
 
 #' @noRd
-get_weighted_quantile<- function(x, probs, wgt=NULL, narm = TRUE) {
+get_quantile<- function(x, probs, wgt=NULL, narm = TRUE) {
   if (narm) {
     x <- x[!is.na(x)]
   }

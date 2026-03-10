@@ -893,7 +893,7 @@ get_summaries <- function(data, var, weight=NULL, stats, missing = FALSE,
           else if (is.null(weight))
             rw[["MEDIAN"]] <- median(var, na.rm = narm)
           else
-            rw[["MEDIAN"]] <- get_weighted_quantile(var, w, probs = c(0.5), narm = narm)
+            rw[["MEDIAN"]] <- get_quantile(var, w, probs = c(0.5), narm = narm)
         }
 
         if (st == "nobs") {
@@ -1071,108 +1071,108 @@ get_summaries <- function(data, var, weight=NULL, stats, missing = FALSE,
 
         if (st == "p1") {
 
-          rw[["P1"]] <- get_weighted_quantile(var, w, probs = c(0.01), narm = narm)
+          rw[["P1"]] <- get_quantile(var, w, probs = c(0.01), narm = narm)
 
         }
 
         if (st == "p5") {
 
-          rw[["P5"]] <- get_weighted_quantile(var, w, probs = c(0.05), narm = narm)
+          rw[["P5"]] <- get_quantile(var, w, probs = c(0.05), narm = narm)
 
         }
 
         if (st == "p10") {
 
-          rw[["P10"]] <- get_weighted_quantile(var, w, probs = c(0.1), narm = narm)
+          rw[["P10"]] <- get_quantile(var, w, probs = c(0.1), narm = narm)
 
         }
 
         if (st == "p20") {
 
-          rw[["P20"]] <- get_weighted_quantile(var, w, probs = c(0.2), narm = narm)
+          rw[["P20"]] <- get_quantile(var, w, probs = c(0.2), narm = narm)
 
         }
 
         if (st == "p25") {
 
-          rw[["P25"]] <- get_weighted_quantile(var, w, probs = c(0.25), narm = narm)
+          rw[["P25"]] <- get_quantile(var, w, probs = c(0.25), narm = narm)
 
         }
 
         if (st == "q1") {
 
-          rw[["Q1"]] <- get_weighted_quantile(var, w, probs = c(0.25), narm = narm)
+          rw[["Q1"]] <- get_quantile(var, w, probs = c(0.25), narm = narm)
 
         }
 
         if (st == "p30") {
 
-          rw[["P30"]] <- get_weighted_quantile(var, w, probs = c(0.3), narm = narm)
+          rw[["P30"]] <- get_quantile(var, w, probs = c(0.3), narm = narm)
 
         }
         if (st == "p40") {
 
-          rw[["P40"]] <- get_weighted_quantile(var, w, probs = c(0.4), narm = narm)
+          rw[["P40"]] <- get_quantile(var, w, probs = c(0.4), narm = narm)
 
         }
 
         if (st == "p50") {
 
-          rw[["P50"]] <- get_weighted_quantile(var, w, probs = c(0.5), narm = narm)
+          rw[["P50"]] <- get_quantile(var, w, probs = c(0.5), narm = narm)
 
         }
 
         if (st == "p60") {
 
-          rw[["P60"]] <- get_weighted_quantile(var, w, probs = c(0.6), narm = narm)
+          rw[["P60"]] <- get_quantile(var, w, probs = c(0.6), narm = narm)
 
         }
         if (st == "p70") {
 
-          rw[["P70"]] <- get_weighted_quantile(var, w, probs = c(0.7), narm = narm)
+          rw[["P70"]] <- get_quantile(var, w, probs = c(0.7), narm = narm)
 
         }
 
         if (st == "p75") {
 
-          rw[["P75"]] <- get_weighted_quantile(var, w, probs = c(0.75), narm = narm)
+          rw[["P75"]] <- get_quantile(var, w, probs = c(0.75), narm = narm)
 
         }
 
         if (st == "q3") {
 
-          rw[["Q3"]] <- get_weighted_quantile(var, w, probs = c(0.75), narm = narm)
+          rw[["Q3"]] <- get_quantile(var, w, probs = c(0.75), narm = narm)
 
         }
 
         if (st == "p80") {
 
-          rw[["P80"]] <- get_weighted_quantile(var, w, probs = c(0.8), narm = narm)
+          rw[["P80"]] <- get_quantile(var, w, probs = c(0.8), narm = narm)
 
         }
 
         if (st == "p90") {
 
-          rw[["P90"]] <- get_weighted_quantile(var, w, probs = c(0.9), narm = narm)
+          rw[["P90"]] <- get_quantile(var, w, probs = c(0.9), narm = narm)
 
         }
 
         if (st == "p95") {
 
-          rw[["P95"]] <- get_weighted_quantile(var, w, probs = c(0.95), narm = narm)
+          rw[["P95"]] <- get_quantile(var, w, probs = c(0.95), narm = narm)
 
         }
 
         if (st == "p99") {
 
-          rw[["P99"]] <- get_weighted_quantile(var, w, probs = c(0.99), narm = narm)
+          rw[["P99"]] <- get_quantile(var, w, probs = c(0.99), narm = narm)
 
         }
 
         if (st == "qrange") {
 
-          q25 <- get_weighted_quantile(var, w, probs = c(0.25), narm = narm)
-          q75 <- get_weighted_quantile(var, w, probs = c(0.75), narm = narm)
+          q25 <- get_quantile(var, w, probs = c(0.25), narm = narm)
+          q75 <- get_quantile(var, w, probs = c(0.75), narm = narm)
 
           rw[["QRANGE"]] <- q75 - q25
 
