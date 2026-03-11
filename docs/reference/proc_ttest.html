@@ -274,15 +274,18 @@ the appropriate T-Test results for your data based on the known normality.</p></
 
 <p>By default, <code>proc_ttest</code> results will
 be sent to the viewer as an HTML report.  This functionality
-makes it easy to get a quick analysis of your data. To turn off the
-interactive report, pass the "noprint" keyword
-to the <code>options</code> parameter.</p>
+makes it easy to get a quick analysis of your data.</p>
 <p>The <code>titles</code> parameter allows you to set one or more titles for your
 report.  Pass these titles as a vector of strings.</p>
 <p>The exact datasets used for the interactive report can be returned as a list.
 To return these datasets, pass
 the "report" keyword on the <code>output</code> parameter. This list may in
 turn be passed to <code><a href="proc_print.html">proc_print</a></code> to write the report to a file.</p>
+<p>To turn off the
+interactive report, pass the "noprint" keyword
+to the <code>options</code> parameter. If you want to turn off the interactive
+report for all procedures, set the global option
+<code>options("procs.print" = FALSE)</code>.</p>
     </div>
     <div id="dataset-output">
     <h2>Dataset Output</h2>
@@ -336,9 +339,9 @@ choice essentially sorts the class values according to however the
 class variable values were encountered in the incoming data.</p></li>
 <li><p><strong>freq</strong>: The "freq" order value means to sort the class values in
 descending frequency order.</p></li>
-<li><p><strong>formatted</strong>: If there is a format assigned to the class variable(s),
+<li><p><strong>formatted</strong>: If there is a format assigned to the class variable,
 you may also use "formatted" order.  "formatted" order means to apply the
-format to the class variable(s) and then sort the analysis according to the
+format to the class variable and then sort the analysis according to the
 order specified in the format.  The format should be a user-defined
 format as defined in the <strong>fmtr</strong> package.</p></li>
 </ul><p>Note that the <code>order</code> parameter applies to both the interactive report

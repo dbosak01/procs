@@ -1208,11 +1208,11 @@ test_that("ttest29: where parameter works as expected.", {
 test_that("ttest30: order parameter works as expected.", {
 
 
-  # Internal order
+  # Internal order - Default, also with NSE
   res1 <- proc_ttest(cls,
                      var = c("Weight"),
                      class = "Sex",
-                     order = "internal")
+                     order = internal)
 
   expect_equal(res1$Statistics$CLASS[1:2], c("F", "M"))
 
@@ -1270,6 +1270,14 @@ test_that("ttest30: order parameter works as expected.", {
 
   expect_equal(as.character(res1$Statistics$CLASS[1:2]), c("M", "F"))
 
+  #Factor order
+  res1 <- proc_ttest(dat2,
+                     var = c("Weight"),
+                     class = "Sex",
+                     order = "data")
+
+  expect_equal(as.character(res1$Statistics$CLASS[1:2]), c("M", "F"))
+
 
   # Data order two variables
   res1 <- proc_ttest(cls,
@@ -1279,6 +1287,38 @@ test_that("ttest30: order parameter works as expected.", {
 
   expect_equal(res1$Statistics$CLASS[1:2], c("M", "F"))
 
+
+  # Parameter check single value
+  expect_error(proc_ttest(cls,
+                          var = c("Weight", "Height"),
+                          class = "Sex",
+                          order = "test"))
+
+
+  # Plot check - Long label
+  res1 <- proc_ttest(dat1,
+                     var = "Weight",
+                     output = "report",
+                     plots = c("summary", "boxplot"),
+                     class = "Sex",
+                     order = "formatted")
+
+
+  expect_equal("plot_spec" %in% class(res1$Plots$summary), TRUE)
+  expect_equal("plot_spec" %in% class(res1$Plots$boxplot), TRUE)
+
+
+  # Plot check - Short label
+  res1 <- proc_ttest(cls,
+                     var = "Weight",
+                     output = "report",
+                     plots = c("summary", "boxplot"),
+                     class = "Sex",
+                     order = "internal")
+
+
+  expect_equal("plot_spec" %in% class(res1$Plots$summary), TRUE)
+  expect_equal("plot_spec" %in% class(res1$Plots$boxplot), TRUE)
 
 })
 

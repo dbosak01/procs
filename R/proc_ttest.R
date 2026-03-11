@@ -53,9 +53,7 @@
 #' @section Interactive Output:
 #' By default, \code{proc_ttest} results will
 #' be sent to the viewer as an HTML report.  This functionality
-#' makes it easy to get a quick analysis of your data. To turn off the
-#' interactive report, pass the "noprint" keyword
-#' to the \code{options} parameter.
+#' makes it easy to get a quick analysis of your data.
 #'
 #' The \code{titles} parameter allows you to set one or more titles for your
 #' report.  Pass these titles as a vector of strings.
@@ -64,6 +62,12 @@
 #' To return these datasets, pass
 #' the "report" keyword on the \code{output} parameter. This list may in
 #' turn be passed to \code{\link{proc_print}} to write the report to a file.
+#'
+#' To turn off the
+#' interactive report, pass the "noprint" keyword
+#' to the \code{options} parameter. If you want to turn off the interactive
+#' report for all procedures, set the global option
+#' \code{options("procs.print" = FALSE)}.
 #'
 #' @section Dataset Output:
 #' Dataset results are also returned from the function by default.
@@ -116,9 +120,9 @@
 #' class variable values were encountered in the incoming data.}
 #' \item{\strong{freq}: The "freq" order value means to sort the class values in
 #' descending frequency order.}
-#' \item{\strong{formatted}: If there is a format assigned to the class variable(s),
+#' \item{\strong{formatted}: If there is a format assigned to the class variable,
 #' you may also use "formatted" order.  "formatted" order means to apply the
-#' format to the class variable(s) and then sort the analysis according to the
+#' format to the class variable and then sort the analysis according to the
 #' order specified in the format.  The format should be a user-defined
 #' format as defined in the \strong{fmtr} package.}
 #' }
@@ -573,8 +577,9 @@ proc_ttest <- function(data,
   } else {
     order <- tolower(order)
 
-    if (!order %in% c("data", "internal", "formatted", "freq")) {
-      stop(paste0("Invalid value for 'order' parameter: '", order, "'\n",
+    if (any(!order %in% c("data", "internal", "formatted", "freq"))) {
+      stop(paste0("Invalid value for 'order' parameter: ",
+                  paste0("'", order, "'", collapse = ", "), "\n",
                   "Valid values are: 'internal', 'freq', 'formatted', and 'data'"))
     }
   }

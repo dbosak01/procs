@@ -158,9 +158,7 @@ the appropriate T-Test results for your data based on the known normality.
 
 By default, \code{proc_ttest} results will
 be sent to the viewer as an HTML report.  This functionality
-makes it easy to get a quick analysis of your data. To turn off the
-interactive report, pass the "noprint" keyword
-to the \code{options} parameter.
+makes it easy to get a quick analysis of your data.
 
 The \code{titles} parameter allows you to set one or more titles for your
 report.  Pass these titles as a vector of strings.
@@ -169,6 +167,12 @@ The exact datasets used for the interactive report can be returned as a list.
 To return these datasets, pass
 the "report" keyword on the \code{output} parameter. This list may in
 turn be passed to \code{\link{proc_print}} to write the report to a file.
+
+To turn off the
+interactive report, pass the "noprint" keyword
+to the \code{options} parameter. If you want to turn off the interactive
+report for all procedures, set the global option
+\code{options("procs.print" = FALSE)}.
 }
 
 \section{Dataset Output}{
@@ -228,9 +232,9 @@ choice essentially sorts the class values according to however the
 class variable values were encountered in the incoming data.}
 \item{\strong{freq}: The "freq" order value means to sort the class values in
 descending frequency order.}
-\item{\strong{formatted}: If there is a format assigned to the class variable(s),
+\item{\strong{formatted}: If there is a format assigned to the class variable,
 you may also use "formatted" order.  "formatted" order means to apply the
-format to the class variable(s) and then sort the analysis according to the
+format to the class variable and then sort the analysis according to the
 order specified in the format.  The format should be a user-defined
 format as defined in the \strong{fmtr} package.}
 }

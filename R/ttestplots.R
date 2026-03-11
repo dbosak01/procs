@@ -699,9 +699,7 @@ render_summary2 <- function(dat, var, plt, class) {
   # Output to image file
   jpeg(pth, width = wd, height = ht, quality = 100, units = "px")
 
-  # Set margins
-  par(oma = c(5, 1, 2, .75) + 0.1,
-      mar = c(0, 3, 0, 0) + 0.1)
+
 
   # Convert to data frame just in case it is a tibble
   dat <- as.data.frame(dat)
@@ -725,6 +723,17 @@ render_summary2 <- function(dat, var, plt, class) {
   dt1 <- dat[dat[[class]] == vl1, var]
   dt2 <- dat[dat[[class]] == vl2, var]
 
+  # Get number of lines needed to show labels
+  minlns <- get_line_count(as.character(cvls)) + 1
+
+  lmg <- 3
+  if (minlns > 2) {
+    lmg <- minlns + 1
+  }
+
+  # Set margins
+  par(oma = c(5, 1, 2, .75) + 0.1,
+      mar = c(.1, lmg, 0, 0) + 0.1)
 
   #******************************
   #*  Calculate scales
@@ -804,7 +813,7 @@ render_summary2 <- function(dat, var, plt, class) {
        border = "grey20",
        main = "",
        xlab = "",
-       ylab = "Percent",
+       ylab = "",
        xlim = scl,
        ylim = c(0, y_mx * 1.025),  # max(h$counts) * 1.05),
        axes = FALSE)
@@ -833,7 +842,7 @@ render_summary2 <- function(dat, var, plt, class) {
        mgp = c(3, .5, 0), tck = -0.015)
 
   # Add y label
-  mtext("Percent", side = 2, line = 2.5)
+  mtext("Percent", side = 2, line = par()$mar[2] - .75)
 
   # Add class label
   legend("topleft", legend = vl1, bty = "n",
@@ -876,7 +885,7 @@ render_summary2 <- function(dat, var, plt, class) {
        border = "grey20",
        main = "",
        xlab = "",
-       ylab = "Percent",
+       ylab = "",
        xlim = scl,
        ylim = c(0, y_mx * 1.025), # max(h$counts) * 1.05),
        axes = FALSE)
@@ -904,7 +913,7 @@ render_summary2 <- function(dat, var, plt, class) {
        mgp = c(3, .5, 0), tck = -0.015)
 
   # Add y label
-  mtext("Percent", side = 2, line = 2.5)
+  mtext("Percent", side = 2, line = par()$mar[2] - .75)
 
   # Add class label
   legend("topleft", legend = vl2, bty = "n",
@@ -953,7 +962,7 @@ render_summary2 <- function(dat, var, plt, class) {
 
   # Y Label
   mtext(class, side = 2,
-        line = 2.5,
+        line = par()$mar[2] - .75,
         font = 1)
 
   # Draw X axis
@@ -1035,7 +1044,7 @@ render_summary2 <- function(dat, var, plt, class) {
       text(bp$out2, rep(1, length(bp$out2)),
            labels = olbls2,
            cex = .9,
-           pos = 1)
+           pos = 3)
     }
   }
 
@@ -1754,9 +1763,6 @@ render_boxplot2 <- function(dat, var, plt, class) {
     stop("Something is wrong")
   }
 
-  # Set margins
-  par(mar = c(4, 4, 2, .75) + 0.1)
-
   # Prepare data
   dt <- dat[[var]]
   rwnms <- rownames(dat)
@@ -1766,6 +1772,18 @@ render_boxplot2 <- function(dat, var, plt, class) {
   nms2 <- rwnms[dat[[fvr]] == fvls[2]]
   dat1 <- dat[dat[[fvr]] == fvls[1], ]
   dat2 <- dat[dat[[fvr]] == fvls[2], ]
+
+  # Get number of lines needed to show labels
+  minlns <- get_line_count(as.character(fvls)) + 1
+
+  lmg <- 4
+  if (minlns > 2) {
+    lmg <- minlns + 2
+  }
+
+  # Set margins
+  par(mar = c(4, lmg, 2, .75) + 0.1)
+
 
   # Get x scale
   # xscl <- get_scale(dt, .05)
