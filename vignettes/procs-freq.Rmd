@@ -155,8 +155,29 @@ variable for all frequency calculations.
 ```{r eval=FALSE, echo=TRUE} 
 # Add weight variable
 proc_freq(dat, tables = y, weight = z)
+#   VAR CAT   N CNT      PCT
+# 1   y   A 506 230 45.45455
+# 2   y   B 506  77 15.21739
+# 3   y   C 506 199 39.32806
 ```
 <img src="../man/images/freqtut9.png" alt="Proc freq weighted frequencies"/>
+
+## Where Expression
+
+The `where` parameter can be used to filter the incoming data before performing
+frequency counts.  This parameter provides some convenience when manipulating
+data.  The parameter uses an `expression` function that accepts non-standard
+evaluation and any kind of R function or operator.  Here is the above analysis, 
+with some values filtered out by the `where` expression:
+```{r eval=FALSE, echo=TRUE} 
+# Add weight variable
+proc_freq(dat, tables = y, weight = z,
+          where = expression(z < 100))
+#   VAR CAT   N CNT      PCT
+# 1   y   A 406 130 32.01970
+# 2   y   B 406  77 18.96552
+# 3   y   C 406 199 49.01478
+```
 
 
 ## Statistics Options

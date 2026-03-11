@@ -444,6 +444,18 @@ res6
 # - path: 'C:\Users\dbosa\AppData\Local\Temp\RtmpOYrg1Y\file5dfa84693581d.jpg'
 # - height: 4.5
 # - width: 6
+
+# Example 7: Order and Where expression
+res7 <- proc_ttest(sleep, var = "extra", class = "group",
+                   order = "freq",
+                   where = expression(extra > 0))
+# View results
+res7$Statistics
+#     VAR      CLASS        METHOD  N MEAN      STD    STDERR MIN MAX
+# 1 extra          2          <NA>  9 2.60 1.920937 0.6403124 0.1 5.5
+# 2 extra          1          <NA>  5 2.12 1.406058 0.6288084 0.7 3.7
+# 3 extra Diff (1-2)        Pooled NA 0.48       NA 0.9850663  NA  NA
+# 4 extra Diff (1-2) Satterthwaite NA 0.48       NA 0.8974408  NA  NA
 }
 \seealso{
 \code{\link[=ttestplot]{ttestplot()}}

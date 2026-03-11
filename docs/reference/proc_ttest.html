@@ -550,7 +550,19 @@ for <code><a href="ttestplot.html">ttestplot</a></code> for more information.</p
 <span><span class="co"># # A plot specification:</span></span>
 <span><span class="co"># - path: 'C:\Users\dbosa\AppData\Local\Temp\RtmpOYrg1Y\file5dfa84693581d.jpg'</span></span>
 <span><span class="co"># - height: 4.5</span></span>
-<span><span class="co"># - width: 6</span></span></code></pre></div>
+<span><span class="co"># - width: 6</span></span>
+<span></span>
+<span><span class="co"># Example 7: Order and Where expression</span></span>
+<span><span class="va">res7</span> <span class="op">&lt;-</span> <span class="fu">proc_ttest</span><span class="op">(</span><span class="va">sleep</span>, var <span class="op">=</span> <span class="st">"extra"</span>, class <span class="op">=</span> <span class="st">"group"</span>,</span>
+<span>                   order <span class="op">=</span> <span class="st">"freq"</span>,</span>
+<span>                   where <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/expression.html" class="external-link">expression</a></span><span class="op">(</span><span class="va">extra</span> <span class="op">&gt;</span> <span class="fl">0</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co"># View results</span></span>
+<span><span class="va">res7</span><span class="op">$</span><span class="va">Statistics</span></span>
+<span><span class="co">#     VAR      CLASS        METHOD  N MEAN      STD    STDERR MIN MAX</span></span>
+<span><span class="co"># 1 extra          2          &lt;NA&gt;  9 2.60 1.920937 0.6403124 0.1 5.5</span></span>
+<span><span class="co"># 2 extra          1          &lt;NA&gt;  5 2.12 1.406058 0.6288084 0.7 3.7</span></span>
+<span><span class="co"># 3 extra Diff (1-2)        Pooled NA 0.48       NA 0.9850663  NA  NA</span></span>
+<span><span class="co"># 4 extra Diff (1-2) Satterthwaite NA 0.48       NA 0.8974408  NA  NA</span></span></code></pre></div>
     </div>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">

@@ -407,6 +407,31 @@ Also note that the "vardef" option controls which denominator is used for the
 variance (VARI) statistic.  See the `proc_means()` documentation for further
 information on this option.
 
+## Where Expression
+
+You can perform subsetting of the `proc_means()` data with a where expression.
+To add a where
+expression, pass an `expression` function to the `where` parameter. For example,
+here is the above analysis with a where expression:
+```{r eval=FALSE, echo=TRUE} 
+res <- proc_means(dat2, var = Score,
+                  class = Name,
+                  weight = Weight, 
+                  options = c("nway", vardef = "wgt"),
+                  stats = v(n, mean, median, std, min, max, vari),
+                  where = expression(Score <= 100)
+                  )
+
+# View results
+res
+#   CLASS TYPE FREQ   VAR N     MEAN MEDIAN      STD MIN MAX       VARI
+# 1 Smith    1    6 Score 6 80.15000     85 23.93799   0  93 573.027500
+# 2  Wang    1    5 Score 5 96.42105     96  2.54053  87 100   6.454294
+```
+Notice that one record has been removed from the input dataset for student "Wang".
+Also notice that the where expression is applied 
+before any statistics are calculated.
+
 ## Data Shaping
 
 The `proc_means()` function also offers options for data shaping.  The

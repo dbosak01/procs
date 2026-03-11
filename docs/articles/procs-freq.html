@@ -261,8 +261,30 @@ use the counts in the indicated variable for all frequency
 calculations.</p>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Add weight variable</span></span>
-<span><span class="fu"><a href="../reference/proc_freq.html">proc_freq</a></span><span class="op">(</span><span class="va">dat</span>, tables <span class="op">=</span> <span class="va">y</span>, weight <span class="op">=</span> <span class="va">z</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu"><a href="../reference/proc_freq.html">proc_freq</a></span><span class="op">(</span><span class="va">dat</span>, tables <span class="op">=</span> <span class="va">y</span>, weight <span class="op">=</span> <span class="va">z</span><span class="op">)</span></span>
+<span><span class="co">#   VAR CAT   N CNT      PCT</span></span>
+<span><span class="co"># 1   y   A 506 230 45.45455</span></span>
+<span><span class="co"># 2   y   B 506  77 15.21739</span></span>
+<span><span class="co"># 3   y   C 506 199 39.32806</span></span></code></pre></div>
 <p><img src="../man/images/freqtut9.png" alt="Proc freq weighted frequencies"></p>
+</div>
+<div class="section level2">
+<h2 id="where-expression">Where Expression<a class="anchor" aria-label="anchor" href="#where-expression"></a>
+</h2>
+<p>The <code>where</code> parameter can be used to filter the incoming
+data before performing frequency counts. This parameter provides some
+convenience when manipulating data. The parameter uses an
+<code>expression</code> function that accepts non-standard evaluation
+and any kind of R function or operator. Here is the above analysis, with
+some values filtered out by the <code>where</code> expression:</p>
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Add weight variable</span></span>
+<span><span class="fu"><a href="../reference/proc_freq.html">proc_freq</a></span><span class="op">(</span><span class="va">dat</span>, tables <span class="op">=</span> <span class="va">y</span>, weight <span class="op">=</span> <span class="va">z</span>,</span>
+<span>          where <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/expression.html" class="external-link">expression</a></span><span class="op">(</span><span class="va">z</span> <span class="op">&lt;</span> <span class="fl">100</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co">#   VAR CAT   N CNT      PCT</span></span>
+<span><span class="co"># 1   y   A 406 130 32.01970</span></span>
+<span><span class="co"># 2   y   B 406  77 18.96552</span></span>
+<span><span class="co"># 3   y   C 406 199 49.01478</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="statistics-options">Statistics Options<a class="anchor" aria-label="anchor" href="#statistics-options"></a>
@@ -270,11 +292,11 @@ calculations.</p>
 <p>The <code>options</code> parameter also accepts statistics options.
 For two-way tables, you may request either Chi-Square or Fisher’s tests
 of association. Here is an example of the Chi-Square test:</p>
-<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Request Chi-Square and Output datasets</span></span>
 <span><span class="va">res</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/proc_freq.html">proc_freq</a></span><span class="op">(</span><span class="va">dat</span>, tables <span class="op">=</span> <span class="va">y</span> <span class="op">*</span> <span class="va">x</span>, options <span class="op">=</span> <span class="va">chisq</span><span class="op">)</span></span></code></pre></div>
 <p><img src="../man/images/freqtut10.png" alt="chisq option"></p>
-<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># View results</span></span>
 <span><span class="va">res</span></span>
 <span><span class="co"># $`y * x`</span></span>
@@ -312,39 +334,39 @@ datasets. The name of the list item will identify the dataset. You may
 specify the names of the output tables in the list by using a named
 table request.</p>
 <p>Here is an example of the “out” option:</p>
-<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" tabindex="-1"></a><span class="co"># Request output data</span></span>
-<span id="cb13-2"><a href="#cb13-2" tabindex="-1"></a>res <span class="ot">&lt;-</span> <span class="fu">proc_freq</span>(dat, <span class="at">tables =</span> <span class="fu">v</span>(x, y, <span class="at">MyCross =</span> y <span class="sc">*</span> x), </span>
-<span id="cb13-3"><a href="#cb13-3" tabindex="-1"></a>                 <span class="at">output =</span> out)</span>
-<span id="cb13-4"><a href="#cb13-4" tabindex="-1"></a></span>
-<span id="cb13-5"><a href="#cb13-5" tabindex="-1"></a><span class="co"># View results</span></span>
-<span id="cb13-6"><a href="#cb13-6" tabindex="-1"></a>res</span>
-<span id="cb13-7"><a href="#cb13-7" tabindex="-1"></a><span class="sc">$</span>x</span>
-<span id="cb13-8"><a href="#cb13-8" tabindex="-1"></a>  VAR CAT N CNT  PCT</span>
-<span id="cb13-9"><a href="#cb13-9" tabindex="-1"></a><span class="dv">1</span>   x   <span class="dv">2</span> <span class="dv">8</span>   <span class="dv">3</span> <span class="fl">37.5</span></span>
-<span id="cb13-10"><a href="#cb13-10" tabindex="-1"></a><span class="dv">2</span>   x   <span class="dv">3</span> <span class="dv">8</span>   <span class="dv">2</span> <span class="fl">25.0</span></span>
-<span id="cb13-11"><a href="#cb13-11" tabindex="-1"></a><span class="dv">3</span>   x   <span class="dv">5</span> <span class="dv">8</span>   <span class="dv">1</span> <span class="fl">12.5</span></span>
-<span id="cb13-12"><a href="#cb13-12" tabindex="-1"></a><span class="dv">4</span>   x   <span class="dv">6</span> <span class="dv">8</span>   <span class="dv">2</span> <span class="fl">25.0</span></span>
-<span id="cb13-13"><a href="#cb13-13" tabindex="-1"></a></span>
-<span id="cb13-14"><a href="#cb13-14" tabindex="-1"></a><span class="sc">$</span>y</span>
-<span id="cb13-15"><a href="#cb13-15" tabindex="-1"></a>  VAR CAT N CNT  PCT</span>
-<span id="cb13-16"><a href="#cb13-16" tabindex="-1"></a><span class="dv">1</span>   y   A <span class="dv">8</span>   <span class="dv">3</span> <span class="fl">37.5</span></span>
-<span id="cb13-17"><a href="#cb13-17" tabindex="-1"></a><span class="dv">2</span>   y   B <span class="dv">8</span>   <span class="dv">2</span> <span class="fl">25.0</span></span>
-<span id="cb13-18"><a href="#cb13-18" tabindex="-1"></a><span class="dv">3</span>   y   C <span class="dv">8</span>   <span class="dv">3</span> <span class="fl">37.5</span></span>
-<span id="cb13-19"><a href="#cb13-19" tabindex="-1"></a></span>
-<span id="cb13-20"><a href="#cb13-20" tabindex="-1"></a><span class="sc">$</span>MyCross</span>
-<span id="cb13-21"><a href="#cb13-21" tabindex="-1"></a>   VAR1 VAR2 CAT1 CAT2 N CNT  PCT</span>
-<span id="cb13-22"><a href="#cb13-22" tabindex="-1"></a><span class="dv">1</span>     y    x    A    <span class="dv">2</span> <span class="dv">8</span>   <span class="dv">1</span> <span class="fl">12.5</span></span>
-<span id="cb13-23"><a href="#cb13-23" tabindex="-1"></a><span class="dv">2</span>     y    x    A    <span class="dv">3</span> <span class="dv">8</span>   <span class="dv">0</span>  <span class="fl">0.0</span></span>
-<span id="cb13-24"><a href="#cb13-24" tabindex="-1"></a><span class="dv">3</span>     y    x    A    <span class="dv">5</span> <span class="dv">8</span>   <span class="dv">0</span>  <span class="fl">0.0</span></span>
-<span id="cb13-25"><a href="#cb13-25" tabindex="-1"></a><span class="dv">4</span>     y    x    A    <span class="dv">6</span> <span class="dv">8</span>   <span class="dv">2</span> <span class="fl">25.0</span></span>
-<span id="cb13-26"><a href="#cb13-26" tabindex="-1"></a><span class="dv">5</span>     y    x    B    <span class="dv">2</span> <span class="dv">8</span>   <span class="dv">1</span> <span class="fl">12.5</span></span>
-<span id="cb13-27"><a href="#cb13-27" tabindex="-1"></a><span class="dv">6</span>     y    x    B    <span class="dv">3</span> <span class="dv">8</span>   <span class="dv">1</span> <span class="fl">12.5</span></span>
-<span id="cb13-28"><a href="#cb13-28" tabindex="-1"></a><span class="dv">7</span>     y    x    B    <span class="dv">5</span> <span class="dv">8</span>   <span class="dv">0</span>  <span class="fl">0.0</span></span>
-<span id="cb13-29"><a href="#cb13-29" tabindex="-1"></a><span class="dv">8</span>     y    x    B    <span class="dv">6</span> <span class="dv">8</span>   <span class="dv">0</span>  <span class="fl">0.0</span></span>
-<span id="cb13-30"><a href="#cb13-30" tabindex="-1"></a><span class="dv">9</span>     y    x    C    <span class="dv">2</span> <span class="dv">8</span>   <span class="dv">1</span> <span class="fl">12.5</span></span>
-<span id="cb13-31"><a href="#cb13-31" tabindex="-1"></a><span class="dv">10</span>    y    x    C    <span class="dv">3</span> <span class="dv">8</span>   <span class="dv">1</span> <span class="fl">12.5</span></span>
-<span id="cb13-32"><a href="#cb13-32" tabindex="-1"></a><span class="dv">11</span>    y    x    C    <span class="dv">5</span> <span class="dv">8</span>   <span class="dv">1</span> <span class="fl">12.5</span></span>
-<span id="cb13-33"><a href="#cb13-33" tabindex="-1"></a><span class="dv">12</span>    y    x    C    <span class="dv">6</span> <span class="dv">8</span>   <span class="dv">0</span>  <span class="fl">0.0</span></span></code></pre></div>
+<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" tabindex="-1"></a><span class="co"># Request output data</span></span>
+<span id="cb14-2"><a href="#cb14-2" tabindex="-1"></a>res <span class="ot">&lt;-</span> <span class="fu">proc_freq</span>(dat, <span class="at">tables =</span> <span class="fu">v</span>(x, y, <span class="at">MyCross =</span> y <span class="sc">*</span> x), </span>
+<span id="cb14-3"><a href="#cb14-3" tabindex="-1"></a>                 <span class="at">output =</span> out)</span>
+<span id="cb14-4"><a href="#cb14-4" tabindex="-1"></a></span>
+<span id="cb14-5"><a href="#cb14-5" tabindex="-1"></a><span class="co"># View results</span></span>
+<span id="cb14-6"><a href="#cb14-6" tabindex="-1"></a>res</span>
+<span id="cb14-7"><a href="#cb14-7" tabindex="-1"></a><span class="sc">$</span>x</span>
+<span id="cb14-8"><a href="#cb14-8" tabindex="-1"></a>  VAR CAT N CNT  PCT</span>
+<span id="cb14-9"><a href="#cb14-9" tabindex="-1"></a><span class="dv">1</span>   x   <span class="dv">2</span> <span class="dv">8</span>   <span class="dv">3</span> <span class="fl">37.5</span></span>
+<span id="cb14-10"><a href="#cb14-10" tabindex="-1"></a><span class="dv">2</span>   x   <span class="dv">3</span> <span class="dv">8</span>   <span class="dv">2</span> <span class="fl">25.0</span></span>
+<span id="cb14-11"><a href="#cb14-11" tabindex="-1"></a><span class="dv">3</span>   x   <span class="dv">5</span> <span class="dv">8</span>   <span class="dv">1</span> <span class="fl">12.5</span></span>
+<span id="cb14-12"><a href="#cb14-12" tabindex="-1"></a><span class="dv">4</span>   x   <span class="dv">6</span> <span class="dv">8</span>   <span class="dv">2</span> <span class="fl">25.0</span></span>
+<span id="cb14-13"><a href="#cb14-13" tabindex="-1"></a></span>
+<span id="cb14-14"><a href="#cb14-14" tabindex="-1"></a><span class="sc">$</span>y</span>
+<span id="cb14-15"><a href="#cb14-15" tabindex="-1"></a>  VAR CAT N CNT  PCT</span>
+<span id="cb14-16"><a href="#cb14-16" tabindex="-1"></a><span class="dv">1</span>   y   A <span class="dv">8</span>   <span class="dv">3</span> <span class="fl">37.5</span></span>
+<span id="cb14-17"><a href="#cb14-17" tabindex="-1"></a><span class="dv">2</span>   y   B <span class="dv">8</span>   <span class="dv">2</span> <span class="fl">25.0</span></span>
+<span id="cb14-18"><a href="#cb14-18" tabindex="-1"></a><span class="dv">3</span>   y   C <span class="dv">8</span>   <span class="dv">3</span> <span class="fl">37.5</span></span>
+<span id="cb14-19"><a href="#cb14-19" tabindex="-1"></a></span>
+<span id="cb14-20"><a href="#cb14-20" tabindex="-1"></a><span class="sc">$</span>MyCross</span>
+<span id="cb14-21"><a href="#cb14-21" tabindex="-1"></a>   VAR1 VAR2 CAT1 CAT2 N CNT  PCT</span>
+<span id="cb14-22"><a href="#cb14-22" tabindex="-1"></a><span class="dv">1</span>     y    x    A    <span class="dv">2</span> <span class="dv">8</span>   <span class="dv">1</span> <span class="fl">12.5</span></span>
+<span id="cb14-23"><a href="#cb14-23" tabindex="-1"></a><span class="dv">2</span>     y    x    A    <span class="dv">3</span> <span class="dv">8</span>   <span class="dv">0</span>  <span class="fl">0.0</span></span>
+<span id="cb14-24"><a href="#cb14-24" tabindex="-1"></a><span class="dv">3</span>     y    x    A    <span class="dv">5</span> <span class="dv">8</span>   <span class="dv">0</span>  <span class="fl">0.0</span></span>
+<span id="cb14-25"><a href="#cb14-25" tabindex="-1"></a><span class="dv">4</span>     y    x    A    <span class="dv">6</span> <span class="dv">8</span>   <span class="dv">2</span> <span class="fl">25.0</span></span>
+<span id="cb14-26"><a href="#cb14-26" tabindex="-1"></a><span class="dv">5</span>     y    x    B    <span class="dv">2</span> <span class="dv">8</span>   <span class="dv">1</span> <span class="fl">12.5</span></span>
+<span id="cb14-27"><a href="#cb14-27" tabindex="-1"></a><span class="dv">6</span>     y    x    B    <span class="dv">3</span> <span class="dv">8</span>   <span class="dv">1</span> <span class="fl">12.5</span></span>
+<span id="cb14-28"><a href="#cb14-28" tabindex="-1"></a><span class="dv">7</span>     y    x    B    <span class="dv">5</span> <span class="dv">8</span>   <span class="dv">0</span>  <span class="fl">0.0</span></span>
+<span id="cb14-29"><a href="#cb14-29" tabindex="-1"></a><span class="dv">8</span>     y    x    B    <span class="dv">6</span> <span class="dv">8</span>   <span class="dv">0</span>  <span class="fl">0.0</span></span>
+<span id="cb14-30"><a href="#cb14-30" tabindex="-1"></a><span class="dv">9</span>     y    x    C    <span class="dv">2</span> <span class="dv">8</span>   <span class="dv">1</span> <span class="fl">12.5</span></span>
+<span id="cb14-31"><a href="#cb14-31" tabindex="-1"></a><span class="dv">10</span>    y    x    C    <span class="dv">3</span> <span class="dv">8</span>   <span class="dv">1</span> <span class="fl">12.5</span></span>
+<span id="cb14-32"><a href="#cb14-32" tabindex="-1"></a><span class="dv">11</span>    y    x    C    <span class="dv">5</span> <span class="dv">8</span>   <span class="dv">1</span> <span class="fl">12.5</span></span>
+<span id="cb14-33"><a href="#cb14-33" tabindex="-1"></a><span class="dv">12</span>    y    x    C    <span class="dv">6</span> <span class="dv">8</span>   <span class="dv">0</span>  <span class="fl">0.0</span></span></code></pre></div>
 <p>Notice that the way output datasets are requested from the
 <code><a href="../reference/proc_freq.html">proc_freq()</a></code> function is much simpler than the corresponding
 mechanism in SAS®. With <code><a href="../reference/proc_freq.html">proc_freq()</a></code>, by default, all
@@ -393,7 +415,7 @@ shaping data: “wide”, “long”, and “stacked”. These options control h
 the output data is organized. The options are also passed on the
 <code>output</code> parameter. The shaping options are best illustrated
 by an example:</p>
-<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Shape wide</span></span>
 <span><span class="va">res1</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/proc_freq.html">proc_freq</a></span><span class="op">(</span><span class="va">dat</span>, tables <span class="op">=</span> <span class="va">y</span>, </span>
 <span>                  output <span class="op">=</span> <span class="va">wide</span><span class="op">)</span></span>
