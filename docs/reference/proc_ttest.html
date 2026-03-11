@@ -115,6 +115,7 @@ the viewer interactively and returned from the function.</p>
 <span>  class <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  options <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  titles <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  order <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  plots <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  where <span class="op">=</span> <span class="cn">NULL</span></span>
 <span><span class="op">)</span></span></code></pre></div>
@@ -194,6 +195,12 @@ hypothesis testing.  The "noprint" option turns off the interactive report.</p><
 
 <dt id="arg-titles">titles<a class="anchor" aria-label="anchor" href="#arg-titles"></a></dt>
 <dd><p>A vector of one or more titles to use for the report output.</p></dd>
+
+
+<dt id="arg-order">order<a class="anchor" aria-label="anchor" href="#arg-order"></a></dt>
+<dd><p>Determines the order of class variable values in the analysis.
+Valid values are "data", "formatted", "freq", and "internal". Default is
+NULL, which corresponds to "internal".</p></dd>
 
 
 <dt id="arg-plots">plots<a class="anchor" aria-label="anchor" href="#arg-plots"></a></dt>
@@ -313,6 +320,30 @@ option will inhibit printing.  You may inhibit printing globally by
 setting the package print option to false:
 <code>options("procs.print" = FALSE)</code>.</p></li>
 </ul></div>
+    <div id="class-order">
+    <h2>Class Order</h2>
+
+
+<p>For analysis of two independent samples, the order of the class values can effect
+the statistical results. The <code>order</code> parameter allows you to control
+that order. The parameter takes four possible values:</p><ul><li><p><strong>internal</strong>: The internal or "natural" order of the class values.
+For character variables, "internal" means alphabetical order.  For factors,
+"internal" means by order of the levels.</p></li>
+<li><p><strong>data</strong>: "data" order is different from "internal" order.  "data"
+order means the order that the data appears in the incoming data frame, which
+may or may not be the same as the "internal" order. This
+choice essentially sorts the class values according to however the
+class variable values were encountered in the incoming data.</p></li>
+<li><p><strong>freq</strong>: The "freq" order value means to sort the class values in
+descending frequency order.</p></li>
+<li><p><strong>formatted</strong>: If there is a format assigned to the class variable(s),
+you may also use "formatted" order.  "formatted" order means to apply the
+format to the class variable(s) and then sort the analysis according to the
+order specified in the format.  The format should be a user-defined
+format as defined in the <strong>fmtr</strong> package.</p></li>
+</ul><p>Note that the <code>order</code> parameter applies to both the interactive report
+and the data frame output.</p>
+    </div>
     <div id="data-shaping">
     <h2>Data Shaping</h2>
 

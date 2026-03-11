@@ -1098,6 +1098,44 @@ get_valid_obs <- function(data, formula) {
 
 }
 
+# Remove factors from output data frames.
+# The factors are added by the order parameter to sort the class
+# values correctly.
+#' @noRd
+clear_factors <- function(res, class) {
+
+  # Clear out factors from output datasets
+  if (!is.null(class)) {
+    if (length(class) > 1) {
+      cvect <- paste0("CLASS", seq(1, length(class)))
+    } else {
+      cvect <- "CLASS"
+    }
+
+    for (cnm in cvect) {
+      for (nm in names(res)) {
+        if (grepl("Statistics", nm, fixed = TRUE)) {
+          if (is.factor(res[[nm]][[cnm]])) {
+            lbl <- attr(res[[nm]][[cnm]], "label")
+            res[[nm]][[cnm]] <- as.character(res[[nm]][[cnm]])
+            attr(res[[nm]][[cnm]], "label") <- lbl
+          }
+        }
+        if (grepl("ConfLimits", nm, fixed = TRUE)) {
+          if (is.factor(res[[nm]][[cnm]])) {
+            lbl <- attr(res[[nm]][[cnm]], "label")
+            res[[nm]][[cnm]] <- as.character(res[[nm]][[cnm]])
+            attr(res[[nm]][[cnm]], "label") <- lbl
+          }
+        }
+      }
+    }
+  }
+
+  return(res)
+
+}
+
 
 # Binning Experiments -----------------------------------------------------
 

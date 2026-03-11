@@ -101,6 +101,29 @@
 #' \code{options("procs.print" = FALSE)}.
 #' }
 #' }
+#' @section Class Order:
+#' For analysis of two independent samples, the order of the class values can effect
+#' the statistical results. The \code{order} parameter allows you to control
+#' that order. The parameter takes four possible values:
+#' \itemize{
+#' \item{\strong{internal}: The internal or "natural" order of the class values.
+#' For character variables, "internal" means alphabetical order.  For factors,
+#' "internal" means by order of the levels.}
+#' \item{\strong{data}: "data" order is different from "internal" order.  "data"
+#' order means the order that the data appears in the incoming data frame, which
+#' may or may not be the same as the "internal" order. This
+#' choice essentially sorts the class values according to however the
+#' class variable values were encountered in the incoming data.}
+#' \item{\strong{freq}: The "freq" order value means to sort the class values in
+#' descending frequency order.}
+#' \item{\strong{formatted}: If there is a format assigned to the class variable(s),
+#' you may also use "formatted" order.  "formatted" order means to apply the
+#' format to the class variable(s) and then sort the analysis according to the
+#' order specified in the format.  The format should be a user-defined
+#' format as defined in the \strong{fmtr} package.}
+#' }
+#' Note that the \code{order} parameter applies to both the interactive report
+#' and the data frame output.
 #' @section Data Shaping:
 #' The output datasets produced by the function can be shaped
 #' in different ways. These shaping options allow you to decide whether the
@@ -185,6 +208,9 @@
 #' The "h0 = " option sets the baseline hypothesis value for single-variable
 #' hypothesis testing.  The "noprint" option turns off the interactive report.
 #' @param titles A vector of one or more titles to use for the report output.
+#' @param order Determines the order of class variable values in the analysis.
+#' Valid values are "data", "formatted", "freq", and "internal". Default is
+#' NULL, which corresponds to "internal".
 #' @param plots A plot request. Valid values are NULL, TRUE, "all", a vector
 #' of plot names, or a call to \code{\link{ttestplot}}.  The value TRUE will
 #' give you a default set of
@@ -387,8 +413,7 @@ proc_ttest <- function(data,
                        # weight = NULL, ?
                        options = NULL,
                        titles = NULL,
-                       # sides = NULL, ?  Maybe put in options
-                       # order = NULL, ?*
+                       order = NULL,
                        plots = NULL,
                        where = NULL
 ) {
@@ -424,6 +449,9 @@ proc_ttest <- function(data,
   paired <- tryCatch({if (typeof(paired) %in% c("character", "NULL")) paired else opaired},
                      error = function(cond) {opaired})
 
+  rout <- deparse(substitute(order, env = environment()))
+  order <- tryCatch({if (typeof(order) %in% c("character", "NULL")) order else rout},
+                    error = function(cond) {rout})
 
   # Parameter checks
   if (!"data.frame" %in% class(data)) {
@@ -539,6 +567,18 @@ proc_ttest <- function(data,
     }
   }
 
+  # Default order parameter
+  if (is.null(order)) {
+    order <- "internal"
+  } else {
+    order <- tolower(order)
+
+    if (!order %in% c("data", "internal", "formatted", "freq")) {
+      stop(paste0("Invalid value for 'order' parameter: '", order, "'\n",
+                  "Valid values are: 'internal', 'freq', 'formatted', and 'data'"))
+    }
+  }
+
 
   rptflg <- FALSE
   rptnm <- ""
@@ -563,6 +603,40 @@ proc_ttest <- function(data,
     data <- subset(data, eval(where))
   }
 
+  # Deal with order
+  if (!is.null(order) & !is.null(class)) {
+    if (length(order) != length(class)) {
+      if (length(order) == 1) {
+
+        order <- rep(order, length(class))
+      } else {
+        stop("Order keywords are misaligned with the number of class variables.")
+      }
+    }
+
+    for (idx in seq_len(length(class))) {
+      cl <- class[idx]
+      odr <- order[idx]
+
+      if (odr == "data") {
+         data[[cl]] <- factor(data[[cl]], unique(data[[cl]]))
+      } else if (odr == "formatted") {
+        fmt <- attr(data[[cl]], "format")
+
+        if (!is.null(fmt)) {
+          attr(fmt, "as.factor") <- TRUE
+          data[[cl]] <- fapply(data[[cl]], fmt)
+        }
+      } else if (odr == "freq") {
+        ftbl <- table(data[[cl]])
+        ftbl <- sort(ftbl, decreasing = TRUE)
+        data[[cl]] <- factor(data[[cl]], names(ftbl))
+      } else {
+        # Do nothing.  Internal is default.
+      }
+    }
+  }
+
   # Get report if requested
   if (view == TRUE | rptflg) {
     rptres <- gen_report_ttest(data, by = by, var = var, class = class,
@@ -581,6 +655,11 @@ proc_ttest <- function(data,
                             output = output,
                             opts = options
     )
+
+    # Clear out factors from output datasets
+    if (!is.null(class)) {
+      res <- clear_factors(res, class)
+    }
   }
 
   # Add report to result if requested
@@ -595,7 +674,7 @@ proc_ttest <- function(data,
 
   }
 
-  # Log the means function
+  # Log the ttest function
   log_ttest(data,
             by = by,
             class = class,
@@ -1221,7 +1300,8 @@ gen_report_ttest <- function(data,
                              output = NULL,
                              view = TRUE,
                              titles = NULL,
-                             plots = NULL) {
+                             plots = NULL,
+                             order = NULL) {
 
   # browser()
   spcs <- get_output_specs_ttest(data, var, paired, class,
@@ -1404,6 +1484,11 @@ gen_report_ttest <- function(data,
           }
         }
 
+      }
+
+      # Clear out factors from report datasets
+      if (!is.null(class)) {
+        res <- clear_factors(res, class)
       }
 
       byres[[bynm]] <- res

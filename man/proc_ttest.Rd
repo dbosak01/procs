@@ -14,6 +14,7 @@ proc_ttest(
   class = NULL,
   options = NULL,
   titles = NULL,
+  order = NULL,
   plots = NULL,
   where = NULL
 )
@@ -74,6 +75,10 @@ The "h0 = " option sets the baseline hypothesis value for single-variable
 hypothesis testing.  The "noprint" option turns off the interactive report.}
 
 \item{titles}{A vector of one or more titles to use for the report output.}
+
+\item{order}{Determines the order of class variable values in the analysis.
+Valid values are "data", "formatted", "freq", and "internal". Default is
+NULL, which corresponds to "internal".}
 
 \item{plots}{A plot request. Valid values are NULL, TRUE, "all", a vector
 of plot names, or a call to \code{\link{ttestplot}}.  The value TRUE will
@@ -205,6 +210,32 @@ setting the package print option to false:
 \code{options("procs.print" = FALSE)}.
 }
 }
+}
+
+\section{Class Order}{
+
+For analysis of two independent samples, the order of the class values can effect
+the statistical results. The \code{order} parameter allows you to control
+that order. The parameter takes four possible values:
+\itemize{
+\item{\strong{internal}: The internal or "natural" order of the class values.
+For character variables, "internal" means alphabetical order.  For factors,
+"internal" means by order of the levels.}
+\item{\strong{data}: "data" order is different from "internal" order.  "data"
+order means the order that the data appears in the incoming data frame, which
+may or may not be the same as the "internal" order. This
+choice essentially sorts the class values according to however the
+class variable values were encountered in the incoming data.}
+\item{\strong{freq}: The "freq" order value means to sort the class values in
+descending frequency order.}
+\item{\strong{formatted}: If there is a format assigned to the class variable(s),
+you may also use "formatted" order.  "formatted" order means to apply the
+format to the class variable(s) and then sort the analysis according to the
+order specified in the format.  The format should be a user-defined
+format as defined in the \strong{fmtr} package.}
+}
+Note that the \code{order} parameter applies to both the interactive report
+and the data frame output.
 }
 
 \section{Data Shaping}{

@@ -169,7 +169,6 @@ freqplot <- function(type = "barchart", orient = "vertical", scale = "freq",
                      error = function(cond) {ogroupby})
 
   if (length(type) > 1) {
-
     stop("Parmeter 'type' is invalid.  Value must be a single character string.")
   }
 
