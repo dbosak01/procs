@@ -170,9 +170,7 @@
 ttestplot <- function(type = "default", panel = TRUE, showh0 = FALSE, label = TRUE, id = NULL) {
 
   # Non-standard evaluation
-  otype <- deparse(substitute(type, env = environment()))
-  type <- tryCatch({if (typeof(type) %in% c("character", "NULL")) type else otype},
-                   error = function(cond) {otype})
+  type <- resolve_arg(type)
 
 
   # agreement, boxplot, histogram, interval, profiles, qqplot, summary

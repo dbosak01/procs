@@ -172,53 +172,31 @@ proc_transpose <- function(data,
   }
 
   # Deal with single value unquoted parameter values
-  oby <- deparse(substitute(by, env = environment()))
-  by <- tryCatch({if (typeof(by) %in% c("character", "NULL")) by else oby},
-                 error = function(cond) {oby})
+  by <- resolve_arg(by)
 
   # Deal with single value unquoted parameter values
-  ovar <- deparse(substitute(var, env = environment()))
-  var <- tryCatch({if (typeof(var) %in% c("character", "NULL")) var else ovar},
-                 error = function(cond) {ovar})
+  var <- resolve_arg(var)
 
   # Deal with single value unquoted parameter values
-  oid <- deparse(substitute(id, env = environment()))
-  id <- tryCatch({if (typeof(id) %in% c("character", "NULL")) id else oid},
-                 error = function(cond) {oid})
+  id <- resolve_arg(id)
 
   # Deal with single value unquoted parameter values
-  oidlabel <- deparse(substitute(idlabel, env = environment()))
-  idlabel <- tryCatch({if (typeof(idlabel) %in% c("character", "NULL")) idlabel else oidlabel},
-                 error = function(cond) {oidlabel})
+  idlabel <- resolve_arg(idlabel)
 
   # Deal with single value unquoted parameter values
-  ocopy <- deparse(substitute(copy, env = environment()))
-  copy <- tryCatch({if (typeof(copy) %in% c("character", "NULL")) copy else ocopy},
-                 error = function(cond) {ocopy})
+  copy <- resolve_arg(copy)
 
-  oname <- deparse(substitute(name, env = environment()))
-  name <- tryCatch({if (typeof(name) %in% c("character", "NULL")) name else oname},
-                   error = function(cond) {oname})
+  name <- resolve_arg(name)
 
-  onamelabel <- deparse(substitute(namelabel, env = environment()))
-  namelabel <- tryCatch({if (typeof(namelabel) %in% c("character", "NULL")) namelabel else onamelabel},
-                   error = function(cond) {onamelabel})
+  namelabel <- resolve_arg(namelabel)
 
-  oprefix <- deparse(substitute(prefix, env = environment()))
-  prefix <- tryCatch({if (typeof(prefix) %in% c("character", "NULL")) prefix else oprefix},
-                        error = function(cond) {oprefix})
+  prefix <- resolve_arg(prefix)
 
-  osuffix <- deparse(substitute(suffix, env = environment()))
-  suffix <- tryCatch({if (typeof(suffix) %in% c("character", "NULL")) suffix else osuffix},
-                     error = function(cond) {osuffix})
+  suffix <- resolve_arg(suffix)
 
-  odelimiter <- deparse(substitute(delimiter, env = environment()))
-  delimiter <- tryCatch({if (typeof(delimiter) %in% c("character", "NULL")) delimiter else odelimiter},
-                     error = function(cond) {odelimiter})
+  delimiter <- resolve_arg(delimiter)
 
-  ooptions <- deparse(substitute(options, env = environment()))
-  options <- tryCatch({if (typeof(options) %in% c("character", "NULL")) options else ooptions},
-                        error = function(cond) {ooptions})
+  options <- resolve_arg(options)
 
   # Parameter checks
 
@@ -497,8 +475,7 @@ proc_transpose <- function(data,
 
    # Where
    if (!is.null(where)) {
-     res <- subset(res, eval(where))
-
+     res <- subset_data(res, where)
    }
 
    if ("noname" %in% options) {

@@ -443,26 +443,16 @@ proc_reg <- function(data,
   missing <- FALSE
 
   # Deal with single value unquoted parameter values
-  oweight <- deparse(substitute(weight, env = environment()))
-  weight <- tryCatch({if (typeof(weight) %in% c("character", "NULL")) weight else oweight},
-                    error = function(cond) {oweight})
+  weight <- resolve_arg(weight)
 
   # Deal with single value unquoted parameter values
-  oby <- deparse(substitute(by, env = environment()))
-  by <- tryCatch({if (typeof(by) %in% c("character", "NULL")) by else oby},
-                 error = function(cond) {oby})
+  by <- resolve_arg(by)
 
-  ostats <- deparse(substitute(stats, env = environment()))
-  stats <- tryCatch({if (typeof(stats) %in% c("character", "NULL")) stats else ostats},
-                  error = function(cond) {ostats})
+  stats <- resolve_arg(stats)
 
-  oopt <- deparse(substitute(options, env = environment()))
-  options <- tryCatch({if (typeof(options) %in% c("integer", "double", "character", "NULL")) options else oopt},
-                      error = function(cond) {oopt})
+  options <- resolve_arg(options, type = c("integer", "double", "character", "NULL"))
 
-  oout <- deparse(substitute(output, env = environment()))
-  output <- tryCatch({if (typeof(output) %in% c("character", "NULL")) output else oout},
-                     error = function(cond) {oout})
+  output <- resolve_arg(output)
 
 
   # Parameter checks
@@ -596,7 +586,7 @@ proc_reg <- function(data,
 
   # Where subset
   if (!is.null(where)) {
-    data <- subset(data, eval(where))
+    data <- subset_data(data, where)
   }
 
   # Get report if requested
