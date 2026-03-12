@@ -260,17 +260,11 @@ regplot <- function(type = c("diagnostics", "residuals", "fitplot"), panel = TRU
 
   # Non-standard evaluation
 
-  otype <- deparse(substitute(type, env = environment()))
-  type <- tryCatch({if (typeof(type) %in% c("character", "NULL")) type else otype},
-                   error = function(cond) {otype})
+  type <- resolve_arg(type)
 
-  ostats <- deparse(substitute(stats, env = environment()))
-  stats <- tryCatch({if (typeof(stats) %in% c("character", "NULL")) stats else ostats},
-                     error = function(cond) {ostats})
+  stats <- resolve_arg(stats)
 
-  oid <- deparse(substitute(id, env = environment()))
-  id <- tryCatch({if (typeof(id) %in% c("character", "NULL")) id else oid},
-                    error = function(cond) {oid})
+  id <- resolve_arg(id)
 
 
   # Parameter Checks
