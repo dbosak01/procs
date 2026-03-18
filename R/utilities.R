@@ -1517,5 +1517,73 @@ force_width <- function(str, wdth) {
   return(ret)
 }
 
+# Sassy-r NSE
+#' @noRd
+resolve_arg <- function(arg, type = c("character", "NULL")) {
+
+  call <- match.call()
+  if (!"arg" %in% names(call)) {
+    stop("Argument 'arg' is missing.", call. =  FALSE)
+  }
+
+  if (!is.character(type)) {
+    stop("'type' must be a character vector.", call. = FALSE)
+  }
+
+  valid_modes <- c("character", "double", "integer", "NULL")
+
+  if (!all(type %in% valid_modes)) {
+    stop("'type' must contain valid mode values.", call. = FALSE)
+  }
+
+  expr <- eval.parent(substitute(substitute(arg)))
+  expr_str <- paste(deparse(expr, width.cutoff = 500L), collapse = " ")
+
+  value <- tryCatch(arg, error = function(e) e)
+
+  res <- if (!inherits(value, "error") && typeof(value) %in% type) value else expr_str
+
+  return(res)
+}
+
+# Subset data
+#' @noRd
+subset_data <- function(data, where = NULL) {
+
+  if (!is.data.frame(data)) {
+    stop("'data' must be a data.frame.", call. = FALSE)
+  }
+
+  if (is.null(where)) {
+    return(data)
+  }
+
+  if (!is.expression(where)) {
+    stop("'where' must be an expression.", call. = FALSE)
+  }
+
+  if (length(where) != 1L) {
+    stop("'where' must be an expression of length 1.", call. = FALSE)
+  }
+
+  rows <- tryCatch(
+    eval(where, envir = data),
+    error = function(e)
+      stop("Error evaluating 'where': ", e$message, call. = FALSE)
+  )
+
+  if (!is.logical(rows)) {
+    stop("'where' must evaluate to a logical vector.", call. = FALSE)
+  }
+
+  if (length(rows) != nrow(data)) {
+    stop("'where' must evaluate to a logical vector with length equal to nrow(data).", call. = FALSE)
+  }
+
+  res <- copy.attributes(data, data[rows, , drop = FALSE])
+
+  return(res)
+}
+
 
 

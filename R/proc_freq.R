@@ -517,31 +517,12 @@ proc_freq <- function(data,
                       where = NULL
                       ) {
 
-  # Deal with single value unquoted parameter values
-  oby <- deparse(substitute(by, env = environment()))
-  by <- tryCatch({if (typeof(by) %in% c("character", "NULL")) by else oby},
-                 error = function(cond) {oby})
-
-  otables <- deparse(substitute(tables, env = environment()))
-  tables <- tryCatch({if (typeof(tables) %in% c("character", "NULL")) tables else otables},
-                  error = function(cond) {otables})
-
-  owgt <- deparse(substitute(weight, env = environment()))
-  weight <- tryCatch({if (typeof(weight) %in% c("character", "NULL")) weight else owgt},
-                 error = function(cond) {owgt})
-
-  oopt <- deparse(substitute(options, env = environment()))
-  options <- tryCatch({if (typeof(options) %in% c("character", "NULL")) options else oopt},
-                     error = function(cond) {oopt})
-
-  oout <- deparse(substitute(output, env = environment()))
-  output <- tryCatch({if (typeof(output) %in% c("character", "NULL")) output else oout},
-                      error = function(cond) {oout})
-
-  rout <- deparse(substitute(order, env = environment()))
-  order <- tryCatch({if (typeof(order) %in% c("character", "NULL")) order else rout},
-                     error = function(cond) {rout})
-
+  by <- resolve_arg(by)
+  tables <- resolve_arg(tables)
+  weight <- resolve_arg(weight)
+  options <- resolve_arg(options)
+  output <- resolve_arg(output)
+  order <- resolve_arg(order)
 
   # Parameter checks
 
@@ -649,7 +630,7 @@ proc_freq <- function(data,
 
   # Deal with where expression
   if (!is.null(where)) {
-    data <- subset(data, eval(where))
+    data <- subset_data(data, where)
   }
 
   rptflg <- FALSE

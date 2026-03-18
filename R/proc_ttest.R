@@ -440,34 +440,20 @@ proc_ttest <- function(data,
 
 
   # Deal with single value unquoted parameter values
-  oby <- deparse(substitute(by, env = environment()))
-  by <- tryCatch({if (typeof(by) %in% c("character", "NULL")) by else oby},
-                 error = function(cond) {oby})
+  by <- resolve_arg(by)
 
   # Deal with single value unquoted parameter values
-  oclass <- deparse(substitute(class, env = environment()))
-  class <- tryCatch({if (typeof(class) %in% c("character", "NULL")) class else oclass},
-                    error = function(cond) {oclass})
+  class <- resolve_arg(class)
 
-  ovar <- deparse(substitute(var, env = environment()))
-  var <- tryCatch({if (typeof(var) %in% c("character", "NULL")) var else ovar},
-                  error = function(cond) {ovar})
+  var <- resolve_arg(var)
 
-  oopt <- deparse(substitute(options, env = environment()))
-  options <- tryCatch({if (typeof(options) %in% c("integer", "double", "character", "NULL")) options else oopt},
-                      error = function(cond) {oopt})
+  options <- resolve_arg(options, type = c("character", "double", "integer", "NULL"))
 
-  oout <- deparse(substitute(output, env = environment()))
-  output <- tryCatch({if (typeof(output) %in% c("character", "NULL")) output else oout},
-                     error = function(cond) {oout})
+  output <- resolve_arg(output)
 
-  opaired <- deparse(substitute(paired, env = environment()))
-  paired <- tryCatch({if (typeof(paired) %in% c("character", "NULL")) paired else opaired},
-                     error = function(cond) {opaired})
+  paired <- resolve_arg(paired)
 
-  rout <- deparse(substitute(order, env = environment()))
-  order <- tryCatch({if (typeof(order) %in% c("character", "NULL")) order else rout},
-                    error = function(cond) {rout})
+  order <- resolve_arg(order)
 
   # Parameter checks
   if (!"data.frame" %in% class(data)) {
@@ -617,7 +603,7 @@ proc_ttest <- function(data,
 
   # Where subset
   if (!is.null(where)) {
-    data <- subset(data, eval(where))
+    data <- subset_data(data, where)
   }
 
   # Deal with order

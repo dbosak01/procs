@@ -888,3 +888,347 @@ test_that("utils29: get_line_count() works as expected.", {
 
 })
 
+
+test_that("resolve_arg1: errors when arg is missing in the resolve_arg call itself", {
+  caller <- function() {
+    resolve_arg()
+  }
+
+  expect_error(
+    caller(),
+    "Argument 'arg' is missing.",
+    fixed = TRUE
+  )
+})
+
+test_that("resolve_arg2: errors when type is not a character vector", {
+  caller <- function(x) {
+    resolve_arg(x, type = 1)
+  }
+
+  expect_error(
+    caller("A"),
+    "'type' must be a character vector.",
+    fixed = TRUE
+  )
+})
+
+test_that("resolve_arg3: errors when type contains an invalid mode value", {
+  caller <- function(x) {
+    resolve_arg(x, type = c("character", "logical"))
+  }
+
+  expect_error(
+    caller("A"),
+    "'type' must contain valid mode values.",
+    fixed = TRUE
+  )
+})
+
+test_that("resolve_arg4: errors when type consists entirely of invalid mode values", {
+  caller <- function(x) {
+    resolve_arg(x, type = c("logical", "list"))
+  }
+
+  expect_error(
+    caller("A"),
+    "'type' must contain valid mode values.",
+    fixed = TRUE
+  )
+})
+
+test_that("resolve_arg5: returns character input unchanged when character is allowed", {
+  caller <- function(x) {
+    resolve_arg(x)
+  }
+
+  expect_identical(caller("USUBJID"), "USUBJID")
+  expect_identical(caller(c("A", "B")), c("A", "B"))
+})
+
+test_that("resolve_arg6: returns NULL unchanged when NULL is allowed", {
+  caller <- function(x = NULL) {
+    resolve_arg(x)
+  }
+
+  expect_null(caller())
+  expect_null(caller(NULL))
+})
+
+test_that("resolve_arg7: captures unquoted name as character string", {
+  caller <- function(x) {
+    resolve_arg(x)
+  }
+
+  expect_identical(caller(USUBJID), "USUBJID")
+})
+
+test_that("resolve_arg8: captures unevaluated expression as a single string", {
+  caller <- function(x) {
+    resolve_arg(x)
+  }
+
+  expect_identical(caller(AGE > 18), "AGE > 18")
+  expect_identical(caller(A + B * C), "A + B * C")
+})
+
+test_that("resolve_arg9: returns evaluated double when double is allowed", {
+  caller <- function(x) {
+    resolve_arg(x, type = "double")
+  }
+
+  expect_identical(caller(1.5), 1.5)
+})
+
+test_that("resolve_arg10: returns evaluated integer when integer is allowed", {
+  caller <- function(x) {
+    resolve_arg(x, type = "integer")
+  }
+
+  expect_identical(caller(1L), 1L)
+})
+
+test_that("resolve_arg11: returns expression string when value type is not allowed", {
+  caller <- function(x) {
+    resolve_arg(x, type = "character")
+  }
+
+  expect_identical(caller(1.5), "1.5")
+  expect_identical(caller(1L), "1L")
+})
+
+test_that("resolve_arg12: returns evaluated value when multiple allowed types include actual type", {
+  caller <- function(x) {
+    resolve_arg(x, type = c("character", "double"))
+  }
+
+  expect_identical(caller("AVAL"), "AVAL")
+  expect_identical(caller(2.5), 2.5)
+})
+
+test_that("resolve_arg13: falls back to expression string when evaluation errors", {
+  caller <- function(x) {
+    resolve_arg(x)
+  }
+
+  expect_identical(caller(not_an_object), "not_an_object")
+  expect_identical(caller(a + b), "a + b")
+})
+
+test_that("resolve_arg14: captures complex function call expression when result type is not allowed", {
+  caller <- function(x) {
+    resolve_arg(x, type = "character")
+  }
+
+  expect_identical(caller(mean(c(1, 2, 3))), "mean(c(1, 2, 3))")
+})
+
+test_that("resolve_arg15: returns evaluated character result of an expression when character is allowed", {
+  caller <- function(x) {
+    resolve_arg(x, type = "character")
+  }
+
+  expect_identical(caller(paste0("A", "B")), "AB")
+})
+
+test_that("resolve_arg16: returns expression string for NULL when NULL is not allowed", {
+  caller <- function(x = NULL) {
+    resolve_arg(x, type = "character")
+  }
+
+  expect_identical(caller(), "NULL")
+  expect_identical(caller(NULL), "NULL")
+})
+
+library(testthat)
+
+test_that("subset_data1: errors when data is not a data.frame", {
+  expect_error(
+    subset_data(data = 1:5),
+    "'data' must be a data.frame.",
+    fixed = TRUE
+  )
+})
+
+test_that("subset_data2: returns data unchanged when where is NULL", {
+  df <- data.frame(
+    USUBJID = c("01", "02", "03"),
+    AGE = c(10, 20, 30)
+  )
+
+  res <- subset_data(df, where = NULL)
+
+  rownames(res) <- NULL
+  rownames(df) <- NULL
+
+  expect_identical(res, df)
+})
+
+test_that("subset_data3: errors when where is not an expression", {
+  df <- data.frame(
+    USUBJID = c("01", "02", "03"),
+    AGE = c(10, 20, 30)
+  )
+
+  expect_error(
+    subset_data(df, where = quote(AGE > 18)),
+    "'where' must be an expression.",
+    fixed = TRUE
+  )
+})
+
+test_that("subset_data4: errors when where expression has length greater than 1", {
+  df <- data.frame(
+    USUBJID = c("01", "02", "03"),
+    AGE = c(10, 20, 30)
+  )
+
+  where <- expression(AGE > 18, AGE < 30)
+
+  expect_error(
+    subset_data(df, where = where),
+    "'where' must be an expression of length 1.",
+    fixed = TRUE
+  )
+})
+
+test_that("subset_data5: errors when where references a non-existent column", {
+  df <- data.frame(
+    USUBJID = c("01", "02", "03"),
+    AGE = c(10, 20, 30)
+  )
+
+  where <- expression(TRT == "A")
+
+  expect_error(
+    subset_data(df, where = where),
+    "Error evaluating 'where'",
+    fixed = TRUE
+  )
+})
+
+test_that("subset_data6: errors when where evaluates to non-logical vector", {
+  df <- data.frame(
+    USUBJID = c("01", "02", "03"),
+    AGE = c(10, 20, 30)
+  )
+
+  where <- expression(AGE)
+
+  expect_error(
+    subset_data(df, where = where),
+    "'where' must evaluate to a logical vector.",
+    fixed = TRUE
+  )
+})
+
+test_that("subset_data7: errors when where returns logical vector of incorrect length", {
+  df <- data.frame(
+    USUBJID = c("01", "02", "03"),
+    AGE = c(10, 20, 30)
+  )
+
+  where <- expression(c(TRUE, FALSE))
+
+  expect_error(
+    subset_data(df, where = where),
+    "'where' must evaluate to a logical vector with length equal to nrow(data).",
+    fixed = TRUE
+  )
+})
+
+test_that("subset_data8: subsets rows correctly when where evaluates to logical vector", {
+  df <- data.frame(
+    USUBJID = c("01", "02", "03"),
+    AGE = c(10, 20, 30)
+  )
+
+  where <- expression(AGE > 18)
+
+  res <- subset_data(df, where = where)
+
+  expected <- data.frame(
+    USUBJID = c("02", "03"),
+    AGE = c(20, 30)
+  )
+
+  rownames(res) <- NULL
+  rownames(expected) <- NULL
+
+  expect_identical(res, expected)
+})
+
+test_that("subset_data9: returns empty data.frame when condition is all FALSE", {
+  df <- data.frame(
+    USUBJID = c("01", "02", "03"),
+    AGE = c(10, 20, 30)
+  )
+
+  where <- expression(AGE > 100)
+
+  res <- subset_data(df, where = where)
+  expected <- df[0, , drop = FALSE]
+
+  rownames(res) <- NULL
+  rownames(expected) <- NULL
+
+  expect_identical(res, expected)
+})
+
+test_that("subset_data10: returns full dataset when condition is all TRUE", {
+  df <- data.frame(
+    USUBJID = c("01", "02", "03"),
+    AGE = c(10, 20, 30)
+  )
+
+  where <- expression(AGE >= 10)
+
+  res <- subset_data(df, where = where)
+
+  rownames(res) <- NULL
+  rownames(df) <- NULL
+
+  expect_identical(res, df)
+})
+
+test_that("subset_data11: preserves data.frame structure when single row returned", {
+  df <- data.frame(
+    USUBJID = c("01", "02", "03"),
+    AGE = c(10, 20, 30)
+  )
+
+  where <- expression(USUBJID == "02")
+
+  res <- subset_data(df, where = where)
+
+  rownames(res) <- NULL
+
+  expect_true(is.data.frame(res))
+  expect_identical(nrow(res), 1L)
+  expect_identical(ncol(res), 2L)
+  expect_identical(res$USUBJID, "02")
+  expect_identical(res$AGE, 20)
+})
+
+test_that("subset_data12: handles compound logical expressions correctly", {
+  df <- data.frame(
+    USUBJID = c("01", "02", "03", "04"),
+    AGE = c(10, 20, 30, 40),
+    SEX = c("F", "M", "F", "M")
+  )
+
+  where <- expression(AGE >= 20 & SEX == "M")
+
+  res <- subset_data(df, where = where)
+
+  expected <- data.frame(
+    USUBJID = c("02", "04"),
+    AGE = c(20, 40),
+    SEX = c("M", "M")
+  )
+
+  rownames(res) <- NULL
+  rownames(expected) <- NULL
+
+  expect_identical(res, expected)
+})

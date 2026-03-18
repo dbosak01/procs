@@ -366,34 +366,20 @@ proc_means <- function(data,
 
 
   # Deal with single value unquoted parameter values
-  oby <- deparse(substitute(by, env = environment()))
-  by <- tryCatch({if (typeof(by) %in% c("character", "NULL")) by else oby},
-                 error = function(cond) {oby})
+  by <- resolve_arg(by)
 
   # Deal with single value unquoted parameter values
-  oclass <- deparse(substitute(class, env = environment()))
-  class <- tryCatch({if (typeof(class) %in% c("character", "NULL")) class else oclass},
-                    error = function(cond) {oclass})
+  class <- resolve_arg(class)
 
-  ovar <- deparse(substitute(var, env = environment()))
-  var <- tryCatch({if (typeof(var) %in% c("character", "NULL")) var else ovar},
-                  error = function(cond) {ovar})
+  var <- resolve_arg(var)
 
-  oweight <- deparse(substitute(weight, env = environment()))
-  weight <- tryCatch({if (typeof(weight) %in% c("character", "NULL")) weight else oweight},
-                     error = function(cond) {oweight})
+  weight <- resolve_arg(weight)
 
-  ostats <- deparse(substitute(stats, env = environment()))
-  stats <- tryCatch({if (typeof(stats) %in% c("character", "NULL")) stats else ostats},
-                    error = function(cond) {ostats})
+  stats <- resolve_arg(stats)
 
-  oopt <- deparse(substitute(options, env = environment()))
-  options <- tryCatch({if (typeof(options) %in% c("integer", "double", "character", "NULL")) options else oopt},
-                      error = function(cond) {oopt})
+  options <- resolve_arg(options, type = c("character", "double", "integer", "NULL"))
 
-  oout <- deparse(substitute(output, env = environment()))
-  output <- tryCatch({if (typeof(output) %in% c("character", "NULL")) output else oout},
-                     error = function(cond) {oout})
+  output <- resolve_arg(output)
 
   # Parameter checks
 
@@ -521,7 +507,7 @@ proc_means <- function(data,
 
   # Deal with where expression
   if (!is.null(where)) {
-    data <- subset(data, eval(where))
+    data <- subset_data(data, where)
   }
 
   # Get report if requested

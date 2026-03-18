@@ -141,32 +141,20 @@ proc_sort <- function(data,  by = NULL, keep = NULL, order = "ascending",
                       options = NULL, as.character = FALSE, na.sort = NULL,
                       where = NULL) {
 
+  # Deal with single value unquoted parameter values
+  by <- resolve_arg(by)
 
   # Deal with single value unquoted parameter values
-  oby <- deparse(substitute(by, env = environment()))
-  by <- tryCatch({if (typeof(by) %in% c("character", "NULL")) by else oby},
-                 error = function(cond) {oby})
+  keep <- resolve_arg(keep)
 
   # Deal with single value unquoted parameter values
-  okeep <- deparse(substitute(keep, env = environment()))
-  keep <- tryCatch({if (typeof(keep) %in% c("character", "NULL")) keep else okeep},
-                 error = function(cond) {okeep})
-
-
-  # Deal with single value unquoted parameter values
-  oorder <- deparse(substitute(order, env = environment()))
-  order <- tryCatch({if (typeof(order) %in% c("character", "NULL")) order else oorder},
-                 error = function(cond) {oorder})
+  order <- resolve_arg(order)
 
   # Deal with single value unquoted option values
-  oopt <- deparse(substitute(options, env = environment()))
-  options <- tryCatch({if (typeof(options) %in% c("integer", "double", "character", "NULL")) options else oopt},
-                      error = function(cond) {oopt})
+  options <- resolve_arg(options, type = c("character", "double", "integer", "NULL"))
 
   # Deal with single value unquoted option values
-  onasort <- deparse(substitute(na.sort, env = environment()))
-  na.sort <- tryCatch({if (typeof(na.sort) %in% c("character", "NULL")) na.sort else onasort},
-                      error = function(cond) {onasort})
+  na.sort <-  resolve_arg(na.sort)
 
   # Force to lower case
   if (!is.null(na.sort)) {
@@ -174,7 +162,6 @@ proc_sort <- function(data,  by = NULL, keep = NULL, order = "ascending",
   }
 
   # Parameter checks
-
   if (!"data.frame" %in% class(data)) {
     stop("Input data is not a data frame.")
   }
@@ -185,7 +172,7 @@ proc_sort <- function(data,  by = NULL, keep = NULL, order = "ascending",
 
   # Deal with where expression
   if (!is.null(where)) {
-    data <- subset(data, eval(where))
+    data <- subset_data(data, where)
   }
 
   if (!is.null(order)) {

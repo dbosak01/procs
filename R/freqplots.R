@@ -148,25 +148,15 @@ freqplot <- function(type = "barchart", orient = "vertical", scale = "freq",
 
   # Non-standard evaluation
 
-  otype <- deparse(substitute(type, env = environment()))
-  type <- tryCatch({if (typeof(type) %in% c("character", "NULL")) type else otype},
-                     error = function(cond) {otype})
+  type <- resolve_arg(type)
 
-  oorient <- deparse(substitute(orient, env = environment()))
-  orient <- tryCatch({if (typeof(orient) %in% c("character", "NULL")) orient else oorient},
-                     error = function(cond) {oorient})
+  orient <- resolve_arg(orient)
 
-  oscale <- deparse(substitute(scale, env = environment()))
-  scale <- tryCatch({if (typeof(scale) %in% c("character", "NULL")) scale else oscale},
-                     error = function(cond) {oscale})
+  scale <- resolve_arg(scale)
 
-  otwoway <- deparse(substitute(twoway, env = environment()))
-  twoway <- tryCatch({if (typeof(twoway) %in% c("character", "NULL")) twoway else otwoway},
-                    error = function(cond) {otwoway})
+  twoway <- resolve_arg(twoway)
 
-  ogroupby <- deparse(substitute(groupby, env = environment()))
-  groupby <- tryCatch({if (typeof(groupby) %in% c("character", "NULL")) groupby else ogroupby},
-                     error = function(cond) {ogroupby})
+  groupby <- resolve_arg(groupby)
 
   if (length(type) > 1) {
     stop("Parmeter 'type' is invalid.  Value must be a single character string.")
