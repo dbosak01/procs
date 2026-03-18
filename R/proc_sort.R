@@ -151,7 +151,7 @@ proc_sort <- function(data,  by = NULL, keep = NULL, order = "ascending",
   order <- resolve_arg(order)
 
   # Deal with single value unquoted option values
-  options <- resolve_arg(options)
+  options <- resolve_arg(options, type = c("character", "double", "integer", "NULL"))
 
   # Deal with single value unquoted option values
   na.sort <-  resolve_arg(na.sort)

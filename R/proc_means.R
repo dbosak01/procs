@@ -377,7 +377,7 @@ proc_means <- function(data,
 
   stats <- resolve_arg(stats)
 
-  options <- resolve_arg(options)
+  options <- resolve_arg(options, type = c("character", "double", "integer", "NULL"))
 
   output <- resolve_arg(output)
 

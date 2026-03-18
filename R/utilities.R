@@ -1580,7 +1580,7 @@ subset_data <- function(data, where = NULL) {
     stop("'where' must evaluate to a logical vector with length equal to nrow(data).", call. = FALSE)
   }
 
-  res <- data[rows, , drop = FALSE]
+  res <- copy.attributes(data, data[rows, , drop = FALSE])
 
   return(res)
 }
