@@ -444,19 +444,12 @@ proc_reg <- function(data,
 
   # Deal with single value unquoted parameter values
   weight <- resolve_arg(weight)
-
-  # Deal with single value unquoted parameter values
   by <- resolve_arg(by)
-
   stats <- resolve_arg(stats)
-
   options <- resolve_arg(options, type = c("integer", "double", "character", "NULL"))
-
   output <- resolve_arg(output)
 
-
   # Parameter checks
-
   if (!"data.frame" %in% class(data)) {
     stop("Input data is not a data frame.")
   }
@@ -636,6 +629,8 @@ proc_reg <- function(data,
             view = view,
             titles = titles,
             options = options,
+            plots = plots,
+            where = where,
             outcnt = ifelse("data.frame" %in% class(res),
                             1, length(res)))
 
@@ -651,6 +646,18 @@ proc_reg <- function(data,
   return(res)
 }
 
+# data,
+# model,
+# by = NULL,
+# stats = NULL,
+# #var = NULL,
+# output = NULL,
+# # freq = NULL, ?
+# weight = NULL,
+# options = NULL,
+# titles = NULL,
+# plots = NULL,
+# where = NULL
 
 log_reg <- function(data,
                       model = NULL,
@@ -661,11 +668,13 @@ log_reg <- function(data,
                       view = TRUE,
                       titles = NULL,
                       options = NULL,
+                      plots = NULL,
+                      where = NULL,
                       outcnt = NULL) {
 
   ret <- c()
 
-  indt <- paste0(rep(" ", 12), collapse = "")
+  indt <- paste0(rep(" ", 10), collapse = "")
 
   ret <- paste0("proc_reg: input data set ", nrow(data),
                 " rows and ", ncol(data), " columns")
@@ -689,6 +698,24 @@ log_reg <- function(data,
 
   if (!is.null(view))
     ret[length(ret) + 1]<- paste0(indt, "view: ", paste(view, collapse = " "))
+
+
+  if (!is.null(options))
+    ret[length(ret) + 1]<- paste0(indt, "options: ", paste(options, collapse = " "))
+
+
+  if (!is.null(where))
+    ret[length(ret) + 1]<- paste0(indt, "where: ", as.character(where))
+
+
+  if (!is.null(plots)) {
+    if ("logical" %in% class(plots)) {
+      ret[length(ret) + 1]<- paste0(indt, "plots: ", as.character(plots))
+    } else {
+      ret[length(ret) + 1]<- paste0(indt, "plots: ", "(object)")
+    }
+  }
+
 
   if (!is.null(titles))
     ret[length(ret) + 1] <- paste0(indt, "titles: ", paste(titles, collapse = "\n"))

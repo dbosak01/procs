@@ -49,7 +49,7 @@ keys.  The NA sort style may be controlled globally with
 \code{options("procs.na.sort" = <value>)}.  Any values passed
 on the local parameter will override the global setting. The default
 value is NULL, which defers to the global setting.  If the global setting
-is NULL, the parameter will default to "last".}
+is also NULL, the parameter will default to "last".}
 
 \item{where}{An expression to filter the rows before the sort takes place.
 Use the \code{\link[base]{expression}} function to define the where clause.}

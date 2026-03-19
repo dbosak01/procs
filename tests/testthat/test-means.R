@@ -821,16 +821,31 @@ test_that("means35: Stacked output works.", {
 
 test_that("means36: log_means() works as expected.", {
 
+  # data,
+  # by = NULL,
+  # class = NULL,
+  # var = NULL,
+  # stats = NULL,
+  # output = NULL,
+  # weight = NULL,
+  # view = TRUE,
+  # titles = NULL,
+  # opts = NULL,
+  # where = NULL,
+  # outcnt = NULL
 
   res <- log_means(mtcars, var = c("mpg", "cyl"),
                    stats = c("n", "mean", "median"),
                    weight = "count", titles = c("here is my big long title",
                                                 "Here is another title"),
+                   output = "report",
+                   opts = c("nway", vardef = "DF"),
+                   where = expression(A == 1),
                    by = "cyl", class="disp", outcnt = 6)
 
   res
 
-  expect_equal(length(res), 10)
+  expect_equal(length(res), 12)
 
 })
 

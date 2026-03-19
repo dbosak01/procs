@@ -259,11 +259,8 @@ regplot <- function(type = c("diagnostics", "residuals", "fitplot"), panel = TRU
                     stats = "default", label = FALSE, id = NULL) {
 
   # Non-standard evaluation
-
   type <- resolve_arg(type)
-
   stats <- resolve_arg(stats)
-
   id <- resolve_arg(id)
 
 

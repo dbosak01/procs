@@ -173,29 +173,15 @@ proc_transpose <- function(data,
 
   # Deal with single value unquoted parameter values
   by <- resolve_arg(by)
-
-  # Deal with single value unquoted parameter values
   var <- resolve_arg(var)
-
-  # Deal with single value unquoted parameter values
   id <- resolve_arg(id)
-
-  # Deal with single value unquoted parameter values
   idlabel <- resolve_arg(idlabel)
-
-  # Deal with single value unquoted parameter values
   copy <- resolve_arg(copy)
-
   name <- resolve_arg(name)
-
   namelabel <- resolve_arg(namelabel)
-
   prefix <- resolve_arg(prefix)
-
   suffix <- resolve_arg(suffix)
-
   delimiter <- resolve_arg(delimiter)
-
   options <- resolve_arg(options)
 
   # Parameter checks
@@ -277,7 +263,7 @@ proc_transpose <- function(data,
    nms <- nms[!nms %in% c(by, id, idlabel, copy)]
 
    if (length(nms) == 0) {
-     stop("No variables to transpose.  You may need to specify the var parameter")
+     stop("No variables to transpose. You may need to specify the var parameter")
 
    }
 
@@ -514,7 +500,11 @@ proc_transpose <- function(data,
                    copy = copy,
                    name = name,
                    namelabel = namelabel,
+                   prefix = prefix,
+                   delimiter = delimiter,
+                   suffix = suffix,
                    where = where,
+                   options = options,
                    outdata = res)
 
      if (log_output()) {
@@ -536,7 +526,11 @@ log_transpose <- function(data,
                       copy = NULL,
                       name = "NAME",
                       namelabel = NULL,
+                      prefix = prefix,
+                      delimiter = delimiter,
+                      suffix = suffix,
                       where = NULL,
+                      options = options,
                       outdata = NULL) {
 
   ret <- c()
@@ -572,9 +566,20 @@ log_transpose <- function(data,
   if (!is.null(namelabel))
     ret[length(ret) + 1]<- paste0(indt, "namelabel: ", paste(namelabel, collapse = " "))
 
+  if (!is.null(prefix))
+    ret[length(ret) + 1]<- paste0(indt, "prefix: ", paste(prefix, collapse = " "))
+
+  if (!is.null(delimiter))
+    ret[length(ret) + 1]<- paste0(indt, "delimiter: ", paste(delimiter, collapse = " "))
+
+  if (!is.null(suffix))
+    ret[length(ret) + 1]<- paste0(indt, "suffix: ", paste(suffix, collapse = " "))
+
   if (!is.null(where))
     ret[length(ret) + 1] <- paste0(indt, "where: ", paste(as.character(where), collapse = "\n"))
 
+  if (!is.null(options))
+    ret[length(ret) + 1]<- paste0(indt, "options: ", paste(options, collapse = " "))
 
   if (!is.null(outdata))
     ret[length(ret) + 1] <- paste0(indt, "output dataset ", nrow(outdata),

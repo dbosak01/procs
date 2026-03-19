@@ -1382,13 +1382,21 @@ test_that("freq51: fisher output statistics works.", {
 
 test_that("freq52: Logging function works.", {
 
+
   res <- log_freq(mtcars, tables = c("mpg", "cyl"),
                   weight = "count",
-                  by = "cyl", outcnt = 6)
+                  by = "cyl",
+                  options = c("nofreq", "notype"),
+                  view = TRUE,
+                  titles = "My nice frequency",
+                  order = "freq",
+                  where = expression(A == 1),
+                  plots = freqplot(),
+                  outcnt = 6)
 
   res
 
-  expect_equal(length(res), 6)
+  expect_equal(length(res), 10)
 
 })
 

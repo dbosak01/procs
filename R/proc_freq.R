@@ -517,6 +517,7 @@ proc_freq <- function(data,
                       where = NULL
                       ) {
 
+  # Allow single-value NSE on some parameters
   by <- resolve_arg(by)
   tables <- resolve_arg(tables)
   weight <- resolve_arg(weight)
@@ -682,8 +683,10 @@ proc_freq <- function(data,
     }
   }
 
+
   log_freq(data = data, by = by, tables = tables, options = options, output = output,
-           weight = weight, view = view, titles = titles, outcnt = length(res))
+           weight = weight, view = view, titles = titles, order = order, where = where,
+           plots = plots, outcnt = length(res))
 
 
   # If only one dataset returned, remove list
@@ -708,6 +711,9 @@ log_freq <- function(data,
                      weight = NULL,
                      view = TRUE,
                      titles = NULL,
+                     order = NULL,
+                     where = NULL,
+                     plots = NULL,
                      outcnt = NULL) {
 
   ret <- c()
@@ -737,9 +743,25 @@ log_freq <- function(data,
   if (!is.null(titles))
     ret[length(ret) + 1] <- paste0(indt, "titles: ", paste(titles, collapse = "\n"))
 
+  if (!is.null(order))
+    ret[length(ret) + 1] <- paste0(indt, "order: ", paste(order, collapse = " "))
+
+  if (!is.null(where))
+    ret[length(ret) + 1] <- paste0(indt, "where: ", as.character(where))
+
+  if (!is.null(plots)) {
+    if ("logical" %in% class(plots)) {
+      ret[length(ret) + 1] <- paste0(indt, "plots: ", as.character(plots))
+    } else {
+      ret[length(ret) + 1] <- paste0(indt, "plots: ", "(object)")
+    }
+
+  }
 
   if (!is.null(outcnt))
     ret[length(ret) + 1] <- paste0(indt, "output: ", outcnt, " datasets")
+
+  plts <- freqplot(type = "dotplot")
 
 
   log_logr(ret)

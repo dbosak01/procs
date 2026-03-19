@@ -141,11 +141,13 @@ test_that("sort9: log_sort() works as expected.", {
                        keep = c("n", "mean", "median"),
                        order = "ascending",
                        options = c("dupkey", "forker"),
+                       as.character = TRUE,
+                       na.sort = "sas",
                        outdata = mtcars)
 
   res
 
-  expect_equal(length(res), 6)
+  expect_equal(length(res), 8)
 
 })
 
@@ -442,11 +444,11 @@ test_that("sort18: na.sort parameter checks work.", {
 
 })
 
-test_that("sort19: Returns empty data.frame unchanged when input has 0 rows", {
+test_that("sort19: Returns error when input has 0 rows", {
 
   df <- data.frame(X = character())
 
-  expect_silent({
+  expect_error({
     out <- proc_sort(df, by = X)
     expect_identical(out, df)
     expect_equal(nrow(out), 0L)
@@ -457,11 +459,18 @@ test_that("sort19: Returns empty data.frame unchanged when input has 0 rows", {
 
 test_that("sort20: where expression works as expected.", {
 
-  res <- proc_sort(prt,
+  dat <- prt
+
+  labels(dat) <- list(sex = "Sex", internship = "Internship")
+
+  res <- proc_sort(dat,
                    where = expression(sex == "boys"))
 
 
   expect_equal(all(res$sex == "boys") , TRUE)
 
+  # Check that labels are retained
+  lbls <- labels(res)
+  expect_equal(length(lbls), 2)
 
 })

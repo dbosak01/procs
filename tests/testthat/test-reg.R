@@ -890,3 +890,33 @@ test_that("reg27: where expression works as expected.", {
 
 })
 
+
+test_that("reg28: log_reg() works as expected.", {
+
+  # data,
+  # model,
+  # by = NULL,
+  # stats = NULL,
+  # #var = NULL,
+  # output = NULL,
+  # # freq = NULL, ?
+  # weight = NULL,
+  # options = NULL,
+  # titles = NULL,
+  # plots = NULL,
+  # where = NULL
+
+  res <- log_reg(mtcars, model = "x = y z",  by = "region",
+                       stats = c("n", "mean", "median"),
+                       output = c("out", "report", "long"),
+                       weight = "count",
+                       plots = regplot(),
+                       where = expression(x == 1),
+                       options = "noname",
+                       titles = "My Title")
+
+  res
+
+  expect_equal(length(res), 11)
+
+})

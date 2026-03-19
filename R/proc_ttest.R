@@ -438,21 +438,13 @@ proc_ttest <- function(data,
   # Not sure why R has an option to keep them
   missing <- FALSE
 
-
   # Deal with single value unquoted parameter values
   by <- resolve_arg(by)
-
-  # Deal with single value unquoted parameter values
   class <- resolve_arg(class)
-
   var <- resolve_arg(var)
-
   options <- resolve_arg(options, type = c("character", "double", "integer", "NULL"))
-
   output <- resolve_arg(output)
-
   paired <- resolve_arg(paired)
-
   order <- resolve_arg(order)
 
   # Parameter checks
@@ -688,6 +680,9 @@ proc_ttest <- function(data,
             view = view,
             titles = titles,
             options = options,
+            order = order,
+            plots = plots,
+            where = where,
             outcnt = ifelse("data.frame" %in% class(res),
                             1, length(res)))
 
@@ -714,6 +709,9 @@ log_ttest <- function(data,
                       view = TRUE,
                       titles = NULL,
                       options = NULL,
+                      order = NULL,
+                      plots = NULL,
+                      where = NULL,
                       outcnt = NULL) {
 
   ret <- c()
@@ -746,6 +744,21 @@ log_ttest <- function(data,
 
   if (!is.null(view))
     ret[length(ret) + 1]<- paste0(indt, "view: ", paste(view, collapse = " "))
+
+  if (!is.null(order))
+    ret[length(ret) + 1]<- paste0(indt, "order: ", paste(order, collapse = " "))
+
+  if (!is.null(plots)) {
+    if ("logical" %in% class(plots)) {
+      ret[length(ret) + 1]<- paste0(indt, "plots: ", as.character(plots))
+    } else {
+      ret[length(ret) + 1]<- paste0(indt, "plots: ", "(object")
+    }
+
+  }
+
+  if (!is.null(where))
+    ret[length(ret) + 1]<- paste0(indt, "where: ", as.character(where))
 
   if (!is.null(titles))
     ret[length(ret) + 1] <- paste0(indt, "titles: ", paste(titles, collapse = "\n"))

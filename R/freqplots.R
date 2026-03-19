@@ -147,15 +147,10 @@ freqplot <- function(type = "barchart", orient = "vertical", scale = "freq",
                      twoway = "groupvertical", groupby = "column", npanelpos = 4) {
 
   # Non-standard evaluation
-
   type <- resolve_arg(type)
-
   orient <- resolve_arg(orient)
-
   scale <- resolve_arg(scale)
-
   twoway <- resolve_arg(twoway)
-
   groupby <- resolve_arg(groupby)
 
   if (length(type) > 1) {

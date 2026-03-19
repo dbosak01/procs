@@ -470,17 +470,32 @@ test_that("transpose19: Factor with unused level works.", {
 
 test_that("transpose20: log_transpose() works as expected.", {
 
+  # data,
+  # by = NULL,
+  # var = NULL,
+  # id = NULL,
+  # idlabel = NULL,
+  # copy = NULL,
+  # name = "NAME",
+  # namelabel = NULL,
+  # prefix = prefix,
+  # delimiter = delimiter,
+  # suffix = suffix,
+  # where = NULL,
+  # options = options,
+  # outdata = NULL
 
-  res <- log_transpose(mtcars, var = c("mpg", "cyl"),
+  res <- log_transpose(mtcars, by = "region", var = c("mpg", "cyl"),
                    id = c("n", "mean", "median"),
                    idlabel = c("n", "mean", "median"),
                    copy = "count", name = "sam", namelabel = "fork",
+                   prefix = "a_", suffix = "_b", delimiter = ".",
                    where = expression(x == 1),
-                   by = "cyl", outdata = mtcars)
+                   options = "noname", outdata = mtcars)
 
   res
 
-  expect_equal(length(res), 10)
+  expect_equal(length(res), 14)
 
 })
 

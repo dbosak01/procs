@@ -367,18 +367,11 @@ proc_means <- function(data,
 
   # Deal with single value unquoted parameter values
   by <- resolve_arg(by)
-
-  # Deal with single value unquoted parameter values
   class <- resolve_arg(class)
-
   var <- resolve_arg(var)
-
   weight <- resolve_arg(weight)
-
   stats <- resolve_arg(stats)
-
   options <- resolve_arg(options, type = c("character", "double", "integer", "NULL"))
-
   output <- resolve_arg(output)
 
   # Parameter checks
@@ -552,6 +545,8 @@ proc_means <- function(data,
             weight = weight,
             view = view,
             titles = titles,
+            opts = options,
+            where = where,
             outcnt = ifelse("data.frame" %in% class(res),
                             1, length(res)))
 
@@ -578,6 +573,7 @@ log_means <- function(data,
                       view = TRUE,
                       titles = NULL,
                       opts = NULL,
+                      where = NULL,
                       outcnt = NULL) {
 
   ret <- c()
@@ -598,10 +594,6 @@ log_means <- function(data,
     ret[length(ret) + 1] <- paste0(indt, "var: ",
                                    paste(var, collapse = " "))
 
-  if (!is.null(weight))
-    ret[length(ret) + 1] <- paste0(indt, "weight: ",
-                                   paste(weight, collapse = " "))
-
   if (!is.null(stats))
     ret[length(ret) + 1] <- paste0(indt, "stats: ",
                                    paste(stats, collapse = " "))
@@ -612,8 +604,15 @@ log_means <- function(data,
   if (!is.null(weight))
     ret[length(ret) + 1] <- paste0(indt, "weight: ", paste(weight, collapse = " "))
 
+  if (!is.null(opts))
+    ret[length(ret) + 1] <- paste0(indt, "options: ",
+                                   paste(opts, collapse = " "))
+
   if (!is.null(view))
     ret[length(ret) + 1]<- paste0(indt, "view: ", paste(view, collapse = " "))
+
+  if (!is.null(where))
+    ret[length(ret) + 1] <- paste0(indt, "where: ", as.character(where))
 
   if (!is.null(titles))
     ret[length(ret) + 1] <- paste0(indt, "titles: ", paste(titles, collapse = "\n"))

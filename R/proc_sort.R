@@ -69,7 +69,7 @@
 #' \code{options("procs.na.sort" = <value>)}.  Any values passed
 #' on the local parameter will override the global setting. The default
 #' value is NULL, which defers to the global setting.  If the global setting
-#' is NULL, the parameter will default to "last".
+#' is also NULL, the parameter will default to "last".
 #' @param where An expression to filter the rows before the sort takes place.
 #' Use the \code{\link[base]{expression}} function to define the where clause.
 #' @return The sorted dataset.  If a data frame was input, a
@@ -143,17 +143,9 @@ proc_sort <- function(data,  by = NULL, keep = NULL, order = "ascending",
 
   # Deal with single value unquoted parameter values
   by <- resolve_arg(by)
-
-  # Deal with single value unquoted parameter values
   keep <- resolve_arg(keep)
-
-  # Deal with single value unquoted parameter values
   order <- resolve_arg(order)
-
-  # Deal with single value unquoted option values
   options <- resolve_arg(options, type = c("character", "double", "integer", "NULL"))
-
-  # Deal with single value unquoted option values
   na.sort <-  resolve_arg(na.sort)
 
   # Force to lower case
@@ -167,7 +159,7 @@ proc_sort <- function(data,  by = NULL, keep = NULL, order = "ascending",
   }
 
   if (nrow(data) == 0) {
-    return(data)
+    stop("Input data has no rows.")
   }
 
   # Deal with where expression
@@ -269,6 +261,8 @@ proc_sort <- function(data,  by = NULL, keep = NULL, order = "ascending",
            keep = keep,
            order = order,
            options = options,
+           as.character = as.character,
+           na.sort = na.sort,
            outdata = ret)
 
   if (log_output()) {
@@ -287,6 +281,8 @@ log_sort <- function(data,
                      keep = NULL,
                      order = "ascending",
                      options = NULL,
+                     as.character = as.character,
+                     na.sort = na.sort,
                      outdata = NULL) {
 
   ret <- c()
@@ -309,6 +305,12 @@ log_sort <- function(data,
 
   if (!is.null(options))
     ret[length(ret) + 1] <- paste0(indt, "options: ", paste(options, collapse = " "))
+
+  if (!is.null(as.character))
+    ret[length(ret) + 1] <- paste0(indt, "as.character: ", paste(as.character, collapse = " "))
+
+  if (!is.null(na.sort))
+    ret[length(ret) + 1] <- paste0(indt, "na.sort: ", paste(na.sort, collapse = " "))
 
   if (!is.null(outdata))
     ret[length(ret) + 1]  <- paste0(indt, "output data set ", nrow(outdata),

@@ -6,7 +6,6 @@
 * Added "weight" parameter to `proc_means()`.
 * Added "vardef" option to `proc_means()`.
 * Added "na.sort" parameter to `proc_sort()`.
-* Changed `proc_sort()` to accept an empty data frame.
 * Added "where" parameter to `proc_freq()`, `proc_means()`, `proc_ttest()`,
 `proc_reg()`, and `proc_sort()`.
 * Updates to documentation.

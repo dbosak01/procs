@@ -1322,6 +1322,37 @@ test_that("ttest30: order parameter works as expected.", {
 
 })
 
+test_that("ttest31: log_ttest() works as expected.", {
+
+
+  # data,
+  # var = NULL,
+  # paired = NULL,
+  # output = NULL,
+  # by = NULL,
+  # class = NULL,
+  # # freq = NULL, ?
+  # # weight = NULL, ?
+  # options = NULL,
+  # titles = NULL,
+  # order = NULL,
+  # plots = NULL,
+  # where = NULL
+
+  res <- log_ttest(mtcars, by = "region", var = c("mpg", "cyl"),
+                   paired = "x * y",
+                   class = "z", plots = ttestplot(),
+                       where = expression(x == 1),
+                       options = "noname")
+
+  res
+
+  expect_equal(length(res), 8)
+
+})
+
+
+
 
 
 # Not sure how to do this.  Can't get lognormal dist to match SAS.
