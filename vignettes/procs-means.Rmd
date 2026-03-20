@@ -156,7 +156,7 @@ turned off with options:
 # Turn off TYPE and FREQ variables
 res3 <- proc_means(dat, 
                    stats = v(median, sum, q1, q3),
-                   output = all,
+                   output = out,
                    options = v(notype, nofreq))
 
 # View results

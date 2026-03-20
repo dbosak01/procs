@@ -656,7 +656,7 @@ test_that("ttestplot14: troublesome plots match SAS", {
 
   # qqplot2 - Hurray!
   res <- proc_ttest(cls,
-             var = "Height",
+             var = c("Height"),
              class = "Sex",
              output = report,
              plot = TRUE,
@@ -666,7 +666,7 @@ test_that("ttestplot14: troublesome plots match SAS", {
   expect_equal("plot_spec" %in% class(res[[5]][[1]]), TRUE)
 
 
-  # histogram  - Sorry!  Still not working!
+  # histogram  - Good enough
   res <- proc_ttest(cls,
                     var = c("Age"),
                     options = c("h0" = 65, "alpha" = 0.05),
@@ -690,6 +690,17 @@ test_that("ttestplot14: troublesome plots match SAS", {
                     class = "Sex",
                     output = report,
                     plot = "boxplot")
+
+  expect_equal(length(res), 5)
+  expect_equal("plot_spec" %in% class(res[[5]][[1]]), TRUE)
+
+
+  # Different data with class - Fixed
+  res <- proc_ttest(sleep,
+                    var = "extra",
+                    class = "group",
+                    output = "report",
+                    plots = c("summary", "histogram", "boxplot"))
 
   expect_equal(length(res), 5)
   expect_equal("plot_spec" %in% class(res[[5]][[1]]), TRUE)

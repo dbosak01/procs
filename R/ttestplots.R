@@ -1291,9 +1291,52 @@ render_histogram2 <- function(dat, var, plt, class) {
       mar = c(0, 3, 0, 0) + 0.1,
       mfrow = c(2, 1))
 
+  #******************************
+  #*  Calculate scales
+  #******************************
+
   # Overall scale
   scl <- range(dat[[var]])
   scl <- c(scl[1] * .875, scl[2] * 1.125)
+
+  # Calculate breaks - Histogram 1
+  brks1 <- pretty(range(dt1), n = nclass.Sturges(dt1),
+                  min.n = 1, high.u.bias = 3)
+
+
+  # Calculate breaks - Histogram 2
+  brks2 <- pretty(range(dt2), n = nclass.Sturges(dt2),
+                  min.n = 1, high.u.bias = 3)
+
+  # Scale for Histogram 1
+  w1 <- diff(brks1)[1] # bin width
+  xmin1 <- min(brks1) - w1
+  xmax1 <- max(brks1) + w1
+  scl1 <- c(xmin1, xmax1)
+
+  # Scale for Histogram 2
+  w2 <- diff(brks2)[1] # bin width
+  xmin2 <- min(brks2) - w2
+  xmax2 <- max(brks2) + w2
+  scl2 <- c(xmin2, xmax2)
+
+
+  # Adjust overall scale if needed by histogram 1
+  if (scl1[1] < scl[1]) {
+    scl[1] <- scl1[1]
+  }
+  if (scl1[2] > scl[2]) {
+    scl[2] <- scl1[2]
+  }
+
+  # Adjust overall scale if needed by histogram 2
+  if (scl2[1] < scl[1]) {
+    scl[1] <- scl2[1]
+  }
+  if (scl2[2] > scl[2]) {
+    scl[2] <- scl2[2]
+  }
+
 
 
   #******************************
@@ -1305,28 +1348,37 @@ render_histogram2 <- function(dat, var, plt, class) {
   mu  <- mean(dt1)
   sdx <- sd(dt1)
 
-  # Calculate breaks - Closer to SAS algorithm
-  brks <- pretty(range(dt1), n = nclass.Sturges(dt1),
-                 min.n = 1, high.u.bias = 3)
-
   # Histogram (Percent scale)
   h <- hist(dt1,
-            breaks = brks,
+            breaks = brks1,
             plot = FALSE)
 
   # Convert counts to percent
   h$counts <- h$counts / sum(h$counts) * 100
 
-  # Use calculated breaks to get scale
-  w <- diff(h$breaks)[1] # bin width
-  xmin <- min(h$breaks) - w
-  xmax <- max(h$breaks) + w
-  scl1 <- c(xmin, xmax)
-
   # Use calculated break to get normal curve
   grid <- seq(scl1[1] , scl1[2], length.out = 300)
-  y_norm_percent <- 100 * w * dnorm(grid, mean = mu, sd = sdx)
+  y_norm_percent <- 100 * w1 * dnorm(grid, mean = mu, sd = sdx)
   y_mx <- max(max(y_norm_percent), max(h$counts))
+
+  # # Histogram (Percent scale)
+  # h <- hist(dt1,
+  #           breaks = brks1,
+  #           plot = FALSE)
+  #
+  # # Convert counts to percent
+  # h$counts <- h$counts / sum(h$counts) * 100
+  #
+  # # Use calculated breaks to get scale
+  # w <- diff(h$breaks)[1] # bin width
+  # xmin <- min(h$breaks) - w
+  # xmax <- max(h$breaks) + w
+  # scl1 <- c(xmin, xmax)
+  #
+  # # Use calculated break to get normal curve
+  # grid <- seq(scl1[1] , scl1[2], length.out = 300)
+  # y_norm_percent <- 100 * w * dnorm(grid, mean = mu, sd = sdx)
+  # y_mx <- max(max(y_norm_percent), max(h$counts))
 
 
   # Create plot using histogram values
@@ -1350,7 +1402,7 @@ render_histogram2 <- function(dat, var, plt, class) {
   dens <- density(dt1, kernel = "gaussian",  bw = bw, n = 512)
 
   # Scale KDE to Percent axis
-  y_kernel_percent <- 100 * w * dens$y
+  y_kernel_percent <- 100 * w1 * dens$y
 
   yscl <- seq(50, length(y_kernel_percent) - 25)
 
@@ -1383,28 +1435,42 @@ render_histogram2 <- function(dat, var, plt, class) {
   mu  <- mean(dt2)
   sdx <- sd(dt2)
 
-  # Calculate breaks - Closer to SAS algorithm
-  brks <- pretty(range(dt2), n = nclass.Sturges(dt2),
-                 min.n = 1, high.u.bias = 3)
-
   # Histogram (Percent scale)
   h <- hist(dt2,
-            breaks = brks,
+            breaks = brks2,
             plot = FALSE)
 
   # Convert counts to percent
   h$counts <- h$counts / sum(h$counts) * 100
 
-  # Use calculated breaks to get scale
-  w <- diff(h$breaks)[1] # bin width
-  xmin <- min(h$breaks) - w
-  xmax <- max(h$breaks) + w
-  scl2 <- c(xmin, xmax)
 
   # Use calculated break to get normal curve
   grid <- seq(scl2[1] , scl2[2], length.out = 300)
-  y_norm_percent <- 100 * w * dnorm(grid, mean = mu, sd = sdx)
+  y_norm_percent <- 100 * w2 * dnorm(grid, mean = mu, sd = sdx)
   y_mx <- max(max(y_norm_percent), max(h$counts))
+
+  # # Calculate breaks - Closer to SAS algorithm
+  # brks <- pretty(range(dt2), n = nclass.Sturges(dt2),
+  #                min.n = 1, high.u.bias = 3)
+  #
+  # # Histogram (Percent scale)
+  # h <- hist(dt2,
+  #           breaks = brks,
+  #           plot = FALSE)
+  #
+  # # Convert counts to percent
+  # h$counts <- h$counts / sum(h$counts) * 100
+  #
+  # # Use calculated breaks to get scale
+  # w <- diff(h$breaks)[1] # bin width
+  # xmin <- min(h$breaks) - w
+  # xmax <- max(h$breaks) + w
+  # scl2 <- c(xmin, xmax)
+  #
+  # # Use calculated break to get normal curve
+  # grid <- seq(scl2[1] , scl2[2], length.out = 300)
+  # y_norm_percent <- 100 * w * dnorm(grid, mean = mu, sd = sdx)
+  # y_mx <- max(max(y_norm_percent), max(h$counts))
 
   # Create plot using histogram values
   plot(h,
@@ -1427,7 +1493,7 @@ render_histogram2 <- function(dat, var, plt, class) {
   dens <- density(dt2, kernel = "gaussian", bw = bw, n = 512)
 
   # Scale KDE to Percent axis
-  y_kernel_percent <- 100 * w * dens$y
+  y_kernel_percent <- 100 * w2 * dens$y
 
   # Overlay on histogram
   lines(dens$x, y_kernel_percent, col = "orangered2", lwd = 2)

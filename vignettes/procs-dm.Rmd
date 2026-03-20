@@ -216,10 +216,11 @@ res
 
 ```
 By transposing one more time on the results of the previous example,
-you can nearly restore the original data frame.
+you can restore the original data frame.
 ```{r eval=FALSE, echo=TRUE} 
 # Restore original data shape
-res2 <- proc_transpose(res, by = v(Name, Subject), id = NAME)
+res2 <- proc_transpose(res, by = v(Name, Subject), 
+                       id = NAME, options = noname)
 
 # View results
 res2[ , c("Name", "Subject", "Semester1", "Semester2")]

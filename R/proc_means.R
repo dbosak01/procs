@@ -260,7 +260,9 @@
 #' The "maxdec = " option sets the maximum number of decimal places displayed
 #' on report output. The "nway" option returns only the highest type values.
 #' The "vardef=" option specifies the variance divisor. Note that the selected
-#' variance divisor can effect the calculations for several statistics.
+#' variance divisor can effect the calculations for several statistics. Valid
+#' values for "vardef=" are: "DF", "N", "WEIGHT", "WGT", or "WDF".  See details
+#' for further explanation of these values.
 #' @param titles A vector of one or more titles to use for the report output.
 #' @param where An expression to filter the rows before the statistics are
 #' calculated. Use the \code{\link[base]{expression}} function to define

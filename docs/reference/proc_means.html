@@ -199,7 +199,9 @@ value for confidence limit statistics.  The default is 95% (alpha = 0.05).
 The "maxdec = " option sets the maximum number of decimal places displayed
 on report output. The "nway" option returns only the highest type values.
 The "vardef=" option specifies the variance divisor. Note that the selected
-variance divisor can effect the calculations for several statistics.</p></dd>
+variance divisor can effect the calculations for several statistics. Valid
+values for "vardef=" are: "DF", "N", "WEIGHT", "WGT", or "WDF".  See details
+for further explanation of these values.</p></dd>
 
 
 <dt id="arg-titles">titles<a class="anchor" aria-label="anchor" href="#arg-titles"></a></dt>
@@ -495,7 +497,7 @@ columns, and variables are in rows. This shaping option is the default.</p></li>
 
 
       <footer><div class="copyright">
-  <p></p><p>Developed by David Bosak, Diyu Yang.</p>
+  <p></p><p>Developed by David Bosak, Diyu Yang, Athenkosi Nkonyeni.</p>
 </div>
 
 <div class="pkgdown">
