@@ -15,7 +15,7 @@ ttestplot(
 \arguments{
 \item{type}{The type(s) of plot to create. Multiple types should be passed
 as a vector of strings.  Valid values are "agreement", "boxplot", "histogram",
-"interval", "profiles", "qqplot", "summary".  The default value is "default", which
+"interval", "profiles", "qqplot", and "summary".  The default value is "default", which
 will produce default plots appropriate for the analysis.  You may use the
 \code{\link[common]{v}} function to pass the plot keywords unquoted.}
 

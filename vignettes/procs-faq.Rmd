@@ -80,7 +80,7 @@ changed intentionally as an improvement over the corresponding SAS® procedures.
 ### Can you do N-way tables? {#nway}
 
 **Q:** I see you can do one-way and two-way frequency tables. What about
-N-way tables?  Does that package support them?
+N-way tables?  Does the package support them?
 
 **A:** No.  N-way tables are less common, and were not seen as a priority.
 These types of tables are on the list for a future enhancement. The package

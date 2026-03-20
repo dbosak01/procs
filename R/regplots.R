@@ -51,7 +51,7 @@
 #' }
 #' \item{\strong{fitplot}:  Produces a scatter plot of the dependent variable
 #' against the regressor, including the fitted line and confidence/prediction bands.
-#' This is only available for models with a single regressor.
+#' The fitplot is only available for models with a single regressor.
 #' }
 #' \item{\strong{observedbypredicted}: Dependent variable (Observed) vs. Predicted values.
 #' }
@@ -75,7 +75,7 @@
 #' }
 #' }
 #'
-#' If possible, the statistics from the report tabular output are used for the plots.
+#' If possible, the statistics from the tabular report are used for the plots.
 #' Otherwise, additional statistics functions are called to produce the
 #' needed values.
 #'
