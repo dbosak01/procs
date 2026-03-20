@@ -84,7 +84,7 @@ N-way tables?  Does the package support them?
 
 **A:** No.  N-way tables are less common, and were not seen as a priority.
 These types of tables are on the list for a future enhancement. The package
-does support 2 way frequency tables with one or more by variables.
+does support 2-way frequency tables with one or more by variables.
 
 [top](#top) 
 

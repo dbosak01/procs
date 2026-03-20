@@ -23,7 +23,7 @@
 #' @section Missing Values:
 #' Missing values are handled in R differently than they are handled in SAS.
 #' In R, missing values (NA) are sorted last, and most sorting
-#' functions in R give you an option to sort it first if desired.
+#' functions in R give you an option to sort them first if desired.
 #'
 #' SAS, on the other hand, considers a missing as the smallest value.  If the
 #' sort is ascending, it will sort the missing values first.  If the sort is
@@ -36,7 +36,7 @@
 #'
 #' Note that this parameter only sorts NA values in a manner similar to SAS.
 #' It does not guarantee that the entire sort will match SAS.  There can
-#' still be differences in the sort caused by formats, character set mismatch,
+#' still be differences in the sort caused by formats, character-set mismatch,
 #' or other reasons.
 #'
 #' If you want to always use the SAS style sort, you can set it as a global

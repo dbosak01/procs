@@ -15,7 +15,7 @@ knitr::opts_chunk$set(
 ```
 
 The **procs** package contains functions that replicate procedures from
-SAS® software. The intention of the package is to ease transition to R
+SAS® software. The intention of the package is to ease R
 adoption by providing SAS® programmers a familiar conceptual framework and 
 functions that produce nearly identical output. Along the way, the 
 functions in the **procs** package also provide much nicer output 
@@ -50,7 +50,7 @@ options to control the output data and display.
 Note that the `options("procs.print" = FALSE)` global option
 has been added to these examples to allow the **procs** package to pass
 CRAN checks.  When running sample code yourself,
-remove this option or set to TRUE.
+remove this option or set it to TRUE.
 
 ```{r eval=FALSE, echo=TRUE} 
 library(procs)

@@ -32,8 +32,8 @@ report themselves.
 
 SAS® software, on the other hand, provides the same statistical results, 
 but with rich outputs.  These outputs include multiple datasets, plots,
-and complete statistical reports. These rich outputs could be a benefit 
-to R users.
+and complete statistical reports. These rich outputs could benefit 
+R users.
 
 **2) Pre-Validation:** There is an industry-wide movement to adopt R for 
 statistical analysis.  This 
@@ -41,7 +41,7 @@ effort is complicated by the fact that R statistical procedures frequently
 do not produce identical output to SAS®.  Many hours are burned trying to figure 
 out why R statistical results do not match SAS® statistical results.
 
-Therefore another goal of the package is to match SAS® statistics with as much
+Therefore, another goal of the package is to match SAS® statistics with as much
 fidelity as possible. If R statistical results match SAS® output, 
 it makes it much easier to rewrite
 SAS® programs in R. This pre-validation will
@@ -79,7 +79,7 @@ information, please visit the **procs** documentation site
 [here](https://procs.r-sassy.org/articles/procs.html)
     
 The **procs** package is under active development.  If you want the latest
-development version, you can download from the github site by running
+development version, you can download from the GitHub site by running
 the following code:
 
     devtools::install_github("https://github.com/dbosak01/procs")    
@@ -88,15 +88,15 @@ the following code:
 ### Getting Help
 
 If you need help, the first place 
-to turn to is the [procs](https://procs.r-sassy.org) web site.  
+to turn to is the [procs](https://procs.r-sassy.org) website.  
 
 If you want to look at the code for the **procs** package, visit the
-github page [here](https://github.com/dbosak01/procs).
+GitHub page [here](https://github.com/dbosak01/procs).
 
 If you encounter a bug or have a feature request, please submit an issue 
 [here](https://github.com/dbosak01/procs/issues).
 
-The **procs** packages has been validated, and the validation documentation
+The **procs** package has been validated, and the validation documentation
 is [here](https://r-sassy.org/validation/Procs_Validation.pdf).
 
 

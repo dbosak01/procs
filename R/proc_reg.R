@@ -11,11 +11,11 @@
 #' parameter allows you to request additional statistics, similar to the
 #' model options in SAS.  The \code{by}
 #' parameter allows you to subset the data into groups and run the model on each
-#' group.  The \code{weight} parameter let's you assign a weight to each observation
+#' group.  The \code{weight} parameter lets you assign a weight to each observation
 #' in the dataset.  The \code{output} and \code{options} parameters provide
 #' additional customization of the results.
 #' @details
-#' The \code{proc_reg} function is a general purpose regression function.  It
+#' The \code{proc_reg} function is a general-purpose regression function.  It
 #' produces a dataset output by default, and, when working in RStudio,
 #' also produces an interactive report.  The function has many convenient options
 #' for what statistics are produced and how the analysis is performed. All
