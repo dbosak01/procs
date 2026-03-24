@@ -873,7 +873,7 @@ render_freqplot.group <- function(dat, tbl1, tbl2, plt) {
             bwdth <- twdth / length(v2)
 
             # Process labels
-            fw <- fit_width(v2, bwdth)
+            fw <- fit_width(as.character(v2), bwdth)
 
             # Update labels
             nlbls <- fw$Vector

@@ -1792,7 +1792,6 @@ test_that("freqplot31: Odd cases with plots.", {
 
 
 
-
   } else {
 
     expect_equal(TRUE, TRUE)
@@ -1881,7 +1880,6 @@ test_that("freqplot32: TRUE and multiple plot requests work as expected.", {
   ')
 
 
-
   # freq 007
   proc_freq(dat, tables = v(Eyes, Hair * Eyes, Eyes * Hair), weight = Count,
             title = "Eye and Hair Color of European Children",
@@ -1889,6 +1887,16 @@ test_that("freqplot32: TRUE and multiple plot requests work as expected.", {
                          freqplot("barchart", twoway = "stacked"),
                          freqplot("barchart", twoway = "cluster")))
 
+
+  # Documentation example - bug
+  dat <- as.data.frame(HairEyeColor)
+
+  res <- proc_freq(dat, table = "Hair * Eye",
+            weight = "Freq",
+            output = report,
+            plots = freqplot(type = "dotplot"))
+
+  expect_equal("plot_spec" %in% class(res[[2]]), TRUE)
 
 })
 

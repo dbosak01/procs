@@ -1403,6 +1403,10 @@ fit_width <- function(str, wdth) {
 
   # browser()
 
+  if (is.character(str) == FALSE) {
+    str <- as.character(str)
+  }
+
   # Return vector and line count
   lst <- list()
   mxlns <- 0
