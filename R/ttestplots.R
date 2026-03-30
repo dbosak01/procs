@@ -263,39 +263,39 @@ render_ttestplot <- function (dat, var, plt, class, res) {
 
       if (tp == "summary") {
         if (is.null(class)) {
-          ret[["summary"]] <- render_summary1(dat, var, plt)
+          ret[["summary"]] <- render_summary1(dat, var, plt, res)
         } else {
-          ret[["summary"]] <- render_summary2(dat, var, plt, class)
+          ret[["summary"]] <- render_summary2(dat, var, plt, class, res)
         }
       } else if (tp == "histogram") {
         if (is.null(class)) {
-          ret[["histogram"]] <- render_histogram1(dat, var, plt)
+          ret[["histogram"]] <- render_histogram1(dat, var, plt, res)
         } else {
 
-          ret[["histogram"]] <- render_histogram2(dat, var, plt, class)
+          ret[["histogram"]] <- render_histogram2(dat, var, plt, class, res)
         }
       } else if (tp == "boxplot") {
         if (is.null(class)) {
-          ret[["boxplot"]] <- render_boxplot1(dat, var, plt)
+          ret[["boxplot"]] <- render_boxplot1(dat, var, plt, res)
         } else {
-          ret[["boxplot"]] <- render_boxplot2(dat, var, plt, class)
+          ret[["boxplot"]] <- render_boxplot2(dat, var, plt, class, res)
         }
       } else if (tp == "qqplot") {
         if (is.null(class)) {
-          ret[["qqplot"]] <- render_tqqplot1(dat, var, plt)
+          ret[["qqplot"]] <- render_tqqplot1(dat, var, plt, res)
         } else {
-          ret[["qqplot"]] <- render_tqqplot2(dat, var, plt, class)
+          ret[["qqplot"]] <- render_tqqplot2(dat, var, plt, class, res)
         }
       } else if (tp == "interval") {
         if (is.null(class)) {
-          ret[["interval"]] <- render_interval1(dat, var, plt)
+          ret[["interval"]] <- render_interval1(dat, var, plt, res)
         } else {
           ret[["interval"]] <- render_interval2(dat, var, plt, res)
         }
       } else if (tp == "profiles") {
-        ret[["profiles"]] <- render_profiles(dat, var, plt)
+        ret[["profiles"]] <- render_profiles(dat, var, plt, res)
       } else if (tp == "agreement") {
-        ret[["agreement"]] <- render_agreement(dat, var, plt)
+        ret[["agreement"]] <- render_agreement(dat, var, plt, res)
       }
     }
 
@@ -313,7 +313,7 @@ render_ttestplot <- function (dat, var, plt, class, res) {
 
 # unpack: TRUE or FALSE
 #' @noRd
-render_summary1 <- function(dat, var, plt) {
+render_summary1 <- function(dat, var, plt, res) {
 
 
   op <- par("mar")
@@ -365,9 +365,13 @@ render_summary1 <- function(dat, var, plt) {
       fig = c(0, 1, .3, 1))
 
   # Calculate stats
-  n   <- length(rdt)
-  mu  <- mean(rdt)
-  sdx <- sd(rdt)
+  stat_tbl <- res[[grep("Statistics$", names(res))[length(grep("Statistics$", names(res)))]]]
+  clm_tbl <- res[[grep("ConfLimits$", names(res))[length(grep("ConfLimits$", names(res)))]]]
+
+  n   <- stat_tbl$N[1]
+  mu  <- stat_tbl$MEAN[1]
+  sdx <- stat_tbl$STD[1]
+  ci  <- c(clm_tbl$LCLM[1], clm_tbl$UCLM[1])
 
   # Use calculated breaks to get scale
   # scl <- range(rdt)
@@ -513,16 +517,13 @@ render_summary1 <- function(dat, var, plt) {
   xscl <- get_scale(dt, .05)  # Not used?
 
   # Calculations
-  n  <- length(dt)
-  mu <- mean(dt)
-  sdx <- sd(dt)
+  stat_tbl <- res[[grep("Statistics$", names(res))[length(grep("Statistics$", names(res)))]]]
+  clm_tbl <- res[[grep("ConfLimits$", names(res))[length(grep("ConfLimits$", names(res)))]]]
 
-  ## 95% CI for mean (SAS uses t-based CI)
-  tcrit <- qt(1 - alpha / 2, df = n - 1)
-
-  # Calculate confidence interval
-  ci <- mu + c(-1, 1) * tcrit * sdx / sqrt(n)
-
+  n   <- stat_tbl$N[1]
+  mu  <- stat_tbl$MEAN[1]
+  sdx <- stat_tbl$STD[1]
+  ci  <- c(clm_tbl$LCLM[1], clm_tbl$UCLM[1])
 
   ## Draw empty plot first (for layering)
   plot(dt, rep(1, n),
@@ -540,8 +541,10 @@ render_summary1 <- function(dat, var, plt) {
         line = par("mar")[1] - 2,
         font = 1)
 
-  ## Shaded CI band
+  ## Shaded CI band and make sure infinite values are out of boundry
   usr <- par("usr")
+  if (is.infinite(ci[1])) ci[1] <- usr[1] - abs(usr[1])*10
+  if (is.infinite(ci[2])) ci[2] <- usr[2] + abs(usr[2])*10
   rect(ci[1], usr[3], ci[2], usr[4],
        col = "#B3D2D0",
        border = NA)
@@ -673,7 +676,7 @@ render_summary1 <- function(dat, var, plt) {
 
 
 #' @noRd
-render_summary2 <- function(dat, var, plt, class) {
+render_summary2 <- function(dat, var, plt, class, res) {
 
 
   op <- par("mar")
@@ -786,9 +789,13 @@ render_summary2 <- function(dat, var, plt, class) {
   par(fig = c(0, 1, .6, 1))
 
   # Calculate stats
-  n   <- length(dt1)
-  mu  <- mean(dt1)
-  sdx <- sd(dt1)
+  stat_tbl <- res[[grep("Statistics$", names(res))[length(grep("Statistics$", names(res)))]]]
+  clm_tbl <- res[[grep("ConfLimits$", names(res))[length(grep("ConfLimits$", names(res)))]]]
+
+  n   <- stat_tbl$N[stat_tbl$CLASS == vl1]
+  mu  <- stat_tbl$MEAN[stat_tbl$CLASS == vl1]
+  sdx <- stat_tbl$STD[stat_tbl$CLASS == vl1]
+
 
 
   # Histogram (Percent scale)
@@ -859,9 +866,9 @@ render_summary2 <- function(dat, var, plt, class) {
   par(fig = c(0, 1, .2, .6), new = TRUE)
 
   # Calculate stats
-  n   <- length(dt2)
-  mu  <- mean(dt2)
-  sdx <- sd(dt2)
+  n   <- stat_tbl$N[stat_tbl$CLASS == vl2]
+  mu  <- stat_tbl$MEAN[stat_tbl$CLASS == vl2]
+  sdx <- stat_tbl$STD[stat_tbl$CLASS == vl2]
 
   # Histogram (Percent scale)
   h <- hist(dt2,
@@ -940,12 +947,16 @@ render_summary2 <- function(dat, var, plt, class) {
   # xscl <- get_scale(dt, .05)
 
   # Calculate
-  n1  <- length(dt1)
-  mu1 <- mean(dt1)
-  sdx1 <- sd(dt1)
-  n2  <- length(dt2)
-  mu2 <- mean(dt2)
-  sdx2 <- sd(dt2)
+  stat_tbl <- res[[grep("Statistics$", names(res))[length(grep("Statistics$", names(res)))]]]
+  clm_tbl <- res[[grep("ConfLimits$", names(res))[length(grep("ConfLimits$", names(res)))]]]
+
+  n1   <- stat_tbl$N[stat_tbl$CLASS == vl1]
+  mu1  <- stat_tbl$MEAN[stat_tbl$CLASS == vl1]
+  sdx1 <- stat_tbl$STD[stat_tbl$CLASS == vl1]
+
+  n2   <- stat_tbl$N[stat_tbl$CLASS == vl2]
+  mu2  <- stat_tbl$MEAN[stat_tbl$CLASS == vl2]
+  sdx2 <- stat_tbl$STD[stat_tbl$CLASS == vl2]
 
   # Draw empty plot first, so we can put ablines() behind the boxes
   plot(dt, rep(1, length(dt)),
@@ -1105,7 +1116,7 @@ render_summary2 <- function(dat, var, plt, class) {
 
 # Curves for normal and density most correct on this one.
 #' @noRd
-render_histogram1 <- function(dat, var, plt) {
+render_histogram1 <- function(dat, var, plt, res) {
 
 
   op <- par("mar")
@@ -1148,9 +1159,13 @@ render_histogram1 <- function(dat, var, plt) {
   }
 
   # Calculate stats
-  n   <- length(rdt)
-  mu  <- mean(rdt)
-  sdx <- sd(rdt)
+  stat_tbl <- res[[grep("Statistics$", names(res))[length(grep("Statistics$", names(res)))]]]
+  clm_tbl <- res[[grep("ConfLimits$", names(res))[length(grep("ConfLimits$", names(res)))]]]
+
+  n   <- stat_tbl$N[1]
+  mu  <- stat_tbl$MEAN[1]
+  sdx <- stat_tbl$STD[1]
+  ci  <- c(clm_tbl$LCLM[1], clm_tbl$UCLM[1])
 
   # Calculate breaks - Closer to SAS algorithm
   brks <- pretty(range(rdt), n = nclass.Sturges(rdt),
@@ -1253,7 +1268,7 @@ render_histogram1 <- function(dat, var, plt) {
 
 
 #' @noRd
-render_histogram2 <- function(dat, var, plt, class) {
+render_histogram2 <- function(dat, var, plt, class, res) {
 
   op <- par("mar")
   om <- par("oma")
@@ -1344,9 +1359,11 @@ render_histogram2 <- function(dat, var, plt, class) {
   #******************************
 
   # Calculate stats
-  n   <- length(dt1)
-  mu  <- mean(dt1)
-  sdx <- sd(dt1)
+  stat_tbl <- res[[grep("Statistics$", names(res))[length(grep("Statistics$", names(res)))]]]
+
+  n   <- stat_tbl$N[stat_tbl$CLASS == vl1]
+  mu  <- stat_tbl$MEAN[stat_tbl$CLASS == vl1]
+  sdx <- stat_tbl$STD[stat_tbl$CLASS == vl1]
 
   # Histogram (Percent scale)
   h <- hist(dt1,
@@ -1431,9 +1448,9 @@ render_histogram2 <- function(dat, var, plt, class) {
   #******************************
 
   # Calculate stats
-  n   <- length(dt2)
-  mu  <- mean(dt2)
-  sdx <- sd(dt2)
+  n   <- stat_tbl$N[stat_tbl$CLASS == vl2]
+  mu  <- stat_tbl$MEAN[stat_tbl$CLASS == vl2]
+  sdx <- stat_tbl$STD[stat_tbl$CLASS == vl2]
 
   # Histogram (Percent scale)
   h <- hist(dt2,
@@ -1565,7 +1582,7 @@ render_histogram2 <- function(dat, var, plt, class) {
 
 # Legend moves to left if mean too far to the right
 #' @noRd
-render_boxplot1 <- function(dat, var, plt) {
+render_boxplot1 <- function(dat, var, plt, res) {
 
 
   op <- par("mar")
@@ -1620,16 +1637,13 @@ render_boxplot1 <- function(dat, var, plt) {
   }
 
   # Get stats
-  n  <- length(dt)
-  mu <- mean(dt)
-  sdx <- sd(dt)
+  stat_tbl <- res[[grep("Statistics$", names(res))[length(grep("Statistics$", names(res)))]]]
+  clm_tbl <- res[[grep("ConfLimits$", names(res))[length(grep("ConfLimits$", names(res)))]]]
 
-  ## 95% CI for mean (SAS uses t-based CI)
-  tcrit <- qt(1 - alpha / 2, df = n - 1)
-
-  # Calculate confidence interval
-  ci <- mu + c(-1, 1) * tcrit * sdx / sqrt(n)
-
+  n   <- stat_tbl$N[1]
+  mu  <- stat_tbl$MEAN[1]
+  sdx <- stat_tbl$STD[1]
+  ci  <- c(clm_tbl$LCLM[1], clm_tbl$UCLM[1])
 
   ## Draw empty plot first (for layering)
   plot(dt, rep(1, n),
@@ -1658,6 +1672,8 @@ render_boxplot1 <- function(dat, var, plt) {
 
   ## Shaded CI band
   usr <- par("usr")
+  if (is.infinite(ci[1])) ci[1] <- usr[1] - abs(usr[1])*10
+  if (is.infinite(ci[2])) ci[2] <- usr[2] + abs(usr[2])*10
   rect(ci[1], usr[3], ci[2], usr[4],
        col = "#B3D2D0",
        border = NA)
@@ -1782,7 +1798,7 @@ render_boxplot1 <- function(dat, var, plt) {
 
 # Need to deal with outliers
 #' @noRd
-render_boxplot2 <- function(dat, var, plt, class) {
+render_boxplot2 <- function(dat, var, plt, class, res) {
 
   # browser()
   op <- par("mar")
@@ -1887,12 +1903,15 @@ render_boxplot2 <- function(dat, var, plt, class) {
   }
 
   # Calculate
-  n1  <- length(dt1)
-  mu1 <- mean(dt1)
-  sdx1 <- sd(dt1)
-  n2  <- length(dt2)
-  mu2 <- mean(dt2)
-  sdx2 <- sd(dt2)
+  stat_tbl <- res[[grep("Statistics$", names(res))[length(grep("Statistics$", names(res)))]]]
+
+  n1   <- stat_tbl$N[stat_tbl$CLASS == vl1]
+  mu1  <- stat_tbl$MEAN[stat_tbl$CLASS == vl1]
+  sdx1 <- stat_tbl$STD[stat_tbl$CLASS == vl1]
+
+  n2   <- stat_tbl$N[stat_tbl$CLASS == vl2]
+  mu2  <- stat_tbl$MEAN[stat_tbl$CLASS == vl2]
+  sdx2 <- stat_tbl$STD[stat_tbl$CLASS == vl2]
 
   # Draw empty plot first, so we can put ablines() behind the boxes
   plot(dt, rep(1, length(dt)),
@@ -2025,7 +2044,7 @@ render_boxplot2 <- function(dat, var, plt, class) {
 
 # type: pergroup or period
 #' @noRd
-render_interval1 <- function(dat, var, plt) {
+render_interval1 <- function(dat, var, plt, res) {
 
 
   op <- par("mar")
@@ -2056,9 +2075,13 @@ render_interval1 <- function(dat, var, plt) {
   par(mar = c(3, 1, 3, .75) + 0.1)
 
   # Calculate basic parameters
-  n  <- length(dt)
-  mu <- mean(dt)
-  sdx <- sd(dt)
+  stat_tbl <- res[[grep("Statistics$", names(res))[length(grep("Statistics$", names(res)))]]]
+  clm_tbl <- res[[grep("ConfLimits$", names(res))[length(grep("ConfLimits$", names(res)))]]]
+
+  n   <- stat_tbl$N[1]
+  mu  <- stat_tbl$MEAN[1]
+  sdx <- stat_tbl$STD[1]
+  ci  <- c(clm_tbl$LCLM[1], clm_tbl$UCLM[1])
 
   # Assign labels
   xlbl <- var
@@ -2068,19 +2091,15 @@ render_interval1 <- function(dat, var, plt) {
     tlbl <- paste0(" Difference: ", plt$varlbl)
   }
 
-  ## 95% CI for mean (SAS uses t-based CI)
-  tcrit <- qt(1 - alpha / 2, df = n - 1)
-
-  # Calculate confidence interval
-  ci <- mu + c(-1, 1) * tcrit * sdx / sqrt(n)
-
   # Get scales
+  xscl <- ci
+  if (is.infinite(xscl[1])) {xscl[1] <- mu-1.5*(xscl[2]-mu)}
+  if (is.infinite(xscl[2])) {xscl[2] <- mu+1.5*(mu-xscl[1])}
   if (plt$showh0) {
-    xscl <- get_scale(ci, .001, plt$h0)
+    xscl <- get_scale(xscl, .001, plt$h0)
   } else {
-    xscl <- get_scale(ci, .001)
+    xscl <- get_scale(xscl, .001)
   }
-
   # Create plot
   plot(ci, rep(1, length(ci)),
        type = "n",
@@ -2109,20 +2128,25 @@ render_interval1 <- function(dat, var, plt) {
   # Draw axis
   aval <- axis(side = 1, las = 1, col.ticks = "grey55",
                mgp = c(3, .5, 0), tck = -0.015)
-
   ## CI line
-  segments(ci[1], 1, ci[2], 1,
-           col = "firebrick3",
-           lwd = 2)
+  if (is.infinite(ci[2])) {
+    # Upper is Inf: Draw arrow pointing right to the edge of the plot
+    arrows(mu, 1, xscl[2]/1.001, 1, col = "#05379B", lwd = 2, length = 0.1)
+    segments(ci[1], 1, mu, 1, col = "firebrick3", lwd = 2)
+  } else if (is.infinite(ci[1])) {
+    # Lower is -Inf: Draw arrow pointing left to the edge of the plot
+    arrows(ci[2], 1, xscl[1]/0.999, 1, col = "#05379B", lwd = 2, length = 0.1)
+    segments(ci[2], 1, mu, 1, col = "firebrick3", lwd = 2)
+
+  } else {
+    # Finite: Draw normal segment
+    segments(ci[1], 1, ci[2], 1, col = "firebrick3", lwd = 2)
+  }
+
 
   ## CI end caps
-  segments(ci[1], 0.95, ci[1], 1.05,
-           col = "firebrick3",
-           lwd = 2)
-
-  segments(ci[2], 0.95, ci[2], 1.05,
-           col = "firebrick3",
-           lwd = 2)
+  if (is.finite(ci[1])) segments(ci[1], 0.95, ci[1], 1.05, col = "firebrick3", lwd = 2)
+  if (is.finite(ci[2])) segments(ci[2], 0.95, ci[2], 1.05, col = "firebrick3", lwd = 2)
 
   ## Mean diamond
   points(mu, 1,
@@ -2213,7 +2237,7 @@ render_interval2 <- function(dat, var, plt, res) {
   jpeg(pth, width = wd, height = ht, quality = 100, units = "px")
 
   # Prepare data
-  dt <- res$ConfLimits
+  dt <- res[[grep("ConfLimits$", names(res))[length(grep("ConfLimits$", names(res)))]]]
 
   # Set margins
   par(mar = c(4, 1, 3, .75) + 0.1)
@@ -2234,12 +2258,14 @@ render_interval2 <- function(dat, var, plt, res) {
   ci <- c(lower_ci, upper_ci)
 
   # Get scales
+  fin_ci <- ci[is.finite(ci)]
   if (plt$showh0) {
-    xscl <- get_scale(ci, .001, plt$h0)
+    xscl <- get_scale(fin_ci, .001, plt$h0)
   } else {
-    xscl <- get_scale(ci, .001)
+    xscl <- get_scale(fin_ci, .001)
   }
-
+  lower_ci[is.infinite(lower_ci)] <- xscl[1] - abs(xscl[1])*10
+  upper_ci[is.infinite(upper_ci)] <- xscl[2] + abs(xscl[2])*10
   # Create base plot
   plot(mean_diff, y,
        xlim = xscl,
@@ -2346,7 +2372,7 @@ render_interval2 <- function(dat, var, plt, res) {
 }
 
 #' @noRd
-render_tqqplot1 <- function(dat, var, plt) {
+render_tqqplot1 <- function(dat, var, plt, res) {
 
   op <- par("mar")
 
@@ -2400,8 +2426,11 @@ render_tqqplot1 <- function(dat, var, plt) {
        cex = 1.3,
        axes = FALSE)
 
+  # Get stats table
+  stat_tbl <- res[[grep("Statistics$", names(res))[length(grep("Statistics$", names(res)))]]]
+
   # Slope = Standard Deviation, Intercept = Mean
-  abline(a = mean(ydat), b = sd(ydat), col = "grey60")
+  abline(a = stat_tbl$MEAN[1], b = stat_tbl$STD[1], col = "grey60")
 
   # Add custom axes
   axis(side = 1, col.ticks = "grey55", mgp = c(3, .5, 0), tck = -0.015)
@@ -2518,7 +2547,7 @@ render_tqqplot1 <- function(dat, var, plt) {
 
 
 #' @noRd
-render_tqqplot2 <- function(dat, var, plt, class) {
+render_tqqplot2 <- function(dat, var, plt, class, res) {
 
 
   op <- par("mar")
@@ -2580,8 +2609,12 @@ render_tqqplot2 <- function(dat, var, plt, class) {
        cex = 1,
        axes = FALSE)
 
+  # Get stats table
+  stat_tbl <- res[[grep("Statistics$", names(res))[length(grep("Statistics$", names(res)))]]]
+
   # Slope = Standard Deviation, Intercept = Mean
-  abline(a = mean(ydat), b = sd(ydat), col = "grey60")
+  abline(a = stat_tbl$MEAN[stat_tbl$CLASS == cvls[1]],
+         b = stat_tbl$STD[stat_tbl$CLASS == cvls[1]], col = "grey60")
 
   # Add custom axes
   axis(side = 1, col.ticks = "grey55", mgp = c(3, .5, 0), tck = -0.015)
@@ -2629,7 +2662,8 @@ render_tqqplot2 <- function(dat, var, plt, class) {
        axes = FALSE)
 
   # Slope = Standard Deviation, Intercept = Mean
-  abline(a = mean(ydat), b = sd(ydat), col = "grey60")
+  abline(a = stat_tbl$MEAN[stat_tbl$CLASS == cvls[2]],
+         b = stat_tbl$STD[stat_tbl$CLASS == cvls[2]], col = "grey60")
 
   # Add custom axes
   axis(side = 1, col.ticks = "grey55", mgp = c(3, .5, 0), tck = -0.015)
@@ -2676,7 +2710,7 @@ render_tqqplot2 <- function(dat, var, plt, class) {
 }
 
 #' @noRd
-render_profiles <- function(dat, var, plt) {
+render_profiles <- function(dat, var, plt, res) {
 
 
   op <- par("mar")
@@ -2775,7 +2809,7 @@ render_profiles <- function(dat, var, plt) {
 }
 
 #' @noRd
-render_agreement <- function(dat, var, plt) {
+render_agreement <- function(dat, var, plt, res) {
 
 
   op <- par("mar")

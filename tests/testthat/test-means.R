@@ -431,7 +431,7 @@ test_that("means18: get_output long works.", {
 
   res <- get_output(datm,  var = c("PresentScore", "TasteScore"),
                     stats = c("n", "mean", "min", "max", "range", "median"),
-                    shape = "long", type = 0, freq = TRUE,
+                    shape = "long", type = 0, frq = TRUE,
                     by = c(by1 = "By1"),
                     class = c(cls1 = "Class1", cls2 = "Class2"))
 
@@ -451,7 +451,7 @@ test_that("means19: get_output wide works.", {
 
   res <- get_output(datm,  var = c("PresentScore", "TasteScore"),
                     stats = c("n", "mean", "min", "max", "range", "median"),
-                    shape = "wide", type = 0, freq = TRUE,
+                    shape = "wide", type = 0, frq = TRUE,
                     by = c(by1 = "By1"),
                     class = c(cls1 = "Class1", cls2 = "Class2"))
 
@@ -471,7 +471,7 @@ test_that("means20: get_output wide no by or class works.", {
 
   res <- get_output(datm,  var = c("PresentScore", "TasteScore"),
                     stats = c("n", "mean", "min", "max", "range", "median"),
-                    shape = "wide", type = 0, freq = TRUE)
+                    shape = "wide", type = 0, frq = TRUE)
 
   res
 

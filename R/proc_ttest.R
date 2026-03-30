@@ -425,8 +425,8 @@ proc_ttest <- function(data,
                        output = NULL,
                        by = NULL,
                        class = NULL,
-                       # freq = NULL, ?
-                       # weight = NULL, ?
+                       freq = NULL,
+                       weight = NULL,
                        options = NULL,
                        titles = NULL,
                        order = NULL,
@@ -446,6 +446,8 @@ proc_ttest <- function(data,
   output <- resolve_arg(output)
   paired <- resolve_arg(paired)
   order <- resolve_arg(order)
+  weight <- resolve_arg(weight)
+  freq <- resolve_arg(freq)
 
   # Parameter checks
   if (!"data.frame" %in% class(data)) {
@@ -484,9 +486,28 @@ proc_ttest <- function(data,
 
       stop(paste("Invalid output keyword: ", output[!tolower(output) %in% outs], "\n"))
     }
+  }
+  if (!is.null(weight)){
+    if (!all(weight %in% nms)) {
 
+      stop(paste("Invalid weight variable name: ", weight[!weight %in% nms], "\n"))
+
+    }else if (!is.numeric(data[[weight[1]]])){
+
+      stop("Weight variable must be numeric.\n")
+    }
   }
 
+  if (!is.null(freq)){
+    if (!all(freq %in% nms)) {
+
+      stop(paste("Invalid freq variable name: ", freq[!freq %in% nms], "\n"))
+
+    }else if (!is.numeric(data[[freq[1]]])){
+
+      stop("Freq variable must be numeric.\n")
+    }
+  }
   # https://documentation.sas.com/doc/en/pgmsascdc/9.4_3.4/statug/statug_ttest_overview.htm
   # https://documentation.sas.com/doc/en/pgmsascdc/9.4_3.4/statug/statug_ttest_syntax01.htm
   aopts <- c("alpha=", "dist", "H0=", "sides", "test", "tost", "crossover=") # analysis options
@@ -496,7 +517,7 @@ proc_ttest <- function(data,
   # Parameter checks for options
   if (!is.null(options)) {
 
-    kopts <- c("alpha", "h0", "noprint")
+    kopts <- c("alpha", "h0", "noprint", "sides")
 
     # Deal with "alpha =" and "maxdec = " by using name instead of value
     nopts <- names(options)
@@ -636,13 +657,15 @@ proc_ttest <- function(data,
   if (view == TRUE | rptflg) {
     rptres <- gen_report_ttest(data, by = by, var = var, class = class,
                                paired = paired, view = view,
-                               titles = titles, #weight = weight,
+                               titles = titles, weight = weight,
                                opts = options, output = output, plots = plots)
   }
 
   # Get output datasets if requested
   if (has_output(output)) {
     res <- gen_output_ttest(data,
+                            weight = weight,
+                            freq = freq,
                             by = by,
                             class = class,
                             var = var,
@@ -676,7 +699,8 @@ proc_ttest <- function(data,
             var = var,
             paired = paired,
             output = output,
-            # weight = weight,
+            freq = freq,
+            weight = weight,
             view = view,
             titles = titles,
             options = options,
@@ -705,7 +729,8 @@ log_ttest <- function(data,
                       var = NULL,
                       paired = NULL,
                       output = NULL,
-                      #weight = NULL,
+                      freq = NULL,
+                      weight = NULL,
                       view = TRUE,
                       titles = NULL,
                       options = NULL,
@@ -739,8 +764,11 @@ log_ttest <- function(data,
   if (!is.null(output))
     ret[length(ret) + 1] <- paste0(indt, "output: ", paste(output, collapse = " "))
 
-  # if (!is.null(weight))
-  #   ret[length(ret) + 1] <- paste0(indt, "weight: ", paste(weight, collapse = " "))
+  if (!is.null(freq))
+    ret[length(ret) + 1] <- paste0(indt, "freq: ", paste(freq, collapse = " "))
+
+  if (!is.null(weight))
+    ret[length(ret) + 1] <- paste0(indt, "weight: ", paste(weight, collapse = " "))
 
   if (!is.null(view))
     ret[length(ret) + 1]<- paste0(indt, "view: ", paste(view, collapse = " "))
@@ -965,6 +993,8 @@ get_output_specs_ttest <- function(data, var, paired, class, opts, output,
 
   } else if (!is.null(paired)) {   # Paired T-Test
 
+    h0 <- get_option(opts, "h0", 0)
+
     if (report == TRUE) {
 
       cnt <- 1
@@ -977,6 +1007,7 @@ get_output_specs_ttest <- function(data, var, paired, class, opts, output,
         v2 <- splt[2]
 
         vnm <- paste0("..diff", i)
+        tvnm <- paste0("..tdiff", i)
 
         if (report == TRUE)
           lnm <- paste0("diff", i, ":")
@@ -984,6 +1015,7 @@ get_output_specs_ttest <- function(data, var, paired, class, opts, output,
           lnm <- ""
 
         dat[[vnm]] <- dat[[v1]] - dat[[v2]]
+        dat[[tvnm]] <- dat[[vnm]] - h0
 
         vr <- paste0(v1, "-", v2)
 
@@ -1000,7 +1032,7 @@ get_output_specs_ttest <- function(data, var, paired, class, opts, output,
         spcs[[paste0(lnm, "TTests")]] <- out_spec(stats = c("df", "t", "probt"),
                                      shape = "wide",
                                      type = FALSE, freq = FALSE,
-                                     var = vnm, varlbl = vr,
+                                     var = tvnm, varlbl = vr,
                                      report = report)
 
         if (!is.null(plots)) {
@@ -1031,6 +1063,7 @@ get_output_specs_ttest <- function(data, var, paired, class, opts, output,
 
 
       vrs <- c()
+      tvrs <- c()
       vlbls <- c()
       for (i in seq_len(length(paired))) {
 
@@ -1041,10 +1074,13 @@ get_output_specs_ttest <- function(data, var, paired, class, opts, output,
         v2 <- splt[2]
 
         vnm <- paste0("..diff", i)
+        tvnm <- paste0("..tdiff", i)
 
         dat[[vnm]] <- dat[[v1]] - dat[[v2]]
+        dat[[tvnm]] <- dat[[vnm]] - h0
 
         vrs[i] <- vnm
+        tvrs[i] <- tvnm
         vlbls[i] <- paste0(v1, "-", v2)
 
       }
@@ -1065,7 +1101,7 @@ get_output_specs_ttest <- function(data, var, paired, class, opts, output,
         spcs[["TTests"]] <- out_spec(stats = c("df", "t", "probt"),
                                                   shape = shp,
                                                   type = FALSE, freq = FALSE,
-                                                  var = vrs,
+                                                  var = tvrs,
                                                   varlbl = vlbls,
                                                   report = report)
 
@@ -1091,7 +1127,7 @@ get_output_specs_ttest <- function(data, var, paired, class, opts, output,
 
 #' @import sasLM
 #' @import common
-get_class_ttest <- function(data, var, class, report = TRUE, opts = NULL,
+get_class_ttest <- function(data, var, class, freq = NULL, weight = NULL, report = TRUE, opts = NULL,
                             byvar = NULL, byval = NULL, shape = NULL, plt = NULL) {
 
   ret <- list()
@@ -1114,46 +1150,138 @@ get_class_ttest <- function(data, var, class, report = TRUE, opts = NULL,
   #   v2 <- lst[[1]][[var]]
   #
   # }
-
-  alph <- 1 - get_alpha(opts)
-
-  ttret1 <- TTEST(v1, v2, alph)
-  ttret2 <- TTEST(v2, v1, alph)
-
-  ft1 <- as.data.frame(unclass(ttret1$`F-test for the ratio of variances`),
-                      stringsAsFactors = FALSE)
-  ft2 <- as.data.frame(unclass(ttret2$`F-test for the ratio of variances`),
-                       stringsAsFactors = FALSE)
-
-  # SAS appears to be taking the one with the greatest F Value
-  if (ft1$`F value` > ft2$`F value`) {
-    ft <- ft1
-  } else {
-
-    ft <- ft2
+  # freq and weight
+  f1 <- if (!is.null(freq)) floor(lst[[1]][[freq]]) else rep(1, length(v1))
+  f2 <- if (!is.null(freq)) floor(lst[[2]][[freq]]) else rep(1, length(v2))
+  w1 <- if (!is.null(weight)) lst[[1]][[weight]] else rep(1, length(v1))
+  w2 <- if (!is.null(weight)) lst[[2]][[weight]] else rep(1, length(v2))
+  # filter out missing and non-positive values for freq and weight
+  idx1 <- !is.na(v1) & !is.na(f1) & f1 > 0 & !is.na(w1) & w1 > 0
+  idx2 <- !is.na(v2) & !is.na(f2) & f2 > 0 & !is.na(w2) & w2 > 0
+  v1 <- v1[idx1]; f1 <- f1[idx1]; w1 <- w1[idx1]
+  v2 <- v2[idx2]; f2 <- f2[idx2]; w2 <- w2[idx2]
+  # apply freq by replicating values
+  if (!is.null(freq)) {
+    v1 <- rep(v1, times = f1)
+    w1 <- rep(w1, times = f1)
+    v2 <- rep(v2, times = f2)
+    w2 <- rep(w2, times = f2)
   }
 
-  st <- as.data.frame(ttret1$`Statistics by group`,
-                      stringsAsFactors = FALSE)
-  tt <- as.data.frame(unclass(ttret1$`Two groups t-test for the difference of means`),
-                      stringsAsFactors = FALSE)
-  # ft <- as.data.frame(unclass(ttret$`F-test for the ratio of variances`),
-  #                     stringsAsFactors = FALSE)
+  n1 <- length(v1)
+  n2 <- length(v2)
+  sw1 <- sum(w1)
+  sw2 <- sum(w2)
+
+  if (!is.null(weight)) {
+    mean1 <- sum(v1 * w1) / sw1
+    mean2 <- sum(v2 * w2) / sw2
+  } else {
+    mean1 <- mean(v1)
+    mean2 <- mean(v2)
+  }
+  diff_mean <- mean1 - mean2
+  wgt1_arg <- if(!is.null(weight)) w1 else NULL
+  wgt2_arg <- if(!is.null(weight)) w2 else NULL
+  var1 <- get_variance(v1, df = n1 - 1, wgt = wgt1_arg, narm = FALSE)
+  var2 <- get_variance(v2, df = n2 - 1, wgt = wgt2_arg, narm = FALSE)
+
+  if (is.na(var1) || is.na(var2) || var1 == 0 || var2 == 0) {
+    f_val <- NA; ndf <- NA; ddf <- NA; prob_f <- NA
+  } else if (var1 > var2) {
+    f_val <- var1 / var2
+    ndf <- n1 - 1; ddf <- n2 - 1
+    prob_f <- 2 * pf(f_val, ndf, ddf, lower.tail = FALSE)
+  } else {
+    f_val <- var2 / var1
+    ndf <- n2 - 1; ddf <- n1 - 1
+    prob_f <- 2 * pf(f_val, ndf, ddf, lower.tail = FALSE)
+  }
+
+  ft <- data.frame(`Num Df` = ndf, `Denom Df` = ddf, `F value` = f_val, `Pr(>F)` = prob_f, check.names = FALSE)
+  alph <- get_alpha(opts)
+  # Pooled
+  df_p <- n1 + n2 - 2
+  var_p <- ((n1 - 1) * var1 + (n2 - 1) * var2) / df_p
+  std_p <- sqrt(var_p)
+  se_p <- sqrt(var_p * (1/sw1 + 1/sw2))
+  t_p <- diff_mean / se_p
+  crit_low <- qchisq(alph / 2, df = df_p, lower.tail = FALSE)
+  crit_upp <- qchisq(alph / 2, df = df_p, lower.tail = TRUE)
+  lclmstd_p <- sqrt(df_p * var_p / crit_low)
+  uclmstd_p <- sqrt(df_p * var_p / crit_upp)
+  # Satterthwaite
+  var_mean1 <- var1 / sw1
+  var_mean2 <- var2 / sw2
+  se_s <- sqrt(var_mean1 + var_mean2)
+  t_s <- diff_mean / se_s
+  df_s <- (var_mean1 + var_mean2)^2 / ((var_mean1^2 / (n1 - 1)) + (var_mean2^2 / (n2 - 1)))
+
+  sides <- toupper(as.character(get_option(opts, "sides", 2, FALSE)))
+
+  if (sides == "2") {
+    margin_p <- qt(1 - alph/2, df = df_p) * se_p
+    margin_s <- qt(1 - alph/2, df = df_s) * se_s
+    pval_p <- 2 * pt(-abs(t_p), df = df_p)
+    pval_s <- 2 * pt(-abs(t_s), df = df_s)
+    lcl_p <- diff_mean - margin_p
+    ucl_p <- diff_mean + margin_p
+    lcl_s <- diff_mean - margin_s
+    ucl_s <- diff_mean + margin_s
+  } else {
+    margin_p <- qt(1 - alph, df = df_p) * se_p
+    margin_s <- qt(1 - alph, df = df_s) * se_s
+
+    if (sides == "U") {
+      pval_p <- pt(t_p, df = df_p, lower.tail = FALSE)
+      pval_s <- pt(t_s, df = df_s, lower.tail = FALSE)
+      lcl_p <- diff_mean - margin_p
+      ucl_p <- Inf
+      lcl_s <- diff_mean - margin_s
+      ucl_s <- Inf
+    } else if (sides == "L"){
+      pval_p <- pt(t_p, df = df_p, lower.tail = TRUE)
+      pval_s <- pt(t_s, df = df_s, lower.tail = TRUE)
+      lcl_p <- -Inf
+      ucl_p <- diff_mean + margin_p
+      lcl_s <- -Inf
+      ucl_s <- diff_mean + margin_s
+    }
+  }
+
+  tt <- data.frame(
+    PE = c(diff_mean, diff_mean),
+    SE = c(se_p, se_s),
+    `t value` = c(t_p, t_s),
+    Df = c(df_p, df_s),
+    `Pr(>|t|)` = c(pval_p, pval_s),
+    LCL = c(lcl_p, lcl_s),
+    UCL = c(ucl_p, ucl_s),
+    STD = c(std_p, NA),
+    lclmstd = c(lclmstd_p, NA),
+    uclmstd = c(uclmstd_p, NA),
+    check.names = FALSE,
+    stringsAsFactors = FALSE
+  )
+
 
   vcls <- c("Diff (1-2)")
   empt <- c(NA, NA)
   mth <- c("Pooled", "Satterthwaite")
   vari <- c("Equal", "Unequal")
 
+
+
   ret[["Statistics"]] <- data.frame(CLASS = vcls, METHOD = mth, N = empt,
                                     MEAN = tt$PE,
-                                    STD = empt, STDERR = tt$SE, MIN = empt,
+                                    STD = tt$STD, STDERR = tt$SE, MIN = empt,
                                     MAX = empt,
                                     stringsAsFactors = FALSE)
 
   ret[["ConfLimits"]] <- data.frame(CLASS = vcls, METHOD = mth, MEAN = tt$PE,
                                     LCLM = tt$LCL ,
-                                    UCLM = tt$UCL, STD = empt,
+                                    UCLM = tt$UCL, STD = tt$STD,
+                                    LCLMSTD = tt$lclmstd, UCLMSTD = tt$uclmstd,
                                     stringsAsFactors = FALSE)
 
 
@@ -1311,6 +1439,7 @@ gen_report_ttest <- function(data,
                              class = NULL,
                              var = NULL,
                              paired = NULL,
+                             freq = NULL,
                              weight = NULL,
                              opts = NULL,
                              output = NULL,
@@ -1392,7 +1521,7 @@ gen_report_ttest <- function(data,
         # Get class-level t-tests
         if (!is.null(class)) {
 
-          ctbl <- get_class_ttest(dt, outp$var, class, TRUE, opts, plots)
+          ctbl <- get_class_ttest(dt, outp$var, class, freq = freq, weight = weight, TRUE, opts, plots)
         }
 
         if (is.null(class) && !tnm %in% "Plots" ||
@@ -1401,7 +1530,7 @@ gen_report_ttest <- function(data,
           # data, var, class, outp, freq = TRUE,
           # type = NULL, byvals = NULL
           #outp <- out_spec(stats = stats, shape = "wide")
-          smtbl <- get_class_report(dt, outp$var, class, outp, freq = FALSE, opts = opts)
+          smtbl <- get_class_report(dt, outp$var, class, outp, frq = FALSE, opts = opts)
 
 
 
@@ -1577,11 +1706,12 @@ gen_report_ttest <- function(data,
 #' @import fmtr
 #' @import common
 gen_output_ttest <- function(data,
+                             freq = NULL,
+                             weight = NULL,
                              by = NULL,
                              class = NULL,
                              var = NULL,
                              paired = NULL,
-                             weight = NULL,
                              output = NULL,
                              opts = NULL) {
 
@@ -1675,11 +1805,22 @@ gen_output_ttest <- function(data,
                               class = cls,
                               stats = outp$stats,
                               shape = outp$shape,
-                              freq = outp$parameters$freq,
+                              freq = freq,
+                              weight = weight,
+                              frq = outp$parameters$freq,
                               type = outp$parameters$type,
                               opts = opts)
 
           if (!is.null(paired)) {
+          #update the name from tdiff back to diff
+            outp$var <- sub("..tdiff", "..diff", outp$var, fixed = TRUE)
+
+            if ("VAR" %in% names(tmpby)) {
+              tmpby$VAR <- sub("..tdiff", "..diff", tmpby$VAR, fixed = TRUE)
+            }
+
+            names(tmpby) <- sub("..tdiff", "..diff", names(tmpby), fixed = TRUE)
+
             tmpby <- add_paired_vars(tmpby, outp$varlbl, outp$shape)
           }
 
@@ -1700,7 +1841,7 @@ gen_output_ttest <- function(data,
           for (vr in outp$var) {
 
             # Get class-level t-tests
-            ctbl <- get_class_ttest(dat, vr, class, FALSE, opts,
+            ctbl <- get_class_ttest(dat, vr, class, freq = freq, weight = weight, FALSE, opts,
                                     byvar = by, byval = bynm,
                                     shape = outp$shape)
 
@@ -1709,8 +1850,10 @@ gen_output_ttest <- function(data,
 
               # Get standard statistics
               tmpcls <- get_class_output(dat, var = vr,
-                                         class = class, outp = outp,
-                                         freq = outp$parameters$freq,
+                                         class = class,
+                                         weight = weight, freq = freq,
+                                         outp = outp,
+                                         frq = outp$parameters$freq,
                                          type = outp$parameters$type,
                                          byvals = bynm, opts = opts,
                                          stats = outp$stats)

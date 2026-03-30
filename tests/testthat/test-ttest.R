@@ -883,7 +883,7 @@ test_that("ttest22: proc_ttest with two vars and class works.", {
 
   expect_equal(is.null(res), FALSE)
   expect_equal(length(res), 4)
-  expect_equal(nrow(res$Statistics), 16)
+  expect_equal(nrow(res$Statistics), 18)
 
 
   res <- proc_ttest(cls,
@@ -895,7 +895,7 @@ test_that("ttest22: proc_ttest with two vars and class works.", {
 
   expect_equal(is.null(res), FALSE)
   expect_equal(length(res), 4)
-  expect_equal(nrow(res$Statistics), 32)
+  expect_equal(nrow(res$Statistics), 36)
   expect_equal(nrow(res$Equality), 8)
 
 
@@ -921,7 +921,7 @@ test_that("ttest22: proc_ttest with two vars and class works.", {
   res
 
   expect_equal(length(res), 4)
-  expect_equal(nrow(res$Statistics), 32)
+  expect_equal(nrow(res$Statistics), 36)
 
 
   res <- proc_ttest(cls,
@@ -934,7 +934,7 @@ test_that("ttest22: proc_ttest with two vars and class works.", {
 
   expect_equal(is.null(res), FALSE)
   expect_equal(length(res), 4)
-  expect_equal(nrow(res$Statistics), 64)
+  expect_equal(nrow(res$Statistics), 72)
   expect_equal(nrow(res$Equality), 16)
 
 
@@ -1349,6 +1349,68 @@ test_that("ttest31: log_ttest() works as expected.", {
 
   expect_equal(length(res), 8)
 
+})
+
+test_that("ttest32: proc_ttest sides option works for One-Sample, Two-Sample, and Paired.", {
+
+  # 1. One Sample T-Test (Sides = U)
+  # Upper bound should be Inf, lower bound should be calculated
+  res1 <- proc_ttest(cls, var = "Height", options = c(h0 = 60, sides = "U"),plots = c("summary", "boxplot"))
+  expect_equal(as.numeric(res1$ConfLimits$UCLM), Inf)
+  expect_true(is.numeric(res1$ConfLimits$LCLM))
+
+  # 2. One Sample T-Test (Sides = L)
+  # Lower bound should be -Inf, upper bound should be calculated
+  res2 <- proc_ttest(cls, var = "Height", options = c(h0 = 60, sides = "L"))
+  expect_equal(as.numeric(res2$ConfLimits$LCLM), -Inf)
+  expect_true(is.numeric(res2$ConfLimits$UCLM))
+
+  # 3. Two Sample T-Test (Sides = U)
+  res3 <- proc_ttest(cls, var = "Height", class = "Sex", options = c(sides = "U"))
+
+  # Row 3 is Diff (1-2) Pooled, UCLM should be Inf
+  expect_equal(as.numeric(res3$ConfLimits$UCLM[3]), Inf)
+  expect_true(is.numeric(res3$ConfLimits$LCLM[3]))
+
+  # Row 1 and 2 are individual group limits, they should also follow the 'sides' rule
+  expect_equal(as.numeric(res3$ConfLimits$UCLM[1]), Inf)
+  expect_equal(as.numeric(res3$ConfLimits$UCLM[2]), Inf)
+
+  # 4. Paired T-Test (Sides = L)
+  res4 <- proc_ttest(paird, paired = "before_measure * after_measure", options = c(sides = "L"))
+  expect_equal(as.numeric(res4$ConfLimits$LCLM[1]), -Inf)
+  expect_true(is.numeric(res4$ConfLimits$UCLM[1]))
+})
+
+
+test_that("ttest33: proc_ttest works with weight and freq parameters.", {
+
+  # Create mock weight and freq columns on the 'cls' dataset
+  cls_wt <- cls
+  cls_wt$WGT <- rep(c(0.5, 1.5), length.out = nrow(cls_wt))
+  cls_wt$FRQ <- rep(c(1, 2, 3), length.out = nrow(cls_wt))
+
+  # 1. One Sample with weight and freq
+  res1 <- proc_ttest(cls_wt, var = "Height", weight = "WGT", freq = "FRQ", options = c(h0 = 60))
+  expect_equal(is.null(res1), FALSE)
+  expect_equal(length(res1), 3)
+  expect_equal(nrow(res1$Statistics), 1)
+
+  # 2. Two Sample (class) with weight and freq
+  res2 <- proc_ttest(cls_wt, var = "Height", class = "Sex", weight = "WGT", freq = "FRQ")
+  expect_equal(is.null(res2), FALSE)
+  expect_equal(length(res2), 4) # Statistics, ConfLimits, TTests, Equality
+  expect_equal(nrow(res2$Statistics), 4) # F, M, Pooled, Satterthwaite
+
+  # 3. Paired with weight and freq
+  paird_fq <- paird
+  paird_fq$WGT <- rep(c(0.8, 1.2), length.out = nrow(paird_fq))
+  paird_fq$FRQ <- rep(c(1, 2), length.out = nrow(paird_fq))
+
+  res3 <- proc_ttest(paird_fq, paired = "before_measure * after_measure", weight = "WGT", freq = "FRQ")
+  expect_equal(is.null(res3), FALSE)
+  expect_equal(length(res3), 3)
+  expect_equal(nrow(res3$Statistics), 1)
 })
 
 

@@ -356,6 +356,7 @@ proc_means <- function(data,
                        output = NULL,
                        by = NULL,
                        class = NULL,
+                       freq = NULL,
                        weight = NULL,
                        options = NULL,
                        titles = NULL,
@@ -372,6 +373,7 @@ proc_means <- function(data,
   class <- resolve_arg(class)
   var <- resolve_arg(var)
   weight <- resolve_arg(weight)
+  freq <- resolve_arg(freq)
   stats <- resolve_arg(stats)
   options <- resolve_arg(options, type = c("character", "double", "integer", "NULL"))
   output <- resolve_arg(output)
@@ -427,6 +429,16 @@ proc_means <- function(data,
     }
   }
 
+  if (!is.null(freq)){
+   if (!all(freq %in% nms)) {
+
+      stop(paste("Invalid freq variable name: ", freq[!freq %in% nms], "\n"))
+
+    }else if (!is.numeric(data[[freq[1]]])){
+
+      stop("Freq variable must be numeric.\n")
+    }
+  }
 
   if (!is.null(class)) {
     if (!all(class %in% nms)) {
@@ -509,7 +521,7 @@ proc_means <- function(data,
   if (view == TRUE | rptflg) {
     rptres <- gen_report_means(data, by = by, var = var, class = class,
                                stats = stats, view = view,
-                               titles = titles, weight = weight,
+                               titles = titles, freq = freq, weight = weight,
                                opts = options)
   }
 
@@ -519,6 +531,7 @@ proc_means <- function(data,
                             by = by,
                             class = class,
                             var = var,
+                            freq = freq,
                             weight = weight,
                             output = outreq,
                             opts = options
@@ -544,6 +557,7 @@ proc_means <- function(data,
             var = var,
             stats = stats,
             output = output,
+            freq = freq,
             weight = weight,
             view = view,
             titles = titles,
@@ -571,6 +585,7 @@ log_means <- function(data,
                       var = NULL,
                       stats = NULL,
                       output = NULL,
+                      freq = NULL,
                       weight = NULL,
                       view = TRUE,
                       titles = NULL,
@@ -580,7 +595,7 @@ log_means <- function(data,
 
   ret <- c()
 
-  indt <- paste0(rep(" ", 12), collapse = "")
+  indt <- paste0(rep(" ", 13), collapse = "")
 
   ret <- paste0("proc_means: input data set ", nrow(data),
                 " rows and ", ncol(data), " columns")
@@ -602,6 +617,9 @@ log_means <- function(data,
 
   if (!is.null(output))
     ret[length(ret) + 1] <- paste0(indt, "output: ", paste(output, collapse = " "))
+
+  if (!is.null(freq))
+    ret[length(ret) + 1] <- paste0(indt, "freq: ", paste(freq, collapse = " "))
 
   if (!is.null(weight))
     ret[length(ret) + 1] <- paste0(indt, "weight: ", paste(weight, collapse = " "))
@@ -662,13 +680,13 @@ get_output_specs_means <- function(outs, stats, opts, output) {
 
     if (option_true(output, "long")) {
       outreq[["out"]] <- out_spec(stats = stats, shape = "long",
-                                  type = TRUE, freq = TRUE)
+                                  type = TRUE, frq = TRUE)
     } else if (option_true(output, "stacked")) {
       outreq[["out"]] <- out_spec(stats = stats, shape = "stacked",
-                                  type = TRUE, freq = TRUE)
+                                  type = TRUE, frq = TRUE)
     } else {
       outreq[["out"]] <- out_spec(stats = stats, shape = "wide",
-                                  type = TRUE, freq = TRUE)
+                                  type = TRUE, frq = TRUE)
     }
 
   }
@@ -682,20 +700,27 @@ get_output_specs_means <- function(outs, stats, opts, output) {
 # Purpose of this function is to prepare data for output.
 # It will append the by, class, type, and freq columns to the subset df.
 # These subsets will get stacked up in the driver function.
-get_output <- function(data, var, weight = NULL, stats, missing = FALSE,
-                       shape = "wide", type = NULL, freq = FALSE,
+get_output <- function(data, var, freq = NULL, weight = NULL, stats, missing = FALSE,
+                       shape = "wide", type = NULL, frq = FALSE,
                        by = NULL, class = NULL, opts = NULL,
                        keep_names = FALSE) {
 
   if (is.null(stats))
     stats <- c("n", "mean", "std", "min", "max")
 
-  ret <- get_summaries(data, var, weight, stats, missing = missing,
+  ret <- get_summaries(data, var, freq, weight, stats, missing = missing,
                        shape = shape, opts = opts)
 
-  if (freq)
-    ret <- cbind(data.frame(FREQ = nrow(data)), ret)
 
+  if (frq) {
+    if (!is.null(freq)) {
+      f_vals <- floor(data[[freq]])
+      actual_freq <- sum(f_vals[f_vals > 0], na.rm = TRUE)
+      ret <- cbind(data.frame(FREQ = actual_freq), ret)
+    } else {
+      ret <- cbind(data.frame(FREQ = nrow(data)), ret)
+    }
+  }
 
   if (!is.null(type))
     ret <- cbind(data.frame(TYPE = type), ret)
@@ -763,60 +788,83 @@ get_output <- function(data, var, weight = NULL, stats, missing = FALSE,
 }
 
 # This is where most of the summary statistics get calculated.
-get_summaries <- function(data, var, weight=NULL, stats, missing = FALSE,
+get_summaries <- function(data, var, freq = NULL, weight=NULL, stats, missing = FALSE,
                           shape = "wide", opts = NULL) {
 
   narm <- TRUE
   ret <- NULL
   vardef <- tolower(get_option(opts, "vardef", "df", FALSE))
   if (vardef=="wgt") vardef <- "weight"
-
+  sides <- toupper(as.character(get_option(opts, "sides", 2, FALSE)))
+  if (!sides %in% c("2", "U", "L")) {
+    stop(paste0("Expecting one of the following values for the SIDES= option： L, U, 2."))
+  }
   for (nm in var) {
 
     w <- NULL
 
     if (!nm %in% names(data)) {
-
       stop(paste0("Variable '", nm, "' not found on input dataset."))
     } else {
       sts <- tolower(stats)
-      rw <- data.frame(VAR = nm, stringsAsFactors = FALSE)
-      var <- data[[nm]]
-      #create one copy of variable to use for some statistic calculation
-      var_all <- var
+      rw  <- data.frame(VAR = nm, stringsAsFactors = FALSE)
 
-      #adjust variable by weight if specified
+      var_raw    <- data[[nm]]
+      weight_raw <- NULL
+      freq_raw   <- NULL
+
+      # get frequency variable if specified
+      if (!is.null(freq)) {
+        freq_raw <- floor(data[[freq]])
+      }
+
+      # get weight variable if specified
       if (!is.null(weight)) {
+        weight_raw <- data[[weight]]
+      } else if (vardef %in% c("weight", "wdf")) {
+        weight_raw <- rep(1, nrow(data))
+      }
 
-        #create one copy of variable to use for some statistic calculation
-        keep <- !is.na(data[[weight]])
-        var_all <- var[keep]
+      # filter data based on missingness and weight/freq conditions
+      keep_all <- rep(TRUE, nrow(data))
+      if (!is.null(freq_raw))   keep_all <- keep_all & !is.na(freq_raw) & freq_raw > 0
+      if (!is.null(weight_raw)) keep_all <- keep_all & !is.na(weight_raw)
+      is_analyzable <- keep_all & !is.na(var_raw)
+      if (!is.null(weight_raw)) is_analyzable <- is_analyzable & weight_raw > 0
 
-        #create w and var vector for stats calculations
-        keep <- !is.na(data[[weight]]) & !is.na(var) & data[[weight]] > 0
-        w = data[[weight]][keep]
-        var <- var[keep]
+      var_all <- var_raw[keep_all]  # for calculating N, NMISS, MIN, MAX, and other stats that use all non-missing values
+      var     <- var_raw[is_analyzable] # for calculating stats that use only analyzable values (e.g. mean, std, etc.)
 
-      } else if (vardef == "weight" || vardef == "wdf") {
-        # If weight is not specified, but vardef is weight or wdf, then we will
-        # use equal weights for all non-missing values.
-        keep <- !is.na(var_all)
-        w <- rep(1, sum(keep))
-        var <- var[keep]
-
+      w <- NULL
+      if (!is.null(weight_raw)) {
+        w <- weight_raw[is_analyzable]
+        if (!is.null(freq_raw)) {
+          w <- w * freq_raw[is_analyzable]
+        }
+      } else if (!is.null(freq_raw)) {
+        w <- freq_raw[is_analyzable]
       }
 
       # compute denominator
-
-      denom <- switch(
-        vardef,
-        "df" = sum(!is.na(var)) - 1,
-        "n"  = sum(!is.na(var)),
-        "weight" = sum(w),
-        "wdf" = sum(w) - 1,
-        stop(paste0("Unexpected vardef value '", vardef,"'"))
-      )
-
+      if (is.null(freq)){
+        denom <- switch(
+          vardef,
+          "df" = sum(!is.na(var)) - 1,
+          "n"  = sum(!is.na(var)),
+          "weight" = sum(w),
+          "wdf" = sum(w) - 1,
+          stop(paste0("Unexpected vardef value '", vardef,"'"))
+        )
+      } else {
+        denom <- switch(
+          vardef,
+          "df" = sum(freq_raw) - 1,
+          "n"  = sum(freq_raw),
+          "weight" = sum(freq_raw),
+          "wdf" = sum(freq_raw) - 1,
+          stop(paste0("Unexpected vardef value '", vardef,"'"))
+        )
+      }
       #browser()
 
       for (st in sts) {
@@ -950,7 +998,7 @@ get_summaries <- function(data, var, weight=NULL, stats, missing = FALSE,
             (all(c("lclm", "uclm") %in% sts) & st == "lclm")) {
 
           alph <- get_alpha(opts)
-          tmp <- get_clm(var, denom, w, narm, alph)
+          tmp <- get_clm(var, denom, w, narm, alph, sides = sides)
 
 
           if (vardef == "df"){
@@ -969,7 +1017,7 @@ get_summaries <- function(data, var, weight=NULL, stats, missing = FALSE,
 
             alph <- get_alpha(opts)
 
-            tmp <- get_clm(var, denom, w, narm, alph, onesided = TRUE)
+            tmp <- get_clm(var, denom, w, narm, alph, sides = "U")
 
             if (vardef == "df")
               rw[["LCLM"]] <- tmp[["lcl"]]
@@ -985,7 +1033,7 @@ get_summaries <- function(data, var, weight=NULL, stats, missing = FALSE,
 
             alph <- get_alpha(opts)
 
-            tmp <- get_clm(var, denom, w, narm, alph, onesided = TRUE)
+            tmp <- get_clm(var, denom, w, narm, alph, sides = "L")
 
             if (vardef == "df")
               rw[["UCLM"]] <- tmp[["ucl"]]
@@ -1013,7 +1061,7 @@ get_summaries <- function(data, var, weight=NULL, stats, missing = FALSE,
 
           alph <- get_alpha(opts)
 
-          tmp <- get_t(var, denom, w, alpha = alph)
+          tmp <- get_t(var, denom, w, alpha = alph, sides = sides)
 
           if (vardef == "df")
             rw[["T"]] <- tmp[["T"]]
@@ -1025,7 +1073,7 @@ get_summaries <- function(data, var, weight=NULL, stats, missing = FALSE,
 
           alph <- get_alpha(opts)
 
-          tmp <- get_t(var, denom, w, alpha = alph)
+          tmp <- get_t(var, denom, w, alpha = alph, sides = sides)
 
           if (vardef == "df")
             rw[["PRT"]] <- tmp[["PRT"]]
@@ -1038,7 +1086,7 @@ get_summaries <- function(data, var, weight=NULL, stats, missing = FALSE,
 
           alph <- get_alpha(opts)
 
-          tmp <- get_t(var, denom, w, alpha = alph)
+          tmp <- get_t(var, denom, w, alpha = alph, sides = sides)
 
           if (vardef == "df")
             rw[["PROBT"]] <- tmp[["PRT"]]
@@ -1050,7 +1098,7 @@ get_summaries <- function(data, var, weight=NULL, stats, missing = FALSE,
 
           alph <- get_alpha(opts)
 
-          tmp <- get_t(var, denom, w, alpha = alph)
+          tmp <- get_t(var, denom, w, alpha = alph, sides = sides)
 
           rw[["DF"]] <- tmp[["DF"]]
 
@@ -1268,6 +1316,7 @@ gen_report_means <- function(data,
                              class = NULL,
                              var = NULL,
                              stats = c("n", "mean", "std", "min", "max"),
+                             freq = NULL,
                              weight = NULL,
                              opts = NULL,
                              view = TRUE,
@@ -1324,10 +1373,10 @@ gen_report_means <- function(data,
     # Get table for this by group
     dt <- dtlst[[j]]
 
-    # data, var, class, outp, freq = TRUE,
+    # data, var, class, outp, frq = TRUE,
     # type = NULL, byvals = NULL
     outp <- out_spec(stats = stats, shape = "wide")
-    smtbl <- get_class_report(dt, var, class, outp, freq = FALSE, weight=weight, opts = opts)
+    smtbl <- get_class_report(dt, var, class, outp, frq = FALSE, freq = freq, weight=weight, opts = opts)
 
     nm <- length(res) + 1
 
@@ -1411,8 +1460,8 @@ gen_report_means <- function(data,
 
 
 
-get_class_report <- function(data, var, class, outp, freq = TRUE,
-                             type = NULL, byvals = NULL, weight = NULL, opts = NULL) {
+get_class_report <- function(data, var, class, outp, frq = TRUE,
+                             type = NULL, byvals = NULL, freq = NULL, weight = NULL, opts = NULL) {
 
 
   res <- NULL
@@ -1450,12 +1499,12 @@ get_class_report <- function(data, var, class, outp, freq = TRUE,
     }
 
 
-    tmpres <- get_output(clslist[[k]], var = var, weight = weight,
+    tmpres <- get_output(clslist[[k]], var = var, freq = freq, weight = weight,
                          by = byvals,
                          class = cnmv,
                          stats = outp$stats,
                          shape = outp$shape,
-                         freq = freq,
+                         frq = frq,
                          type = type,
                          opts = opts)
 
@@ -1492,6 +1541,7 @@ gen_output_means <- function(data,
                              by = NULL,
                              class = NULL,
                              var = NULL,
+                             freq = NULL,
                              weight = NULL,
                              output = NULL,
                              opts = NULL) {
@@ -1575,12 +1625,12 @@ gen_output_means <- function(data,
             (has_option(opts, "nway") == TRUE && is.null(class))) {
 
           # Always add type 0
-          tmpby <- get_output(dat, var = var, weight = weight,
+          tmpby <- get_output(dat, var = var, freq = freq, weight = weight,
                               by = bynm,
                               class = cls,
                               stats = outp$stats,
                               shape = outp$shape,
-                              freq = frq,
+                              frq = frq,
                               type = tp,
                               opts = opts)
 
@@ -1600,9 +1650,9 @@ gen_output_means <- function(data,
             tp <- 1
 
 
-          tmpcls <- get_class_output(dat, var = var, weight = weight,
+          tmpcls <- get_class_output(dat, var = var, freq = freq, weight = weight,
                                      class = class, outp = outp,
-                                     freq = frq, type = tp, byvals = bynm, opts = opts,
+                                     frq = frq, type = tp, byvals = bynm, opts = opts,
                                      stats = outp$stats)
 
           if (is.null(tmpres))
@@ -1663,8 +1713,8 @@ gen_output_means <- function(data,
 }
 
 #' @import utils
-get_class_output <- function(data, var, class, outp, freq = TRUE,
-                             type = NULL, byvals = NULL, weight = NULL,
+get_class_output <- function(data, var, class, outp, frq = TRUE,
+                             type = NULL, byvals = NULL, freq = NULL, weight = NULL,
                              opts = NULL, stats = NULL) {
 
 
@@ -1672,12 +1722,12 @@ get_class_output <- function(data, var, class, outp, freq = TRUE,
 
   if (is.null(class)) {
 
-    res <- get_output(data, var = var, weight = weight,
+    res <- get_output(data, var = var, freq = freq, weight = weight,
                       by = byvals,
                       class = NULL,
                       stats = outp$stats,
                       shape = outp$shape,
-                      freq = freq,
+                      frq = frq,
                       type = type,
                       opts = opts)
 
@@ -1722,12 +1772,12 @@ get_class_output <- function(data, var, class, outp, freq = TRUE,
           }
 
 
-          tmpres <- get_output(clslist[[k]], var = var, weight = weight,
+          tmpres <- get_output(clslist[[k]], var = var, freq = freq, weight = weight,
                                by = byvals,
                                class = cnmv,
                                stats = outp$stats,
                                shape = outp$shape,
-                               freq = freq,
+                               frq = frq,
                                type = tp,
                                opts = opts,
                                keep_names = TRUE)
