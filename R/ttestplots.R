@@ -792,9 +792,9 @@ render_summary2 <- function(dat, var, plt, class, res) {
   stat_tbl <- res[[grep("Statistics$", names(res))[length(grep("Statistics$", names(res)))]]]
   clm_tbl <- res[[grep("ConfLimits$", names(res))[length(grep("ConfLimits$", names(res)))]]]
 
-  n   <- stat_tbl$N[stat_tbl$CLASS == vl1]
-  mu  <- stat_tbl$MEAN[stat_tbl$CLASS == vl1]
-  sdx <- stat_tbl$STD[stat_tbl$CLASS == vl1]
+  n   <- stat_tbl$N[as.character(stat_tbl$CLASS) == as.character(vl1)]
+  mu  <- stat_tbl$MEAN[as.character(stat_tbl$CLASS) == as.character(vl1)]
+  sdx <- stat_tbl$STD[as.character(stat_tbl$CLASS) == as.character(vl1)]
 
 
 
@@ -866,9 +866,9 @@ render_summary2 <- function(dat, var, plt, class, res) {
   par(fig = c(0, 1, .2, .6), new = TRUE)
 
   # Calculate stats
-  n   <- stat_tbl$N[stat_tbl$CLASS == vl2]
-  mu  <- stat_tbl$MEAN[stat_tbl$CLASS == vl2]
-  sdx <- stat_tbl$STD[stat_tbl$CLASS == vl2]
+  n   <- stat_tbl$N[as.character(stat_tbl$CLASS) == as.character(vl2)]
+  mu  <- stat_tbl$MEAN[as.character(stat_tbl$CLASS) == as.character(vl2)]
+  sdx <- stat_tbl$STD[as.character(stat_tbl$CLASS) == as.character(vl2)]
 
   # Histogram (Percent scale)
   h <- hist(dt2,
@@ -950,13 +950,13 @@ render_summary2 <- function(dat, var, plt, class, res) {
   stat_tbl <- res[[grep("Statistics$", names(res))[length(grep("Statistics$", names(res)))]]]
   clm_tbl <- res[[grep("ConfLimits$", names(res))[length(grep("ConfLimits$", names(res)))]]]
 
-  n1   <- stat_tbl$N[stat_tbl$CLASS == vl1]
-  mu1  <- stat_tbl$MEAN[stat_tbl$CLASS == vl1]
-  sdx1 <- stat_tbl$STD[stat_tbl$CLASS == vl1]
+  n1   <- stat_tbl$N[as.character(stat_tbl$CLASS) == as.character(vl1)]
+  mu1  <- stat_tbl$MEAN[as.character(stat_tbl$CLASS) == as.character(vl1)]
+  sdx1 <- stat_tbl$STD[as.character(stat_tbl$CLASS) == as.character(vl1)]
 
-  n2   <- stat_tbl$N[stat_tbl$CLASS == vl2]
-  mu2  <- stat_tbl$MEAN[stat_tbl$CLASS == vl2]
-  sdx2 <- stat_tbl$STD[stat_tbl$CLASS == vl2]
+  n2   <- stat_tbl$N[as.character(stat_tbl$CLASS) == as.character(vl2)]
+  mu2  <- stat_tbl$MEAN[as.character(stat_tbl$CLASS) == as.character(vl2)]
+  sdx2 <- stat_tbl$STD[as.character(stat_tbl$CLASS) == as.character(vl2)]
 
   # Draw empty plot first, so we can put ablines() behind the boxes
   plot(dt, rep(1, length(dt)),
@@ -1361,9 +1361,9 @@ render_histogram2 <- function(dat, var, plt, class, res) {
   # Calculate stats
   stat_tbl <- res[[grep("Statistics$", names(res))[length(grep("Statistics$", names(res)))]]]
 
-  n   <- stat_tbl$N[stat_tbl$CLASS == vl1]
-  mu  <- stat_tbl$MEAN[stat_tbl$CLASS == vl1]
-  sdx <- stat_tbl$STD[stat_tbl$CLASS == vl1]
+  n   <- stat_tbl$N[as.character(stat_tbl$CLASS) == as.character(vl1)]
+  mu  <- stat_tbl$MEAN[as.character(stat_tbl$CLASS) == as.character(vl1)]
+  sdx <- stat_tbl$STD[as.character(stat_tbl$CLASS) == as.character(vl1)]
 
   # Histogram (Percent scale)
   h <- hist(dt1,
@@ -1448,9 +1448,9 @@ render_histogram2 <- function(dat, var, plt, class, res) {
   #******************************
 
   # Calculate stats
-  n   <- stat_tbl$N[stat_tbl$CLASS == vl2]
-  mu  <- stat_tbl$MEAN[stat_tbl$CLASS == vl2]
-  sdx <- stat_tbl$STD[stat_tbl$CLASS == vl2]
+  n   <- stat_tbl$N[as.character(stat_tbl$CLASS) == as.character(vl2)]
+  mu  <- stat_tbl$MEAN[as.character(stat_tbl$CLASS) == as.character(vl2)]
+  sdx <- stat_tbl$STD[as.character(stat_tbl$CLASS) == as.character(vl2)]
 
   # Histogram (Percent scale)
   h <- hist(dt2,
@@ -1878,6 +1878,11 @@ render_boxplot2 <- function(dat, var, plt, class, res) {
     xscl2 <- get_scale(dt2, .05)
   }
 
+  # Get analysis variables
+  cvls <- unique(dat[[class]])
+  vl1 <- cvls[1]
+  vl2 <- cvls[2]
+
   # Get combined scale
   xscl <- c()
   xscl[1] <- min(xscl1[1], xscl2[1])
@@ -1905,13 +1910,13 @@ render_boxplot2 <- function(dat, var, plt, class, res) {
   # Calculate
   stat_tbl <- res[[grep("Statistics$", names(res))[length(grep("Statistics$", names(res)))]]]
 
-  n1   <- stat_tbl$N[stat_tbl$CLASS == vl1]
-  mu1  <- stat_tbl$MEAN[stat_tbl$CLASS == vl1]
-  sdx1 <- stat_tbl$STD[stat_tbl$CLASS == vl1]
+  n1   <- stat_tbl$N[as.character(stat_tbl$CLASS) == as.character(vl1)]
+  mu1  <- stat_tbl$MEAN[as.character(stat_tbl$CLASS) == as.character(vl1)]
+  sdx1 <- stat_tbl$STD[as.character(stat_tbl$CLASS) == as.character(vl1)]
 
-  n2   <- stat_tbl$N[stat_tbl$CLASS == vl2]
-  mu2  <- stat_tbl$MEAN[stat_tbl$CLASS == vl2]
-  sdx2 <- stat_tbl$STD[stat_tbl$CLASS == vl2]
+  n2   <- stat_tbl$N[as.character(stat_tbl$CLASS) == as.character(vl2)]
+  mu2  <- stat_tbl$MEAN[as.character(stat_tbl$CLASS) == as.character(vl2)]
+  sdx2 <- stat_tbl$STD[as.character(stat_tbl$CLASS) == as.character(vl2)]
 
   # Draw empty plot first, so we can put ablines() behind the boxes
   plot(dt, rep(1, length(dt)),
@@ -2613,8 +2618,8 @@ render_tqqplot2 <- function(dat, var, plt, class, res) {
   stat_tbl <- res[[grep("Statistics$", names(res))[length(grep("Statistics$", names(res)))]]]
 
   # Slope = Standard Deviation, Intercept = Mean
-  abline(a = stat_tbl$MEAN[stat_tbl$CLASS == cvls[1]],
-         b = stat_tbl$STD[stat_tbl$CLASS == cvls[1]], col = "grey60")
+  abline(a = stat_tbl$MEAN[as.character(stat_tbl$CLASS) == as.character(cvls[1])],
+         b = stat_tbl$STD[as.character(stat_tbl$CLASS) == as.character(cvls[1])], col = "grey60")
 
   # Add custom axes
   axis(side = 1, col.ticks = "grey55", mgp = c(3, .5, 0), tck = -0.015)
@@ -2662,8 +2667,8 @@ render_tqqplot2 <- function(dat, var, plt, class, res) {
        axes = FALSE)
 
   # Slope = Standard Deviation, Intercept = Mean
-  abline(a = stat_tbl$MEAN[stat_tbl$CLASS == cvls[2]],
-         b = stat_tbl$STD[stat_tbl$CLASS == cvls[2]], col = "grey60")
+  abline(a = stat_tbl$MEAN[as.character(stat_tbl$CLASS) == as.character(cvls[2])],
+         b = stat_tbl$STD[as.character(stat_tbl$CLASS) == as.character(cvls[2])], col = "grey60")
 
   # Add custom axes
   axis(side = 1, col.ticks = "grey55", mgp = c(3, .5, 0), tck = -0.015)

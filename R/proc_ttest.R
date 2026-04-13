@@ -1506,7 +1506,7 @@ gen_report_ttest <- function(data,
 
     # Loop through by groups
     for (j in seq_len(length(dtlst))) {
-
+      res <- list()
       # Get table for this by group
       dt <- dtlst[[j]]
       bynm <- "main"
