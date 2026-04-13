@@ -888,7 +888,7 @@ get_summaries <- function(data, var, freq = NULL, weight=NULL, stats, missing = 
 
           if (all(is.na(var)))
             rw[["CV"]] <- NA
-          else if (is.null(weight))
+          else if (is.null(w))
              rw[["CV"]] <- sqrt(get_variance(var, denom, w, narm))/ mean(var, na.rm = narm) * 100
           else
             rw[["CV"]] <- sqrt(get_variance(var, denom, w, narm))/ (sum(var*w, na.rm = narm)/sum(w)) * 100
@@ -898,7 +898,7 @@ get_summaries <- function(data, var, freq = NULL, weight=NULL, stats, missing = 
 
           if (all(is.na(var)))
             rw[["MEAN"]] <- NA
-          else if (is.null(weight))
+          else if (is.null(w))
              rw[["MEAN"]] <- mean(var, na.rm = narm)
           else
             rw[["MEAN"]] <- sum(var*w, na.rm = narm)/sum(w)
@@ -908,7 +908,7 @@ get_summaries <- function(data, var, freq = NULL, weight=NULL, stats, missing = 
 
           if (all(is.na(var)))
             rw[["MODE"]] <- NA
-          else if (!is.null(weight))
+          else if (!is.null(w))
             rw[["MODE"]] <- NA
           else
             rw[["MODE"]] <- get_mode(var)
@@ -933,7 +933,7 @@ get_summaries <- function(data, var, freq = NULL, weight=NULL, stats, missing = 
 
           if (all(is.na(var)))
             rw[["MEDIAN"]] <- NA
-          else if (is.null(weight))
+          else if (is.null(w))
             rw[["MEDIAN"]] <- median(var, na.rm = narm)
           else
             rw[["MEDIAN"]] <- get_quantile(var, w, probs = c(0.5), narm = narm)
