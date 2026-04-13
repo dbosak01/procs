@@ -1739,7 +1739,7 @@ test_that("means64: Weight works for stats option: t clm uclm lclm prt probt", {
   expect_equal(as.numeric(res1[1,5:7]),c(13.62869969, 35.658376846,48.598033410))
 })
 
-test_that("means64: Weight works for stats option: skew kurt", {
+test_that("means65: Weight works for stats option: skew kurt", {
 
   datsp <- datm
   datsp$Weight <- c(1,2,3,1,2,3,1,2,3,1,2,3,1,2,3,1,2,3,1,2)
@@ -1811,7 +1811,7 @@ test_that("means67: Some other cases with Weight", {
 })
 
 
-test_that("means67: Vardef options with weight and class work as expected.", {
+test_that("means68: Vardef options with weight and class work as expected.", {
 
   dat2 <- read.table(header = TRUE, text = '
                 Name      Assessment     Score   Weight
@@ -1894,7 +1894,7 @@ test_that("means67: Vardef options with weight and class work as expected.", {
 
 
 # More comparisons to SAS
-test_that("means68: Vardef options with other statistics work as expected.", {
+test_that("means69: Vardef options with other statistics work as expected.", {
 
   # NAs in Score and Weight
   dat2 <- read.table(header = TRUE, text = '
@@ -2021,7 +2021,7 @@ test_that("means68: Vardef options with other statistics work as expected.", {
 
 
 # More comparisons to SAS
-test_that("means69: Vardef options with other statistics no weight work as expected.", {
+test_that("means70: Vardef options with other statistics no weight work as expected.", {
 
   # NAs in Score and Weight
   dat2 <- read.table(header = TRUE, text = '
@@ -2116,7 +2116,7 @@ test_that("means69: Vardef options with other statistics no weight work as expec
 
 # T, P, etc. with vardef options
 # More comparisons to SAS
-test_that("means70: Vardef options with other statistics no weight work as expected.", {
+test_that("means71: Vardef options with other statistics no weight work as expected.", {
 
   # NAs in Score and Weight
   dat2 <- read.table(header = TRUE, text = '
@@ -2191,7 +2191,7 @@ test_that("means70: Vardef options with other statistics no weight work as expec
 
 })
 
-test_that("means71: where expression works as expected.", {
+test_that("means72: where expression works as expected.", {
 
   res <- proc_means(datm, var = "Age")
 
@@ -2203,5 +2203,249 @@ test_that("means71: where expression works as expected.", {
                     where = expression(Age < 65))
 
   expect_equal(res$N, 19)
+
+})
+
+
+# --- freq parameter tests ---
+
+test_that("means73: freq parameter with all freq=1 matches no-freq baseline.", {
+
+  # When all freq values are 1, results should match the no-freq case
+  datf <- datm
+  datf$FreqVar <- rep(1, nrow(datf))
+
+  res_no_freq <- proc_means(datm, var = c("PresentScore", "TasteScore"),
+                            stats = c("n", "mean", "std", "min", "max"),
+                            options = v(notype, nonobs))
+
+  res_freq <- proc_means(datf, var = c("PresentScore", "TasteScore"),
+                         stats = c("n", "mean", "std", "min", "max"),
+                         freq = "FreqVar",
+                         options = v(notype, nonobs))
+
+  expect_equal(res_freq$N, res_no_freq$N)
+  expect_equal(res_freq$MEAN, res_no_freq$MEAN)
+  expect_equal(res_freq$STD, res_no_freq$STD)
+  expect_equal(res_freq$MIN, res_no_freq$MIN)
+  expect_equal(res_freq$MAX, res_no_freq$MAX)
+
+})
+
+
+test_that("means74: freq parameter changes FREQ column in output.", {
+
+  datf <- datm
+  datf$FreqVar <- rep(2, nrow(datf))
+
+  # Without freq: FREQ column should be nrow(data) = 20
+  res_no_freq <- proc_means(datf, var = "PresentScore",
+                            stats = c("n", "mean"),
+                            output = out)
+  expect_equal(res_no_freq$FREQ[1], 20)
+
+  # With freq = 2 for all rows: FREQ column = sum(freq) = 40
+  res_freq <- proc_means(datf, var = "PresentScore",
+                         stats = c("n", "mean"),
+                         freq = "FreqVar",
+                         output = out)
+  expect_equal(res_freq$FREQ[1], 40)
+
+})
+
+
+test_that("means75: freq parameter excludes rows with zero freq.", {
+
+  datf <- data.frame(
+    x = c(10, 20, 30, 40),
+    f = c(2, 3, 0, 1)
+  )
+
+  # Row 3 (x=30, f=0) should be excluded
+  res <- proc_means(datf, var = "x",
+                    stats = c("n", "min", "max"),
+                    freq = "f",
+                    options = v(notype, nonobs))
+
+  expect_equal(res$N[1], 3)
+  expect_equal(res$MIN[1], 10)
+  expect_equal(res$MAX[1], 40)
+
+})
+
+
+test_that("means76: freq parameter floors non-integer values.", {
+
+  datf_int <- data.frame(
+    x = c(10, 20, 30),
+    f_int = c(2, 1, 1)
+  )
+  datf_dec <- data.frame(
+    x = c(10, 20, 30),
+    f_dec = c(2.7, 1.3, 1.9)
+  )
+
+  # floor(c(2.7, 1.3, 1.9)) = c(2, 1, 1) so should match integer case
+  res_int <- proc_means(datf_int, var = "x",
+                        stats = c("n", "mean", "std", "min", "max"),
+                        freq = "f_int",
+                        options = v(notype, nonobs))
+
+  res_dec <- proc_means(datf_dec, var = "x",
+                        stats = c("n", "mean", "std", "min", "max"),
+                        freq = "f_dec",
+                        options = v(notype, nonobs))
+
+  expect_equal(res_dec$N[1], res_int$N[1])
+  expect_equal(res_dec$MEAN[1], res_int$MEAN[1])
+  expect_equal(res_dec$STD[1], res_int$STD[1])
+  expect_equal(res_dec$MIN[1], res_int$MIN[1])
+  expect_equal(res_dec$MAX[1], res_int$MAX[1])
+
+})
+
+
+test_that("means77: freq works for variance.", {
+
+  datf <- data.frame(
+    x = c(10, 20, 30),
+    f = c(2, 1, 1)
+  )
+
+  res <- proc_means(datf, var = "x",
+                    stats = c("n", "std", "vari"),
+                    freq = "f",
+                    options = v(notype, nonobs))
+
+  expect_equal(res$N[1], 3)
+  expect_equal(res$VARI[1], 91.6666667)
+  expect_equal(res$STD[1], 9.5742711)
+
+})
+
+
+test_that("means78: freq with by group works.", {
+
+  datf <- datm
+  datf$FreqVar <- c(rep(2, 10), rep(1, 10))
+
+  res <- proc_means(datf, var = "PresentScore",
+                    stats = c("n", "mean", "min", "max"),
+                    freq = "FreqVar",
+                    by = "Layers",
+                    output = out)
+
+  res
+
+  # Should produce results for each Layers group
+  expect_true(nrow(res) > 0)
+  expect_true("BY" %in% names(res))
+  expect_true("FREQ" %in% names(res))
+
+})
+
+
+test_that("means79: freq with class works.", {
+
+  datf <- datm
+  datf$FreqVar <- rep(2, nrow(datf))
+
+  res <- proc_means(datf, var = "PresentScore",
+                    stats = c("n", "mean"),
+                    freq = "FreqVar",
+                    class = "Layers",
+                    output = out)
+
+  res
+
+  expect_true(nrow(res) > 0)
+  expect_true("CLASS" %in% names(res))
+  expect_equal(res$FREQ[1], 40)
+  expect_equal(res$FREQ[2], 18)
+
+})
+
+
+test_that("means80: freq with weight together works.", {
+
+  datf <- datm
+  datf$FreqVar <- c(2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3)
+  datf$Weight <- c(1, 2, 3, 1, 2, 3, 1, 2, 3, 1, 2, 3, 1, 2, 3, 1, 2, 3, 1, 2)
+
+  res <- proc_means(datf, var = "PresentScore",
+                    stats = c("n", "mean", "std"),
+                    freq = "FreqVar",
+                    weight = "Weight",
+                    options = v(notype, nonobs))
+
+  res
+
+  expect_equal(nrow(res), 1)
+  expect_equal(res$N[1], 20)
+  expect_equal(res$MEAN[1], 73.8877551)
+  expect_equal(res$STD[1], 13.2985846)
+
+
+})
+
+
+test_that("means81: freq with n, nmiss, nobs stats.", {
+
+  # nobs = total rows in data (unaffected by freq)
+  # n = count of non-missing values in var_all (filtered by freq > 0)
+  # nmiss = count of missing values in var_all
+
+  datf <- data.frame(
+    x = c(10, NA, 30, 40),
+    f = c(2, 3, 0, 1)
+  )
+
+  res <- proc_means(datf, var = "x",
+                    stats = c("n", "nmiss", "nobs"),
+                    freq = "f",
+                    options = v(notype, nonobs))
+
+  expect_equal(res$NOBS[1], 4)   # total rows in original data
+  expect_equal(res$N[1], 2)      # non-missing: 10, 40
+  expect_equal(res$NMISS[1], 1)  # missing: NA (row 2)
+
+})
+
+
+test_that("means82: freq with sum and range stats.", {
+
+  datf <- data.frame(
+    x = c(10, 20, 30, 40),
+    f = c(2, 3, 0, 1)
+  )
+
+  # Row 3 excluded (f=0). Analyzed values: x = c(10, 20, 40)
+  res <- proc_means(datf, var = "x",
+                    stats = c("sum", "range", "min", "max"),
+                    freq = "f",
+                    options = v(notype, nonobs))
+
+  expect_equal(res$SUM[1], 70)    # 10 + 20 + 40
+  expect_equal(res$MIN[1], 10)
+  expect_equal(res$MAX[1], 40)
+  expect_equal(res$RANGE[1], 30)  # 40 - 10
+
+})
+
+
+test_that("means83: freq FREQ column on output with zeros excluded.", {
+
+  datf <- data.frame(
+    x = c(10, 20, 30, 40),
+    f = c(2, 3, 0, 5)
+  )
+
+  res <- proc_means(datf, var = "x",
+                    stats = c("n", "mean"),
+                    freq = "f",
+                    output = out)
+
+  # FREQ column = sum of freq values where f > 0 = 2 + 3 + 5 = 10
+  expect_equal(res$FREQ[1], 10)
 
 })
