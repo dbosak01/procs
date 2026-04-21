@@ -858,10 +858,10 @@ get_summaries <- function(data, var, freq = NULL, weight=NULL, stats, missing = 
       } else {
         denom <- switch(
           vardef,
-          "df" = sum(freq_raw) - 1,
-          "n"  = sum(freq_raw),
-          "weight" = sum(freq_raw),
-          "wdf" = sum(freq_raw) - 1,
+          "df" = sum(freq_raw[is_analyzable]) - 1,
+          "n"  = sum(freq_raw[is_analyzable]),
+          "weight" = sum(freq_raw[is_analyzable]),
+          "wdf" = sum(freq_raw[is_analyzable]) - 1,
           stop(paste0("Unexpected vardef value '", vardef,"'"))
         )
       }
@@ -908,7 +908,7 @@ get_summaries <- function(data, var, freq = NULL, weight=NULL, stats, missing = 
 
           if (all(is.na(var)))
             rw[["MODE"]] <- NA
-          else if (!is.null(w))
+          else if (!is.null(weight))
             rw[["MODE"]] <- NA
           else
             rw[["MODE"]] <- get_mode(var)
@@ -933,7 +933,7 @@ get_summaries <- function(data, var, freq = NULL, weight=NULL, stats, missing = 
 
           if (all(is.na(var)))
             rw[["MEDIAN"]] <- NA
-          else if (is.null(w))
+          else if (is.null(weight))
             rw[["MEDIAN"]] <- median(var, na.rm = narm)
           else
             rw[["MEDIAN"]] <- get_quantile(var, w, probs = c(0.5), narm = narm)

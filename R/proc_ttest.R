@@ -657,7 +657,7 @@ proc_ttest <- function(data,
   if (view == TRUE | rptflg) {
     rptres <- gen_report_ttest(data, by = by, var = var, class = class,
                                paired = paired, view = view,
-                               titles = titles, weight = weight,
+                               titles = titles, weight = weight, freq = freq,
                                opts = options, output = output, plots = plots)
   }
 
@@ -1017,7 +1017,7 @@ get_output_specs_ttest <- function(data, var, paired, class, opts, output,
         dat[[vnm]] <- dat[[v1]] - dat[[v2]]
         dat[[tvnm]] <- dat[[vnm]] - h0
 
-        vr <- paste0(v1, "-", v2)
+        vr <- paste0(v1, " - ", v2)
 
         stats <- c("n", "mean", "std", "stderr", "min", "max")
 
@@ -1530,7 +1530,8 @@ gen_report_ttest <- function(data,
           # data, var, class, outp, freq = TRUE,
           # type = NULL, byvals = NULL
           #outp <- out_spec(stats = stats, shape = "wide")
-          smtbl <- get_class_report(dt, outp$var, class, outp, frq = FALSE, opts = opts)
+          smtbl <- get_class_report(dt, outp$var, class, outp, frq = FALSE,
+                                    freq = freq, weight = weight, opts = opts)
 
 
 
@@ -1566,6 +1567,8 @@ gen_report_ttest <- function(data,
           if (!is.null(plots)) {
 
             # Add plots: dat, res, var, plt, alph
+            outp$plots$freq <- freq
+            outp$plots$weight <- weight
             res[[nm]] <- render_ttestplot(dt, outp$var, outp$plot, class, res)
 
           }

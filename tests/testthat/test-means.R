@@ -2419,7 +2419,6 @@ test_that("means82: freq with sum and range stats.", {
     f = c(2, 3, 0, 1)
   )
 
-  # Row 3 excluded (f=0). Analyzed values: x = c(10, 20, 40)
   res <- proc_means(datf, var = "x",
                     stats = c("sum", "range", "min", "max"),
                     freq = "f",
@@ -2445,7 +2444,6 @@ test_that("means83: freq FREQ column on output with zeros excluded.", {
                     freq = "f",
                     output = out)
 
-  # FREQ column = sum of freq values where f > 0 = 2 + 3 + 5 = 10
   expect_equal(res$FREQ[1], 10)
 
 })

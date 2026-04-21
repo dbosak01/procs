@@ -1350,73 +1350,342 @@ test_that("ttest31: log_ttest() works as expected.", {
   expect_equal(length(res), 8)
 
 })
+test_that("ttest32: weight parameter",{
 
-test_that("ttest32: proc_ttest sides option works for One-Sample, Two-Sample, and Paired.", {
+  # basic weight
+  cls_wgt <- cls
+  cls_wgt$WeightVar <- c(1, 2.1, 3.2, 4.3, 5, 4, 3, 2, 1, 2, 3, 4, 5, 4, 3, 2, 1, 2, 3)
 
-  # 1. One Sample T-Test (Sides = U)
-  # Upper bound should be Inf, lower bound should be calculated
-  res1 <- proc_ttest(cls, var = "Height", options = c(h0 = 60, sides = "U"),plots = c("summary", "boxplot"))
-  expect_equal(as.numeric(res1$ConfLimits$UCLM), Inf)
-  expect_true(is.numeric(res1$ConfLimits$LCLM))
+  res <- proc_ttest(cls_wgt, var = "Height", weight = "WeightVar",
+                    options = c(h0 = 65))
 
-  # 2. One Sample T-Test (Sides = L)
-  # Lower bound should be -Inf, upper bound should be calculated
-  res2 <- proc_ttest(cls, var = "Height", options = c(h0 = 60, sides = "L"))
-  expect_equal(as.numeric(res2$ConfLimits$LCLM), -Inf)
-  expect_true(is.numeric(res2$ConfLimits$UCLM))
+  expect_equal(is.null(res), FALSE)
+  expect_equal(length(res), 3)
 
-  # 3. Two Sample T-Test (Sides = U)
-  res3 <- proc_ttest(cls, var = "Height", class = "Sex", options = c(sides = "U"))
 
-  # Row 3 is Diff (1-2) Pooled, UCLM should be Inf
-  expect_equal(as.numeric(res3$ConfLimits$UCLM[3]), Inf)
-  expect_true(is.numeric(res3$ConfLimits$LCLM[3]))
+  expect_equal(round(as.numeric(res$Statistics$MEAN),4),   61.9771)
+  expect_equal(round(as.numeric(res$Statistics$STD),4),    8.6055	)
+  expect_equal(round(as.numeric(res$Statistics$STDERR),4), 1.1646)
+  expect_equal(round(as.numeric(res$ConfLimits$LCLM),4),   59.5304)
+  expect_equal(round(as.numeric(res$ConfLimits$UCLM),4),   64.4239)
+  expect_equal(round(as.numeric(res$TTests$T),2),          -2.60)
+  expect_equal(round(as.numeric(res$TTests$PROBT),4),      0.0183)
 
-  # Row 1 and 2 are individual group limits, they should also follow the 'sides' rule
-  expect_equal(as.numeric(res3$ConfLimits$UCLM[1]), Inf)
-  expect_equal(as.numeric(res3$ConfLimits$UCLM[2]), Inf)
+  # weight with class variable
+  res <- proc_ttest(cls_wgt, var = "Height", class = "Sex", weight = "WeightVar")
 
-  # 4. Paired T-Test (Sides = L)
-  res4 <- proc_ttest(paird, paired = "before_measure * after_measure", options = c(sides = "L"))
-  expect_equal(as.numeric(res4$ConfLimits$LCLM[1]), -Inf)
-  expect_true(is.numeric(res4$ConfLimits$UCLM[1]))
+  expect_equal(is.null(res), FALSE)
+  expect_equal(length(res), 4)
+  expect_equal(nrow(res$Statistics), 4)
+
+  # expect_equal(as.numeric(res$Equality$NDF),         _____)
+  # expect_equal(as.numeric(res$Equality$DDF),         _____)
+  # expect_equal(as.numeric(res$Equality$FVAL),        _____)
+
+  # weight with by groups
+  res <- proc_ttest(cls_wgt, var = "Height", by = "Sex", weight = "WeightVar")
+
+  expect_equal(is.null(res), FALSE)
+  expect_equal(length(res), 3)
+
+  # weight with NA values filtered out
+  cls_w <- cls_wgt
+  cls_w$WeightVar[c(2, 5)] <- NA
+
+  res <- proc_ttest(cls_w, var = "Height", weight = "WeightVar")
+
+  expect_equal(is.null(res), FALSE)
+  expect_equal(length(res), 3)
+
+  # weight with non-positive values filtered out
+  cls_w <- cls_wgt
+  cls_w$WeightVar[1] <- 0
+  cls_w$WeightVar[2] <- -5
+
+  res <- proc_ttest(cls_w, var = "Height", weight = "WeightVar")
+
+  expect_equal(is.null(res), FALSE)
+  expect_equal(length(res), 3)
+
+  # weight and sides together
+  res <- proc_ttest(cls_wgt, var = "Height", weight = "WeightVar",
+                    options = c(h0 = 65, sides = "U"))
+
+  expect_equal(as.numeric(res$ConfLimits$UCLM[1]), Inf)
+  expect_true(is.finite(as.numeric(res$ConfLimits$LCLM[1])))
+
+  # invalid weight variable name
+  expect_error(proc_ttest(cls_wgt, var = "Height", weight = "InvalidWeightvar"))
+
+  # non-numeric weight variable
+  expect_error(proc_ttest(cls_wgt, var = "Height", weight = "Sex"))
+})
+
+# --- freq parameter tests ---
+test_that("ttest33: freq parameter", {
+
+  cls_freq <- cls
+  cls_freq$FreqVar <- c(1, 2, 3, 4, 5, 4, 3, 2, 1, 2, 3, 4, 5, 4, 3, 2, 1, 2, 3)
+
+  res <- proc_ttest(cls_freq, var = "Height", freq = "FreqVar",
+                    options = c(h0 = 65))
+
+  expect_equal(is.null(res), FALSE)
+  expect_equal(length(res), 3)
+  res$Statistics$STD[1]
+
+  # expect_equal(as.numeric(res$Statistics$MEAN),   _____)
+  # expect_equal(as.numeric(res$Statistics$STD),    _____)
+  # expect_equal(as.numeric(res$Statistics$STDERR), _____)
+  # expect_equal(as.numeric(res$ConfLimits$LCLM),   _____)
+  # expect_equal(as.numeric(res$ConfLimits$UCLM),   _____)
+  # expect_equal(as.numeric(res$TTests$DF),         _____)
+  # expect_equal(as.numeric(res$TTests$T),          _____)
+  # expect_equal(as.numeric(res$TTests$PROBT),      _____)
+
+
+  #freq parameter with zero frequencies
+  cls_freq <- cls[1:5, ]
+  cls_freq$FreqVar <- c(1, 0, 2, 1, 0)  # Rows 2 and 5 have freq = 0
+
+  res <- proc_ttest(cls_freq, var = "Height", freq = "FreqVar",
+                    options = c(h0 = 65))
+
+  expect_equal(is.null(res), FALSE)
+  expect_equal(length(res), 3)
+
+  #freq with class variable
+  cls_freq <- cls
+  cls_freq$FreqVar <- rep(2, nrow(cls_freq))
+
+  res <- proc_ttest(cls_freq, var = "Height", class = "Sex", freq = "FreqVar")
+
+  expect_equal(is.null(res), FALSE)
+  expect_equal(length(res), 4)
+  expect_equal(nrow(res$Statistics), 4)
+
+  #freq and sides together
+
+  cls_freq <- cls
+  cls_freq$FreqVar <- c(1, 2, 3, 4, 5, 4, 3, 2, 1, 2, 3, 4, 5, 4, 3, 2, 1, 2, 3)
+
+  res <- proc_ttest(cls_freq, var = "Height", freq = "FreqVar",
+                    options = c(h0 = 65, sides = "U"))
+
+  expect_equal(is.null(res), FALSE)
+  expect_equal(as.numeric(res$ConfLimits$UCLM[1]), Inf)
+  expect_true(is.finite(as.numeric(res$ConfLimits$LCLM[1])))
 })
 
 
-test_that("ttest33: proc_ttest works with weight and freq parameters.", {
+test_that("ttest34: freq with paired test.", {
 
-  # Create mock weight and freq columns on the 'cls' dataset
-  cls_wt <- cls
-  cls_wt$WGT <- rep(c(0.5, 1.5), length.out = nrow(cls_wt))
-  cls_wt$FRQ <- rep(c(1, 2, 3), length.out = nrow(cls_wt))
+  paird_freq <- paird
+  paird_freq$FreqVar <- rep(2, nrow(paird_freq))
 
-  # 1. One Sample with weight and freq
-  res1 <- proc_ttest(cls_wt, var = "Height", weight = "WGT", freq = "FRQ", options = c(h0 = 60))
-  expect_equal(is.null(res1), FALSE)
-  expect_equal(length(res1), 3)
-  expect_equal(nrow(res1$Statistics), 1)
+  res <- proc_ttest(paird_freq, paired = "before_measure * after_measure",
+                    freq = "FreqVar")
 
-  # 2. Two Sample (class) with weight and freq
-  res2 <- proc_ttest(cls_wt, var = "Height", class = "Sex", weight = "WGT", freq = "FRQ")
-  expect_equal(is.null(res2), FALSE)
-  expect_equal(length(res2), 4) # Statistics, ConfLimits, TTests, Equality
-  expect_equal(nrow(res2$Statistics), 4) # F, M, Pooled, Satterthwaite
+  expect_equal(is.null(res), FALSE)
+  expect_equal(length(res), 3)
 
-  # 3. Paired with weight and freq
-  paird_fq <- paird
-  paird_fq$WGT <- rep(c(0.8, 1.2), length.out = nrow(paird_fq))
-  paird_fq$FRQ <- rep(c(1, 2), length.out = nrow(paird_fq))
+  # expect_equal(as.numeric(res$Statistics$N),      _____)
+  # expect_equal(as.numeric(res$Statistics$MEAN),   _____)
+  # expect_equal(as.numeric(res$Statistics$STD),    _____)
+  # expect_equal(as.numeric(res$Statistics$STDERR), _____)
+  # expect_equal(as.numeric(res$ConfLimits$LCLM),   _____)
+  # expect_equal(as.numeric(res$ConfLimits$UCLM),   _____)
+  # expect_equal(as.numeric(res$TTests$DF),         _____)
+  # expect_equal(as.numeric(res$TTests$T),          _____)
+  # expect_equal(as.numeric(res$TTests$PROBT),      _____)
 
-  res3 <- proc_ttest(paird_fq, paired = "before_measure * after_measure", weight = "WGT", freq = "FRQ")
-  expect_equal(is.null(res3), FALSE)
-  expect_equal(length(res3), 3)
-  expect_equal(nrow(res3$Statistics), 1)
+  #freq with by groups
+  cls_freq <- cls
+  cls_freq$FreqVar <- c(rep(2, 10), rep(1, 9))
+
+  res <- proc_ttest(cls_freq, var = "Height", by = "Sex", freq = "FreqVar")
+
+  expect_equal(is.null(res), FALSE)
+  expect_equal(length(res), 3)
+
+  #sides = 'L' lower bound
+  res1 <- proc_ttest(cls, var = "Height", options = c(h0 = 65, sides = "L"))
+
+  expect_equal(as.numeric(res1$ConfLimits$LCLM[1]), -Inf)
+  expect_true(is.finite(as.numeric(res1$ConfLimits$UCLM[1])))
+  expect_true(is.numeric(as.numeric(res1$TTests$T[1])))
+
+  #sides = 'U' upper bound
+  res1 <- proc_ttest(cls, var = "Height", options = c(h0 = 65, sides = "U"))
+
+  expect_equal(as.numeric(res1$ConfLimits$UCLM[1]), Inf)
+  expect_true(is.finite(as.numeric(res1$ConfLimits$LCLM[1])))
+
+  #sides = '2' two-sided test
+  res1 <- proc_ttest(cls, var = "Height", options = c(h0 = 65, sides = "2"))
+
+  expect_true(is.finite(as.numeric(res1$ConfLimits$LCLM[1])))
+  expect_true(is.finite(as.numeric(res1$ConfLimits$UCLM[1])))
+  expect_true(as.numeric(res1$ConfLimits$LCLM[1]) < as.numeric(res1$ConfLimits$UCLM[1]))
+
+  #sides with class variable
+  res1 <- proc_ttest(cls, var = "Height", class = "Sex", options = c(sides = "L"))
+
+  expect_equal(as.numeric(res1$ConfLimits$LCLM[3]), -Inf)
+  expect_true(is.finite(as.numeric(res1$ConfLimits$UCLM[3])))
+
+  res2 <- proc_ttest(cls, var = "Height", class = "Sex", options = c(sides = "U"))
+
+  expect_equal(as.numeric(res2$ConfLimits$UCLM[3]), Inf)
+  expect_true(is.finite(as.numeric(res2$ConfLimits$LCLM[3])))
 })
 
 
+test_that("ttest35: freq and weight parameter together",{
+
+  # basic freq + weight
+  cls_fw <- cls
+  cls_fw$FreqVar   <- c(1, 2, 3, 4, 5, 4, 3, 2, 1, 2, 3, 4, 5, 4, 3, 2, 1, 2, 3)
+  cls_fw$WeightVar <- c(3, 1, 2, 5, 4, 2, 3, 1, 4, 5, 2, 3, 1, 4, 2, 5, 3, 1, 2)
+
+  res <- proc_ttest(cls_fw, var = "Height", freq = "FreqVar", weight = "WeightVar",
+                    options = c(h0 = 65))
+
+  expect_equal(is.null(res), FALSE)
+  expect_equal(length(res), 3)
+
+  # expect_equal(as.numeric(res$Statistics$MEAN),   _____)
+  # expect_equal(as.numeric(res$Statistics$STD),    _____)
+  # expect_equal(as.numeric(res$Statistics$STDERR), _____)
+  # expect_equal(as.numeric(res$ConfLimits$LCLM),   _____)
+  # expect_equal(as.numeric(res$ConfLimits$UCLM),   _____)
+  # expect_equal(as.numeric(res$TTests$DF),         _____)
+  # expect_equal(as.numeric(res$TTests$T),          _____)
+  # expect_equal(as.numeric(res$TTests$PROBT),      _____)
+
+  # freq + weight with class variable
+  res <- proc_ttest(cls_fw, var = "Height", class = "Sex",
+                    freq = "FreqVar", weight = "WeightVar")
+
+  expect_equal(is.null(res), FALSE)
+  expect_equal(length(res), 4)
+  expect_equal(nrow(res$Statistics), 4)
+
+  # freq + weight with by groups
+  res <- proc_ttest(cls_fw, var = "Height", by = "Sex",
+                    freq = "FreqVar", weight = "WeightVar")
+
+  expect_equal(is.null(res), FALSE)
+  expect_equal(length(res), 3)
+
+  # zero/NA freq and NA weight rows are dropped
+  cls_fw2 <- cls_fw
+  cls_fw2$FreqVar[1]   <- 0
+  cls_fw2$FreqVar[2]   <- NA
+  cls_fw2$WeightVar[3] <- NA
+
+  res <- proc_ttest(cls_fw2, var = "Height",
+                    freq = "FreqVar", weight = "WeightVar")
+
+  expect_equal(is.null(res), FALSE)
+  expect_equal(length(res), 3)
+
+  # freq + weight with sides = "L"
+  res <- proc_ttest(cls_fw, var = "Height",
+                    freq = "FreqVar", weight = "WeightVar",
+                    options = c(h0 = 65, sides = "L"))
+
+  expect_equal(as.numeric(res$ConfLimits$LCLM[1]), -Inf)
+  expect_true(is.finite(as.numeric(res$ConfLimits$UCLM[1])))
+
+  # freq + weight with paired test
+  paird_fw <- paird
+  paird_fw$FreqVar <- rep(2, nrow(paird_fw))
+  paird_fw$WeightVar <- seq_len(nrow(paird_fw))
+
+  res <- proc_ttest(paird_fw, paired = "before_measure * after_measure",
+                    freq = "FreqVar", weight = "WeightVar")
+
+  expect_equal(is.null(res), FALSE)
+  expect_equal(length(res), 3)
+})
+
+test_that("ttest36: freq and weight parameter and vardef option together",{
 
 
+  cls_fw <- cls
+  cls_fw$FreqVar   <- c(1, 2, 3, 4, 5, 4, 3, 2, 1, 2, 3, 4, 5, 4, 3, 2, 1, 2, 3)
+  cls_fw$WeightVar <- c(3, 1, 2, 5, 4, 2, 3, 1, 4, 5, 2, 3, 1, 4, 2, 5, 3, 1, 2)
 
+  # vardef = wgt (weight)
+  res_wgt <- proc_ttest(cls_fw, var = "Height",
+                        freq = "FreqVar", weight = "WeightVar",
+                        options = c(h0 = 65, vardef = "wgt"))
+
+  expect_equal(is.null(res_wgt), FALSE)
+  expect_equal(length(res_wgt), 3)
+
+  # expect_equal(as.numeric(res_wgt$Statistics$MEAN),   _____)
+  # expect_equal(as.numeric(res_wgt$Statistics$STD),    _____)
+  # expect_equal(as.numeric(res_wgt$Statistics$STDERR), _____)
+  # expect_equal(as.numeric(res_wgt$ConfLimits$LCLM),   _____)
+  # expect_equal(as.numeric(res_wgt$ConfLimits$UCLM),   _____)
+  # expect_equal(as.numeric(res_wgt$TTests$DF),         _____)
+  # expect_equal(as.numeric(res_wgt$TTests$T),          _____)
+  # expect_equal(as.numeric(res_wgt$TTests$PROBT),      _____)
+
+  # vardef = wdf
+  res_wdf <- proc_ttest(cls_fw, var = "Height",
+                        freq = "FreqVar", weight = "WeightVar",
+                        options = c(h0 = 65, vardef = "wdf"))
+
+  expect_equal(is.null(res_wdf), FALSE)
+  expect_equal(length(res_wdf), 3)
+
+
+  # expect_equal(as.numeric(res_wdf$TTests$DF),         _____)
+  # expect_equal(as.numeric(res_wdf$TTests$T),          _____)
+  # expect_equal(as.numeric(res_wdf$TTests$PROBT),      _____)
+
+  # vardef = df
+  res_df <- proc_ttest(cls_fw, var = "Height",
+                       freq = "FreqVar", weight = "WeightVar",
+                       options = c(h0 = 65, vardef = "df"))
+
+  expect_equal(is.null(res_df), FALSE)
+  expect_equal(length(res_df), 3)
+
+
+  # expect_equal(as.numeric(res_df$TTests$DF),         _____)
+  # expect_equal(as.numeric(res_df$TTests$T),          _____)
+  # expect_equal(as.numeric(res_df$TTests$PROBT),      _____)
+
+  # vardef = n
+  res_n <- proc_ttest(cls_fw, var = "Height",
+                      freq = "FreqVar", weight = "WeightVar",
+                      options = c(h0 = 65, vardef = "n"))
+
+  expect_equal(is.null(res_n), FALSE)
+  expect_equal(length(res_n), 3)
+
+
+  # expect_equal(as.numeric(res_n$TTests$DF),         _____)
+  # expect_equal(as.numeric(res_n$TTests$T),          _____)
+  # expect_equal(as.numeric(res_n$TTests$PROBT),      _____)
+
+  # vardef together with class (pooled + Satterthwaite + Equality F-test)
+  res_cls <- proc_ttest(cls_fw, var = "Height", class = "Sex",
+                        freq = "FreqVar", weight = "WeightVar",
+                        options = c(vardef = "wgt"))
+
+  expect_equal(is.null(res_cls), FALSE)
+  expect_equal(length(res_cls), 4)
+  expect_equal(nrow(res_cls$Statistics), 4)
+
+  # expect_equal(as.numeric(res_cls$Equality$NDF),         _____)
+  # expect_equal(as.numeric(res_cls$Equality$DDF),         _____)
+  # expect_equal(as.numeric(res_cls$Equality$FVAL),        _____)
+})
 # Not sure how to do this.  Can't get lognormal dist to match SAS.
 # test_that("ttest28: Paired ttest with lognormal data works.", {
 #

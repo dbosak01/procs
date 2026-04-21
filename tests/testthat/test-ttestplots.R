@@ -779,3 +779,269 @@ test_that("ttestplot15: Label and ID parameters work as expected.", {
 
 
 })
+
+
+test_that("ttestplot16: plots with freq parameter.", {
+
+  # One sample with freq
+  cls_freq <- cls
+  cls_freq$FreqVar <- c(1,2,3,1,2,3,1,2,3,1,2,3,1,2,3,1,2,3,1)
+
+  res <- proc_ttest(cls_freq, var = "Height",
+                    freq = "FreqVar",
+                    options = c(h0 = 65),
+                    output = "report",
+                    plots = ttestplot("summary"))
+
+  expect_equal(length(res), 4)
+  expect_equal("plot_spec" %in% class(res[[4]][[1]]), TRUE)
+
+  # Two sample (class) with freq
+  res <- proc_ttest(cls_freq, var = "Height",
+                    class = "Sex",
+                    freq = "FreqVar",
+                    output = "report",
+                    plots = ttestplot("boxplot"))
+
+  expect_equal(length(res), 5)
+  expect_equal("plot_spec" %in% class(res[[5]][[1]]), TRUE)
+
+  # Paired with freq
+  paird_freq <- paird
+  paird_freq$FreqVar <- c(1,2,3,1,2,3,1,2,3,1)
+
+  res <- proc_ttest(paird_freq,
+                    paired = "before * after",
+                    freq = "FreqVar",
+                    output = "report",
+                    plots = ttestplot("boxplot"))
+
+  expect_equal(length(res), 4)
+  expect_equal("plot_spec" %in% class(res[[4]][[1]]), TRUE)
+})
+
+
+test_that("ttestplot17: plots with weight parameter.", {
+
+  # One sample with weight
+  cls_wgt <- cls
+  cls_wgt$WgtVar <- c(1.5, 2.0, 0.8, 1.2, 1.0, 1.5, 2.0, 0.8, 1.2, 1.0,
+                      1.5, 2.0, 0.8, 1.2, 1.0, 1.5, 2.0, 0.8, 1.2)
+
+  res <- proc_ttest(cls_wgt, var = "Height",
+                    weight = "WgtVar",
+                    options = c(h0 = 65),
+                    output = "report",
+                    plots = ttestplot("summary"))
+
+  expect_equal(length(res), 4)
+  expect_equal("plot_spec" %in% class(res[[4]][[1]]), TRUE)
+
+
+  # Two sample (class) with weight
+  res <- proc_ttest(cls_wgt, var = "Height",
+                    class = "Sex",
+                    weight = "WgtVar",
+                    output = "report",
+                    plots = ttestplot("boxplot"))
+
+  expect_equal(length(res), 5)
+  expect_equal("plot_spec" %in% class(res[[5]][[1]]), TRUE)
+
+
+  # Paired with weight
+  paird_wgt <- paird
+  paird_wgt$WgtVar <- c(1.5, 2.0, 0.8, 1.2, 1.0, 1.5, 2.0, 0.8, 1.2, 1.0)
+
+  res <- proc_ttest(paird_wgt,
+                    paired = "before * after",
+                    weight = "WgtVar",
+                    output = "report",
+                    plots = ttestplot("boxplot"))
+
+  expect_equal(length(res), 4)
+  expect_equal("plot_spec" %in% class(res[[4]][[1]]), TRUE)
+
+
+  # Multiple plot types with weight
+  res <- proc_ttest(cls_wgt, var = "Height",
+                    weight = "WgtVar",
+                    options = c(h0 = 65),
+                    output = "report",
+                    plots = ttestplot(c("summary", "histogram", "boxplot")))
+
+  expect_equal(length(res), 4)
+  expect_equal("plot_spec" %in% class(res[[4]][[1]]), TRUE)
+
+})
+test_that("ttestplot18: plots with sides parameter (one-sample).", {
+
+  # Summary plot with sides = 'U'
+  res <- proc_ttest(cls, var = "Height",
+                    options = c(h0 = 65, sides = "U"),
+                    output = "report",
+                    plots = ttestplot("summary"))
+
+  expect_equal(length(res), 4)
+  expect_equal("plot_spec" %in% class(res[[4]][[1]]), TRUE)
+
+  # Summary plot with sides = 'L'
+  res <- proc_ttest(cls, var = "Height",
+                    options = c(h0 = 65, sides = "L"),
+                    output = "report",
+                    plots = ttestplot("summary"))
+
+  expect_equal(length(res), 4)
+  expect_equal("plot_spec" %in% class(res[[4]][[1]]), TRUE)
+
+  # Interval plot with sides option
+  res <- proc_ttest(cls, var = "Height",
+                    options = c(h0 = 65, sides = "U"),
+                    output = "report",
+                    plots = ttestplot("interval"))
+
+  expect_equal(length(res), 4)
+  expect_equal("plot_spec" %in% class(res[[4]][[1]]), TRUE)
+})
+
+
+test_that("ttestplot19: plots with sides parameter (two-sample).", {
+
+  # Summary plot with sides = 'U' and class
+  res <- proc_ttest(cls, var = "Height",
+                    class = "Sex",
+                    options = c(sides = "U"),
+                    output = "report",
+                    plots = ttestplot("summary"))
+
+  expect_equal(length(res), 5)
+  expect_equal("plot_spec" %in% class(res[[5]][[1]]), TRUE)
+
+  # Boxplot with sides = 'L' and class
+  res <- proc_ttest(cls, var = "Height",
+                    class = "Sex",
+                    options = c(sides = "L"),
+                    output = "report",
+                    plots = ttestplot("boxplot"))
+
+  expect_equal(length(res), 5)
+  expect_equal("plot_spec" %in% class(res[[5]][[1]]), TRUE)
+
+  # Interval plot with sides and class
+  res <- proc_ttest(cls, var = "Height",
+                    class = "Sex",
+                    options = c(sides = "U", alpha = 0.1),
+                    output = "report",
+                    plots = ttestplot("interval"))
+
+  expect_equal(length(res), 5)
+  expect_equal("plot_spec" %in% class(res[[5]][[1]]), TRUE)
+})
+
+
+test_that("ttestplot20: plots with sides parameter (paired).", {
+
+  # Profiles plot with sides = 'U'
+  res <- proc_ttest(paird, paired = "before * after",
+                    options = c(sides = "U"),
+                    output = "report",
+                    plots = ttestplot("profiles"))
+
+  expect_equal(length(res), 4)
+  expect_equal("plot_spec" %in% class(res[[4]][[1]]), TRUE)
+
+  # Agreement plot with sides = 'L'
+  res <- proc_ttest(paird, paired = "before * after",
+                    options = c(sides = "L"),
+                    output = "report",
+                    plots = ttestplot("agreement"))
+
+  expect_equal(length(res), 4)
+  expect_equal("plot_spec" %in% class(res[[4]][[1]]), TRUE)
+
+  # Summary with paired and sides
+  res <- proc_ttest(paird, paired = "before * after",
+                    options = c(sides = "U"),
+                    output = "report",
+                    plots = ttestplot("summary"))
+
+  expect_equal(length(res), 4)
+  expect_equal("plot_spec" %in% class(res[[4]][[1]]), TRUE)
+})
+
+
+test_that("ttestplot21: plots with freq and sides together.", {
+
+  cls_freq <- cls
+  cls_freq$FreqVar <- c(1,2,3,1,2,3,1,2,3,1,2,3,1,2,3,1,2,3,1)
+
+  # One sample with freq and sides
+  res <- proc_ttest(cls_freq, var = "Height",
+                    freq = "FreqVar",
+                    options = c(h0 = 65, sides = "U"),
+                    output = "report",
+                    plots = ttestplot("summary"))
+
+  expect_equal(length(res), 4)
+  expect_equal("plot_spec" %in% class(res[[4]][[1]]), TRUE)
+
+  # Two sample with freq and sides
+  res <- proc_ttest(cls_freq, var = "Height",
+                    class = "Sex",
+                    freq = "FreqVar",
+                    options = c(sides = "L"),
+                    output = "report",
+                    plots = ttestplot(c("summary", "boxplot")))
+
+  expect_equal(length(res), 5)
+  expect_equal("plot_spec" %in% class(res[[5]][[1]]), TRUE)
+})
+
+
+test_that("ttestplot22: multiple plot types with freq and sides.", {
+
+  cls_freq <- cls
+  cls_freq$FreqVar <- c(1,2,3,1,2,3,1,2,3,1,2,3,1,2,3,1,2,3,1)
+
+  # Multiple plots with freq
+  res <- proc_ttest(cls_freq, var = "Height",
+                    freq = "FreqVar",
+                    options = c(h0 = 65),
+                    output = "report",
+                    plots = ttestplot(c("summary", "histogram", "boxplot")))
+
+  expect_equal(length(res), 4)
+  expect_equal("plot_spec" %in% class(res[[4]][[1]]), TRUE)
+
+  # All plots with sides
+  res <- proc_ttest(cls, var = "Height",
+                    options = c(h0 = 65, sides = "U"),
+                    output = "report",
+                    plots = "all")
+
+  expect_equal(length(res), 4)
+  expect_equal(length(res[[4]]), 5)
+})
+
+
+test_that("ttestplot23: plots with showh0 and sides together.", {
+
+  # showh0 with sides = 'U'
+  res <- proc_ttest(cls, var = "Height",
+                    options = c(h0 = 70, sides = "U"),
+                    output = "report",
+                    plots = ttestplot("summary", showh0 = TRUE))
+
+  expect_equal(length(res), 4)
+  expect_equal("plot_spec" %in% class(res[[4]][[1]]), TRUE)
+
+  # showh0 with sides = 'L' and class
+  res <- proc_ttest(cls, var = "Height",
+                    class = "Sex",
+                    options = c(h0 = 60, sides = "L"),
+                    output = "report",
+                    plots = ttestplot("interval", showh0 = TRUE))
+
+  expect_equal(length(res), 5)
+  expect_equal("plot_spec" %in% class(res[[5]][[1]]), TRUE)
+})

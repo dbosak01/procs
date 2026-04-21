@@ -176,15 +176,15 @@ ttestplot <- function(type = "default", panel = TRUE, showh0 = FALSE, label = TR
   # agreement, boxplot, histogram, interval, profiles, qqplot, summary
 
   # Parameter Checks
-  vldvals <- c("agreement", "boxplot", "histogram", 'interval', 'profiles',
-               "qqplot", "summary", "default", "all")
+  vldvals <- c("agreement", "boxplot", "box", "histogram", 'interval', 'profiles',
+               "qqplot", "qq", "summary", "default", "all")
   if (any(!type %in% vldvals)) {
 
     ivd <- type[!type %in% vldvals]
     stop(paste0("Parameter value for 'type' invalid: ", paste0("'", ivd, "'", collapse = ", "),
                 "\nValid values are: ",
-                "'agreement', 'boxplot', 'histogram', 'interval', 'profiles', ",
-                "'qqplot', 'summary', 'default', 'all'."
+                "'agreement', 'boxplot', 'box', 'histogram', 'interval', 'profiles', ",
+                "'qqplot', 'qq', 'summary', 'default', 'all'."
     ))
   }
 
@@ -274,13 +274,13 @@ render_ttestplot <- function (dat, var, plt, class, res) {
 
           ret[["histogram"]] <- render_histogram2(dat, var, plt, class, res)
         }
-      } else if (tp == "boxplot") {
+      } else if (tp == "boxplot" || tp == "box") {
         if (is.null(class)) {
           ret[["boxplot"]] <- render_boxplot1(dat, var, plt, res)
         } else {
           ret[["boxplot"]] <- render_boxplot2(dat, var, plt, class, res)
         }
-      } else if (tp == "qqplot") {
+      } else if (tp == "qqplot" || tp == "qq") {
         if (is.null(class)) {
           ret[["qqplot"]] <- render_tqqplot1(dat, var, plt, res)
         } else {
@@ -345,6 +345,7 @@ render_summary1 <- function(dat, var, plt, res) {
 
   # Prepare data
   rdt <- dat[[var]]
+  wgt <- if (!is.null(plt$weight)) dat[[plt$weight]] else NULL
   # dt <- dat[[ivr]]
 
   # Assign labels
@@ -392,8 +393,15 @@ render_summary1 <- function(dat, var, plt, res) {
             breaks = brks,
             plot = FALSE)
 
-  # Convert counts to percent
-  h$counts <- h$counts / sum(h$counts) * 100
+  # Convert counts to percent (weighted if a weight column was supplied)
+  if (is.null(wgt)) {
+    h$counts <- h$counts / sum(h$counts) * 100
+  } else {
+    bin <- cut(rdt, h$breaks, include.lowest = TRUE)
+    cnt <- as.numeric(tapply(wgt, bin, sum))
+    cnt[is.na(cnt)] <- 0
+    h$counts <- cnt / sum(cnt) * 100
+  }
 
   # Use calculated breaks to get scale
   w <- diff(h$breaks)[1] # bin width
@@ -462,11 +470,16 @@ render_summary1 <- function(dat, var, plt, res) {
 
   # Kernel density overlay (scaled to percent)
 
-  # Bandwidth (Silverman / SAS)
-  bw <- 1.06 * sdx * n^(-1/5)
+  # Bandwidth (Silverman / SAS) - use Kish's effective n when weighted
+  n_eff <- if (is.null(wgt)) length(rdt) else (sum(wgt))^2 / sum(wgt^2)
+  bw <- 1.06 * sdx * n_eff^(-1/5)
 
-  # Kernel density estimate
-  dens <- density(rdt, kernel = "gaussian", bw = bw, n = 512)
+  # Kernel density estimate (weighted when wgt is non-null)
+  dens <- if (is.null(wgt)) {
+    density(rdt, kernel = "gaussian", bw = bw, n = 512)
+  } else {
+    density(rdt, kernel = "gaussian", bw = bw, n = 512, weights = wgt / sum(wgt))
+  }
 
   # Scale KDE to Percent axis
   y_kernel_percent <- 100 * w * dens$y
@@ -562,7 +575,7 @@ render_summary1 <- function(dat, var, plt, res) {
   }
 
   # Get boxplot stats
-  bp <- boxplot_stats1(dt)
+  bp <- boxplot_stats1(dt, if (!is.null(plt$freq)) dat[[plt$freq]] else NULL)
 
   # Boxplot (horizontal)
   bxp(bp,
@@ -723,6 +736,8 @@ render_summary2 <- function(dat, var, plt, class, res) {
   # Prepare data
   dt1 <- dat[dat[[class]] == vl1, var]
   dt2 <- dat[dat[[class]] == vl2, var]
+  wgt1 <- if (!is.null(plt$weight)) dat[dat[[class]] == vl1, plt$weight] else NULL
+  wgt2 <- if (!is.null(plt$weight)) dat[dat[[class]] == vl2, plt$weight] else NULL
 
   # Get number of lines needed to show labels
   minlns <- get_line_count(as.character(cvls)) + 1
@@ -803,8 +818,15 @@ render_summary2 <- function(dat, var, plt, class, res) {
             breaks = brks1,
             plot = FALSE)
 
-  # Convert counts to percent
-  h$counts <- h$counts / sum(h$counts) * 100
+  # Convert counts to percent (weighted if a weight column was supplied)
+  if (is.null(wgt1)) {
+    h$counts <- h$counts / sum(h$counts) * 100
+  } else {
+    bin <- cut(dt1, h$breaks, include.lowest = TRUE)
+    cnt <- as.numeric(tapply(wgt1, bin, sum))
+    cnt[is.na(cnt)] <- 0
+    h$counts <- cnt / sum(cnt) * 100
+  }
 
   # Use calculated break to get normal curve
   grid <- seq(scl1[1] , scl1[2], length.out = 300)
@@ -828,11 +850,16 @@ render_summary2 <- function(dat, var, plt, class, res) {
 
   # Kernel density overlay (scaled to percent)
 
-  # Bandwidth (Silverman / SAS)
-  bw <- 1.06 * sdx * n^(-1/5)
+  # Bandwidth (Silverman / SAS) - use Kish's effective n when weighted
+  n_eff <- if (is.null(wgt1)) length(dt1) else (sum(wgt1))^2 / sum(wgt1^2)
+  bw <- 1.06 * sdx * n_eff^(-1/5)
 
-  # Kernel density estimate
-  dens <- density(dt1, kernel = "gaussian",  bw = bw, n = 512)
+  # Kernel density estimate (weighted when wgt1 is non-null)
+  dens <- if (is.null(wgt1)) {
+    density(dt1, kernel = "gaussian", bw = bw, n = 512)
+  } else {
+    density(dt1, kernel = "gaussian", bw = bw, n = 512, weights = wgt1 / sum(wgt1))
+  }
 
   # Scale KDE to Percent axis
   y_kernel_percent <- 100 * w1 * dens$y
@@ -875,8 +902,15 @@ render_summary2 <- function(dat, var, plt, class, res) {
             breaks = brks2,
             plot = FALSE)
 
-  # Convert counts to percent
-  h$counts <- h$counts / sum(h$counts) * 100
+  # Convert counts to percent (weighted if applicable)
+  if (is.null(wgt2)) {
+    h$counts <- h$counts / sum(h$counts) * 100
+  } else {
+    bin <- cut(dt2, h$breaks, include.lowest = TRUE)
+    cnt <- as.numeric(tapply(wgt2, bin, sum))
+    cnt[is.na(cnt)] <- 0
+    h$counts <- cnt / sum(cnt) * 100
+  }
 
 
   # Use calculated break to get normal curve
@@ -901,10 +935,15 @@ render_summary2 <- function(dat, var, plt, class, res) {
   # Kernel density overlay (scaled to percent)
 
   # Bandwidth (Silverman / SAS)
-  bw <- 1.06 * sdx * n^(-1/5)   # 1.06
+  n_eff <- if (is.null(wgt2)) length(dt2) else (sum(wgt2))^2 / sum(wgt2^2)
+  bw <- 1.06 * sdx * n_eff^(-1/5)   # 1.06
 
   # Kernel density estimate
-  dens <- density(dt2, kernel = "gaussian", bw = bw, n = 512)
+  dens <- if (is.null(wgt2)) {
+    density(dt2, kernel = "gaussian", bw = bw, n = 512)
+  } else {
+    density(dt2, kernel = "gaussian", bw = bw, n = 512, weights = wgt2 / sum(wgt2))
+  }
 
   # Scale KDE to Percent axis
   y_kernel_percent <- 100 * w2 * dens$y
@@ -987,7 +1026,9 @@ render_summary2 <- function(dat, var, plt, class, res) {
   abline(v = aval, col = "grey90", lwd = 1)
 
   # Get boxplot stats for 2 plots
-  bp <- boxplot_stats2(dt1, dt2, nms1, nms2, cvls)
+  freq1 <- if (!is.null(plt$freq)) dat[dat[[class]] == vl1, plt$freq] else NULL
+  freq2 <- if (!is.null(plt$freq)) dat[dat[[class]] == vl2, plt$freq] else NULL
+  bp <- boxplot_stats2(dt1, dt2, nms1, nms2, cvls, freq1, freq2)
 
 
   # Boxplot (horizontal)
@@ -1145,6 +1186,7 @@ render_histogram1 <- function(dat, var, plt, res) {
 
   # Prepare data
   rdt <- dat[[var]]
+  wgt <- if (!is.null(plt$weight)) dat[[plt$weight]] else NULL
   # dt <- dat[[ivr]]
 
   # Set margins
@@ -1176,8 +1218,15 @@ render_histogram1 <- function(dat, var, plt, res) {
             breaks = brks,
             plot = FALSE)
 
-  # Convert counts to percent
-  h$counts <- h$counts / sum(h$counts) * 100
+  # Convert counts to percent (weighted if applicable)
+  if (is.null(wgt)) {
+    h$counts <- h$counts / sum(h$counts) * 100
+  } else {
+    bin <- cut(rdt, h$breaks, include.lowest = TRUE)
+    cnt <- as.numeric(tapply(wgt, bin, sum))
+    cnt[is.na(cnt)] <- 0
+    h$counts <- cnt / sum(cnt) * 100
+  }
 
   # Use calculated breaks to get scale
   w <- diff(h$breaks)[1] # bin width
@@ -1208,10 +1257,15 @@ render_histogram1 <- function(dat, var, plt, res) {
   # Kernel density overlay (original)
 
   # Bandwidth (Silverman / SAS)
-  bw <- 1.06 * sdx * n^(-1/5)
+  n_eff <- if (is.null(wgt)) length(rdt) else (sum(wgt))^2 / sum(wgt^2)
+  bw <- 1.06 * sdx * n_eff^(-1/5)
 
   # Kernel density estimate
-  dens <- density(rdt, kernel = "gaussian", bw = bw, n = 512)
+  dens <- if (is.null(wgt)) {
+    density(rdt, kernel = "gaussian", bw = bw, n = 512)
+  } else {
+    density(rdt, kernel = "gaussian", bw = bw, n = 512, weights = wgt / sum(wgt))
+  }
 
   # Scale KDE to Percent axis
   y_kernel_percent <- 100 * w * dens$y
@@ -1297,6 +1351,8 @@ render_histogram2 <- function(dat, var, plt, class, res) {
   # Prepare data
   dt1 <- dat[dat[[class]] == vl1, var]
   dt2 <- dat[dat[[class]] == vl2, var]
+  wgt1 <- if (!is.null(plt$weight)) dat[dat[[class]] == vl1, plt$weight] else NULL
+  wgt2 <- if (!is.null(plt$weight)) dat[dat[[class]] == vl2, plt$weight] else NULL
 
   # Output to image file
   jpeg(pth, width = wd, height = ht, quality = 100, units = "px")
@@ -1370,8 +1426,15 @@ render_histogram2 <- function(dat, var, plt, class, res) {
             breaks = brks1,
             plot = FALSE)
 
-  # Convert counts to percent
-  h$counts <- h$counts / sum(h$counts) * 100
+  # Convert counts to percent (weighted if applicable)
+  if (is.null(wgt1)) {
+    h$counts <- h$counts / sum(h$counts) * 100
+  } else {
+    bin <- cut(dt1, h$breaks, include.lowest = TRUE)
+    cnt <- as.numeric(tapply(wgt1, bin, sum))
+    cnt[is.na(cnt)] <- 0
+    h$counts <- cnt / sum(cnt) * 100
+  }
 
   # Use calculated break to get normal curve
   grid <- seq(scl1[1] , scl1[2], length.out = 300)
@@ -1413,10 +1476,15 @@ render_histogram2 <- function(dat, var, plt, class, res) {
   lines(grid, y_norm_percent, col = "steelblue4", lwd = 2)
 
   # Bandwidth (Silverman / SAS)
-  bw <- 1.06 * sdx * n^(-1/5)
+  n_eff <- if (is.null(wgt1)) length(dt1) else (sum(wgt1))^2 / sum(wgt1^2)
+  bw <- 1.06 * sdx * n_eff^(-1/5)
 
   # Kernel density estimate
-  dens <- density(dt1, kernel = "gaussian",  bw = bw, n = 512)
+  dens <- if (is.null(wgt1)) {
+    density(dt1, kernel = "gaussian", bw = bw, n = 512)
+  } else {
+    density(dt1, kernel = "gaussian", bw = bw, n = 512, weights = wgt1 / sum(wgt1))
+  }
 
   # Scale KDE to Percent axis
   y_kernel_percent <- 100 * w1 * dens$y
@@ -1457,8 +1525,15 @@ render_histogram2 <- function(dat, var, plt, class, res) {
             breaks = brks2,
             plot = FALSE)
 
-  # Convert counts to percent
-  h$counts <- h$counts / sum(h$counts) * 100
+  # Convert counts to percent (weighted if applicable)
+  if (is.null(wgt2)) {
+    h$counts <- h$counts / sum(h$counts) * 100
+  } else {
+    bin <- cut(dt2, h$breaks, include.lowest = TRUE)
+    cnt <- as.numeric(tapply(wgt2, bin, sum))
+    cnt[is.na(cnt)] <- 0
+    h$counts <- cnt / sum(cnt) * 100
+  }
 
 
   # Use calculated break to get normal curve
@@ -1504,10 +1579,15 @@ render_histogram2 <- function(dat, var, plt, class, res) {
   lines(grid, y_norm_percent, col = "steelblue4", lwd = 2)
 
   # Bandwidth (Silverman / SAS)
-  bw <- 1.06 * sdx * n^(-1/5)   # 1.06
+  n_eff <- if (is.null(wgt2)) length(dt2) else (sum(wgt2))^2 / sum(wgt2^2)
+  bw <- 1.06 * sdx * n_eff^(-1/5)   # 1.06
 
   # Kernel density estimate
-  dens <- density(dt2, kernel = "gaussian", bw = bw, n = 512)
+  dens <- if (is.null(wgt2)) {
+    density(dt2, kernel = "gaussian", bw = bw, n = 512)
+  } else {
+    density(dt2, kernel = "gaussian", bw = bw, n = 512, weights = wgt2 / sum(wgt2))
+  }
 
   # Scale KDE to Percent axis
   y_kernel_percent <- 100 * w2 * dens$y
@@ -1622,11 +1702,12 @@ render_boxplot1 <- function(dat, var, plt, res) {
   if (plt$showh0) {
     xscl <- get_scale(dt, .05, plt$h0)
   } else {
+    print(dt)
     xscl <- get_scale(dt, .05)
   }
 
   # Get boxplot stats
-  bp <- boxplot_stats1(dt)
+  bp <- boxplot_stats1(dt, if (!is.null(plt$freq)) dat[[plt$freq]] else NULL)
   if (length(bp$out) > 0) {
     if (min(bp$out) < xscl[1]) {
       xscl[1] <- min(bp$out) * 1.05
@@ -1889,7 +1970,9 @@ render_boxplot2 <- function(dat, var, plt, class, res) {
   xscl[2] <- max(xscl1[2], xscl2[2])
 
   # Get boxplot stats for 2 plots
-  bp <- boxplot_stats2(dt1, dt2, nms1, nms2, fvls)
+  freq1 <- if (!is.null(plt$freq)) dat[dat[[fvr]] == fvls[1], plt$freq] else NULL
+  freq2 <- if (!is.null(plt$freq)) dat[dat[[fvr]] == fvls[2], plt$freq] else NULL
+  bp <- boxplot_stats2(dt1, dt2, nms1, nms2, fvls, freq1, freq2)
   if (length(bp$out1) > 0) {
     if (min(bp$out1) < xscl[1]) {
       xscl[1] <- min(bp$out1) * 1.05
@@ -2933,8 +3016,17 @@ render_agreement <- function(dat, var, plt, res) {
 # but has no parameter to use SAS-style quantiles. So need to calculate
 # everything manually.
 #' @noRd
-boxplot_stats1 <- function(dt1) {
+boxplot_stats1 <- function(dt1, freq = NULL) {
 
+  # Apply freq expansion if specified, tracking original row indices
+  if (!is.null(freq)) {
+    f <- floor(freq)
+    valid <- !is.na(dt1) & !is.na(f) & f > 0
+    row_map <- rep(which(valid), times = f[valid])
+    dt1 <- rep(dt1[valid], times = f[valid])
+  } else {
+    row_map <- seq_along(dt1)
+  }
   # Calculate quantile
   q1 <- quantile(dt1, probs = c(0, .25, .5, .75, 1), type = 2, na.rm = TRUE)
 
@@ -2955,7 +3047,7 @@ boxplot_stats1 <- function(dt1) {
     mx1 <- max(dt1[dt1 < lm1[2]])
     q1[1] <- mn1
     q1[5] <- mx1
-    onm1 <- seq(1, length(dt1))[ol1]   # Obs within class: This matches SAS
+    onm1 <- row_map[seq(1, length(dt1))[ol1]]  # Obs within class: This matches SAS
     # onm1 <- nms1[ol1]                # Original obs #: This seems more correct
   }
 
@@ -2980,8 +3072,20 @@ boxplot_stats1 <- function(dt1) {
 # but has no parameter to use SAS-style quantiles. So need to calculate
 # everything manually.
 #' @noRd
-boxplot_stats2 <- function(dt1, dt2, nms1, nms2, fvls) {
+boxplot_stats2 <- function(dt1, dt2, nms1, nms2, fvls, freq1, freq2) {
 
+  if (!is.null(freq1)) {
+    f1 <- floor(freq1)
+    valid1 <- !is.na(dt1) & !is.na(f1) & f1 > 0
+    nms1 <- rep(nms1[valid1], times = f1[valid1])
+    dt1  <- rep(dt1[valid1],  times = f1[valid1])
+  }
+  if (!is.null(freq2)) {
+    f2 <- floor(freq2)
+    valid2 <- !is.na(dt2) & !is.na(f2) & f2 > 0
+    nms2 <- rep(nms2[valid2], times = f2[valid2])
+    dt2  <- rep(dt2[valid2],  times = f2[valid2])
+  }
   # Calculate quantile
   q1 <- quantile(dt1, probs = c(0, .25, .5, .75, 1), type = 2, na.rm = TRUE)
   q2 <- quantile(dt2, probs = c(0, .25, .5, .75, 1), type = 2, na.rm = TRUE)
