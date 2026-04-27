@@ -823,10 +823,10 @@ test_that("ttestplot16: plots with freq parameter.", {
 
 test_that("ttestplot17: plots with weight parameter.", {
 
-  # One sample with weight
+  # One sample with weight, add some strange value to show difference
   cls_wgt <- cls
   cls_wgt$WgtVar <- c(1.5, 2.0, 0.8, 1.2, 1.0, 1.5, 2.0, 0.8, 1.2, 1.0,
-                      1.5, 2.0, 0.8, 1.2, 1.0, 1.5, 2.0, 0.8, 1.2)
+                      1.5, 2.0, 0.8, 1.2, 1.0, 1.5, 200, 80, 120)
 
   res <- proc_ttest(cls_wgt, var = "Height",
                     weight = "WgtVar",
@@ -837,6 +837,8 @@ test_that("ttestplot17: plots with weight parameter.", {
   expect_equal(length(res), 4)
   expect_equal("plot_spec" %in% class(res[[4]][[1]]), TRUE)
 
+  #freq and weight together
+  cls_freq$FreqVar <- c(1,2,3,1,2,3,1,2,3,1,2,3,1,2,3,1,2,3,1)
 
   # Two sample (class) with weight
   res <- proc_ttest(cls_wgt, var = "Height",

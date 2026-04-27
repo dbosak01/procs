@@ -832,7 +832,11 @@ get_summaries <- function(data, var, freq = NULL, weight=NULL, stats, missing = 
       is_analyzable <- keep_all & !is.na(var_raw)
       if (!is.null(weight_raw)) is_analyzable <- is_analyzable & weight_raw > 0
 
-      var_all <- var_raw[keep_all]  # for calculating N, NMISS, MIN, MAX, and other stats that use all non-missing values
+      var_all <- var_raw[keep_all]
+      freq_all <- freq_raw[keep_all] # for calculating N, NMISS, MIN, MAX, and other stats that use all non-missing values
+      if (!is.null(freq_all)) {
+        var_all <- rep(var_all, freq_all)
+      }
       var     <- var_raw[is_analyzable] # for calculating stats that use only analyzable values (e.g. mean, std, etc.)
 
       w <- NULL
@@ -908,10 +912,12 @@ get_summaries <- function(data, var, freq = NULL, weight=NULL, stats, missing = 
 
           if (all(is.na(var)))
             rw[["MODE"]] <- NA
-          else if (!is.null(weight))
+          else if (!is.null(weight)) {
             rw[["MODE"]] <- NA
+            warning("The MODE statistic is not computed when a weight variable is specified.")
+          }
           else
-            rw[["MODE"]] <- get_mode(var)
+            rw[["MODE"]] <- get_mode(var_all)
         }
 
         if (st == "max") {
@@ -933,7 +939,7 @@ get_summaries <- function(data, var, freq = NULL, weight=NULL, stats, missing = 
 
           if (all(is.na(var)))
             rw[["MEDIAN"]] <- NA
-          else if (is.null(weight))
+          else if (is.null(weight) && is.null(freq))
             rw[["MEDIAN"]] <- median(var, na.rm = narm)
           else
             rw[["MEDIAN"]] <- get_quantile(var, w, probs = c(0.5), narm = narm)
