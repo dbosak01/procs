@@ -176,14 +176,14 @@ ttestplot <- function(type = "default", panel = TRUE, showh0 = FALSE, label = TR
   # agreement, boxplot, histogram, interval, profiles, qqplot, summary
 
   # Parameter Checks
-  vldvals <- c("agreement", "boxplot", "box", "histogram", 'interval', 'profiles',
+  vldvals <- c("agreement", "boxplot", "box", "histogram", 'hist', 'interval', 'profiles',
                "qqplot", "qq", "summary", "default", "all")
   if (any(!type %in% vldvals)) {
 
     ivd <- type[!type %in% vldvals]
     stop(paste0("Parameter value for 'type' invalid: ", paste0("'", ivd, "'", collapse = ", "),
                 "\nValid values are: ",
-                "'agreement', 'boxplot', 'box', 'histogram', 'interval', 'profiles', ",
+                "'agreement', 'boxplot', 'box', 'histogram', 'hist', 'interval', 'profiles', ",
                 "'qqplot', 'qq', 'summary', 'default', 'all'."
     ))
   }
@@ -267,7 +267,7 @@ render_ttestplot <- function (dat, var, plt, class, res) {
         } else {
           ret[["summary"]] <- render_summary2(dat, var, plt, class, res)
         }
-      } else if (tp == "histogram") {
+      } else if (tp == "histogram" || tp == "hist") {
         if (is.null(class)) {
           ret[["histogram"]] <- render_histogram1(dat, var, plt, res)
         } else {
@@ -353,8 +353,10 @@ render_summary1 <- function(dat, var, plt, res) {
     if (!is.null(wgt))
       idx <- idx & !is.na(wgt) & wgt > 0
     rdt_hist <- rep(rdt[idx], times = freq[idx])
+    wgt_hist <- if (!is.null(wgt)) rep(wgt[idx], times = freq[idx]) else NULL
   } else {
     rdt_hist <- rdt
+    wgt_hist <- wgt
   }
   # dt <- dat[[ivr]]
 
@@ -380,6 +382,8 @@ render_summary1 <- function(dat, var, plt, res) {
   clm_tbl <- res[[grep("ConfLimits$", names(res))[length(grep("ConfLimits$", names(res)))]]]
 
   n   <- stat_tbl$N[1]
+  # mu  <- stat_tbl$MEAN[1]
+  # sdx <- stat_tbl$STD[1]
   mu  <- mean(rdt)
   sdx <- sd(rdt)
   ci  <- c(clm_tbl$LCLM[1], clm_tbl$UCLM[1])
@@ -390,9 +394,13 @@ render_summary1 <- function(dat, var, plt, res) {
   # Calculate breaks
   brks <- get_sas_bins(rdt_hist)
 
-  # Calculate breaks and y scale
+  # Calculate breaks and y scale.
+  # right = FALSE matches SAS's left-closed bin convention [a, b),
+  # with the rightmost break included via include.lowest.
   h <- hist(rdt_hist,
             breaks = brks,
+            right = FALSE,
+            include.lowest = TRUE,
             plot = FALSE)
   h$counts <- h$counts / sum(h$counts) * 100
 
@@ -422,6 +430,8 @@ render_summary1 <- function(dat, var, plt, res) {
   # Initial chart to draw vertical lines
   hist(rdt_hist,
        breaks = brks,
+       right = FALSE,
+       include.lowest = TRUE,
        main = "",
        ylab = "",
        xlim = scl,
@@ -465,16 +475,15 @@ render_summary1 <- function(dat, var, plt, res) {
 
   # Kernel density overlay (scaled to percent)
 
-  # Bandwidth (Silverman / SAS) - Kish's effective n when weighted
-  n_eff <- if (is.null(wgt)) length(rdt) else (sum(wgt))^2 / sum(wgt^2)
+  # Bandwidth (Silverman / SAS) - SAS uses the distinct (non-freq-expanded)
+  # observation count for the bandwidth. Kish's effective n when weighted.
+  n_eff <- if (!is.null(wgt_hist)&is.null(freq)) (sum(wgt_hist))^2 / sum(wgt_hist^2) else length(rdt)
   bw <- 1.06 * sdx * n_eff^(-1/5)
   # Kernel density estimate
   kernel_lo <- min(h$breaks) - 1.25 * w
   kernel_hi <- max(h$breaks) + 1.25 * w
-  dens <-  density(rdt, kernel = "gaussian", bw = bw, n = 512,
+  dens <-  density(rdt_hist, kernel = "gaussian", bw = bw, n = 512,
                    from = kernel_lo, to = kernel_hi)
-
-
   # Scale KDE to Percent axis
   y_kernel_percent <- 100 * w * dens$y
 
@@ -730,6 +739,33 @@ render_summary2 <- function(dat, var, plt, class, res) {
   dt2 <- dat[dat[[class]] == vl2, var]
   wgt1 <- if (!is.null(plt$weight)) dat[dat[[class]] == vl1, plt$weight] else NULL
   wgt2 <- if (!is.null(plt$weight)) dat[dat[[class]] == vl2, plt$weight] else NULL
+  freq1 <- if (!is.null(plt$freq)) dat[dat[[class]] == vl1, plt$freq] else NULL
+  freq2 <- if (!is.null(plt$freq)) dat[dat[[class]] == vl2, plt$freq] else NULL
+
+  # Apply freq-expansion to mirror SAS hist behavior
+  if (!is.null(freq1)) {
+    freq1 <- floor(freq1)
+    idx1 <- !is.na(dt1) & !is.na(freq1) & freq1 > 0
+    if (!is.null(wgt1))
+      idx1 <- idx1 & !is.na(wgt1) & wgt1 > 0
+    dt1_hist <- rep(dt1[idx1], times = freq1[idx1])
+    wgt1_hist <- if (!is.null(wgt1)) rep(wgt1[idx1], times = freq1[idx1]) else NULL
+  } else {
+    dt1_hist <- dt1
+    wgt1_hist <- wgt1
+  }
+
+  if (!is.null(freq2)) {
+    freq2 <- floor(freq2)
+    idx2 <- !is.na(dt2) & !is.na(freq2) & freq2 > 0
+    if (!is.null(wgt2))
+      idx2 <- idx2 & !is.na(wgt2) & wgt2 > 0
+    dt2_hist <- rep(dt2[idx2], times = freq2[idx2])
+    wgt2_hist <- if (!is.null(wgt2)) rep(wgt2[idx2], times = freq2[idx2]) else NULL
+  } else {
+    dt2_hist <- dt2
+    wgt2_hist <- wgt2
+  }
 
   # Get number of lines needed to show labels
   minlns <- get_line_count(as.character(cvls)) + 1
@@ -752,11 +788,11 @@ render_summary2 <- function(dat, var, plt, class, res) {
   scl <- c(scl[1] * .875, scl[2] * 1.125)
 
   # Calculate breaks - Histogram 1
-  brks1 <- get_sas_bins(dt1)
+  brks1 <- get_sas_bins(dt1_hist)
 
 
   # Calculate breaks - Histogram 2
-  brks2 <- get_sas_bins(dt2)
+  brks2 <- get_sas_bins(dt2_hist)
 
   # Scale for Histogram 1 (SAS-style: 1.5 bin-widths of padding)
   w1 <- diff(brks1)[1] # bin width
@@ -798,31 +834,39 @@ render_summary2 <- function(dat, var, plt, class, res) {
   clm_tbl <- res[[grep("ConfLimits$", names(res))[length(grep("ConfLimits$", names(res)))]]]
 
   n   <- stat_tbl$N[as.character(stat_tbl$CLASS) == as.character(vl1)]
-  mu  <- stat_tbl$MEAN[as.character(stat_tbl$CLASS) == as.character(vl1)]
-  sdx <- stat_tbl$STD[as.character(stat_tbl$CLASS) == as.character(vl1)]
+  mu  <- mean(dt1)
+  sdx <- sd(dt1)
 
 
 
-  # Histogram (Percent scale)
-  h <- hist(dt1,
+  # Histogram (Percent scale) - SAS uses left-closed bins [a, b)
+  h <- hist(dt1_hist,
             breaks = brks1,
+            right = FALSE,
+            include.lowest = TRUE,
             plot = FALSE)
-
-  # Convert counts to percent (weighted if a weight column was supplied)
-  if (is.null(wgt1)) {
-    h$counts <- h$counts / sum(h$counts) * 100
-  } else {
-    bin <- cut(dt1, h$breaks, include.lowest = TRUE)
-    cnt <- as.numeric(tapply(wgt1, bin, sum))
-    cnt[is.na(cnt)] <- 0
-    h$counts <- cnt / sum(cnt) * 100
-  }
+  h$counts <- h$counts / sum(h$counts) * 100
 
   # Use calculated break to get normal curve
   grid <- seq(scl1[1] , scl1[2], length.out = 300)
   y_norm_percent <- 100 * w1 * dnorm(grid, mean = mu, sd = sdx)
   y_mx <- max(max(y_norm_percent), max(h$counts))
 
+  # Initial chart to draw vertical orientation lines underneath bars
+  hist(dt1_hist,
+       breaks = brks1,
+       right = FALSE,
+       include.lowest = TRUE,
+       main = "",
+       ylab = "",
+       xlim = scl,
+       ylim = c(0, y_mx * 1.025),
+       plot = TRUE,
+       axes = FALSE)
+
+  # Get axis tick marks and draw orientation lines
+  aval <- pretty(scl, n = 3)
+  abline(v = aval, col = "grey90", lwd = 1)
 
   # Create plot using histogram values
   plot(h,
@@ -833,23 +877,21 @@ render_summary2 <- function(dat, var, plt, class, res) {
        ylab = "",
        xlim = scl,
        ylim = c(0, y_mx * 1.025),  # max(h$counts) * 1.05),
-       axes = FALSE)
+       axes = FALSE,
+       add = TRUE)
 
   # Normal curve overlay (scaled to percent)
   lines(grid, y_norm_percent, col = "steelblue4", lwd = 2)
 
   # Kernel density overlay (scaled to percent)
 
-  # Bandwidth (Silverman / SAS) - use Kish's effective n when weighted
-  n_eff <- if (is.null(wgt1)) length(dt1) else (sum(wgt1))^2 / sum(wgt1^2)
+  # Bandwidth (Silverman / SAS) - SAS uses distinct (non-freq-expanded) n;
+  # Kish's effective n when only weight is supplied.
+  n_eff <- if (!is.null(wgt1_hist) & is.null(freq1)) (sum(wgt1_hist))^2 / sum(wgt1_hist^2) else length(dt1)
   bw <- 1.06 * sdx * n_eff^(-1/5)
 
-  # Kernel density estimate (weighted when wgt1 is non-null)
-  dens <- if (is.null(wgt1)) {
-    density(dt1, kernel = "gaussian", bw = bw, n = 512)
-  } else {
-    density(dt1, kernel = "gaussian", bw = bw, n = 512, weights = wgt1 / sum(wgt1))
-  }
+  # Kernel density estimate
+  dens <- density(dt1_hist, kernel = "gaussian", bw = bw, n = 512)
 
   # Scale KDE to Percent axis
   y_kernel_percent <- 100 * w1 * dens$y
@@ -884,29 +926,38 @@ render_summary2 <- function(dat, var, plt, class, res) {
 
   # Calculate stats
   n   <- stat_tbl$N[as.character(stat_tbl$CLASS) == as.character(vl2)]
-  mu  <- stat_tbl$MEAN[as.character(stat_tbl$CLASS) == as.character(vl2)]
-  sdx <- stat_tbl$STD[as.character(stat_tbl$CLASS) == as.character(vl2)]
+  mu  <- mean(dt2)
+  sdx <- sd(dt2)
 
-  # Histogram (Percent scale)
-  h <- hist(dt2,
+  # Histogram (Percent scale) - SAS uses left-closed bins [a, b)
+  h <- hist(dt2_hist,
             breaks = brks2,
+            right = FALSE,
+            include.lowest = TRUE,
             plot = FALSE)
-
-  # Convert counts to percent (weighted if applicable)
-  if (is.null(wgt2)) {
-    h$counts <- h$counts / sum(h$counts) * 100
-  } else {
-    bin <- cut(dt2, h$breaks, include.lowest = TRUE)
-    cnt <- as.numeric(tapply(wgt2, bin, sum))
-    cnt[is.na(cnt)] <- 0
-    h$counts <- cnt / sum(cnt) * 100
-  }
+  h$counts <- h$counts / sum(h$counts) * 100
 
 
   # Use calculated break to get normal curve
   grid <- seq(scl2[1] , scl2[2], length.out = 300)
   y_norm_percent <- 100 * w2 * dnorm(grid, mean = mu, sd = sdx)
   y_mx <- max(max(y_norm_percent), max(h$counts))
+
+  # Initial chart to draw vertical orientation lines underneath bars
+  hist(dt2_hist,
+       breaks = brks2,
+       right = FALSE,
+       include.lowest = TRUE,
+       main = "",
+       ylab = "",
+       xlim = scl,
+       ylim = c(0, y_mx * 1.025),
+       plot = TRUE,
+       axes = FALSE)
+
+  # Get axis tick marks and draw orientation lines
+  aval <- pretty(scl, n = 3)
+  abline(v = aval, col = "grey90", lwd = 1)
 
   # Create plot using histogram values
   plot(h,
@@ -917,23 +968,20 @@ render_summary2 <- function(dat, var, plt, class, res) {
        ylab = "",
        xlim = scl,
        ylim = c(0, y_mx * 1.025), # max(h$counts) * 1.05),
-       axes = FALSE)
+       axes = FALSE,
+       add = TRUE)
 
   # Normal curve overlay (scaled to percent)
   lines(grid, y_norm_percent, col = "steelblue4", lwd = 2)
 
   # Kernel density overlay (scaled to percent)
 
-  # Bandwidth (Silverman / SAS)
-  n_eff <- if (is.null(wgt2)) length(dt2) else (sum(wgt2))^2 / sum(wgt2^2)
+  # Bandwidth (Silverman / SAS) - distinct n; Kish's effective n when weight only
+  n_eff <- if (!is.null(wgt2_hist) & is.null(freq2)) (sum(wgt2_hist))^2 / sum(wgt2_hist^2) else length(dt2)
   bw <- 1.06 * sdx * n_eff^(-1/5)   # 1.06
 
   # Kernel density estimate
-  dens <- if (is.null(wgt2)) {
-    density(dt2, kernel = "gaussian", bw = bw, n = 512)
-  } else {
-    density(dt2, kernel = "gaussian", bw = bw, n = 512, weights = wgt2 / sum(wgt2))
-  }
+  dens <- density(dt2_hist, kernel = "gaussian", bw = bw, n = 512)
 
   # Scale KDE to Percent axis
   y_kernel_percent <- 100 * w2 * dens$y
@@ -1184,8 +1232,10 @@ render_histogram1 <- function(dat, var, plt, res) {
     if (!is.null(wgt))
       idx <- idx & !is.na(wgt) & wgt > 0
     rdt_hist <- rep(rdt[idx], times = freq[idx])
+    wgt_hist <- if (!is.null(wgt)) rep(wgt[idx], times = freq[idx]) else NULL
   } else {
     rdt_hist <- rdt
+    wgt_hist <- wgt
   }
 
   # Set margins
@@ -1204,27 +1254,20 @@ render_histogram1 <- function(dat, var, plt, res) {
   clm_tbl <- res[[grep("ConfLimits$", names(res))[length(grep("ConfLimits$", names(res)))]]]
 
   n   <- stat_tbl$N[1]
-  mu  <- stat_tbl$MEAN[1]
-  sdx <- stat_tbl$STD[1]
+  mu  <- mean(rdt)
+  sdx <- sd(rdt)
   ci  <- c(clm_tbl$LCLM[1], clm_tbl$UCLM[1])
 
   # Calculate breaks
   brks <- get_sas_bins(rdt_hist)
 
-  # Histogram (Percent scale)
+  # Histogram (Percent scale) - SAS uses left-closed bins [a, b)
   h <- hist(rdt_hist,
             breaks = brks,
+            right = FALSE,
+            include.lowest = TRUE,
             plot = FALSE)
-
-  # Convert counts to percent (weighted if applicable)
-  if (is.null(wgt)) {
-    h$counts <- h$counts / sum(h$counts) * 100
-  } else {
-    bin <- cut(rdt_hist, h$breaks, include.lowest = TRUE)
-    cnt <- as.numeric(tapply(wgt, bin, sum))
-    cnt[is.na(cnt)] <- 0
-    h$counts <- cnt / sum(cnt) * 100
-  }
+  h$counts <- h$counts / sum(h$counts) * 100
 
   # Use calculated breaks to get scale (1.5 bin-widths)
   w <- diff(h$breaks)[1] # bin width
@@ -1237,18 +1280,13 @@ render_histogram1 <- function(dat, var, plt, res) {
   kernel_lo <- min(h$breaks) - 1.4 * w
   kernel_hi <- max(h$breaks) + 1.4 * w
 
-  # Bandwidth (Silverman / SAS)
-  n_eff <- if (is.null(wgt)) length(rdt) else (sum(wgt))^2 / sum(wgt^2)
+  # Bandwidth (Silverman / SAS) - distinct n; Kish's effective n when weight only
+  n_eff <- if (!is.null(wgt_hist) & is.null(freq)) (sum(wgt_hist))^2 / sum(wgt_hist^2) else length(rdt)
   bw <- 1.06 * sdx * n_eff^(-1/5)
 
   # Kernel density estimate
-  dens <- if (is.null(wgt)) {
-    density(rdt, kernel = "gaussian", bw = bw, n = 512,
-            from = kernel_lo, to = kernel_hi)
-  } else {
-    density(rdt, kernel = "gaussian", bw = bw, n = 512, weights = wgt / sum(wgt),
-            from = kernel_lo, to = kernel_hi)
-  }
+  dens <- density(rdt_hist, kernel = "gaussian", bw = bw, n = 512,
+                  from = kernel_lo, to = kernel_hi)
 
   # Use calculated break to get normal curve
   grid <- seq(curve_lo, curve_hi, length.out = 300)
@@ -1256,16 +1294,34 @@ render_histogram1 <- function(dat, var, plt, res) {
   y_kernel_percent <- 100 * w * dens$y
   y_mx <- max(max(y_norm_percent), max(h$counts))
 
-  # Create plot using histogram values
-  plot(h,
-       col = "#CAD5E5", #"grey85",
-       border = "grey20",
+  # Initial chart to draw vertical orientation lines underneath bars
+  hist(rdt_hist,
+       breaks = brks,
+       right = FALSE,
+       include.lowest = TRUE,
        main = paste0("Distribution of", tlbl),
        xlab = "",
        ylab = "Percent",
        xlim = scl,
        ylim = c(0, y_mx * 1.025),
+       plot = TRUE,
        axes = FALSE)
+
+  # Get axis tick marks and draw orientation lines
+  aval <- pretty(scl, n = 3)
+  abline(v = aval, col = "grey90", lwd = 1)
+
+  # Create plot using histogram values
+  plot(h,
+       col = "#CAD5E5", #"grey85",
+       border = "grey20",
+       main = "",
+       xlab = "",
+       ylab = "",
+       xlim = scl,
+       ylim = c(0, y_mx * 1.025),
+       axes = FALSE,
+       add = TRUE)
 
 
   # Draw normal curve line
@@ -1352,6 +1408,33 @@ render_histogram2 <- function(dat, var, plt, class, res) {
   dt2 <- dat[dat[[class]] == vl2, var]
   wgt1 <- if (!is.null(plt$weight)) dat[dat[[class]] == vl1, plt$weight] else NULL
   wgt2 <- if (!is.null(plt$weight)) dat[dat[[class]] == vl2, plt$weight] else NULL
+  freq1 <- if (!is.null(plt$freq)) dat[dat[[class]] == vl1, plt$freq] else NULL
+  freq2 <- if (!is.null(plt$freq)) dat[dat[[class]] == vl2, plt$freq] else NULL
+
+  # Apply freq-expansion to mirror SAS hist behavior
+  if (!is.null(freq1)) {
+    freq1 <- floor(freq1)
+    idx1 <- !is.na(dt1) & !is.na(freq1) & freq1 > 0
+    if (!is.null(wgt1))
+      idx1 <- idx1 & !is.na(wgt1) & wgt1 > 0
+    dt1_hist <- rep(dt1[idx1], times = freq1[idx1])
+    wgt1_hist <- if (!is.null(wgt1)) rep(wgt1[idx1], times = freq1[idx1]) else NULL
+  } else {
+    dt1_hist <- dt1
+    wgt1_hist <- wgt1
+  }
+
+  if (!is.null(freq2)) {
+    freq2 <- floor(freq2)
+    idx2 <- !is.na(dt2) & !is.na(freq2) & freq2 > 0
+    if (!is.null(wgt2))
+      idx2 <- idx2 & !is.na(wgt2) & wgt2 > 0
+    dt2_hist <- rep(dt2[idx2], times = freq2[idx2])
+    wgt2_hist <- if (!is.null(wgt2)) rep(wgt2[idx2], times = freq2[idx2]) else NULL
+  } else {
+    dt2_hist <- dt2
+    wgt2_hist <- wgt2
+  }
 
   # Output to image file
   jpeg(pth, width = wd, height = ht, quality = 100, units = "px")
@@ -1370,11 +1453,11 @@ render_histogram2 <- function(dat, var, plt, class, res) {
   scl <- c(scl[1] * .875, scl[2] * 1.125)
 
   # Calculate breaks - Histogram 1
-  brks1 <- get_sas_bins(dt1)
+  brks1 <- get_sas_bins(dt1_hist)
 
 
   # Calculate breaks - Histogram 2
-  brks2 <- get_sas_bins(dt2)
+  brks2 <- get_sas_bins(dt2_hist)
 
   # Scale for Histogram 1 (SAS-style: 1.5 bin-widths of padding)
   w1 <- diff(brks1)[1] # bin width
@@ -1415,48 +1498,37 @@ render_histogram2 <- function(dat, var, plt, class, res) {
   stat_tbl <- res[[grep("Statistics$", names(res))[length(grep("Statistics$", names(res)))]]]
 
   n   <- stat_tbl$N[as.character(stat_tbl$CLASS) == as.character(vl1)]
-  mu  <- stat_tbl$MEAN[as.character(stat_tbl$CLASS) == as.character(vl1)]
-  sdx <- stat_tbl$STD[as.character(stat_tbl$CLASS) == as.character(vl1)]
+  mu  <- mean(dt1)
+  sdx <- sd(dt1)
 
-  # Histogram (Percent scale)
-  h <- hist(dt1,
+  # Histogram (Percent scale) - SAS uses left-closed bins [a, b)
+  h <- hist(dt1_hist,
             breaks = brks1,
+            right = FALSE,
+            include.lowest = TRUE,
             plot = FALSE)
-
-  # Convert counts to percent (weighted if applicable)
-  if (is.null(wgt1)) {
-    h$counts <- h$counts / sum(h$counts) * 100
-  } else {
-    bin <- cut(dt1, h$breaks, include.lowest = TRUE)
-    cnt <- as.numeric(tapply(wgt1, bin, sum))
-    cnt[is.na(cnt)] <- 0
-    h$counts <- cnt / sum(cnt) * 100
-  }
+  h$counts <- h$counts / sum(h$counts) * 100
 
   # Use calculated break to get normal curve
   grid <- seq(scl1[1] , scl1[2], length.out = 300)
   y_norm_percent <- 100 * w1 * dnorm(grid, mean = mu, sd = sdx)
   y_mx <- max(max(y_norm_percent), max(h$counts))
 
-  # # Histogram (Percent scale)
-  # h <- hist(dt1,
-  #           breaks = brks1,
-  #           plot = FALSE)
-  #
-  # # Convert counts to percent
-  # h$counts <- h$counts / sum(h$counts) * 100
-  #
-  # # Use calculated breaks to get scale
-  # w <- diff(h$breaks)[1] # bin width
-  # xmin <- min(h$breaks) - w
-  # xmax <- max(h$breaks) + w
-  # scl1 <- c(xmin, xmax)
-  #
-  # # Use calculated break to get normal curve
-  # grid <- seq(scl1[1] , scl1[2], length.out = 300)
-  # y_norm_percent <- 100 * w * dnorm(grid, mean = mu, sd = sdx)
-  # y_mx <- max(max(y_norm_percent), max(h$counts))
+  # Initial chart to draw vertical orientation lines underneath bars
+  hist(dt1_hist,
+       breaks = brks1,
+       right = FALSE,
+       include.lowest = TRUE,
+       main = "",
+       ylab = "",
+       xlim = scl,
+       ylim = c(0, y_mx * 1.025),
+       plot = TRUE,
+       axes = FALSE)
 
+  # Get axis tick marks and draw orientation lines
+  aval <- pretty(scl, n = 3)
+  abline(v = aval, col = "grey90", lwd = 1)
 
   # Create plot using histogram values
   plot(h,
@@ -1467,21 +1539,18 @@ render_histogram2 <- function(dat, var, plt, class, res) {
        ylab = "Percent",
        xlim = scl,
        ylim = c(0, y_mx * 1.025),  # max(h$counts) * 1.05),
-       axes = FALSE)
+       axes = FALSE,
+       add = TRUE)
 
   # Normal curve overlay (scaled to percent)
   lines(grid, y_norm_percent, col = "steelblue4", lwd = 2)
 
-  # Bandwidth (Silverman / SAS)
-  n_eff <- if (is.null(wgt1)) length(dt1) else (sum(wgt1))^2 / sum(wgt1^2)
+  # Bandwidth (Silverman / SAS) - distinct n; Kish's effective n when weight only
+  n_eff <- if (!is.null(wgt1_hist) & is.null(freq1)) (sum(wgt1_hist))^2 / sum(wgt1_hist^2) else length(dt1)
   bw <- 1.06 * sdx * n_eff^(-1/5)
 
   # Kernel density estimate
-  dens <- if (is.null(wgt1)) {
-    density(dt1, kernel = "gaussian", bw = bw, n = 512)
-  } else {
-    density(dt1, kernel = "gaussian", bw = bw, n = 512, weights = wgt1 / sum(wgt1))
-  }
+  dens <- density(dt1_hist, kernel = "gaussian", bw = bw, n = 512)
 
   # Scale KDE to Percent axis
   y_kernel_percent <- 100 * w1 * dens$y
@@ -1514,23 +1583,16 @@ render_histogram2 <- function(dat, var, plt, class, res) {
 
   # Calculate stats
   n   <- stat_tbl$N[as.character(stat_tbl$CLASS) == as.character(vl2)]
-  mu  <- stat_tbl$MEAN[as.character(stat_tbl$CLASS) == as.character(vl2)]
-  sdx <- stat_tbl$STD[as.character(stat_tbl$CLASS) == as.character(vl2)]
+  mu  <- mean(dt2)
+  sdx <- sd(dt2)
 
-  # Histogram (Percent scale)
-  h <- hist(dt2,
+  # Histogram (Percent scale) - SAS uses left-closed bins [a, b)
+  h <- hist(dt2_hist,
             breaks = brks2,
+            right = FALSE,
+            include.lowest = TRUE,
             plot = FALSE)
-
-  # Convert counts to percent (weighted if applicable)
-  if (is.null(wgt2)) {
-    h$counts <- h$counts / sum(h$counts) * 100
-  } else {
-    bin <- cut(dt2, h$breaks, include.lowest = TRUE)
-    cnt <- as.numeric(tapply(wgt2, bin, sum))
-    cnt[is.na(cnt)] <- 0
-    h$counts <- cnt / sum(cnt) * 100
-  }
+  h$counts <- h$counts / sum(h$counts) * 100
 
 
   # Use calculated break to get normal curve
@@ -1538,28 +1600,21 @@ render_histogram2 <- function(dat, var, plt, class, res) {
   y_norm_percent <- 100 * w2 * dnorm(grid, mean = mu, sd = sdx)
   y_mx <- max(max(y_norm_percent), max(h$counts))
 
-  # # Calculate breaks - Closer to SAS algorithm
-  # brks <- pretty(range(dt2), n = nclass.Sturges(dt2),
-  #                min.n = 1, high.u.bias = 3)
-  #
-  # # Histogram (Percent scale)
-  # h <- hist(dt2,
-  #           breaks = brks,
-  #           plot = FALSE)
-  #
-  # # Convert counts to percent
-  # h$counts <- h$counts / sum(h$counts) * 100
-  #
-  # # Use calculated breaks to get scale
-  # w <- diff(h$breaks)[1] # bin width
-  # xmin <- min(h$breaks) - w
-  # xmax <- max(h$breaks) + w
-  # scl2 <- c(xmin, xmax)
-  #
-  # # Use calculated break to get normal curve
-  # grid <- seq(scl2[1] , scl2[2], length.out = 300)
-  # y_norm_percent <- 100 * w * dnorm(grid, mean = mu, sd = sdx)
-  # y_mx <- max(max(y_norm_percent), max(h$counts))
+  # Initial chart to draw vertical orientation lines underneath bars
+  hist(dt2_hist,
+       breaks = brks2,
+       right = FALSE,
+       include.lowest = TRUE,
+       main = "",
+       ylab = "",
+       xlim = scl,
+       ylim = c(0, y_mx * 1.025),
+       plot = TRUE,
+       axes = FALSE)
+
+  # Get axis tick marks and draw orientation lines
+  aval <- pretty(scl, n = 3)
+  abline(v = aval, col = "grey90", lwd = 1)
 
   # Create plot using histogram values
   plot(h,
@@ -1570,21 +1625,18 @@ render_histogram2 <- function(dat, var, plt, class, res) {
        ylab = "Percent",
        xlim = scl,
        ylim = c(0, y_mx * 1.025), # max(h$counts) * 1.05),
-       axes = FALSE)
+       axes = FALSE,
+       add = TRUE)
 
   # Normal curve overlay (scaled to percent)
   lines(grid, y_norm_percent, col = "steelblue4", lwd = 2)
 
-  # Bandwidth (Silverman / SAS)
-  n_eff <- if (is.null(wgt2)) length(dt2) else (sum(wgt2))^2 / sum(wgt2^2)
+  # Bandwidth (Silverman / SAS) - distinct n; Kish's effective n when weight only
+  n_eff <- if (!is.null(wgt2_hist) & is.null(freq2)) (sum(wgt2_hist))^2 / sum(wgt2_hist^2) else length(dt2)
   bw <- 1.06 * sdx * n_eff^(-1/5)   # 1.06
 
   # Kernel density estimate
-  dens <- if (is.null(wgt2)) {
-    density(dt2, kernel = "gaussian", bw = bw, n = 512)
-  } else {
-    density(dt2, kernel = "gaussian", bw = bw, n = 512, weights = wgt2 / sum(wgt2))
-  }
+  dens <- density(dt2_hist, kernel = "gaussian", bw = bw, n = 512)
 
   # Scale KDE to Percent axis
   y_kernel_percent <- 100 * w2 * dens$y
@@ -1699,7 +1751,6 @@ render_boxplot1 <- function(dat, var, plt, res) {
   if (plt$showh0) {
     xscl <- get_scale(dt, .05, plt$h0)
   } else {
-    print(dt)
     xscl <- get_scale(dt, .05)
   }
 
@@ -3153,11 +3204,16 @@ get_sas_bins <- function(x) {
   }
   mag    <- 10^floor(log10(raw_w))
   cand   <- c(1, 2, 2.5, 3, 4, 5) * mag
-  nice_w <- cand[which.min(abs(log(cand) - log(raw_w)))]
-  anchor <- 10 * mag
-  lo <- floor(rng[1] / anchor) * anchor
-  while (lo + nice_w <= rng[1]) lo <- lo + nice_w
-  while (lo > rng[1]) lo <- lo - nice_w
+  # SAS rounds DOWN to the nearest nice candidate (prefer more, finer bins).
+  le     <- cand[cand <= raw_w]
+  nice_w <- if (length(le) > 0) max(le) else min(cand)
+  # SAS uses midpoint binning: anchor a bin MIDPOINT (not a break) to the
+  # nice grid, so data values can fall at bin centers. For integer data
+  # with nice_w = 1 this puts breaks at half-integers.
+  m <- floor(rng[1] / nice_w) * nice_w
+  while (m + nice_w / 2 <= rng[1]) m <- m + nice_w
+  while (m - nice_w / 2 >  rng[1]) m <- m - nice_w
+  lo <- m - nice_w / 2
   hi <- lo
   while (hi < rng[2]) hi <- hi + nice_w
   seq(lo, hi, by = nice_w)

@@ -401,7 +401,7 @@ proc_means <- function(data,
     }
   }
 
-  var <- var[!var %in% c(by, class)]
+  var <- var[!var %in% c(by, class, weight, freq)]
 
   if (!is.null(by)) {
     if (!all(by %in% nms)) {

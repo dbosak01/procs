@@ -806,10 +806,15 @@ log_ttest <- function(data,
 tlbls <- c(METHOD = "Method", VARIANCES = "Variances", NDF = "Num DF", DDF = "Den DF",
            FVAL = "F Value", PROBF = "Pr > F", mlbls)
 
+fmt_pvalue <- function(x) {
+  ifelse(is.na(x), NA_character_,
+         ifelse(x < 0.0001, "<.0001", sprintf("%.4f", x)))
+}
+
 ttest_fc <- fcat(N = "%d", MEAN = "%.4f", STD = "%.4f", STDERR = "%.4f",
                  MIN = "%.4f", MAX = "%.4f", UCLM = "%.4f", LCLM = "%.4f",
-                 DF = "%.3f", "T" = "%.2f", PROBT = "%.4f", NDF = "%.3f", DDF = "%.3f",
-                 FVAL = "%.2f", PROBF = "%.4f", UCLMSTD = "%.4f", LCLMSTD = "%.4f",
+                 DF = "%.3f", "T" = "%.2f", PROBT = fmt_pvalue, NDF = "%.3f", DDF = "%.3f",
+                 FVAL = "%.2f", PROBF = fmt_pvalue, UCLMSTD = "%.4f", LCLMSTD = "%.4f",
                  log = FALSE)
 
 get_output_specs_ttest <- function(data, var, paired, class, opts, output,

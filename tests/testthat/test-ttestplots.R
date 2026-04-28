@@ -801,7 +801,7 @@ test_that("ttestplot16: plots with freq parameter.", {
                     class = "Sex",
                     freq = "FreqVar",
                     output = "report",
-                    plots = ttestplot("boxplot"))
+                    plots = ttestplot("summary"))
 
   expect_equal(length(res), 5)
   expect_equal("plot_spec" %in% class(res[[5]][[1]]), TRUE)
@@ -814,7 +814,7 @@ test_that("ttestplot16: plots with freq parameter.", {
                     paired = "before * after",
                     freq = "FreqVar",
                     output = "report",
-                    plots = ttestplot("boxplot"))
+                    plots = ttestplot("summary"))
 
   expect_equal(length(res), 4)
   expect_equal("plot_spec" %in% class(res[[4]][[1]]), TRUE)
@@ -838,14 +838,19 @@ test_that("ttestplot17: plots with weight parameter.", {
   expect_equal("plot_spec" %in% class(res[[4]][[1]]), TRUE)
 
   #freq and weight together
-  cls_freq$FreqVar <- c(1,2,3,1,2,3,1,2,3,1,2,3,1,2,3,1,2,3,1)
+  cls_wgt$FreqVar <- c(1,2,3,1,2,3,1,2,3,1,2,3,1,2,3,1,2,3,1)
+  res <- proc_ttest(cls_wgt, var = "Height",
+                    freq = "FreqVar",
+                    weight = "WgtVar",
+                    output = "report",
+                    plots = ttestplot("summary"))
 
   # Two sample (class) with weight
   res <- proc_ttest(cls_wgt, var = "Height",
                     class = "Sex",
                     weight = "WgtVar",
                     output = "report",
-                    plots = ttestplot("boxplot"))
+                    plots = ttestplot("summary"))
 
   expect_equal(length(res), 5)
   expect_equal("plot_spec" %in% class(res[[5]][[1]]), TRUE)
