@@ -12,6 +12,7 @@ proc_means(
   output = NULL,
   by = NULL,
   class = NULL,
+  freq = NULL,
   weight = NULL,
   options = NULL,
   titles = NULL,

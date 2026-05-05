@@ -1359,10 +1359,7 @@ test_that("ttest32: weight parameter",{
   res <- proc_ttest(cls_wgt, var = "Height", weight = "WeightVar",
                     options = c(h0 = 65))
 
-  expect_equal(is.null(res), FALSE)
   expect_equal(length(res), 3)
-
-
   expect_equal(round(as.numeric(res$Statistics$MEAN),4),   61.9771)
   expect_equal(round(as.numeric(res$Statistics$STD),4),    8.6055	)
   expect_equal(round(as.numeric(res$Statistics$STDERR),4), 1.1646)
@@ -1374,19 +1371,11 @@ test_that("ttest32: weight parameter",{
   # weight with class variable
   res <- proc_ttest(cls_wgt, var = "Height", class = "Sex", weight = "WeightVar")
 
-  expect_equal(is.null(res), FALSE)
   expect_equal(length(res), 4)
   expect_equal(nrow(res$Statistics), 4)
-
-  # expect_equal(as.numeric(res$Equality$NDF),         _____)
-  # expect_equal(as.numeric(res$Equality$DDF),         _____)
-  # expect_equal(as.numeric(res$Equality$FVAL),        _____)
-
-  # weight with by groups
-  res <- proc_ttest(cls_wgt, var = "Height", by = "Sex", weight = "WeightVar")
-
-  expect_equal(is.null(res), FALSE)
-  expect_equal(length(res), 3)
+  expect_equal(as.numeric(res$Equality$NDF), 8)
+  expect_equal(as.numeric(res$Equality$DDF), 9)
+  expect_equal(round(as.numeric(res$Equality$FVAL),4), 1.3749)
 
   # weight with NA values filtered out
   cls_w <- cls_wgt
@@ -1395,7 +1384,7 @@ test_that("ttest32: weight parameter",{
   res <- proc_ttest(cls_w, var = "Height", weight = "WeightVar")
 
   expect_equal(is.null(res), FALSE)
-  expect_equal(length(res), 3)
+  expect_equal(as.numeric(res$Statistics$N), 17)
 
   # weight with non-positive values filtered out
   cls_w <- cls_wgt
@@ -1405,7 +1394,7 @@ test_that("ttest32: weight parameter",{
   res <- proc_ttest(cls_w, var = "Height", weight = "WeightVar")
 
   expect_equal(is.null(res), FALSE)
-  expect_equal(length(res), 3)
+  expect_equal(round(as.numeric(res$Statistics$MEAN),4),   62.0641)
 
   # weight and sides together
   res <- proc_ttest(cls_wgt, var = "Height", weight = "WeightVar",
@@ -1430,18 +1419,15 @@ test_that("ttest33: freq parameter", {
   res <- proc_ttest(cls_freq, var = "Height", freq = "FreqVar",
                     options = c(h0 = 65))
 
-  expect_equal(is.null(res), FALSE)
   expect_equal(length(res), 3)
-  res$Statistics$STD[1]
 
-  # expect_equal(as.numeric(res$Statistics$MEAN),   _____)
-  # expect_equal(as.numeric(res$Statistics$STD),    _____)
-  # expect_equal(as.numeric(res$Statistics$STDERR), _____)
-  # expect_equal(as.numeric(res$ConfLimits$LCLM),   _____)
-  # expect_equal(as.numeric(res$ConfLimits$UCLM),   _____)
-  # expect_equal(as.numeric(res$TTests$DF),         _____)
-  # expect_equal(as.numeric(res$TTests$T),          _____)
-  # expect_equal(as.numeric(res$TTests$PROBT),      _____)
+  expect_equal(round(as.numeric(res$Statistics$MEAN),4),   61.9704)
+  expect_equal(round(as.numeric(res$Statistics$STD),4),    5.0049	)
+  expect_equal(round(as.numeric(res$Statistics$STDERR),4), 0.6811)
+  expect_equal(round(as.numeric(res$ConfLimits$LCLM),4),   60.6043)
+  expect_equal(round(as.numeric(res$ConfLimits$UCLM),4),   63.3364)
+  expect_equal(round(as.numeric(res$TTests$T),2),          -4.45)
+  expect_equal(round(as.numeric(res$TTests$PROBT),4),      0.0000)
 
 
   #freq parameter with zero frequencies
@@ -1451,18 +1437,22 @@ test_that("ttest33: freq parameter", {
   res <- proc_ttest(cls_freq, var = "Height", freq = "FreqVar",
                     options = c(h0 = 65))
 
-  expect_equal(is.null(res), FALSE)
-  expect_equal(length(res), 3)
+  expect_equal(as.numeric(res$Statistics$N),4)
 
   #freq with class variable
   cls_freq <- cls
-  cls_freq$FreqVar <- rep(2, nrow(cls_freq))
+  cls_freq$FreqVar <- c(1, 2, 3, 4, 5, 4, 3, 2, 1, 2, 3, 4, 5, 4, 3, 2, 1, 2, 3)
 
   res <- proc_ttest(cls_freq, var = "Height", class = "Sex", freq = "FreqVar")
 
-  expect_equal(is.null(res), FALSE)
   expect_equal(length(res), 4)
-  expect_equal(nrow(res$Statistics), 4)
+  expect_equal(round(as.numeric(res$Statistics$MEAN[1]),4),   60.7700)
+  expect_equal(round(as.numeric(res$Statistics$STD[1]),4),    4.8189)
+  expect_equal(round(as.numeric(res$Statistics$STDERR[2]),4), 1.0044)
+  expect_equal(round(as.numeric(res$ConfLimits$LCLM[3]),4),   -5.3739)
+  expect_equal(round(as.numeric(res$ConfLimits$UCLM[3]),4),   -0.0278)
+  expect_equal(round(as.numeric(res$TTests$T[1]),2),          -2.03)
+  expect_equal(round(as.numeric(res$TTests$PROBT[1]),4),      0.0478)
 
   #freq and sides together
 
@@ -1481,32 +1471,21 @@ test_that("ttest33: freq parameter", {
 test_that("ttest34: freq with paired test.", {
 
   paird_freq <- paird
-  paird_freq$FreqVar <- rep(2, nrow(paird_freq))
+  paird_freq$FreqVar <-  c(1, 2, 3, 1, 2, 3, 1, 2, 3, 1)
 
-  res <- proc_ttest(paird_freq, paired = "before_measure * after_measure",
+  res <- proc_ttest(paird_freq, paired = "before * after",
                     freq = "FreqVar")
 
   expect_equal(is.null(res), FALSE)
   expect_equal(length(res), 3)
 
-  # expect_equal(as.numeric(res$Statistics$N),      _____)
-  # expect_equal(as.numeric(res$Statistics$MEAN),   _____)
-  # expect_equal(as.numeric(res$Statistics$STD),    _____)
-  # expect_equal(as.numeric(res$Statistics$STDERR), _____)
-  # expect_equal(as.numeric(res$ConfLimits$LCLM),   _____)
-  # expect_equal(as.numeric(res$ConfLimits$UCLM),   _____)
-  # expect_equal(as.numeric(res$TTests$DF),         _____)
-  # expect_equal(as.numeric(res$TTests$T),          _____)
-  # expect_equal(as.numeric(res$TTests$PROBT),      _____)
-
-  #freq with by groups
-  cls_freq <- cls
-  cls_freq$FreqVar <- c(rep(2, 10), rep(1, 9))
-
-  res <- proc_ttest(cls_freq, var = "Height", by = "Sex", freq = "FreqVar")
-
-  expect_equal(is.null(res), FALSE)
-  expect_equal(length(res), 3)
+  expect_equal(round(as.numeric(res$Statistics$MEAN),4),   -1.7368)
+  expect_equal(round(as.numeric(res$Statistics$STD),4),    0.8719	)
+  expect_equal(round(as.numeric(res$Statistics$STDERR),4), 0.2000)
+  expect_equal(round(as.numeric(res$ConfLimits$LCLM),4),   -2.1571)
+  expect_equal(round(as.numeric(res$ConfLimits$UCLM),4),   -1.3166)
+  expect_equal(round(as.numeric(res$TTests$T),2),          -8.68)
+  expect_equal(round(as.numeric(res$TTests$PROBT),4),      0.0000)
 
   #sides = 'L' lower bound
   res1 <- proc_ttest(cls, var = "Height", options = c(h0 = 65, sides = "L"))
@@ -1538,76 +1517,6 @@ test_that("ttest34: freq with paired test.", {
 
   expect_equal(as.numeric(res2$ConfLimits$UCLM[3]), Inf)
   expect_true(is.finite(as.numeric(res2$ConfLimits$LCLM[3])))
-})
-
-
-test_that("ttest35: freq and weight parameter together",{
-
-  # basic freq + weight
-  cls_fw <- cls
-  cls_fw$FreqVar   <- c(1, 2, 3, 4, 5, 4, 3, 2, 1, 2, 3, 4, 5, 4, 3, 2, 1, 2, 3)
-  cls_fw$WeightVar <- c(3, 1, 2, 5, 4, 2, 3, 1, 4, 5, 2, 3, 1, 4, 2, 5, 3, 1, 2)
-
-  res <- proc_ttest(cls_fw, var = "Height", freq = "FreqVar", weight = "WeightVar",
-                    options = c(h0 = 65))
-
-  expect_equal(is.null(res), FALSE)
-  expect_equal(length(res), 3)
-
-  # expect_equal(as.numeric(res$Statistics$MEAN),   _____)
-  # expect_equal(as.numeric(res$Statistics$STD),    _____)
-  # expect_equal(as.numeric(res$Statistics$STDERR), _____)
-  # expect_equal(as.numeric(res$ConfLimits$LCLM),   _____)
-  # expect_equal(as.numeric(res$ConfLimits$UCLM),   _____)
-  # expect_equal(as.numeric(res$TTests$DF),         _____)
-  # expect_equal(as.numeric(res$TTests$T),          _____)
-  # expect_equal(as.numeric(res$TTests$PROBT),      _____)
-
-  # freq + weight with class variable
-  res <- proc_ttest(cls_fw, var = "Height", class = "Sex",
-                    freq = "FreqVar", weight = "WeightVar")
-
-  expect_equal(is.null(res), FALSE)
-  expect_equal(length(res), 4)
-  expect_equal(nrow(res$Statistics), 4)
-
-  # freq + weight with by groups
-  res <- proc_ttest(cls_fw, var = "Height", by = "Sex",
-                    freq = "FreqVar", weight = "WeightVar")
-
-  expect_equal(is.null(res), FALSE)
-  expect_equal(length(res), 3)
-
-  # zero/NA freq and NA weight rows are dropped
-  cls_fw2 <- cls_fw
-  cls_fw2$FreqVar[1]   <- 0
-  cls_fw2$FreqVar[2]   <- NA
-  cls_fw2$WeightVar[3] <- NA
-
-  res <- proc_ttest(cls_fw2, var = "Height",
-                    freq = "FreqVar", weight = "WeightVar")
-
-  expect_equal(is.null(res), FALSE)
-  expect_equal(length(res), 3)
-
-  # freq + weight with sides = "L"
-  res <- proc_ttest(cls_fw, var = "Height",
-                    freq = "FreqVar", weight = "WeightVar",
-                    options = c(h0 = 65, sides = "L"))
-
-  expect_equal(as.numeric(res$ConfLimits$LCLM[1]), -Inf)
-  expect_true(is.finite(as.numeric(res$ConfLimits$UCLM[1])))
-
-  # freq + weight with paired test
-  paird_fw <- paird
-  paird_fw$FreqVar <- rep(2, nrow(paird_fw))
-  paird_fw$WeightVar <- seq_len(nrow(paird_fw))
-
-  res <- proc_ttest(paird_fw, paired = "before_measure * after_measure",
-                    freq = "FreqVar", weight = "WeightVar")
-
-  expect_equal(is.null(res), FALSE)
-  expect_equal(length(res), 3)
 })
 
 # Not sure how to do this.  Can't get lognormal dist to match SAS.

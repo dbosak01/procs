@@ -12,6 +12,8 @@ proc_ttest(
   output = NULL,
   by = NULL,
   class = NULL,
+  freq = NULL,
+  weight = NULL,
   options = NULL,
   titles = NULL,
   order = NULL,

@@ -54,10 +54,10 @@
 #' \item{\strong{agreement}:  An agreement plot for the input data.  Only
 #' available for paired comparisons.
 #' }
-#' \item{\strong{boxplot}: Displays a box and whisker plot for group comparisons,
+#' \item{\strong{boxplot/box}: Displays a box and whisker plot for group comparisons,
 #' including confidence intervals (if appropriate).
 #' }
-#' \item{\strong{histogram}: A histogram with normal curve and kernel density
+#' \item{\strong{histogram/hist}: A histogram with normal curve and kernel density
 #' overlays.
 #' }
 #' \item{\strong{interval}: Visualizes the confidence intervals for means.
@@ -65,7 +65,7 @@
 #' \item{\strong{profiles}: A line plot mapping responses
 #' between analysis variables. Available only for paired analysis.
 #' }
-#' \item{\strong{qqplot}: A quantile-quantile plot used to assess the assumption
+#' \item{\strong{qqplot/qq}: A quantile-quantile plot used to assess the assumption
 #' of normality.
 #' }
 #' \item{\strong{summary}: Combines the histogram and boxplot charts
@@ -395,8 +395,6 @@ render_summary1 <- function(dat, var, plt, res) {
   brks <- get_sas_bins(rdt_hist)
 
   # Calculate breaks and y scale.
-  # right = FALSE matches SAS's left-closed bin convention [a, b),
-  # with the rightmost break included via include.lowest.
   h <- hist(rdt_hist,
             breaks = brks,
             right = FALSE,
@@ -3204,16 +3202,21 @@ get_sas_bins <- function(x) {
   }
   mag    <- 10^floor(log10(raw_w))
   cand   <- c(1, 2, 2.5, 3, 4, 5) * mag
-  # SAS rounds DOWN to the nearest nice candidate (prefer more, finer bins).
+  # SAS rounds DOWN to the nearest nice candidate
   le     <- cand[cand <= raw_w]
   nice_w <- if (length(le) > 0) max(le) else min(cand)
-  # SAS uses midpoint binning: anchor a bin MIDPOINT (not a break) to the
-  # nice grid, so data values can fall at bin centers. For integer data
-  # with nice_w = 1 this puts breaks at half-integers.
+  # SAS picks edge-aligned vs midpoint-centered bins based on whether
+  # X_min already lies on the nice_w grid.
   m <- floor(rng[1] / nice_w) * nice_w
-  while (m + nice_w / 2 <= rng[1]) m <- m + nice_w
-  while (m - nice_w / 2 >  rng[1]) m <- m - nice_w
-  lo <- m - nice_w / 2
+  on_grid <- isTRUE(all.equal(rng[1] - m, 0))
+  if (on_grid) {
+    lo <- m - nice_w / 2
+  } else {
+    anchor <- 10 * mag
+    lo <- floor(rng[1] / anchor) * anchor
+    while (lo + nice_w <= rng[1]) lo <- lo + nice_w
+    while (lo > rng[1])           lo <- lo - nice_w
+  }
   hi <- lo
   while (hi < rng[2]) hi <- hi + nice_w
   seq(lo, hi, by = nice_w)

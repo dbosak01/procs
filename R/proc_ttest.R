@@ -811,9 +811,16 @@ fmt_pvalue <- function(x) {
          ifelse(x < 0.0001, "<.0001", sprintf("%.4f", x)))
 }
 
+fmt_df <- function(x) {
+  ifelse(is.na(x), NA_character_,
+         ifelse(abs(x - round(x)) < 1e-9,
+                sprintf("%d", as.integer(round(x))),
+                sprintf("%.3f", x)))
+}
+
 ttest_fc <- fcat(N = "%d", MEAN = "%.4f", STD = "%.4f", STDERR = "%.4f",
                  MIN = "%.4f", MAX = "%.4f", UCLM = "%.4f", LCLM = "%.4f",
-                 DF = "%.3f", "T" = "%.2f", PROBT = fmt_pvalue, NDF = "%.3f", DDF = "%.3f",
+                 DF = fmt_df, "T" = "%.2f", PROBT = fmt_pvalue, NDF = fmt_df, DDF = fmt_df,
                  FVAL = "%.2f", PROBF = fmt_pvalue, UCLMSTD = "%.4f", LCLMSTD = "%.4f",
                  log = FALSE)
 
