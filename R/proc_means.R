@@ -245,6 +245,14 @@
 #' separate tables, while class groups will be continued in the same table.
 #' When a \code{by} and a \code{class} are both specified, the \code{class}
 #' will be nested in the \code{by}.
+#' @param freq The name of a variable to use for integer frequency counts.
+#' This parameter is optional, and NULL by default. When supplied, each row
+#' contributes to the summary statistics as if it were repeated by the value
+#' of the freq variable. Frequency values must be non-negative integers.
+#' Observations with a missing or zero freq value are excluded from the
+#' analysis. The \code{freq} and \code{weight} parameters may be used
+#' together; in that case each observation is replicated by its frequency
+#' and weighted by its weight.
 #' @param weight The name of a variable to use for weighted statistics.
 #' This parameter is optional, and NULL by default.
 #' The weight can be used to

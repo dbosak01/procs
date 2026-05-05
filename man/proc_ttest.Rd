@@ -70,11 +70,30 @@ variable "Group".  Note that
 there can only be two different values on the class variable.  Also, the
 analysis is restricted to only one class variable.}
 
+\item{freq}{The name of a variable to use for integer frequency counts.
+This parameter is optional, and NULL by default. When supplied, each row
+is treated as if it were repeated by the value of the freq variable for
+the purposes of computing the mean, variance, standard error, t statistic,
+and confidence limits. Frequency values must be non-negative integers.
+Observations with a missing or zero freq value are excluded from the
+analysis.}
+
+\item{weight}{The name of a variable to use for weighted statistics.
+This parameter is optional, and NULL by default. When supplied, the
+mean, variance, standard error, t statistic, and confidence limits are
+computed using the weights. Observations with a missing or non-positive
+weight are excluded from the analysis. The \code{freq} and \code{weight}
+parameters may be used together; in that case each observation is
+replicated by its frequency and weighted by its weight.}
+
 \item{options}{A vector of optional keywords. Valid values are: "alpha =",
-"h0 =", and "noprint". The "alpha = " option will set the alpha
+"h0 =", "sides =", and "noprint". The "alpha = " option will set the alpha
 value for confidence limit statistics.  The default is 95\% (alpha = 0.05).
 The "h0 = " option sets the baseline hypothesis value for single-variable
-hypothesis testing.  The "noprint" option turns off the interactive report.}
+hypothesis testing. The "sides = " option selects a two-sided or one-sided
+test: "2" (default, two-sided), "U" (upper, one-sided alternative
+\eqn{\mu > h_0}), or "L" (lower, one-sided alternative \eqn{\mu < h_0}).
+The "noprint" option turns off the interactive report.}
 
 \item{titles}{A vector of one or more titles to use for the report output.}
 
