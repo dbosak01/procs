@@ -1473,7 +1473,7 @@ test_that("ttest34: freq with paired test.", {
   paird_freq <- paird
   paird_freq$FreqVar <-  c(1, 2, 3, 1, 2, 3, 1, 2, 3, 1)
 
-  res <- proc_ttest(paird_freq, paired = "before * after",
+  res <- proc_ttest(paird_freq, paired = "before_measure * after_measure",
                     freq = "FreqVar")
 
   expect_equal(is.null(res), FALSE)
