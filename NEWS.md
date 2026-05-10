@@ -1,3 +1,9 @@
+# procs 1.0.9
+
+* Added "sides" option to `proc_ttest()`.
+* Added "freq" and "weight" parameters to `proc_ttest()`.
+* Improved binning algorithm for histogram plots.
+
 # procs 1.0.8
 
 * Added "order" parameter to `proc_freq()` and `proc_ttest()`.

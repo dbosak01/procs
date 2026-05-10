@@ -8,3 +8,5 @@
 ^logo\.png$
 ^codecov\.yml$
 ^Procs_Validation\.docx$
+^\.positai$
+^\.claude$

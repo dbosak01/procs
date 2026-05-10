@@ -728,4 +728,31 @@ test_that("transpose30: Standard Eval works on transpose", {
 
 })
 
+test_that("transpose31: Many by variables work as expected.", {
+
+
+  if (dev) {
+
+  vs2 <- readRDS(file.path(base_path, "data\\vs2.rds"))
+
+  nmlst <- find.names(vs2, pattern =  v(USUBJID, AVISITN, AVISIT, ADT, ADY,
+                                        ADTF, STUDYID, SUBJID,
+                                        SITEID, `TRT*`, RANDFL, SAFFL,
+                                        MITTFL, PPROTFL, `AW*`,
+                                        ABLFL, ANL01FL))
+
+    proc_transpose(data=vs2,
+                   by = nmlst,
+                   var = AVAL,
+                   id = PARAMCD,
+    ) -> tvs
+
+
+  } else {
+
+    expect_equal(TRUE, TRUE)
+  }
+
+})
+
 

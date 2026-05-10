@@ -22,7 +22,7 @@ the viewer interactively and returned from the function."><meta property="og:ima
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">procs</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.0.8</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.0.9</span>
       </span>
     </div>
 
@@ -113,6 +113,8 @@ the viewer interactively and returned from the function.</p>
 <span>  output <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  by <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  class <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  freq <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  weight <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  options <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  titles <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  order <span class="op">=</span> <span class="cn">NULL</span>,</span>
@@ -185,12 +187,35 @@ there can only be two different values on the class variable.  Also, the
 analysis is restricted to only one class variable.</p></dd>
 
 
+<dt id="arg-freq">freq<a class="anchor" aria-label="anchor" href="#arg-freq"></a></dt>
+<dd><p>The name of a variable to use for integer frequency counts.
+This parameter is optional, and NULL by default. When supplied, each row
+is treated as if it were repeated by the value of the freq variable for
+the purposes of computing the mean, variance, standard error, t statistic,
+and confidence limits. Frequency values must be non-negative integers.
+Observations with a missing or zero freq value are excluded from the
+analysis.</p></dd>
+
+
+<dt id="arg-weight">weight<a class="anchor" aria-label="anchor" href="#arg-weight"></a></dt>
+<dd><p>The name of a variable to use for weighted statistics.
+This parameter is optional, and NULL by default. When supplied, the
+mean, variance, standard error, t statistic, and confidence limits are
+computed using the weights. Observations with a missing or non-positive
+weight are excluded from the analysis. The <code>freq</code> and <code>weight</code>
+parameters may be used together; in that case each observation is
+replicated by its frequency and weighted by its weight.</p></dd>
+
+
 <dt id="arg-options">options<a class="anchor" aria-label="anchor" href="#arg-options"></a></dt>
 <dd><p>A vector of optional keywords. Valid values are: "alpha =",
-"h0 =", and "noprint". The "alpha = " option will set the alpha
+"h0 =", "sides =", and "noprint". The "alpha = " option will set the alpha
 value for confidence limit statistics.  The default is 95% (alpha = 0.05).
 The "h0 = " option sets the baseline hypothesis value for single-variable
-hypothesis testing.  The "noprint" option turns off the interactive report.</p></dd>
+hypothesis testing. The "sides = " option selects a two-sided or one-sided
+test: "2" (default, two-sided), "U" (upper, one-sided alternative
+\(\mu &gt; h_0\)), or "L" (lower, one-sided alternative \(\mu &lt; h_0\)).
+The "noprint" option turns off the interactive report.</p></dd>
 
 
 <dt id="arg-titles">titles<a class="anchor" aria-label="anchor" href="#arg-titles"></a></dt>

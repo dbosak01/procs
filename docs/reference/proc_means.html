@@ -21,7 +21,7 @@ the viewer interactively and returned from the function."><meta property="og:ima
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">procs</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.0.8</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.0.9</span>
       </span>
     </div>
 
@@ -111,6 +111,7 @@ the viewer interactively and returned from the function.</p>
 <span>  output <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  by <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  class <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  freq <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  weight <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  options <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  titles <span class="op">=</span> <span class="cn">NULL</span>,</span>
@@ -178,6 +179,17 @@ parameter, but the output is different.  By groups will create completely
 separate tables, while class groups will be continued in the same table.
 When a <code>by</code> and a <code>class</code> are both specified, the <code>class</code>
 will be nested in the <code>by</code>.</p></dd>
+
+
+<dt id="arg-freq">freq<a class="anchor" aria-label="anchor" href="#arg-freq"></a></dt>
+<dd><p>The name of a variable to use for integer frequency counts.
+This parameter is optional, and NULL by default. When supplied, each row
+contributes to the summary statistics as if it were repeated by the value
+of the freq variable. Frequency values must be non-negative integers.
+Observations with a missing or zero freq value are excluded from the
+analysis. The <code>freq</code> and <code>weight</code> parameters may be used
+together; in that case each observation is replicated by its frequency
+and weighted by its weight.</p></dd>
 
 
 <dt id="arg-weight">weight<a class="anchor" aria-label="anchor" href="#arg-weight"></a></dt>

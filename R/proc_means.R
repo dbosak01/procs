@@ -805,7 +805,7 @@ get_summaries <- function(data, var, freq = NULL, weight=NULL, stats, missing = 
   if (vardef=="wgt") vardef <- "weight"
   sides <- toupper(as.character(get_option(opts, "sides", 2, FALSE)))
   if (!sides %in% c("2", "U", "L")) {
-    stop(paste0("Expecting one of the following values for the SIDES= option： L, U, 2."))
+    stop(paste0("Expecting one of the following values for the SIDES= option: L, U, 2."))
   }
   for (nm in var) {
 
