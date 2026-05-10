@@ -466,6 +466,58 @@ test_that("stat17: get_variance() works as expected.", {
 })
 
 
+test_that("stat18: get_clm() works with one-sided", {
+
+  dt <- c(4, -1, 7, -4, 6, 8, 10)
+  df <- length(dt) - 1
+
+  # 1. Upper test (sides = "U")
+  res_u <- get_clm(dt, df, alpha = 0.05, sides = "U")
+  expect_equal(res_u[["ucl"]], Inf)
+  expect_equal(res_u[["lcl"]], 0.5717171)
+
+  # 2. Lower test (sides = "L")
+  res_l <- get_clm(dt, df, alpha = 0.05, sides = "L")
+  expect_equal(res_l[["ucl"]], 7.9997115)
+  expect_equal(res_l[["lcl"]], -Inf)
+
+  # 3. Auto-detect (sides = "1") with positive mean
+  res_auto_pos <- get_clm(dt, df, alpha = 0.05, sides = "1")
+  expect_equal(res_auto_pos[["ucl"]], Inf)       # Mean > 0, so should be U
+  expect_equal(res_auto_pos[["lcl"]], 0.5717171)
+
+  # 4. Auto-detect (sides = "1") with negative mean
+  dt_neg <- -dt
+  res_auto_neg <- get_clm(dt_neg, df, alpha = 0.05, sides = "1")
+  expect_equal(res_auto_neg[["ucl"]], -0.5717171) # Mean < 0, so should be L
+  expect_equal(res_auto_neg[["lcl"]], -Inf)
+
+})
+
+test_that("stat19: get_t() works with one-sided", {
+
+  dt <- c(-10, -21, -12,  -5,   1, -70, -41, -24)
+  df <- length(dt) - 1
+
+  # 1. Upper test (sides = "U")
+  res_u <- get_t(dt, df, sides = "U")
+  expect_equal(res_u[["PRT"]], 0.986516273)
+
+  # 2. Lower test (sides = "L")
+  res_l <- get_t(dt, df, sides = "L")
+  expect_equal(res_l[["PRT"]], 0.013483727)
+
+  # 3. Auto-detect (sides = "1") with negative t-value
+  res_auto_neg <- get_t(dt, df, sides = "1")
+  expect_equal(res_auto_neg[["PRT"]], 0.013483727)
+
+  # 4. Auto-detect (sides = "1") with positive t-value
+  dt_pos <- -dt
+  res_auto_pos <- get_t(dt_pos, df, sides = "1")
+  expect_equal(res_auto_pos[["PRT"]], 0.013483727)
+
+})
+
 # Matches SAS?
 # test_that("stat10: cmh works no weight uncorrected", {
 #

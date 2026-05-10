@@ -2949,10 +2949,16 @@ get_scale <- function(vct, pct = .1, h0 = NULL) {
     }
 
   }
-
-  mn <- rng[1] * (1 - pct)
-  mx <- rng[2] * (1 + pct)
-
+  if (rng[1]>0){
+    mn <- rng[1] * (1 - pct)
+  } else{
+    mn <- rng[1] * (1 + pct)
+  }
+  if (rng[2]>0){
+    mx <- rng[2] * (1 + pct)
+  } else{
+    mx <- rng[2] * (1 - pct)
+  }
   ret <- c(mn, mx)
 
   return(ret)

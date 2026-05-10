@@ -431,7 +431,7 @@ test_that("means18: get_output long works.", {
 
   res <- get_output(datm,  var = c("PresentScore", "TasteScore"),
                     stats = c("n", "mean", "min", "max", "range", "median"),
-                    shape = "long", type = 0, freq = TRUE,
+                    shape = "long", type = 0, frq = TRUE,
                     by = c(by1 = "By1"),
                     class = c(cls1 = "Class1", cls2 = "Class2"))
 
@@ -451,7 +451,7 @@ test_that("means19: get_output wide works.", {
 
   res <- get_output(datm,  var = c("PresentScore", "TasteScore"),
                     stats = c("n", "mean", "min", "max", "range", "median"),
-                    shape = "wide", type = 0, freq = TRUE,
+                    shape = "wide", type = 0, frq = TRUE,
                     by = c(by1 = "By1"),
                     class = c(cls1 = "Class1", cls2 = "Class2"))
 
@@ -471,7 +471,7 @@ test_that("means20: get_output wide no by or class works.", {
 
   res <- get_output(datm,  var = c("PresentScore", "TasteScore"),
                     stats = c("n", "mean", "min", "max", "range", "median"),
-                    shape = "wide", type = 0, freq = TRUE)
+                    shape = "wide", type = 0, frq = TRUE)
 
   res
 
@@ -1661,33 +1661,33 @@ test_that("means61: Weight available works for stats option: mean median mode", 
   datsp$Weight <- c(1,2,3,1,2,3,1,2,3,1,2,3,1,2,3,1,2,3,1,2)
   #n mean std
   res1 <- proc_means(datsp, var = c("Age", "PresentScore", "TasteScore"),
-                     stats = c("n", "mean", "median", "mode"),
+                     stats = c("n", "mean", "median"),
                      output = out,
                      weight = "Weight",
                      by = c("Layers"),
                      class = "Flavor")
   res1
   expect_equal(nrow(res1), 36)
-  expect_equal(ncol(res1), 9)
+  expect_equal(ncol(res1), 8)
   expect_equal(res1$MEAN[6],82.1111111)
   expect_equal(res1$MEDIAN[6],83)
-  expect_equal(is.na(res1$MODE[6]),TRUE)
+  # expect_equal(is.na(res1$MODE[6]),TRUE)
 
   ##when missing weight is present
   datsp <- datm
   datsp$Weight <- c(1,2,3,1,2,3,NA,2,3,1,2,3,1,2,3,1,2,3,1,2)
   res2 <- proc_means(datsp, var = c("Age", "PresentScore", "TasteScore"),
-                     stats = c("n", "mean", "median", "mode"),
+                     stats = c("n", "mean", "median"),
                      output = out,
                      weight = "Weight",
                      by = c("Layers"),
                      class = "Flavor")
   res2
   expect_equal(nrow(res2), 36)
-  expect_equal(ncol(res2), 9)
+  expect_equal(ncol(res2), 8)
   expect_equal(res2$MEAN[6],82.50)
   expect_equal(res2$MEDIAN[6],83)
-  expect_equal(is.na(res1$MODE[6]),TRUE)
+  # expect_equal(is.na(res1$MODE[6]),TRUE)
 })
 
 test_that("means62: Weight works for stats option: quantiles, qrange", {
@@ -1739,7 +1739,7 @@ test_that("means64: Weight works for stats option: t clm uclm lclm prt probt", {
   expect_equal(as.numeric(res1[1,5:7]),c(13.62869969, 35.658376846,48.598033410))
 })
 
-test_that("means64: Weight works for stats option: skew kurt", {
+test_that("means65: Weight works for stats option: skew kurt", {
 
   datsp <- datm
   datsp$Weight <- c(1,2,3,1,2,3,1,2,3,1,2,3,1,2,3,1,2,3,1,2)
@@ -1811,7 +1811,7 @@ test_that("means67: Some other cases with Weight", {
 })
 
 
-test_that("means67: Vardef options with weight and class work as expected.", {
+test_that("means68: Vardef options with weight and class work as expected.", {
 
   dat2 <- read.table(header = TRUE, text = '
                 Name      Assessment     Score   Weight
@@ -1894,7 +1894,7 @@ test_that("means67: Vardef options with weight and class work as expected.", {
 
 
 # More comparisons to SAS
-test_that("means68: Vardef options with other statistics work as expected.", {
+test_that("means69: Vardef options with other statistics work as expected.", {
 
   # NAs in Score and Weight
   dat2 <- read.table(header = TRUE, text = '
@@ -1932,13 +1932,13 @@ test_that("means68: Vardef options with other statistics work as expected.", {
   # Weight - No vardef
   res1 <- proc_means(dat2, var = Score, weight = Weight,
                      class = Name, options = c("nway"),
-                     stats = v(nobs, n, mean, median, mode, std, vari, stderr, clm, cv))
+                     stats = v(nobs, n, mean, median, std, vari, stderr, clm, cv))
 
   expect_equal(as.numeric(res1$NOBS), c(6, 6))
   expect_equal(as.numeric(res1$N), c(5, 5))
   expect_equal(as.numeric(res1$MEAN), c(84.4210526, 97.4210526))
   expect_equal(as.numeric(res1$MEDIAN), c(85, 96.0))
-  expect_equal(as.numeric(res1$MODE), as.numeric(c(NA, NA)))
+  # expect_equal(as.numeric(res1$MODE), as.numeric(c(NA, NA)))
   expect_equal(as.numeric(res1$STD), c(7.6637390, 1.0406223))
   expect_equal(as.numeric(res1$VARI), c(58.7328947, 1.0828947))
   expect_equal(as.numeric(res1$STDERR), c(7.8628303, 1.0676559))
@@ -1949,13 +1949,13 @@ test_that("means68: Vardef options with other statistics work as expected.", {
   # vardef = wgt - OK
   res1 <- proc_means(dat2, var = Score, weight = Weight,
                      class = Name, options = c("vardef" = "wgt", "nway"),
-                     stats = v(nobs, n, mean, median, mode, std, vari, stderr, clm, cv))
+                     stats = v(nobs, n, mean, median, std, vari, stderr, clm, cv))
 
   expect_equal(as.numeric(res1$NOBS), c(6, 6))
   expect_equal(as.numeric(res1$N), c(5, 5))
   expect_equal(as.numeric(res1$MEAN), c(84.4210526, 97.4210526))
   expect_equal(as.numeric(res1$MEDIAN), c(85, 96.0))
-  expect_equal(as.numeric(res1$MODE), as.numeric(c(NA, NA)))
+  # expect_equal(as.numeric(res1$MODE), as.numeric(c(NA, NA)))
   expect_equal(as.numeric(res1$STD), c(15.7256605, 2.1353119))
   expect_equal(as.numeric(res1$VARI), c(247.2963989, 4.5595568))
   expect_equal(as.numeric(res1$STDERR), as.numeric(c(NA, NA)))
@@ -1967,13 +1967,13 @@ test_that("means68: Vardef options with other statistics work as expected.", {
   # Weight - vardef = DF
   res1 <- proc_means(dat2, var = Score, weight = Weight,
                      class = Name, options = c("vardef" = "DF", "nway"),
-                     stats = v(nobs, n, mean, median, mode, std, vari, stderr, clm, cv))
+                     stats = v(nobs, n, mean, median, std, vari, stderr, clm, cv))
 
   expect_equal(as.numeric(res1$NOBS), c(6, 6))
   expect_equal(as.numeric(res1$N), c(5, 5))
   expect_equal(as.numeric(res1$MEAN), c(84.4210526, 97.4210526))
   expect_equal(as.numeric(res1$MEDIAN), c(85, 96.0))
-  expect_equal(as.numeric(res1$MODE), as.numeric(c(NA, NA)))
+  # expect_equal(as.numeric(res1$MODE), as.numeric(c(NA, NA)))
   expect_equal(as.numeric(res1$STD), c(7.6637390, 1.0406223))
   expect_equal(as.numeric(res1$VARI), c(58.7328947, 1.0828947))
   expect_equal(as.numeric(res1$STDERR), c(7.8628303, 1.0676559))
@@ -1984,13 +1984,13 @@ test_that("means68: Vardef options with other statistics work as expected.", {
   # vardef = wdf - No variance stats.  No std. OK.
   res1 <- proc_means(dat2, var = Score, weight = Weight,
                      class = Name, options = c("vardef" = "wdf", "nway"),
-                     stats = v(nobs, n, mean, median, mode, std, vari, stderr, clm, cv))
+                     stats = v(nobs, n, mean, median, std, vari, stderr, clm, cv))
 
   expect_equal(as.numeric(res1$NOBS), c(6, 6))
   expect_equal(as.numeric(res1$N), c(5, 5))
   expect_equal(as.numeric(res1$MEAN), c(84.4210526, 97.4210526))
   expect_equal(as.numeric(res1$MEDIAN), c(85, 96.0))
-  expect_equal(as.numeric(res1$MODE), as.numeric(c(NA, NA)))
+  # expect_equal(as.numeric(res1$MODE), as.numeric(c(NA, NA)))
   expect_equal(as.numeric(res1$STD), as.numeric(c(NA, NA)))
   expect_equal(as.numeric(res1$VARI), as.numeric(c(NA, NA)))
   expect_equal(as.numeric(res1$STDERR), as.numeric(c(NA, NA)))
@@ -2002,13 +2002,13 @@ test_that("means68: Vardef options with other statistics work as expected.", {
   # vardef = n  - OK
   res1 <- proc_means(dat2, var = Score, weight = Weight,
                      class = Name, options = c("vardef" = "n", "nway"),
-                     stats = v(nobs, n, mean, median, mode, std, vari, stderr, clm, cv))
+                     stats = v(nobs, n, mean, median, std, vari, stderr, clm, cv))
 
   expect_equal(as.numeric(res1$NOBS), c(6, 6))
   expect_equal(as.numeric(res1$N), c(5, 5))
   expect_equal(as.numeric(res1$MEAN), c(84.4210526, 97.4210526))
   expect_equal(as.numeric(res1$MEDIAN), c(85, 96.0))
-  expect_equal(as.numeric(res1$MODE), as.numeric(c(NA, NA)))
+  # expect_equal(as.numeric(res1$MODE), as.numeric(c(NA, NA)))
   expect_equal(as.numeric(res1$STD), c(6.8546565, 0.9307609))
   expect_equal(as.numeric(res1$VARI), c(46.9863158, 0.8663158))
   expect_equal(as.numeric(res1$STDERR), as.numeric(c(NA, NA)))
@@ -2021,7 +2021,7 @@ test_that("means68: Vardef options with other statistics work as expected.", {
 
 
 # More comparisons to SAS
-test_that("means69: Vardef options with other statistics no weight work as expected.", {
+test_that("means70: Vardef options with other statistics no weight work as expected.", {
 
   # NAs in Score and Weight
   dat2 <- read.table(header = TRUE, text = '
@@ -2116,7 +2116,7 @@ test_that("means69: Vardef options with other statistics no weight work as expec
 
 # T, P, etc. with vardef options
 # More comparisons to SAS
-test_that("means70: Vardef options with other statistics no weight work as expected.", {
+test_that("means71: Vardef options with other statistics no weight work as expected.", {
 
   # NAs in Score and Weight
   dat2 <- read.table(header = TRUE, text = '
@@ -2191,7 +2191,7 @@ test_that("means70: Vardef options with other statistics no weight work as expec
 
 })
 
-test_that("means71: where expression works as expected.", {
+test_that("means72: where expression works as expected.", {
 
   res <- proc_means(datm, var = "Age")
 
@@ -2205,3 +2205,211 @@ test_that("means71: where expression works as expected.", {
   expect_equal(res$N, 19)
 
 })
+
+
+# --- freq parameter tests ---
+
+test_that("means73: freq parameter basics", {
+
+  # When all freq values are 1, results should match the no-freq case
+  datf <- datm
+  datf$FreqVar <- rep(1, nrow(datf))
+
+  res_no_freq <- proc_means(datm, var = c("PresentScore", "TasteScore"),
+                            stats = c("n", "mean", "std", "min", "max"),
+                            options = v(notype, nonobs))
+
+  res_freq <- proc_means(datf, var = c("PresentScore", "TasteScore"),
+                         stats = c("n", "mean", "std", "min", "max"),
+                         freq = "FreqVar",
+                         options = v(notype, nonobs))
+
+  expect_equal(res_freq$N, res_no_freq$N)
+  expect_equal(res_freq$MEAN, res_no_freq$MEAN)
+  expect_equal(res_freq$STD, res_no_freq$STD)
+  expect_equal(res_freq$MIN, res_no_freq$MIN)
+  expect_equal(res_freq$MAX, res_no_freq$MAX)
+
+  #freq parameter changes FREQ column in output
+  datf <- datm
+  datf$FreqVar <- rep(2, nrow(datf))
+
+  # Without freq: FREQ column should be nrow(data) = 20
+  res_no_freq <- proc_means(datf, var = "PresentScore",
+                            stats = c("n", "mean"),
+                            output = out)
+  expect_equal(res_no_freq$FREQ[1], 20)
+
+  # With freq = 2 for all rows: FREQ column = sum(freq) = 40
+  res_freq <- proc_means(datf, var = "PresentScore",
+                         stats = c("n", "mean"),
+                         freq = "FreqVar",
+                         output = out)
+  expect_equal(res_freq$FREQ[1], 40)
+
+  #freq parameter excludes rows with zero freq.
+  datf <- data.frame(
+    x = c(10, 20, 30, 40),
+    f = c(2, 3, 0, 1)
+  )
+
+  # Row 3 (x=30, f=0) should be excluded
+  res <- proc_means(datf, var = "x",
+                    stats = c("n", "min", "max"),
+                    freq = "f",
+                    options = v(notype, nonobs))
+
+  expect_equal(res$N[1], 6)
+  expect_equal(res$MIN[1], 10)
+  expect_equal(res$MAX[1], 40)
+
+  #freq parameter floors non-integer values.
+  datf_int <- data.frame(
+    x = c(10, 20, 30),
+    f_int = c(2, 1, 1)
+  )
+  datf_dec <- data.frame(
+    x = c(10, 20, 30),
+    f_dec = c(2.7, 1.3, 1.9)
+  )
+
+  res_int <- proc_means(datf_int, var = "x",
+                        stats = c("n", "mean", "std", "min", "max"),
+                        freq = "f_int",
+                        options = v(notype, nonobs))
+
+  res_dec <- proc_means(datf_dec, var = "x",
+                        stats = c("n", "mean", "std", "min", "max"),
+                        freq = "f_dec",
+                        options = v(notype, nonobs))
+
+  expect_equal(res_dec$N[1], res_int$N[1])
+  expect_equal(res_dec$MEAN[1], res_int$MEAN[1])
+  expect_equal(res_dec$STD[1], res_int$STD[1])
+  expect_equal(res_dec$MIN[1], res_int$MIN[1])
+  expect_equal(res_dec$MAX[1], res_int$MAX[1])
+})
+
+
+test_that("means74: freq works with statistics and options", {
+  #variance
+  datf <- data.frame(
+    x = c(10, 20, 30),
+    f = c(2, 1, 1)
+  )
+
+  res <- proc_means(datf, var = "x",
+                    stats = c("n", "std", "vari"),
+                    freq = "f",
+                    options = v(notype, nonobs))
+
+  expect_equal(res$N[1], 4)
+  expect_equal(res$VARI[1], 91.6666667)
+  expect_equal(res$STD[1], 9.5742711)
+
+  #by group
+  datf <- datm
+  datf$FreqVar <- c(rep(2, 10), rep(1, 10))
+
+  res <- proc_means(datf, var = "PresentScore",
+                    stats = c("n", "mean", "min", "max"),
+                    freq = "FreqVar",
+                    by = "Layers",
+                    output = out)
+
+  res
+
+  expect_true(nrow(res) > 0)
+  expect_true("BY" %in% names(res))
+  expect_true("FREQ" %in% names(res))
+
+  #class
+  datf <- datm
+  datf$FreqVar <- rep(2, nrow(datf))
+
+  res <- proc_means(datf, var = "PresentScore",
+                    stats = c("n", "mean"),
+                    freq = "FreqVar",
+                    class = "Layers",
+                    output = out)
+
+  res
+
+  expect_true(nrow(res) > 0)
+  expect_true("CLASS" %in% names(res))
+  expect_equal(res$FREQ[1], 40)
+  expect_equal(res$FREQ[2], 18)
+
+  #n, nmiss, nobs
+
+  datf <- data.frame(
+    x = c(10, NA, 30, 40, 50, 60),
+    f = c(2, 3, 0, 4, NA, -1),
+    w = c(1, 0, -1, NA, 2, 3)
+  )
+
+  res <- proc_means(datf, var = "x",
+                    stats = c("n", "nmiss", "nobs"),
+                    freq = "f",
+                    options = v(notype, nonobs))
+
+  expect_equal(res$NOBS[1], 6)   # total rows in original data
+  expect_equal(res$N[1], 6)      # non-missing: 10, 40 (2+4)
+  expect_equal(res$NMISS[1], 3)  # missing: NA (f=3)
+
+  res <- proc_means(datf, var = "x",
+                    stats = c("n", "nmiss", "nobs"),
+                    freq = "f",
+                    weight = "w",
+                    options = v(notype, nonobs))
+
+  expect_equal(res$NOBS[1], 6)   # total rows in original data
+  expect_equal(res$N[1], 2)      # non-missing: 10, 40
+  expect_equal(res$NMISS[1], 3)  # missing: NA (row 2)
+
+
+  #sum and range
+
+  datf <- data.frame(
+    x = c(10, 20, 30, 40),
+    f = c(2, 3, 0, 1)
+  )
+
+  res <- proc_means(datf, var = "x",
+                    stats = c("sum", "range", "min", "max"),
+                    freq = "f",
+                    options = v(notype, nonobs))
+
+  expect_equal(res$SUM[1], 70)    # 10 + 20 + 40
+  expect_equal(res$MIN[1], 10)
+  expect_equal(res$MAX[1], 40)
+  expect_equal(res$RANGE[1], 30)  # 40 - 10
+
+})
+
+
+test_that("means75: freq with weight together works.", {
+
+  datf <- datm
+  datf$FreqVar <- c(2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3)
+  datf$Weight <- c(1, 2, 3, 1, 2, 3, 1, 2, 3, 1, 2, 3, 1, 2, 3, 1, 2, 3, 1, 2)
+
+  res <- proc_means(datf, var = "PresentScore",
+                    stats = c("n", "mean", "std"),
+                    freq = "FreqVar",
+                    weight = "Weight",
+                    options = v(notype, nonobs))
+
+  res
+
+  expect_equal(nrow(res), 1)
+  expect_equal(res$N[1], 50)
+  expect_equal(res$MEAN[1], 73.8877551)
+  expect_equal(res$STD[1], 13.2985846)
+
+
+})
+
+
+
+

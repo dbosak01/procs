@@ -90,10 +90,10 @@ the plot type keyword needed to request the plot, and a brief description:
 \item{\strong{agreement}:  An agreement plot for the input data.  Only
 available for paired comparisons.
 }
-\item{\strong{boxplot}: Displays a box and whisker plot for group comparisons,
+\item{\strong{boxplot/box}: Displays a box and whisker plot for group comparisons,
 including confidence intervals (if appropriate).
 }
-\item{\strong{histogram}: A histogram with normal curve and kernel density
+\item{\strong{histogram/hist}: A histogram with normal curve and kernel density
 overlays.
 }
 \item{\strong{interval}: Visualizes the confidence intervals for means.
@@ -101,7 +101,7 @@ overlays.
 \item{\strong{profiles}: A line plot mapping responses
 between analysis variables. Available only for paired analysis.
 }
-\item{\strong{qqplot}: A quantile-quantile plot used to assess the assumption
+\item{\strong{qqplot/qq}: A quantile-quantile plot used to assess the assumption
 of normality.
 }
 \item{\strong{summary}: Combines the histogram and boxplot charts

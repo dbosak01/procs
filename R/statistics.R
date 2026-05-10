@@ -129,18 +129,16 @@ get_stderr <- function(x, df, wgt = NULL, narm = TRUE) {
 }
 
 #' @noRd
-get_t <- function(x, df, wgt=NULL, y = NULL, narm = TRUE, alpha = 0.05, paired = FALSE) {
+get_t <- function(x, df, wgt=NULL, y = NULL, narm = TRUE, alpha = 0.05, paired = FALSE, sides = 2) {
   if (narm) {
     x <- x[!is.na(x)]
   }
   if (!is.numeric(alpha))
     alpha <- as.numeric(alpha)
 
-  onesided = FALSE
-  if (onesided) {
-    alp <- 1 - alpha
-  } else {
-    alp <- 1 - (alpha / 2)
+  sides_char <- toupper(as.character(sides))
+  if (!sides_char %in% c("1", "2", "U", "L")) {
+    sides_char <- "2"
   }
 
   ret <- NULL
@@ -156,18 +154,30 @@ get_t <- function(x, df, wgt=NULL, y = NULL, narm = TRUE, alpha = 0.05, paired =
         t_value <- mean(x, na.rm = narm) / stderr_x
       else
         t_value <- sum(x*wgt, na.rm = narm)/sum(wgt)/ stderr_x
-      p_value <- 2 * pt(-abs(t_value), df = df)
+
+      actual_side <- sides_char
+      if (actual_side == "1") {
+        actual_side <- ifelse(t_value >= 0, "U", "L")
+      }
+
+      if (actual_side == "U") {
+        p_value <- pt(t_value, df = df, lower.tail = FALSE)
+      } else if (actual_side == "L") {
+        p_value <- pt(t_value, df = df, lower.tail = TRUE)
+      } else {
+        p_value <- 2 * pt(-abs(t_value), df = df)
+      }
     }
 
     ret <- c("T" = t_value,
              PRT = p_value,
              DF = df)
-
-
   }
 
   return(ret)
 }
+
+
 
 #' @noRd
 get_quantile<- function(x, probs, wgt=NULL, narm = TRUE) {
@@ -189,42 +199,49 @@ get_quantile<- function(x, probs, wgt=NULL, narm = TRUE) {
 
 
 #' @noRd
-get_clm <- function(x, df, wgt = NULL, narm = TRUE, alpha = 0.05, onesided = FALSE) {
+get_clm <- function(x, df, wgt = NULL, narm = TRUE, alpha = 0.05, onesided = FALSE, sides = 2) {
   if (narm) {
     x <- x[!is.na(x)]
   }
   if (!is.numeric(alpha))
     alpha <- as.numeric(alpha)
 
+  sides_char <- toupper(as.character(sides))
+  if (!sides_char %in% c("1", "2", "U", "L")) {
+    sides_char <- "2"
+  }
 
+  if (df<=0){
+    return(c(ucl = NA, lcl = NA, alpha = alpha))
+  }
 
-  if (onesided) {
+  n <- sum(!is.na(x))
+  if (is.null(wgt))
+    xbar <- mean(x, na.rm = narm)
+  else
+    xbar <- sum(x*wgt, na.rm = narm)/sum(wgt)
+
+  actual_side <- sides_char
+  if (actual_side == "1") {
+    actual_side <- ifelse(xbar >= 0, "U", "L")
+  }
+
+  if (onesided || actual_side %in% c("U", "L")) {
     alp <- 1 - alpha
   } else {
     alp <- 1 - (alpha / 2)
   }
 
-  if (df<=0){
-    res <- c(ucl = NA, lcl = NA, alpha = alpha)
+  margin <- qt(alp,df=df)*get_stderr(x, df, wgt, narm)
+
+  if (actual_side == "U") {
+    res <- c(ucl = Inf, lcl = xbar - margin, alpha = alpha)
+  } else if (actual_side == "L") {
+    res <- c(ucl = xbar + margin, lcl = -Inf, alpha = alpha)
   } else {
-    #Sample size
-    n <- sum(!is.na(x))
-
-    # Sample weighted mean
-    if (is.null(wgt))
-      xbar <- mean(x, na.rm = narm)
-    else
-      xbar <- sum(x*wgt, na.rm = narm)/sum(wgt)
-
-    # Margin of error
-
-    margin <- qt(alp,df=df)*get_stderr(x, df, wgt, narm)
-
-    # Lower and upper confidence interval boundaries
-    res <- c(ucl = xbar + margin,
-             lcl = xbar - margin,
-             alpha = alpha)
+    res <- c(ucl = xbar + margin, lcl = xbar - margin, alpha = alpha)
   }
+
   return(res)
 }
 
@@ -265,7 +282,6 @@ get_clmstd <- function(x, df, wgt=NULL, narm = TRUE, alpha = 0.05, onesided = FA
 }
 
 
-
 #' @noRd
 get_mode <- function(x) {
 
@@ -274,27 +290,6 @@ get_mode <- function(x) {
 
   return(res)
 }
-
-
-# Not sure why this was changed.
-# @noRd
-# get_mode_diyu <- function(x, narm = TRUE) {
-#   if (narm)
-#     x <- x[!is.na(x)]
-#   uniqv <- unique(x)
-#   counts <- tabulate(match(x, uniqv))
-#
-#   if (sum(counts == max(counts)) > 1) {
-#     # If there are multiple modes, return NA
-#     res <- NA
-#   } else {
-#     res <- uniqv[which.max(counts)]
-#   }
-#
-#   return(res)
-# }
-
-
 
 
 get_fisher <- function(x, y, wgt = NULL, bylbl = "", output = FALSE) {
