@@ -234,6 +234,13 @@ option will inhibit printing.  You may inhibit printing globally by
 setting the package print option to false:
 \code{options("procs.print" = FALSE)}.
 }
+\item{\strong{sides = }: The "sides = " option indicates whether to perform
+a one-sided or two-sided T-test.  Valid values are "2" for two-sided,
+"U" for upper, and "L" for lower.  The default value is "2". The sides parameter
+will effect the data frame output, interactive report, and any requested plots.
+For one-sided tests, the confidence intervals will be set to negative or positive
+infinity for the alternative hypothesis.
+}
 }
 }
 

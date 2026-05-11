@@ -84,6 +84,14 @@ the following code:
 
     devtools::install_github("https://github.com/dbosak01/procs")    
 
+### Introductory Videos
+
+Here is a brief introduction to the `proc_reg()` function in the **procs**
+package. This function is representative of the other statistical functions
+in the package:
+
+[![Overview of the proc_reg() Function](https://img.youtube.com/vi/DK4kCYgNjfA/0.jpg)](https://www.youtube.com/watch?v=DK4kCYgNjfA)
+
 
 ### Getting Help
 

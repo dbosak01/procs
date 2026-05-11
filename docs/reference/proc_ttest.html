@@ -347,6 +347,12 @@ viewer.  By default, the report is printed to the viewer. The "noprint"
 option will inhibit printing.  You may inhibit printing globally by
 setting the package print option to false:
 <code>options("procs.print" = FALSE)</code>.</p></li>
+<li><p><strong>sides = </strong>: The "sides = " option indicates whether to perform
+a one-sided or two-sided T-test.  Valid values are "2" for two-sided,
+"U" for upper, and "L" for lower.  The default value is "2". The sides parameter
+will effect the data frame output, interactive report, and any requested plots.
+For one-sided tests, the confidence intervals will be set to negative or positive
+infinity for the alternative hypothesis.</p></li>
 </ul></div>
     <div id="class-order">
     <h2>Class Order</h2>
