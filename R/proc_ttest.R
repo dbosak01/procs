@@ -1565,8 +1565,14 @@ gen_report_ttest <- function(data,
           # data, var, class, outp, freq = TRUE,
           # type = NULL, byvals = NULL
           #outp <- out_spec(stats = stats, shape = "wide")
+          grp_opts <- opts
+          if (!is.null(opts)) {
+            nms_o <- names(grp_opts)
+            if (!is.null(nms_o) && "sides" %in% nms_o)
+              grp_opts[nms_o == "sides"] <- "2"
+          }
           smtbl <- get_class_report(dt, outp$var, class, outp, frq = FALSE,
-                                    freq = freq, weight = weight, opts = opts)
+                                    freq = freq, weight = weight, opts = grp_opts)
 
 
 
@@ -1886,6 +1892,13 @@ gen_output_ttest <- function(data,
 
             if (nm %in% c("Statistics", "ConfLimits")) {
 
+              # SAS applies sides= only to Difference rows
+              grp_opts <- opts
+              if (!is.null(opts)) {
+                nms_o <- names(grp_opts)
+                if (!is.null(nms_o) && "sides" %in% nms_o)
+                  grp_opts[nms_o == "sides"] <- "2"
+              }
               # Get standard statistics
               tmpcls <- get_class_output(dat, var = vr,
                                          class = class,
@@ -1893,7 +1906,7 @@ gen_output_ttest <- function(data,
                                          outp = outp,
                                          frq = outp$parameters$freq,
                                          type = outp$parameters$type,
-                                         byvals = bynm, opts = opts,
+                                         byvals = bynm, opts = grp_opts,
                                          stats = outp$stats)
 
               tmpcls <- add_class_ttest(tmpcls, ctbl[[nm]])

@@ -2391,15 +2391,18 @@ render_interval2 <- function(dat, var, plt, res) {
   y <- c(2, 1)  # vertical positions
   ci <- c(lower_ci, upper_ci)
 
-  # Get scales
-  fin_ci <- ci[is.finite(ci)]
+  # Get scales - seed from finite CI bounds plus the means so one-sided tests
+  # (where all upper_ci or all lower_ci are Inf) produce a readable axis range.
+  xscl <- c(min(lower_ci), max(upper_ci))
+  mean_mid <- mean(mean_diff)
+  if (is.infinite(xscl[1])) { xscl[1] <- mean_mid - 1.5 * (xscl[2] - mean_mid) }
+  if (is.infinite(xscl[2])) { xscl[2] <- mean_mid + 1.5 * (mean_mid - xscl[1]) }
+  xscl <- c(min(c(xscl, mean_diff)), max(c(xscl, mean_diff)))
   if (plt$showh0) {
-    xscl <- get_scale(fin_ci, .001, plt$h0)
+    xscl <- get_scale(xscl, .001, plt$h0)
   } else {
-    xscl <- get_scale(fin_ci, .001)
+    xscl <- get_scale(xscl, .001)
   }
-  lower_ci[is.infinite(lower_ci)] <- xscl[1] - abs(xscl[1])*10
-  upper_ci[is.infinite(upper_ci)] <- xscl[2] + abs(xscl[2])*10
   # Create base plot
   plot(mean_diff, y,
        xlim = xscl,
@@ -2417,7 +2420,8 @@ render_interval2 <- function(dat, var, plt, res) {
               line = 1.5, cex = 1.25, font = 2)
 
   ## Subtitle
-  mtext(paste("With ", alph, "% Confidence Intervals"), side = 3,
+  sides_lbl <- if (any(is.infinite(upper_ci))) "Upper " else if (any(is.infinite(lower_ci))) "Lower " else ""
+  mtext(paste0("With ", alph, "% ", sides_lbl, "Confidence Intervals"), side = 3,
         line = .5, cex = 1)
 
   # X axis label
@@ -2427,16 +2431,19 @@ render_interval2 <- function(dat, var, plt, res) {
   aval <- axis(side = 1, las = 1, col.ticks = "grey55",
                mgp = c(3, .5, 0), tck = -0.015)
 
-  ## Confidence interval lines
-  segments(lower_ci, y, upper_ci, y,
-           col = "brown3", lwd = 3)
-
-  ## CI end caps
-  segments(lower_ci, y - 0.08, lower_ci, y + 0.08,
-           col = "brown3", lwd = 3)
-
-  segments(upper_ci, y - 0.08, upper_ci, y + 0.08,
-           col = "brown3", lwd = 3)
+  for (k in seq_along(y)) {
+    if (is.infinite(upper_ci[k])) {
+      arrows(mean_diff[k], y[k], xscl[2] / 1.001, y[k], col = "#05379B", lwd = 3, length = 0.1)
+      segments(lower_ci[k], y[k], mean_diff[k], y[k], col = "brown3", lwd = 3)
+    } else if (is.infinite(lower_ci[k])) {
+      arrows(mean_diff[k], y[k], xscl[1] / 0.999, y[k], col = "#05379B", lwd = 3, length = 0.1)
+      segments(upper_ci[k], y[k], mean_diff[k], y[k], col = "brown3", lwd = 3)
+    } else {
+      segments(lower_ci[k], y[k], upper_ci[k], y[k], col = "brown3", lwd = 3)
+    }
+    if (is.finite(lower_ci[k])) segments(lower_ci[k], y[k] - 0.08, lower_ci[k], y[k] + 0.08, col = "brown3", lwd = 3)
+    if (is.finite(upper_ci[k])) segments(upper_ci[k], y[k] - 0.08, upper_ci[k], y[k] + 0.08, col = "brown3", lwd = 3)
+  }
 
   ## Mean diamonds
   points(mean_diff, y,
@@ -2527,6 +2534,12 @@ render_tqqplot1 <- function(dat, var, plt, res) {
 
   # Extract data
   rdt <- dat[[var]]
+  freq <- if (!is.null(plt$freq)) dat[[plt$freq]] else NULL
+  if (!is.null(freq)) {
+    freq <- floor(freq)
+    idx <- !is.na(rdt) & !is.na(freq) & freq > 0
+    rdt <- rep(rdt[idx], times = freq[idx])
+  }
 
   # Assign label
   ylbl <- var
@@ -2707,6 +2720,19 @@ render_tqqplot2 <- function(dat, var, plt, class, res) {
   cvls <-  unique(dat[[class]])
   dt1 <- dat[dat[[class]] == cvls[1], var]
   dt2 <- dat[dat[[class]] == cvls[2], var]
+  freq1 <- if (!is.null(plt$freq)) dat[dat[[class]] == cvls[1], plt$freq] else NULL
+  freq2 <- if (!is.null(plt$freq)) dat[dat[[class]] == cvls[2], plt$freq] else NULL
+
+  if (!is.null(freq1)) {
+    freq1 <- floor(freq1)
+    idx1 <- !is.na(dt1) & !is.na(freq1) & freq1 > 0
+    dt1 <- rep(dt1[idx1], times = freq1[idx1])
+  }
+  if (!is.null(freq2)) {
+    freq2 <- floor(freq2)
+    idx2 <- !is.na(dt2) & !is.na(freq2) & freq2 > 0
+    dt2 <- rep(dt2[idx2], times = freq2[idx2])
+  }
 
   # Output to image file
   jpeg(pth, width = wd, height = ht, quality = 100, units = "px")
