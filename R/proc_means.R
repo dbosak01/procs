@@ -922,7 +922,7 @@ get_summaries <- function(data, var, freq = NULL, weight=NULL, stats, missing = 
             rw[["MODE"]] <- NA
           else if (!is.null(weight)) {
             rw[["MODE"]] <- NA
-            warning("The MODE statistic is not computed when a weight variable is specified.")
+            # warning("The MODE statistic is not computed when a weight variable is specified.")
           }
           else
             rw[["MODE"]] <- get_mode(var_all)

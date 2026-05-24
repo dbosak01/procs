@@ -832,7 +832,7 @@ test_that("ttestplot17: plots with weight parameter.", {
                     weight = "WgtVar",
                     options = c(h0 = 65),
                     output = "report",
-                    plots = ttestplot("summary"))
+                    plots = ttestplot(c("summary", "qqplot")))
 
   expect_equal(length(res), 4)
   expect_equal("plot_spec" %in% class(res[[4]][[1]]), TRUE)
@@ -1052,3 +1052,46 @@ test_that("ttestplot23: plots with showh0 and sides together.", {
   expect_equal(length(res), 5)
   expect_equal("plot_spec" %in% class(res[[5]][[1]]), TRUE)
 })
+
+# These now match SAS
+test_that("ttest24: QQplot works as expected with weight.", {
+
+  scrs <- read.table(header = TRUE, text = '
+  Group Score Frequency
+  Online   85  10
+  Online   90  25
+  Online   92  15
+  InPerson 88  12
+  InPerson 91  30
+  InPerson 95  18
+  ')
+
+  # Two charts
+  res <- proc_ttest(scrs,
+                    var = "Score",
+                    class = "Group",
+                    weight = "Frequency",
+                    output = "report",
+                    plot = TRUE)
+
+
+  expect_equal(length(res), 5)
+  # expect_true(is.finite(as.numeric(res2$ConfLimits$LCLM[3])))
+
+
+  # Single chart
+  res <- proc_ttest(scrs,
+                    var = "Score",
+                    weight = "Frequency",
+                    output = "report",
+                    plot = TRUE,
+                    options = c(h0 = 80))
+
+
+  expect_equal(length(res), 4)
+
+
+
+})
+
+

@@ -40,6 +40,16 @@ subject_id before_measure after_measure region
 9 16 17  B
 10 9 13  B')
 
+scrs <- read.table(header = TRUE, text = '
+Group Score Frequency
+Online   85  10
+Online   90  25
+Online   92  15
+InPerson 88  12
+InPerson 91  30
+InPerson 95  18
+')
+
 options("logr.output" = FALSE)
 options("procs.print" = FALSE)
 #options("procs.print" = NULL)
@@ -1518,6 +1528,7 @@ test_that("ttest34: freq with paired test.", {
   expect_equal(as.numeric(res2$ConfLimits$UCLM[3]), Inf)
   expect_true(is.finite(as.numeric(res2$ConfLimits$LCLM[3])))
 })
+
 
 # Not sure how to do this.  Can't get lognormal dist to match SAS.
 # test_that("ttest28: Paired ttest with lognormal data works.", {

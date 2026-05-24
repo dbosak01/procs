@@ -2577,7 +2577,19 @@ render_tqqplot1 <- function(dat, var, plt, res) {
   stat_tbl <- res[[grep("Statistics$", names(res))[length(grep("Statistics$", names(res)))]]]
 
   # Slope = Standard Deviation, Intercept = Mean
-  abline(a = stat_tbl$MEAN[1], b = stat_tbl$STD[1], col = "grey60")
+  if (!is.null(plt$weight)) {
+    # For some reason, the qqplot trend line uses the unweighted values.
+    # So have to calculate them here.
+    ovar <- dat[[var]]
+    owgt <- dat[[plt$weight]]
+    # adjmean <- sum(owgt * ovar) / sum(owgt)  # Weighted mean
+    adjmean <- mean(ovar, na.rm = TRUE)
+    # adjstd <- sqrt(sum(owgt * (ovar - adjmean)^2) / (sum(owgt) - 1))  # Weighted std
+    adjstd <- sd(ovar, na.rm = TRUE)
+    abline(a = adjmean, b = adjstd, col = "grey60")
+  } else {
+    abline(a = stat_tbl$MEAN[1], b = stat_tbl$STD[1], col = "grey60")
+  }
 
   # Add custom axes
   axis(side = 1, col.ticks = "grey55", mgp = c(3, .5, 0), tck = -0.015)
@@ -2773,8 +2785,17 @@ render_tqqplot2 <- function(dat, var, plt, class, res) {
   stat_tbl <- res[[grep("Statistics$", names(res))[length(grep("Statistics$", names(res)))]]]
 
   # Slope = Standard Deviation, Intercept = Mean
-  abline(a = stat_tbl$MEAN[as.character(stat_tbl$CLASS) == as.character(cvls[1])],
-         b = stat_tbl$STD[as.character(stat_tbl$CLASS) == as.character(cvls[1])], col = "grey60")
+  if (!is.null(plt$weight)) {
+    # For some reason, the qqplot trend line uses the unweighted values.
+    # So have to calculate them here.
+    ovar <- dt1
+    adjmean <- mean(ovar, na.rm = TRUE)
+    adjstd <- sd(ovar, na.rm = TRUE)
+    abline(a = adjmean, b = adjstd, col = "grey60")
+  } else {
+    abline(a = stat_tbl$MEAN[as.character(stat_tbl$CLASS) == as.character(cvls[1])],
+           b = stat_tbl$STD[as.character(stat_tbl$CLASS) == as.character(cvls[1])], col = "grey60")
+  }
 
   # Add custom axes
   axis(side = 1, col.ticks = "grey55", mgp = c(3, .5, 0), tck = -0.015)
@@ -2822,8 +2843,17 @@ render_tqqplot2 <- function(dat, var, plt, class, res) {
        axes = FALSE)
 
   # Slope = Standard Deviation, Intercept = Mean
-  abline(a = stat_tbl$MEAN[as.character(stat_tbl$CLASS) == as.character(cvls[2])],
-         b = stat_tbl$STD[as.character(stat_tbl$CLASS) == as.character(cvls[2])], col = "grey60")
+  if (!is.null(plt$weight)) {
+    # For some reason, the qqplot trend line uses the unweighted values.
+    # So have to calculate them here.
+    ovar <- dt2
+    adjmean <- mean(ovar, na.rm = TRUE)
+    adjstd <- sd(ovar, na.rm = TRUE)
+    abline(a = adjmean, b = adjstd, col = "grey60")
+  } else {
+    abline(a = stat_tbl$MEAN[as.character(stat_tbl$CLASS) == as.character(cvls[2])],
+           b = stat_tbl$STD[as.character(stat_tbl$CLASS) == as.character(cvls[2])], col = "grey60")
+  }
 
   # Add custom axes
   axis(side = 1, col.ticks = "grey55", mgp = c(3, .5, 0), tck = -0.015)
