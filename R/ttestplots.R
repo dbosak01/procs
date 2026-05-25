@@ -388,11 +388,12 @@ render_summary1 <- function(dat, var, plt, res) {
   sdx <- sd(rdt)
   ci  <- c(clm_tbl$LCLM[1], clm_tbl$UCLM[1])
 
-  # Use calculated breaks to get scale
-  # scl <- range(rdt)
-  # scl <- c(scl[1] * .8, scl[2] * 1.2)
+  # Calculate breaks - Closer to SAS algorithm
+  brks <- pretty(range(rdt), n = nclass.Sturges(rdt),
+                 min.n = 1, high.u.bias = 3)
+
   # Calculate breaks
-  brks <- get_sas_bins(rdt_hist)
+  # brks <- get_sas_bins(rdt_hist)
 
   # Calculate breaks and y scale.
   h <- hist(rdt_hist,
@@ -786,11 +787,18 @@ render_summary2 <- function(dat, var, plt, class, res) {
   scl <- c(scl[1] * .875, scl[2] * 1.125)
 
   # Calculate breaks - Histogram 1
-  brks1 <- get_sas_bins(dt1_hist)
+  brks1 <- pretty(range(dt1), n = nclass.Sturges(dt1),
+                  min.n = 1, high.u.bias = 3)
 
+  # Calculate breaks - Histogram 1
+  # brks1 <- get_sas_bins(dt1_hist)
 
   # Calculate breaks - Histogram 2
-  brks2 <- get_sas_bins(dt2_hist)
+  brks2 <- pretty(range(dt2), n = nclass.Sturges(dt2),
+                  min.n = 1, high.u.bias = 3)
+
+  # Calculate breaks - Histogram 2
+  # brks2 <- get_sas_bins(dt2_hist)
 
   # Scale for Histogram 1 (SAS-style: 1.5 bin-widths of padding)
   w1 <- diff(brks1)[1] # bin width
@@ -1256,8 +1264,12 @@ render_histogram1 <- function(dat, var, plt, res) {
   sdx <- sd(rdt)
   ci  <- c(clm_tbl$LCLM[1], clm_tbl$UCLM[1])
 
+  # Calculate breaks - Closer to SAS algorithm
+  brks <- pretty(range(rdt), n = nclass.Sturges(rdt),
+                 min.n = 1, high.u.bias = 3)
+
   # Calculate breaks
-  brks <- get_sas_bins(rdt_hist)
+  # brks <- get_sas_bins(rdt_hist)
 
   # Histogram (Percent scale) - SAS uses left-closed bins [a, b)
   h <- hist(rdt_hist,
@@ -1451,11 +1463,19 @@ render_histogram2 <- function(dat, var, plt, class, res) {
   scl <- c(scl[1] * .875, scl[2] * 1.125)
 
   # Calculate breaks - Histogram 1
-  brks1 <- get_sas_bins(dt1_hist)
+  brks1 <- pretty(range(dt1), n = nclass.Sturges(dt1),
+                  min.n = 1, high.u.bias = 3)
+
+  # Calculate breaks - Histogram 2
+  brks2 <- pretty(range(dt2), n = nclass.Sturges(dt2),
+                  min.n = 1, high.u.bias = 3)
+
+  # Calculate breaks - Histogram 1
+  # brks1 <- get_sas_bins(dt1_hist)
 
 
   # Calculate breaks - Histogram 2
-  brks2 <- get_sas_bins(dt2_hist)
+  # brks2 <- get_sas_bins(dt2_hist)
 
   # Scale for Histogram 1 (SAS-style: 1.5 bin-widths of padding)
   w1 <- diff(brks1)[1] # bin width

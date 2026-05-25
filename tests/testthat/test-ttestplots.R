@@ -532,6 +532,18 @@ test_that("ttestplot10: plots = TRUE.", {
   expect_equal(length(res), 4)
   expect_equal("plot_spec" %in% class(res[[4]][[1]]), TRUE)
 
+  # Two Samples
+  res <- proc_ttest(cls,
+                    var = "Weight",
+                    class = "region",
+                    output = report,
+                    plots = TRUE)
+
+  # Paired
+  res <- proc_ttest(cls,
+                    paired = "Height * Weight",
+                    output = report,
+                    plots = TRUE)
 
 
 })
@@ -1054,7 +1066,7 @@ test_that("ttestplot23: plots with showh0 and sides together.", {
 })
 
 # These now match SAS
-test_that("ttest24: QQplot works as expected with weight.", {
+test_that("ttestplot24: qqplot works as expected with weight.", {
 
   scrs <- read.table(header = TRUE, text = '
   Group Score Frequency

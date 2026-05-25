@@ -1789,6 +1789,11 @@ render_residualhistogram <- function(dat, res, mdl, plt) {
   mu  <- mean(rdt)
   sdx <- sd(rdt)
 
+
+  # Calculate breaks - Closer to SAS algorithm
+  # brks <- pretty(range(rdt), n = nclass.Sturges(rdt),
+  #                min.n = 1, high.u.bias = 3)
+
   # Calculate breaks - Closer to SAS algorithm
   brks <- pretty(range(rdt), n = nclass.Sturges(rdt),
                  min.n = 1, high.u.bias = 3)
