@@ -606,7 +606,9 @@ render_diagnostics <- function(dat, res, mdl, plt, alph) {
     lldt <- ldt[lblids]
 
     # Assign labels
-    text(lldt, lrdt, labels = lbls, pos = 3)
+    if (length(lbls) > 0) {
+      text(lldt, lrdt, labels = lbls, pos = 3)
+    }
   }
 
   #******************************
@@ -773,7 +775,9 @@ render_diagnostics <- function(dat, res, mdl, plt, alph) {
     # lcol <- cols[cols != nc]
 
     # Assign labels
-    text(lxcd, lcd, labels = lbls, pos = 3)
+    if (length(lbls) > 0) {
+      text(lxcd, lcd, labels = lbls, pos = 3)
+    }
   }
 
 
@@ -1556,7 +1560,9 @@ render_rstudentbyleverage <- function(dat, res, mdl, plt) {
     lcol <- cols[cols != nc]
 
     # Assign labels
-    text(lldt, lrdt, labels = lbls, pos = 3, col = lcol)
+    if (length(lbls) > 0) {
+      text(lldt, lrdt, labels = lbls, pos = 3, col = lcol)
+    }
   }
 
   # Frame
@@ -2217,7 +2223,9 @@ render_cooksd <- function(dat, res, mdl, plt) {
     lxcd <- xcd[lblids]
 
     # Assign labels
-    text(lxcd, lcd, labels = lbls, pos = 3)
+    if (length(lbls) > 0) {
+      text(lxcd, lcd, labels = lbls, pos = 3)
+    }
   }
 
   # Restore margins

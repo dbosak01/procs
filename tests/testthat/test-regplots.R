@@ -1052,6 +1052,18 @@ test_that("regplot23: dfbetas multiple dependent variables", {
   expect_equal("plot_spec" %in% class(res[[5]][[1]]), TRUE)
 
 
+  # multiple models, cooksd with labels
+  res <- proc_reg(cls,
+                  output = report,
+           model = list(Weight ~ Height,
+                        Height ~ Weight),
+           plots = regplot(type = c("cooksd"),
+                           label = TRUE, id = "Name"))
+
+
+  expect_equal(length(res), 2)
+  expect_equal(length(res[[1]]), 5)
+  expect_equal("plot_spec" %in% class(res[[1]][[5]][[1]]), TRUE)
 
 })
 

@@ -615,10 +615,12 @@ render_summary1 <- function(dat, var, plt, res) {
       } else {
         olbls <- dat[[plt$id]][as.integer(bp$onm)]
       }
-      text(bp$out, rep(1, length(bp$out)),
-           labels = olbls,
-           cex = .9,
-           pos = 1)
+      if (length(olbls) > 0) {
+        text(bp$out, rep(1, length(bp$out)),
+             labels = olbls,
+             cex = .9,
+             pos = 1)
+      }
     }
 
   }
@@ -1113,10 +1115,12 @@ render_summary2 <- function(dat, var, plt, class, res) {
       } else {
         olbls1 <- lbls[as.integer(bp$onm1)]
       }
-      text(bp$out1, rep(2, length(bp$out1)),
-           labels = olbls1,
-           cex = .9,
-           pos = 1)
+      if (length(olbls1) > 0) {
+        text(bp$out1, rep(2, length(bp$out1)),
+             labels = olbls1,
+             cex = .9,
+             pos = 1)
+      }
     }
   }
 
@@ -1135,10 +1139,12 @@ render_summary2 <- function(dat, var, plt, class, res) {
       } else {
         olbls2 <- lbls[as.integer(bp$onm2)]
       }
-      text(bp$out2, rep(1, length(bp$out2)),
-           labels = olbls2,
-           cex = .9,
-           pos = 3)
+      if (length(olbls2) > 0) {
+        text(bp$out2, rep(1, length(bp$out2)),
+             labels = olbls2,
+             cex = .9,
+             pos = 3)
+      }
     }
   }
 
@@ -1875,10 +1881,12 @@ render_boxplot1 <- function(dat, var, plt, res) {
       } else {
         olbls <- dat[[plt$id]][as.integer(bp$onm)]
       }
-      text(bp$out, rep(1, length(bp$out)),
-           labels = olbls,
-           cex = .9,
-           pos = 1)
+      if (length(olbls) > 0) {
+        text(bp$out, rep(1, length(bp$out)),
+             labels = olbls,
+             cex = .9,
+             pos = 1)
+      }
     }
 
   }
@@ -2148,10 +2156,12 @@ render_boxplot2 <- function(dat, var, plt, class, res) {
       } else {
         olbls1 <- lbls[as.integer(bp$onm1)]
       }
-      text(bp$out1, rep(2, length(bp$out1)),
-           labels = olbls1,
-           cex = .9,
-           pos = 1)
+      if (length(olbls1) > 0) {
+        text(bp$out1, rep(2, length(bp$out1)),
+             labels = olbls1,
+             cex = .9,
+             pos = 1)
+      }
     }
   }
 
@@ -2171,10 +2181,12 @@ render_boxplot2 <- function(dat, var, plt, class, res) {
       } else {
         olbls2 <- lbls[as.integer(bp$onm2)]
       }
-      text(bp$out2, rep(1, length(bp$out2)),
-           labels = olbls2,
-           cex = .9,
-           pos = 1)
+      if (length(olbls2) > 0) {
+        text(bp$out2, rep(1, length(bp$out2)),
+             labels = olbls2,
+             cex = .9,
+             pos = 1)
+      }
     }
   }
 
