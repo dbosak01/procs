@@ -1900,3 +1900,29 @@ test_that("freqplot32: TRUE and multiple plot requests work as expected.", {
 
 })
 
+
+test_that("freqplot33: Plots with order work as expected.", {
+
+
+  # Clustered
+  res <- proc_freq(adsl,
+              tables = v(ARM * SEX),
+              order = data,
+              output = report,
+              plots = freqplot(twoway = cluster))
+
+  expect_equal("plot_spec" %in% class(res[[2]]), TRUE)
+
+
+  # Stacked
+  res <- proc_freq(adsl,
+                   tables = v(ARM * SEX),
+                   order = data,
+                   output = report,
+                   plots = freqplot(twoway = stacked))
+
+  expect_equal("plot_spec" %in% class(res[[2]]), TRUE)
+
+
+})
+

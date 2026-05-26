@@ -1368,6 +1368,10 @@ get_line_count <- function(vct, fs = 12) {
 
   mxwdth <- 0
 
+  if ("factor" %in% class(vct)) {
+    vct <- as.character(vct)
+  }
+
   # Break by user-defined line feeds
   spl <- strsplit(vct, "\n", fixed = TRUE)
 
