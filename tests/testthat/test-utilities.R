@@ -888,6 +888,21 @@ test_that("utils29: get_line_count() works as expected.", {
 
 })
 
+test_that("utils30: flatten_list works as expected.", {
+
+
+  mlst <- list(mtcars, mtcars, list(mtcars, mtcars),
+               list(mtcars, list(mtcars, create_plot("myfile.jpg", height = 2, width = 3)),
+                    mtcars),
+               mtcars, create_plot("myfile.jpg", height = 2, width = 3))
+
+
+  ret <- flatten_list(mlst)
+
+  expect_equal(length(ret), 10)
+
+})
+
 
 test_that("resolve_arg1: errors when arg is missing in the resolve_arg call itself", {
   caller <- function() {

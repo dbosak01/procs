@@ -87,19 +87,19 @@ test_that("print1: Simple proc_print text works.", {
 })
 
 
-# test_that("print2: Simple proc_print pdf works.", {
-#
-#
-#   fp <- file.path(base_path, "print/test2")
-#
-#   res <- proc_print(mtcars, fp, output_type = "PDF",
-#                     titles = "My title", view = FALSE)
-#
-#   res
-#
-#   expect_equal(file.exists(res[[1]]), TRUE)
-#
-# })
+test_that("print2: Simple proc_print pdf works.", {
+
+
+  fp <- file.path(base_path, "print/test2")
+
+  res <- proc_print(mtcars, fp, output_type = "PDF",
+                    titles = "My title", view = FALSE)
+
+  res
+
+  expect_equal(file.exists(res[[1]]), TRUE)
+
+})
 
 
 
@@ -271,9 +271,9 @@ test_that("print11: printing of create_plot() works as expected.", {
     plt <- freqplot()
 
     # Plot object
-    res <- render_freqplot(dt, "Eyes", plt = plt)
+    myplt <- render_freqplot(dt, "Eyes", plt = plt)
 
-    myplt <- create_plot(res, height = 4, width = 5)
+    # myplt <- create_plot(res, height = 4, width = 5)
 
 
     pres <- list(dt, myplt)
@@ -323,5 +323,40 @@ test_that("print12: printing of proc_freq() with plots option works as expected.
 
 
   expect_equal(file.exists(pth), TRUE)
+
+})
+
+
+test_that("print13: printing of proc_reg() with by variable works as expected.", {
+
+  # Fixed, sort of
+  res <- proc_reg(cls,
+                  model = "Weight = Height",
+                  by = "region",
+                  output = report,
+                  plots = regplot(type = "residualbypredicted"))
+
+  pth <- file.path(base_path, "print/test13a.rtf")
+
+  proc_print(res, pth, output_type = "RTF")
+
+  expect_equal(file.exists(pth), TRUE)
+
+
+  # Page breaking is terrible, but it works.
+  res <- proc_reg(cls,
+                  model = c("Weight = Height",
+                            "Height = Weight"),
+                  by = "region",
+                  output = report,
+                  plots = regplot(type = "residualbypredicted"))
+
+  pth <- file.path(base_path, "print/test13b.docx")
+
+  proc_print(res, pth, output_type = "DOCX")
+
+  expect_equal(file.exists(pth), TRUE)
+
+
 
 })
