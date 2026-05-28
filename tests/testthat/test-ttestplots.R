@@ -48,7 +48,7 @@ Barbara   F  13   65.3   98.0  A
 Carol   F  14   62.8  102.5    A
 Henry   M  14   63.5  102.5    A
 James   M  12   NA   83.0    A
-Jane   F  12   59.8   84.5     A
+Jane   NA  12   59.8   84.5     A
 Janet   F  15   62.5  112.5    A
 Jeffrey   M  13   62.5   84.0  A
 John   M  12   59.0   99.5     B
@@ -1198,6 +1198,14 @@ test_that("ttestplot24: plots work with NAs in data.", {
                     options = c(h0 = 65),
                     plots = "all")
 
+
+  # One sample all with NA
+  res <- proc_ttest(clsna,
+                    var = "Height",
+                    by = "Sex",
+                    output = "report",
+                    options = c(h0 = 65),
+                    plots = "all")
 
 
 })

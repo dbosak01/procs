@@ -736,6 +736,7 @@ render_summary2 <- function(dat, var, plt, class, res) {
 
   # Get analysis variables
   cvls <- unique(dat[[class]])
+  cvls <- cvls[!is.na(cvls)]
   vl1 <- cvls[1]
   vl2 <- cvls[2]
 
@@ -2020,6 +2021,7 @@ render_boxplot2 <- function(dat, var, plt, class, res) {
     fvr <- class
     dat <- sort(dat, by = fvr)
     fvls <- unique(dat[[class]])
+    fvls <- fvls[!is.na(fvls)]
   } else {
     stop("Something is wrong")
   }
@@ -2061,6 +2063,7 @@ render_boxplot2 <- function(dat, var, plt, class, res) {
 
   # Get analysis variables
   cvls <- unique(dat[[class]])
+  cvls <- cvls[!is.na(cvls)]
   vl1 <- cvls[1]
   vl2 <- cvls[2]
 
