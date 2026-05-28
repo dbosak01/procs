@@ -2043,20 +2043,20 @@ render_rfplot <- function(dat, res, mdl) {
   p <- (seq_len(n) - 0.5) / n
 
   ## Left panel: Fit Mean
-  fit_centered <- sort(fdt - mean(fdt))
+  fit_centered <- sort(fdt - mean(fdt, na.rm = TRUE))
 
   ## Right panel: Residuals
   res_sorted <- sort(rdt)
 
   # Get y scale
   smin <- min(fit_centered)
-  if (min(res_sorted) < smin) {
-    smin <- min(res_sorted)
+  if (min(res_sorted, na.rm = TRUE) < smin) {
+    smin <- min(res_sorted, na.rm = TRUE)
   }
 
-  smax <- max(fit_centered)
-  if (min(res_sorted) > smax) {
-    smax <- max(res_sorted)
+  smax <- max(fit_centered, na.rm = TRUE)
+  if (min(res_sorted, na.rm = TRUE) > smax) {
+    smax <- max(res_sorted, na.rm = TRUE)
   }
 
   # Finalize y scale
@@ -2396,7 +2396,7 @@ render_residualboxplot <- function(dat, res, mdl, plt) {
 
 
   # Mean diamond
-  points(1, mean(rdt),
+  points(1, mean(rdt, na.rm = TRUE),
          pch = 5,          # diamond
          col = "#05379B",
          cex = 1.3)
@@ -2615,9 +2615,9 @@ render_dfbetas <- function(dat, res, mdl, plt) {
 
   # Get yscale - Consistent Y scale on panel plot
   if (plt$label) {
-    yscl <- c(min(dfb, -cutoff), max(dfb, cutoff)) * 1.2 # Give more room for labels
+    yscl <- c(min(dfb, -cutoff, na.rm = TRUE), max(dfb, cutoff, na.rm = TRUE)) * 1.2 # Give more room for labels
   } else {
-    yscl <- c(min(dfb, -cutoff), max(dfb, cutoff)) * 1.1
+    yscl <- c(min(dfb, -cutoff, na.rm = TRUE), max(dfb, cutoff, na.rm = TRUE)) * 1.1
   }
 
   # Get xscale
@@ -2927,7 +2927,7 @@ draw_stats_box <- function(stats,
   box_h <- inner_h + 2 * py
 
   # center vertically in plot area
-  y_mid <- mean(usr[3:4])
+  y_mid <- mean(usr[3:4], na.rm = TRUE)
   y_bot <- y_mid - box_h / 2
   y_top <- y_mid + box_h / 2
 
@@ -2951,7 +2951,7 @@ draw_stats_box <- function(stats,
 
 get_scale <- function(vct, pct = .1, h0 = NULL) {
 
-  rng <- range(vct)
+  rng <- range(vct, na.rm = TRUE)
 
   if (!is.null(h0)) {
     if (h0 < rng[1]) {
@@ -2981,12 +2981,12 @@ get_scale <- function(vct, pct = .1, h0 = NULL) {
 
 get_zero_scale <- function(vct, pct = .1) {
 
-  rng <- range(vct)
+  rng <- range(vct, na.rm = TRUE)
 
   mn <- abs(rng[1] * (1 + pct))
   mx <- abs(rng[2] * (1 + pct))
 
-  tmx <- max(mn, mx)
+  tmx <- max(mn, mx, na.rm = TRUE)
 
   ret <- c(-tmx, tmx)
 
@@ -3003,14 +3003,14 @@ get_reg_xlim <- function(brks, mu, sdx,
                          max_sigma = 6) {
 
   # Get range of calculated breaks
-  rng  <- range(brks)
+  rng  <- range(brks, na.rm = TRUE)
 
   # Add adding on bin range
   pad0 <- pad_frac * diff(rng)
   xlim <- c(rng[1] - pad0, rng[2] + pad0)
 
   # Force symmetry around zero (expand, never shrink)
-  m <- max(abs(xlim))
+  m <- max(abs(xlim), na.rm = TRUE)
   xlim <- c(-m, m)
 
   if (!is.finite(sdx) || sdx <= 0) return(xlim)

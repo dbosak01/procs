@@ -384,12 +384,12 @@ render_summary1 <- function(dat, var, plt, res) {
   n   <- stat_tbl$N[1]
   # mu  <- stat_tbl$MEAN[1]
   # sdx <- stat_tbl$STD[1]
-  mu  <- mean(rdt)
-  sdx <- sd(rdt)
+  mu  <- mean(rdt, na.rm = TRUE)
+  sdx <- sd(rdt, na.rm = TRUE)
   ci  <- c(clm_tbl$LCLM[1], clm_tbl$UCLM[1])
 
   # Calculate breaks - Closer to SAS algorithm
-  brks <- pretty(range(rdt), n = nclass.Sturges(rdt),
+  brks <- pretty(range(rdt, na.rm = TRUE), n = nclass.Sturges(rdt),
                  min.n = 1, high.u.bias = 3)
 
   # Calculate breaks
@@ -401,12 +401,12 @@ render_summary1 <- function(dat, var, plt, res) {
             right = FALSE,
             include.lowest = TRUE,
             plot = FALSE)
-  h$counts <- h$counts / sum(h$counts) * 100
+  h$counts <- h$counts / sum(h$counts, na.rm = TRUE) * 100
 
   # Use calculated breaks to get scale (1.5 bin-widths)
   w <- diff(h$breaks)[1] # bin width
-  xmin <- min(h$breaks) - 1.5 * w
-  xmax <- max(h$breaks) + 1.5 * w
+  xmin <- min(h$breaks, na.rm = TRUE) - 1.5 * w
+  xmax <- max(h$breaks, na.rm = TRUE) + 1.5 * w
   scl <- c(xmin, xmax)
 
   # Consider h0 if needed
@@ -420,11 +420,11 @@ render_summary1 <- function(dat, var, plt, res) {
   }
 
   # Use calculated break to get normal curve
-  curve_lo <- min(h$breaks) - w
-  curve_hi <- max(h$breaks) + w
+  curve_lo <- min(h$breaks, na.rm = TRUE) - w
+  curve_hi <- max(h$breaks, na.rm = TRUE) + w
   grid <- seq(curve_lo, curve_hi, length.out = 300)
   y_norm_percent <- 100 * w * dnorm(grid, mean = mu, sd = sdx)
-  y_mx <- max(max(y_norm_percent), max(h$counts))
+  y_mx <- max(max(y_norm_percent, na.rm = TRUE), max(h$counts, na.rm = TRUE), na.rm = TRUE)
 
   # Initial chart to draw vertical lines
   hist(rdt_hist,
@@ -476,13 +476,17 @@ render_summary1 <- function(dat, var, plt, res) {
 
   # Bandwidth (Silverman / SAS) - SAS uses the distinct (non-freq-expanded)
   # observation count for the bandwidth. Kish's effective n when weighted.
-  n_eff <- if (!is.null(wgt_hist)&is.null(freq)) (sum(wgt_hist))^2 / sum(wgt_hist^2) else length(rdt)
+  if (!is.null(wgt_hist)&is.null(freq)) {
+    n_eff <- (sum(wgt_hist, na.rm = TRUE))^2 / sum(wgt_hist^2, na.rm = TRUE)
+  } else {
+    n_eff <- length(rdt)
+  }
   bw <- 1.06 * sdx * n_eff^(-1/5)
   # Kernel density estimate
-  kernel_lo <- min(h$breaks) - 1.25 * w
-  kernel_hi <- max(h$breaks) + 1.25 * w
+  kernel_lo <- min(h$breaks, na.rm = TRUE) - 1.25 * w
+  kernel_hi <- max(h$breaks, na.rm = TRUE) + 1.25 * w
   dens <-  density(rdt_hist, kernel = "gaussian", bw = bw, n = 512,
-                   from = kernel_lo, to = kernel_hi)
+                   from = kernel_lo, to = kernel_hi, na.rm = TRUE)
   # Scale KDE to Percent axis
   y_kernel_percent <- 100 * w * dens$y
 
@@ -785,18 +789,18 @@ render_summary2 <- function(dat, var, plt, class, res) {
   #******************************
 
   # Overall scale
-  scl <- range(dat[[var]])
+  scl <- range(dat[[var]], na.rm = TRUE)
   scl <- c(scl[1] * .875, scl[2] * 1.125)
 
   # Calculate breaks - Histogram 1
-  brks1 <- pretty(range(dt1), n = nclass.Sturges(dt1),
+  brks1 <- pretty(range(dt1, na.rm = TRUE), n = nclass.Sturges(dt1),
                   min.n = 1, high.u.bias = 3)
 
   # Calculate breaks - Histogram 1
   # brks1 <- get_sas_bins(dt1_hist)
 
   # Calculate breaks - Histogram 2
-  brks2 <- pretty(range(dt2), n = nclass.Sturges(dt2),
+  brks2 <- pretty(range(dt2, na.rm = TRUE), n = nclass.Sturges(dt2),
                   min.n = 1, high.u.bias = 3)
 
   # Calculate breaks - Histogram 2
@@ -804,14 +808,14 @@ render_summary2 <- function(dat, var, plt, class, res) {
 
   # Scale for Histogram 1 (SAS-style: 1.5 bin-widths of padding)
   w1 <- diff(brks1)[1] # bin width
-  xmin1 <- min(brks1) - 1.5 * w1
-  xmax1 <- max(brks1) + 1.5 * w1
+  xmin1 <- min(brks1, na.rm = TRUE) - 1.5 * w1
+  xmax1 <- max(brks1, na.rm = TRUE) + 1.5 * w1
   scl1 <- c(xmin1, xmax1)
 
   # Scale for Histogram 2 (SAS-style: 1.5 bin-widths of padding)
   w2 <- diff(brks2)[1] # bin width
-  xmin2 <- min(brks2) - 1.5 * w2
-  xmax2 <- max(brks2) + 1.5 * w2
+  xmin2 <- min(brks2, na.rm = TRUE) - 1.5 * w2
+  xmax2 <- max(brks2, na.rm = TRUE) + 1.5 * w2
   scl2 <- c(xmin2, xmax2)
 
 
@@ -842,8 +846,8 @@ render_summary2 <- function(dat, var, plt, class, res) {
   clm_tbl <- res[[grep("ConfLimits$", names(res))[length(grep("ConfLimits$", names(res)))]]]
 
   n   <- stat_tbl$N[as.character(stat_tbl$CLASS) == as.character(vl1)]
-  mu  <- mean(dt1)
-  sdx <- sd(dt1)
+  mu  <- mean(dt1, na.rm = TRUE)
+  sdx <- sd(dt1, na.rm = TRUE)
 
 
 
@@ -853,12 +857,12 @@ render_summary2 <- function(dat, var, plt, class, res) {
             right = FALSE,
             include.lowest = TRUE,
             plot = FALSE)
-  h$counts <- h$counts / sum(h$counts) * 100
+  h$counts <- h$counts / sum(h$counts, na.rm = TRUE) * 100
 
   # Use calculated break to get normal curve
   grid <- seq(scl1[1] , scl1[2], length.out = 300)
   y_norm_percent <- 100 * w1 * dnorm(grid, mean = mu, sd = sdx)
-  y_mx <- max(max(y_norm_percent), max(h$counts))
+  y_mx <- max(max(y_norm_percent, na.rm = TRUE), max(h$counts, na.rm = TRUE), na.rm = TRUE)
 
   # Initial chart to draw vertical orientation lines underneath bars
   hist(dt1_hist,
@@ -895,11 +899,15 @@ render_summary2 <- function(dat, var, plt, class, res) {
 
   # Bandwidth (Silverman / SAS) - SAS uses distinct (non-freq-expanded) n;
   # Kish's effective n when only weight is supplied.
-  n_eff <- if (!is.null(wgt1_hist) & is.null(freq1)) (sum(wgt1_hist))^2 / sum(wgt1_hist^2) else length(dt1)
+  if (!is.null(wgt1_hist) & is.null(freq1)) {
+    n_eff <-  (sum(wgt1_hist, na.rm = TRUE))^2 / sum(wgt1_hist^2, na.rm = TRUE)
+  } else {
+    n_eff <- length(dt1)
+  }
   bw <- 1.06 * sdx * n_eff^(-1/5)
 
   # Kernel density estimate
-  dens <- density(dt1_hist, kernel = "gaussian", bw = bw, n = 512)
+  dens <- density(dt1_hist, kernel = "gaussian", bw = bw, n = 512, na.rm = TRUE)
 
   # Scale KDE to Percent axis
   y_kernel_percent <- 100 * w1 * dens$y
@@ -934,8 +942,8 @@ render_summary2 <- function(dat, var, plt, class, res) {
 
   # Calculate stats
   n   <- stat_tbl$N[as.character(stat_tbl$CLASS) == as.character(vl2)]
-  mu  <- mean(dt2)
-  sdx <- sd(dt2)
+  mu  <- mean(dt2, na.rm = TRUE)
+  sdx <- sd(dt2, na.rm = TRUE)
 
   # Histogram (Percent scale) - SAS uses left-closed bins [a, b)
   h <- hist(dt2_hist,
@@ -943,13 +951,14 @@ render_summary2 <- function(dat, var, plt, class, res) {
             right = FALSE,
             include.lowest = TRUE,
             plot = FALSE)
-  h$counts <- h$counts / sum(h$counts) * 100
+  h$counts <- h$counts / sum(h$counts, na.rm = TRUE) * 100
 
 
   # Use calculated break to get normal curve
   grid <- seq(scl2[1] , scl2[2], length.out = 300)
   y_norm_percent <- 100 * w2 * dnorm(grid, mean = mu, sd = sdx)
-  y_mx <- max(max(y_norm_percent), max(h$counts))
+  y_mx <- max(max(y_norm_percent, na.rm = TRUE),
+              max(h$counts, na.rm = TRUE), na.rm = TRUE)
 
   # Initial chart to draw vertical orientation lines underneath bars
   hist(dt2_hist,
@@ -985,11 +994,15 @@ render_summary2 <- function(dat, var, plt, class, res) {
   # Kernel density overlay (scaled to percent)
 
   # Bandwidth (Silverman / SAS) - distinct n; Kish's effective n when weight only
-  n_eff <- if (!is.null(wgt2_hist) & is.null(freq2)) (sum(wgt2_hist))^2 / sum(wgt2_hist^2) else length(dt2)
+  if (!is.null(wgt2_hist) & is.null(freq2)) {
+    n_eff <- (sum(wgt2_hist, na.rm = TRUE))^2 / sum(wgt2_hist^2, na.rm = TRUE)
+  } else {
+    n_eff <- length(dt2)
+  }
   bw <- 1.06 * sdx * n_eff^(-1/5)   # 1.06
 
   # Kernel density estimate
-  dens <- density(dt2_hist, kernel = "gaussian", bw = bw, n = 512)
+  dens <- density(dt2_hist, kernel = "gaussian", bw = bw, n = 512, na.rm = TRUE)
 
   # Scale KDE to Percent axis
   y_kernel_percent <- 100 * w2 * dens$y
@@ -1266,12 +1279,12 @@ render_histogram1 <- function(dat, var, plt, res) {
   clm_tbl <- res[[grep("ConfLimits$", names(res))[length(grep("ConfLimits$", names(res)))]]]
 
   n   <- stat_tbl$N[1]
-  mu  <- mean(rdt)
-  sdx <- sd(rdt)
+  mu  <- mean(rdt, na.rm = TRUE)
+  sdx <- sd(rdt, na.rm = TRUE)
   ci  <- c(clm_tbl$LCLM[1], clm_tbl$UCLM[1])
 
   # Calculate breaks - Closer to SAS algorithm
-  brks <- pretty(range(rdt), n = nclass.Sturges(rdt),
+  brks <- pretty(range(rdt, na.rm = TRUE), n = nclass.Sturges(rdt),
                  min.n = 1, high.u.bias = 3)
 
   # Calculate breaks
@@ -1283,32 +1296,36 @@ render_histogram1 <- function(dat, var, plt, res) {
             right = FALSE,
             include.lowest = TRUE,
             plot = FALSE)
-  h$counts <- h$counts / sum(h$counts) * 100
+  h$counts <- h$counts / sum(h$counts, na.rm = TRUE) * 100
 
   # Use calculated breaks to get scale (1.5 bin-widths)
   w <- diff(h$breaks)[1] # bin width
-  xmin <- min(h$breaks) - 1.5 * w
-  xmax <- max(h$breaks) + 1.5 * w
+  xmin <- min(h$breaks, na.rm = TRUE) - 1.5 * w
+  xmax <- max(h$breaks, na.rm = TRUE) + 1.5 * w
   scl <- c(xmin, xmax)
 
-  curve_lo <- min(h$breaks) - w
-  curve_hi <- max(h$breaks) + w
-  kernel_lo <- min(h$breaks) - 1.4 * w
-  kernel_hi <- max(h$breaks) + 1.4 * w
+  curve_lo <- min(h$breaks, na.rm = TRUE) - w
+  curve_hi <- max(h$breaks, na.rm = TRUE) + w
+  kernel_lo <- min(h$breaks, na.rm = TRUE) - 1.4 * w
+  kernel_hi <- max(h$breaks, na.rm = TRUE) + 1.4 * w
 
   # Bandwidth (Silverman / SAS) - distinct n; Kish's effective n when weight only
-  n_eff <- if (!is.null(wgt_hist) & is.null(freq)) (sum(wgt_hist))^2 / sum(wgt_hist^2) else length(rdt)
+  if (!is.null(wgt_hist) & is.null(freq)) {
+    n_eff <- (sum(wgt_hist, na.rm = TRUE))^2 / sum(wgt_hist^2, na.rm = TRUE)
+  } else {
+    n_eff <- length(rdt)
+  }
   bw <- 1.06 * sdx * n_eff^(-1/5)
 
   # Kernel density estimate
   dens <- density(rdt_hist, kernel = "gaussian", bw = bw, n = 512,
-                  from = kernel_lo, to = kernel_hi)
+                  from = kernel_lo, to = kernel_hi, na.rm = TRUE)
 
   # Use calculated break to get normal curve
   grid <- seq(curve_lo, curve_hi, length.out = 300)
   y_norm_percent <- 100 * w * dnorm(grid, mean = mu, sd = sdx)
   y_kernel_percent <- 100 * w * dens$y
-  y_mx <- max(max(y_norm_percent), max(h$counts))
+  y_mx <- max(max(y_norm_percent, na.rm = TRUE), max(h$counts, na.rm = TRUE), na.rm = TRUE)
 
   # Initial chart to draw vertical orientation lines underneath bars
   hist(rdt_hist,
@@ -1465,15 +1482,15 @@ render_histogram2 <- function(dat, var, plt, class, res) {
   #******************************
 
   # Overall scale
-  scl <- range(dat[[var]])
+  scl <- range(dat[[var]], na.rm = TRUE)
   scl <- c(scl[1] * .875, scl[2] * 1.125)
 
   # Calculate breaks - Histogram 1
-  brks1 <- pretty(range(dt1), n = nclass.Sturges(dt1),
+  brks1 <- pretty(range(dt1, na.rm = TRUE), n = nclass.Sturges(dt1),
                   min.n = 1, high.u.bias = 3)
 
   # Calculate breaks - Histogram 2
-  brks2 <- pretty(range(dt2), n = nclass.Sturges(dt2),
+  brks2 <- pretty(range(dt2, na.rm = TRUE), n = nclass.Sturges(dt2),
                   min.n = 1, high.u.bias = 3)
 
   # Calculate breaks - Histogram 1
@@ -1485,14 +1502,14 @@ render_histogram2 <- function(dat, var, plt, class, res) {
 
   # Scale for Histogram 1 (SAS-style: 1.5 bin-widths of padding)
   w1 <- diff(brks1)[1] # bin width
-  xmin1 <- min(brks1) - 1.5 * w1
-  xmax1 <- max(brks1) + 1.5 * w1
+  xmin1 <- min(brks1, na.rm = TRUE) - 1.5 * w1
+  xmax1 <- max(brks1, na.rm = TRUE) + 1.5 * w1
   scl1 <- c(xmin1, xmax1)
 
   # Scale for Histogram 2 (SAS-style: 1.5 bin-widths of padding)
   w2 <- diff(brks2)[1] # bin width
-  xmin2 <- min(brks2) - 1.5 * w2
-  xmax2 <- max(brks2) + 1.5 * w2
+  xmin2 <- min(brks2, na.rm = TRUE) - 1.5 * w2
+  xmax2 <- max(brks2, na.rm = TRUE) + 1.5 * w2
   scl2 <- c(xmin2, xmax2)
 
 
@@ -1522,8 +1539,8 @@ render_histogram2 <- function(dat, var, plt, class, res) {
   stat_tbl <- res[[grep("Statistics$", names(res))[length(grep("Statistics$", names(res)))]]]
 
   n   <- stat_tbl$N[as.character(stat_tbl$CLASS) == as.character(vl1)]
-  mu  <- mean(dt1)
-  sdx <- sd(dt1)
+  mu  <- mean(dt1, na.rm = TRUE)
+  sdx <- sd(dt1, na.rm = TRUE)
 
   # Histogram (Percent scale) - SAS uses left-closed bins [a, b)
   h <- hist(dt1_hist,
@@ -1531,12 +1548,12 @@ render_histogram2 <- function(dat, var, plt, class, res) {
             right = FALSE,
             include.lowest = TRUE,
             plot = FALSE)
-  h$counts <- h$counts / sum(h$counts) * 100
+  h$counts <- h$counts / sum(h$counts, na.rm = TRUE) * 100
 
   # Use calculated break to get normal curve
   grid <- seq(scl1[1] , scl1[2], length.out = 300)
   y_norm_percent <- 100 * w1 * dnorm(grid, mean = mu, sd = sdx)
-  y_mx <- max(max(y_norm_percent), max(h$counts))
+  y_mx <- max(max(y_norm_percent, na.rm = TRUE), max(h$counts, na.rm = TRUE), na.rm = TRUE)
 
   # Initial chart to draw vertical orientation lines underneath bars
   hist(dt1_hist,
@@ -1570,11 +1587,15 @@ render_histogram2 <- function(dat, var, plt, class, res) {
   lines(grid, y_norm_percent, col = "steelblue4", lwd = 2)
 
   # Bandwidth (Silverman / SAS) - distinct n; Kish's effective n when weight only
-  n_eff <- if (!is.null(wgt1_hist) & is.null(freq1)) (sum(wgt1_hist))^2 / sum(wgt1_hist^2) else length(dt1)
+  if (!is.null(wgt1_hist) & is.null(freq1)) {
+    n_eff <- (sum(wgt1_hist, na.rm = TRUE))^2 / sum(wgt1_hist^2, na.rm = TRUE)
+  } else {
+    n_eff <- length(dt1)
+  }
   bw <- 1.06 * sdx * n_eff^(-1/5)
 
   # Kernel density estimate
-  dens <- density(dt1_hist, kernel = "gaussian", bw = bw, n = 512)
+  dens <- density(dt1_hist, kernel = "gaussian", bw = bw, n = 512, na.rm = TRUE)
 
   # Scale KDE to Percent axis
   y_kernel_percent <- 100 * w1 * dens$y
@@ -1607,8 +1628,8 @@ render_histogram2 <- function(dat, var, plt, class, res) {
 
   # Calculate stats
   n   <- stat_tbl$N[as.character(stat_tbl$CLASS) == as.character(vl2)]
-  mu  <- mean(dt2)
-  sdx <- sd(dt2)
+  mu  <- mean(dt2, na.rm = TRUE)
+  sdx <- sd(dt2, na.rm = TRUE)
 
   # Histogram (Percent scale) - SAS uses left-closed bins [a, b)
   h <- hist(dt2_hist,
@@ -1616,13 +1637,14 @@ render_histogram2 <- function(dat, var, plt, class, res) {
             right = FALSE,
             include.lowest = TRUE,
             plot = FALSE)
-  h$counts <- h$counts / sum(h$counts) * 100
+  h$counts <- h$counts / sum(h$counts, na.rm = TRUE) * 100
 
 
   # Use calculated break to get normal curve
   grid <- seq(scl2[1] , scl2[2], length.out = 300)
   y_norm_percent <- 100 * w2 * dnorm(grid, mean = mu, sd = sdx)
-  y_mx <- max(max(y_norm_percent), max(h$counts))
+  y_mx <- max(max(y_norm_percent, na.rm = TRUE),
+              max(h$counts, na.rm = TRUE), na.rm = TRUE)
 
   # Initial chart to draw vertical orientation lines underneath bars
   hist(dt2_hist,
@@ -1656,11 +1678,15 @@ render_histogram2 <- function(dat, var, plt, class, res) {
   lines(grid, y_norm_percent, col = "steelblue4", lwd = 2)
 
   # Bandwidth (Silverman / SAS) - distinct n; Kish's effective n when weight only
-  n_eff <- if (!is.null(wgt2_hist) & is.null(freq2)) (sum(wgt2_hist))^2 / sum(wgt2_hist^2) else length(dt2)
+  if (!is.null(wgt2_hist) & is.null(freq2)) {
+    n_eff <- (sum(wgt2_hist, na.rm = TRUE))^2 / sum(wgt2_hist^2, na.rm = TRUE)
+  } else {
+    n_eff <- length(dt2)
+  }
   bw <- 1.06 * sdx * n_eff^(-1/5)   # 1.06
 
   # Kernel density estimate
-  dens <- density(dt2_hist, kernel = "gaussian", bw = bw, n = 512)
+  dens <- density(dt2_hist, kernel = "gaussian", bw = bw, n = 512, na.rm = TRUE)
 
   # Scale KDE to Percent axis
   y_kernel_percent <- 100 * w2 * dens$y
@@ -1781,11 +1807,11 @@ render_boxplot1 <- function(dat, var, plt, res) {
   # Get boxplot stats
   bp <- boxplot_stats1(dt, if (!is.null(plt$freq)) dat[[plt$freq]] else NULL)
   if (length(bp$out) > 0) {
-    if (min(bp$out) < xscl[1]) {
-      xscl[1] <- min(bp$out) * 1.05
+    if (min(bp$out, na.rm = TRUE) < xscl[1]) {
+      xscl[1] <- min(bp$out, na.rm = TRUE) * 1.05
     }
-    if (max(bp$out) > xscl[2]) {
-      xscl[2] <- max(bp$out) * 1.05
+    if (max(bp$out, na.rm = TRUE) > xscl[2]) {
+      xscl[2] <- max(bp$out, na.rm = TRUE) * 1.05
     }
   }
 
@@ -2040,27 +2066,27 @@ render_boxplot2 <- function(dat, var, plt, class, res) {
 
   # Get combined scale
   xscl <- c()
-  xscl[1] <- min(xscl1[1], xscl2[1])
-  xscl[2] <- max(xscl1[2], xscl2[2])
+  xscl[1] <- min(xscl1[1], xscl2[1], na.rm = TRUE)
+  xscl[2] <- max(xscl1[2], xscl2[2], na.rm = TRUE)
 
   # Get boxplot stats for 2 plots
   freq1 <- if (!is.null(plt$freq)) dat[dat[[fvr]] == fvls[1], plt$freq] else NULL
   freq2 <- if (!is.null(plt$freq)) dat[dat[[fvr]] == fvls[2], plt$freq] else NULL
   bp <- boxplot_stats2(dt1, dt2, nms1, nms2, fvls, freq1, freq2)
   if (length(bp$out1) > 0) {
-    if (min(bp$out1) < xscl[1]) {
-      xscl[1] <- min(bp$out1) * 1.05
+    if (min(bp$out1, na.rm = TRUE) < xscl[1]) {
+      xscl[1] <- min(bp$out1, na.rm = TRUE) * 1.05
     }
-    if (max(bp$out1) > xscl[2]) {
-      xscl[2] <- max(bp$out1) * 1.05
+    if (max(bp$out1, na.rm = TRUE) > xscl[2]) {
+      xscl[2] <- max(bp$out1, na.rm = TRUE) * 1.05
     }
   }
   if (length(bp$out2) > 0) {
-    if (min(bp$out2) < xscl[1]) {
-      xscl[1] <- min(bp$out2) * 1.05
+    if (min(bp$out2, na.rm = TRUE) < xscl[1]) {
+      xscl[1] <- min(bp$out2, na.rm = TRUE) * 1.05
     }
-    if (max(bp$out2) > xscl[2]) {
-      xscl[2] <- max(bp$out2) * 1.05
+    if (max(bp$out2, na.rm = TRUE) > xscl[2]) {
+      xscl[2] <- max(bp$out2, na.rm = TRUE) * 1.05
     }
   }
 
@@ -2425,11 +2451,11 @@ render_interval2 <- function(dat, var, plt, res) {
 
   # Get scales - seed from finite CI bounds plus the means so one-sided tests
   # (where all upper_ci or all lower_ci are Inf) produce a readable axis range.
-  xscl <- c(min(lower_ci), max(upper_ci))
-  mean_mid <- mean(mean_diff)
+  xscl <- c(min(lower_ci, na.rm = TRUE), max(upper_ci, na.rm = TRUE))
+  mean_mid <- mean(mean_diff, na.rm = TRUE)
   if (is.infinite(xscl[1])) { xscl[1] <- mean_mid - 1.5 * (xscl[2] - mean_mid) }
   if (is.infinite(xscl[2])) { xscl[2] <- mean_mid + 1.5 * (mean_mid - xscl[1]) }
-  xscl <- c(min(c(xscl, mean_diff)), max(c(xscl, mean_diff)))
+  xscl <- c(min(c(xscl, mean_diff), na.rm = TRUE), max(c(xscl, mean_diff, na.rm = TRUE), na.rm = TRUE))
   if (plt$showh0) {
     xscl <- get_scale(xscl, .001, plt$h0)
   } else {
@@ -2491,7 +2517,7 @@ render_interval2 <- function(dat, var, plt, res) {
   if (plt$showh0) {
     abline(v = plt$h0, col = "grey70", lwd = 2)
 
-    if (plt$h0 > mean(ci)) {
+    if (plt$h0 > mean(ci, na.rm = TRUE)) {
       lgnd <- "topleft"
     } else {
       lgnd <- "topright"
@@ -2614,9 +2640,7 @@ render_tqqplot1 <- function(dat, var, plt, res) {
     # So have to calculate them here.
     ovar <- dat[[var]]
     owgt <- dat[[plt$weight]]
-    # adjmean <- sum(owgt * ovar) / sum(owgt)  # Weighted mean
     adjmean <- mean(ovar, na.rm = TRUE)
-    # adjstd <- sqrt(sum(owgt * (ovar - adjmean)^2) / (sum(owgt) - 1))  # Weighted std
     adjstd <- sd(ovar, na.rm = TRUE)
     abline(a = adjmean, b = adjstd, col = "grey60")
   } else {
@@ -2970,7 +2994,7 @@ render_profiles <- function(dat, var, plt, res) {
   par(mar = c(3, 3, 3, 3) + 0.1)
 
   ## Empty plot frame
-  plot(x, range(dt),
+  plot(x, range(dt, na.rm = TRUE),
        type = "n",
        xaxt = "n",
        xlab = "",
@@ -3064,11 +3088,11 @@ render_agreement <- function(dat, var, plt, res) {
   dt2 <- dat[[v2]]
 
   ## Means
-  m1 <- mean(dt1)
-  m2 <- mean(dt2)
+  m1 <- mean(dt1, na.rm = TRUE)
+  m2 <- mean(dt2, na.rm = TRUE)
 
   ## Axis limits
-  lims <- range(c(dt1, dt2))
+  lims <- range(c(dt1, dt2), na.rm = TRUE)
 
   # Set margins
   par(mar = c(4, 10, 2, 6) + 0.1)
@@ -3170,6 +3194,9 @@ boxplot_stats1 <- function(dt1, freq = NULL) {
   # Calculate outlier limits
   lm1 <- c(q1[2] - iqr1, q1[4] + iqr1)
 
+  # Remove NAs
+  dt1 <- dt1[!is.na(dt1)]
+
   # Determine if there are outliers
   ol1 <- dt1 <= lm1[1] | dt1 >= lm1[2]
   out1 <- dt1[ol1]
@@ -3177,8 +3204,8 @@ boxplot_stats1 <- function(dt1, freq = NULL) {
   # Change min and max to remove outliers
   onm1 <- c()
   if (length(out1) > 0) {
-    mn1 <- min(dt1[dt1 > lm1[1]])
-    mx1 <- max(dt1[dt1 < lm1[2]])
+    mn1 <- min(dt1[dt1 > lm1[1]], na.rm = TRUE)
+    mx1 <- max(dt1[dt1 < lm1[2]], na.rm = TRUE)
     q1[1] <- mn1
     q1[5] <- mx1
     onm1 <- row_map[seq(1, length(dt1))[ol1]]  # Obs within class: This matches SAS
@@ -3232,6 +3259,10 @@ boxplot_stats2 <- function(dt1, dt2, nms1, nms2, fvls, freq1, freq2) {
   lm1 <- c(q1[2] - iqr1, q1[4] + iqr1)
   lm2 <- c(q2[2] - iqr2, q2[4] + iqr2)
 
+  # Remove NAs
+  dt1 <- dt1[!is.na(dt1)]
+  dt2 <- dt2[!is.na(dt2)]
+
   # Determine if there are outliers
   ol1 <- dt1 <= lm1[1] | dt1 >= lm1[2]
   out1 <- dt1[ol1]
@@ -3241,8 +3272,8 @@ boxplot_stats2 <- function(dt1, dt2, nms1, nms2, fvls, freq1, freq2) {
   # Change min and max to remove outliers
   onm1 <- c()
   if (length(out1) > 0) {
-    mn1 <- min(dt1[dt1 > lm1[1]])
-    mx1 <- max(dt1[dt1 < lm1[2]])
+    mn1 <- min(dt1[dt1 > lm1[1]], na.rm = TRUE)
+    mx1 <- max(dt1[dt1 < lm1[2]], na.rm = TRUE)
     q1[1] <- mn1
     q1[5] <- mx1
     onm1 <- nms1[ol1]                # Original obs #: This seems more correct
@@ -3251,8 +3282,8 @@ boxplot_stats2 <- function(dt1, dt2, nms1, nms2, fvls, freq1, freq2) {
   # Change min and max to remove outliers
   onm2 <- c()
   if (length(out2) > 0) {
-    mn2 <- min(dt1[dt2 > lm2[1]])
-    mx2 <- max(dt1[dt2 < lm2[2]])
+    mn2 <- min(dt1[dt2 > lm2[1]], na.rm = TRUE)
+    mx2 <- max(dt1[dt2 < lm2[2]], na.rm = TRUE)
     q2[1] <- mn2
     q2[5] <- mx2
     onm2 <- nms2[ol2]                # Original obs #: This seems more correct
@@ -3281,7 +3312,7 @@ boxplot_stats2 <- function(dt1, dt2, nms1, nms2, fvls, freq1, freq2) {
 #' @noRd
 get_sas_bins <- function(x) {
   x   <- x[!is.na(x)]
-  rng <- range(x)
+  rng <- range(x, na.rm = TRUE)
   n   <- length(x)
   n_bins <- ceiling((2 * n)^(1/3))
   raw_w  <- diff(rng) / n_bins
@@ -3292,7 +3323,7 @@ get_sas_bins <- function(x) {
   cand   <- c(1, 2, 2.5, 3, 4, 5) * mag
   # SAS rounds DOWN to the nearest nice candidate
   le     <- cand[cand <= raw_w]
-  nice_w <- if (length(le) > 0) max(le) else min(cand)
+  nice_w <- if (length(le) > 0) max(le, na.rm = TRUE) else min(cand, na.rm = TRUE)
   # SAS picks edge-aligned vs midpoint-centered bins based on whether
   # X_min already lies on the nice_w grid.
   m <- floor(rng[1] / nice_w) * nice_w
