@@ -1201,3 +1201,4 @@ test_that("regplot24: Test NAs on all plots", {
 
 
 
+

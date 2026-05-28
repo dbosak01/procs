@@ -427,7 +427,7 @@ render_summary1 <- function(dat, var, plt, res) {
   y_mx <- max(max(y_norm_percent, na.rm = TRUE), max(h$counts, na.rm = TRUE), na.rm = TRUE)
 
   # Initial chart to draw vertical lines
-  hist(rdt_hist,
+  hist(Inf,
        breaks = brks,
        right = FALSE,
        include.lowest = TRUE,
@@ -866,7 +866,7 @@ render_summary2 <- function(dat, var, plt, class, res) {
   y_mx <- max(max(y_norm_percent, na.rm = TRUE), max(h$counts, na.rm = TRUE), na.rm = TRUE)
 
   # Initial chart to draw vertical orientation lines underneath bars
-  hist(dt1_hist,
+  hist(Inf,
        breaks = brks1,
        right = FALSE,
        include.lowest = TRUE,
@@ -962,7 +962,7 @@ render_summary2 <- function(dat, var, plt, class, res) {
               max(h$counts, na.rm = TRUE), na.rm = TRUE)
 
   # Initial chart to draw vertical orientation lines underneath bars
-  hist(dt2_hist,
+  hist(Inf,
        breaks = brks2,
        right = FALSE,
        include.lowest = TRUE,
@@ -1250,6 +1250,7 @@ render_histogram1 <- function(dat, var, plt, res) {
 
   # Prepare data
   rdt <- dat[[var]]
+  # rdt <- rdt[!is.na(rdt)]
   wgt <- if (!is.null(plt$weight)) dat[[plt$weight]] else NULL
   freq <- if (!is.null(plt$freq)) dat[[plt$freq]] else NULL
   if (!is.null(freq)) {
@@ -1329,7 +1330,7 @@ render_histogram1 <- function(dat, var, plt, res) {
   y_mx <- max(max(y_norm_percent, na.rm = TRUE), max(h$counts, na.rm = TRUE), na.rm = TRUE)
 
   # Initial chart to draw vertical orientation lines underneath bars
-  hist(rdt_hist,
+  hist(Inf,   # Putting values here was drawing a single bar, and messing up the plot
        breaks = brks,
        right = FALSE,
        include.lowest = TRUE,
@@ -1557,7 +1558,7 @@ render_histogram2 <- function(dat, var, plt, class, res) {
   y_mx <- max(max(y_norm_percent, na.rm = TRUE), max(h$counts, na.rm = TRUE), na.rm = TRUE)
 
   # Initial chart to draw vertical orientation lines underneath bars
-  hist(dt1_hist,
+  hist(Inf,
        breaks = brks1,
        right = FALSE,
        include.lowest = TRUE,
@@ -1648,7 +1649,7 @@ render_histogram2 <- function(dat, var, plt, class, res) {
               max(h$counts, na.rm = TRUE), na.rm = TRUE)
 
   # Initial chart to draw vertical orientation lines underneath bars
-  hist(dt2_hist,
+  hist(Inf,
        breaks = brks2,
        right = FALSE,
        include.lowest = TRUE,

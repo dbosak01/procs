@@ -1129,7 +1129,7 @@ test_that("ttestplot24: qqplot works as expected with weight.", {
 })
 
 
-test_that("ttestplot24: plots work with NAs in data.", {
+test_that("ttestplot25: plots work with NAs in data.", {
 
 
   # Histogram with NA
@@ -1209,4 +1209,35 @@ test_that("ttestplot24: plots work with NAs in data.", {
 
 
 })
+
+
+
+test_that("ttestplot26: More NA tests", {
+
+  # What is grey stuff at top of histogram?  Fixed
+  proc_ttest(airquality,
+             paired = "Ozone * Solar.R",
+             plots = c("summary", "histogram"))
+
+
+
+  # Fixed
+  proc_ttest(airquality,
+             var = "Ozone",
+             options = c(h0 = 50),
+             plots = c("summary", "histogram"))
+
+
+  # Fixed
+  proc_ttest(airquality[airquality$Month %in% c(8,9), ],
+             var = "Ozone",
+             class = "Month",
+             plots = c("summary", "histogram"))
+
+
+  expect_equal(TRUE, TRUE)
+
+})
+
+
 
