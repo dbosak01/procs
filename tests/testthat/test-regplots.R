@@ -52,6 +52,27 @@ hrdat <- read.table(header = TRUE, text = '
   2 brown black  13
   ')
 
+clsna <- read.table(header = TRUE, text = '
+Name Sex Age Height Weight    region
+Alfred   M  14   69.0  112.5   A
+Alice   F  13   56.5   84.0    A
+Barbara   F  13   65.3   98.0  A
+Carol   F  14   62.8  102.5    A
+Henry   M  14   63.5  102.5    A
+James   M  12   NA   83.0    A
+Jane   NA  12   59.8   84.5     A
+Janet   F  15   62.5  112.5    A
+Jeffrey   M  13   62.5   84.0  A
+John   M  12   59.0   99.5     B
+Joyce   F  11   51.3   50.5    B
+Judy   F  14   64.3   90.0     B
+Louise   F  12   56.3   NA   B
+Mary   F  15   66.5  112.0     B
+Philip   M  16   72.0  150.0   B
+Robert   M  12   64.8  128.0   B
+Ronald   M  15   67.0  133.0   B
+Thomas   M  11   57.5   85.0   B
+William   M  15   66.5  112.0  B')
 
 options("logr.output" = FALSE)
 options("procs.print" = FALSE)
@@ -1066,6 +1087,116 @@ test_that("regplot23: dfbetas multiple dependent variables", {
   expect_equal("plot_spec" %in% class(res[[1]][[5]][[1]]), TRUE)
 
 })
+
+
+
+test_that("regplot24: remove_na_rows works as expected", {
+
+
+  expect_equal(nrow(clsna), 19)
+
+  res <- remove_na_rows(clsna, "Weight", c("Height", "Age"))
+
+  expect_equal(nrow(res), 17)
+
+})
+
+
+test_that("regplot24: Test NAs on all plots", {
+
+
+  # One independent variable
+  res <- proc_reg(clsna,
+                  model = "Weight = Height",
+                  output = report,
+                  plots = regplot(type = "residualhistogram")) # Yes
+
+
+  res <- proc_reg(clsna,
+                  model = "Weight = Height",
+                  output = report,
+                  plots = regplot(type = "observedbypredicted"))  # Fixed
+
+  res <- proc_reg(clsna,
+                  model = "Weight = Height",
+                  output = report,
+                  plots = regplot(type = "diagnostics"))  # Fixed
+
+  res <- proc_reg(clsna,
+                  model = "Weight = Height",
+                  output = report,
+                  plots = regplot(type = "cooksd"))  # Yes
+
+  res <- proc_reg(clsna,
+                  model = "Weight = Height",
+                  output = report,
+                  plots = regplot(type = "dfbetas"))  # Yes
+
+  res <- proc_reg(clsna,
+                  model = "Weight = Height",
+                  output = report,
+                  plots = regplot(type = "dffits"))  # Yes
+
+  res <- proc_reg(clsna,
+                  model = "Weight = Height",
+                  output = report,
+                  plots = regplot(type = "fitplot"))  # Fixed
+
+
+  res <- proc_reg(clsna,
+                  model = "Weight = Height",
+                  output = report,
+                  plots = regplot(type = "qqplot"))  # Yes
+
+
+  res <- proc_reg(clsna,
+                  model = "Weight = Height",
+                  output = report,
+                  plots = regplot(type = "residuals"))  # Fixed
+
+  res <- proc_reg(clsna,
+                  model = "Weight = Height",
+                  output = report,
+                  plots = regplot(type = "residualbypredicted"))  # Yes
+
+
+  res <- proc_reg(clsna,
+                  model = "Weight = Height",
+                  output = report,
+                  plots = regplot(type = "rfplot"))  # Yes
+
+
+  res <- proc_reg(clsna,
+                  model = "Weight = Height",
+                  output = report,
+                  plots = regplot(type = "rstudentbyleverage"))  # Yes
+
+
+  res <- proc_reg(clsna,
+                  model = "Weight = Height",
+                  output = report,
+                  plots = regplot(type = "rstudentbypredicted"))  # Yes
+
+
+  res <- proc_reg(clsna,
+                  model = "Weight = Height",
+                  output = report,
+                  plots = regplot(type = "all"))  # Yes
+
+  # Great
+  res <- proc_reg(clsna,
+                  model = "Weight = Height",
+                  by = "Sex",
+                  output = report,
+                  plots = regplot(type = "all"))
+
+
+
+  # Any errors above will cause test to fail
+  expect_equal(TRUE, TRUE)
+
+})
+
 
 
 

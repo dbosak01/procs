@@ -439,6 +439,9 @@ render_diagnostics <- function(dat, res, mdl, plt, alph) {
   dvr <- vrs$dvar
   ivr <- vrs$ivar
 
+  # Remove rows with NAs
+  datclean <- remove_na_rows(dat, dvr, ivr)
+
   # Set margins
   par(mfrow = c(3, 3),
       mar = c(2, 2, 1, 0) + 0.1,
@@ -661,7 +664,7 @@ render_diagnostics <- function(dat, res, mdl, plt, alph) {
   #******************************
 
   # Prepare data
-  odt <- dat[[dvr]]
+  odt <- datclean[[dvr]]
   pdt <- res$OutputStatistics$PREVAL
 
   # Set margins
@@ -1161,6 +1164,9 @@ render_residuals <- function(dat, res, mdl) {
   # Get residuals
   rdt <- res$OutputStatistics$RESID
 
+  # Remove rows with NAs
+  dat <- remove_na_rows(dat, dvr, ivr)
+
   # Split independent variables by panel
   if (length(ivr) > pnlmx) {
     fct <- ceiling(seq_along(ivr) / pnlmx)
@@ -1640,7 +1646,8 @@ render_fitplot <- function(dat, res, mdl, plt, alph) {
     fit <- lm(mdl, data = dat)
 
     # Prediction grid
-    xnew <- seq(min(dat[[ivr]]), max(dat[[ivr]]), length.out = 200)
+    xnew <- seq(min(dat[[ivr]], na.rm = TRUE), max(dat[[ivr]], na.rm = TRUE),
+                length.out = 200)
 
     # Create data frame
     df1 <- data.frame(xnew)
@@ -2267,6 +2274,9 @@ render_observedbypredicted <- function(dat, res, mdl, plt) {
   vrs <- get_vars(mdl)
   dvr <- vrs$dvar
   ivr <- vrs$ivar
+
+  # Remove rows with NAs
+  dat <- remove_na_rows(dat, dvr, ivr)
 
   # Prepare data
   odt <- dat[[dvr]]
@@ -3030,6 +3040,24 @@ get_reg_xlim <- function(brks, mu, sdx,
   }
 
   ret <- xlim - c(-0.5 * sdx, 0.5 * sdx)  # xlim[seq(2, length(xlim) - 1)]
+
+  return(ret)
+}
+
+remove_na_rows <- function(dat, dvr, ivrs) {
+
+  # Determine rows with NAs
+  dvna <- is.na(dat[[dvr]])
+
+  ivna <- rep(FALSE, nrow(dat))
+  for (var in ivrs) {
+    ivna <- ivna | is.na(dat[[var]])
+  }
+
+  cvna <- dvna | ivna
+
+  # Strip any such rows
+  ret <- dat[!cvna, ]
 
   return(ret)
 }
