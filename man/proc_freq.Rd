@@ -57,7 +57,7 @@ The following options are available:
 "chisq", "crosstab", "fisher", "list", "missing",
 "nlevels", "nocol",
 "nocum", "nofreq", "nopercent", "noprint",
-"nonobs", "norow", "nosparse", "notable", "outcum". See
+"nonobs", "norow", "nosparse", "notable", "outcum", "outpct", "varnames". See
 the \strong{Options} section for a description of these options.}
 
 \item{titles}{A vector of titles to assign to the interactive report.}
@@ -233,6 +233,18 @@ want the Chi-Square statistic.
 \item{\strong{outcum}: Whether to include the cumulative frequency and percent
 on output frequency tables.  By default, these columns are not included.
 The "outcum" option will include them.
+}
+\item{\strong{outpct}: Whether to include row and column percentages on
+two-way output datasets.  When specified, two columns are added to the
+output dataset: "PCT_ROW", which contains the row percentage for each
+cell, and "PCT_COL", which contains the column percentage for each cell.
+This option is only meaningful for two-way interactions; for one-way
+frequency tables it is silently ignored.
+}
+\item{\strong{varnames}: Replaces the standardized "CAT" and "BY" output
+column names with the original variable names from which those columns
+are derived.  The variable names are taken from the column labels.
+This option only affects data frame output, not the interactive report.
 }
 }
 }

@@ -10,3 +10,4 @@
 ^Procs_Validation\.docx$
 ^\.positai$
 ^\.claude$
+^\.posit/assistant$

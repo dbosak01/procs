@@ -1259,6 +1259,113 @@ subset_data <- function(data, where = NULL) {
   return(res)
 }
 
+keep_data <- function(data, keep = NULL) {
+
+  datIsLst <- FALSE
+  keepIsLst <- FALSE
+
+  if (!"data.frame" %in% class(data) & is.list(data) == TRUE) {
+    datIsLst <- TRUE
+  }
+
+  if (is.list(keep)) {
+    keepIsLst <- TRUE
+  }
+
+  if (!is.null(keep)) {
+
+    if (datIsLst == FALSE & keepIsLst == FALSE) {
+      nms <- names(data)
+      ret <- data[, keep[keep %in% nms], drop = FALSE]
+    } else if (datIsLst == FALSE & keepIsLst == TRUE) {
+
+      stop("Keep vectors not aligned with table specifications.")
+
+    } else if (datIsLst == TRUE & keepIsLst == FALSE) {
+
+      ret <- data
+      for (idx in seq(1, length(data))) {
+        nms <- names(ret[[idx]])
+
+        ret[[idx]] <- ret[[idx]][, keep[keep %in% nms], drop = FALSE]
+      }
+
+    } else if (datIsLst == TRUE & keepIsLst == TRUE) {
+
+      ret <- data
+
+      # Get names
+      dnms <- names(ret)
+      knms <- names(keep)
+
+      # Create sequences for missing names
+      dseq <- seq(1, length(ret))
+      kseq <- seq(1, length(keep))
+
+      # If there are no names, use sequences
+      if (is.null(dnms)) {
+        dnms <- as.character(dseq)
+      }
+      if (is.null(knms)) {
+        knms <- as.character(kseq)
+      }
+
+      # If some names are missing,
+      # replace missing names with sequence number
+      for (idx in seq(1, length(data))) {
+        if (dnms[idx] == "") {
+          dnms[idx] <- as.character(dseq[idx])
+        }
+
+        if (knms[idx] == "") {
+          knms[idx] <- as.character(kseq[idx])
+        }
+      }
+
+      # Assign corrected names
+      names(ret) <- dnms
+      names(keep) <- knms
+
+      # For each dataset, map keep vector and subset
+      for (idx in seq(1, length(data))) {
+
+        nm <- dnms[idx]
+        kp <- keep[[nm]]
+
+        dfnms <- names(ret[[nm]])
+        ret[[nm]] <- ret[[nm]][, kp[kp %in% dfnms], drop = FALSE]
+      }
+
+      # Restore names
+      names(ret) <- names(data)
+
+    }
+  } else {
+    ret <- data
+  }
+
+
+
+  return(ret)
+}
+
+drop_data <- function(data, drop = NULL) {
+
+
+}
+
+
+rename_data <- function(data, rename = NULL) {
+
+
+}
+
+
+mlst <- list("fork", hey = "bork")
+
+names(mlst)
+
+mlst[[""]]
 
 # Binning Experiments -----------------------------------------------------
 

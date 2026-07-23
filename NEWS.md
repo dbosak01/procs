@@ -1,3 +1,8 @@
+# procs 1.1.0
+
+* Added "outpct" option to `proc_freq()`.   
+* Added "varnames" option to `proc_freq()`.
+
 # procs 1.0.9
 
 * Added "sides" option to `proc_ttest()`.

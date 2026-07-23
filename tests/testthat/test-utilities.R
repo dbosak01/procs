@@ -1247,3 +1247,93 @@ test_that("subset_data12: handles compound logical expressions correctly", {
 
   expect_identical(res, expected)
 })
+
+test_that("utils31: keep_data() works as expected", {
+
+  # No lists
+  dat <- mtcars
+  kp <- c("mpg", "cyl", "disp")
+
+  res <- keep_data(dat, kp)
+
+  expect_equal(ncol(res), 3)
+
+  # List of datasets, one keep
+  dat <- list(mtcars, mtcars)
+  kp <- c("mpg", "cyl", "disp")
+
+  res <- keep_data(dat, kp)
+
+  expect_equal(ncol(res[[1]]), 3)
+  expect_equal(ncol(res[[1]]), 3)
+
+  # Both lists, in order
+  dat <- list(mtcars, mtcars)
+  kp <- list(c("mpg", "cyl", "disp"),
+             c("cyl", "disp", "drat", "am"))
+
+  res <- keep_data(dat, kp)
+
+  expect_equal(ncol(res[[1]]), 3)
+  expect_equal(ncol(res[[2]]), 4)
+
+  # Both lists, Out of order, but names line up
+  dat <- list(A = mtcars, B = mtcars)
+  kp <- list(B = c("cyl", "disp", "drat", "am"),
+             A = c("mpg", "cyl", "disp"))
+
+  res <- keep_data(dat, kp)
+
+  expect_equal(ncol(res[[1]]), 3)
+  expect_equal(ncol(res[[2]]), 4)
+
+
+  # Both lists, Out of order, but names don't line up
+  dat <- list(A = mtcars, B = mtcars)
+  kp <- list(C = c("cyl", "disp", "drat", "am"),
+             A = c("mpg", "cyl", "disp"))
+
+  res <- keep_data(dat, kp)
+
+  expect_equal(ncol(res[[1]]), 3)
+  expect_equal(ncol(res[[2]]), 0)
+
+
+  # Keep list wrong
+  dat <- mtcars
+  kp <- c("mpg2", "cyl2", "disp")
+
+  res <- keep_data(dat, kp)
+
+  expect_equal(ncol(res), 1)
+
+
+  # List of datasets, one wrong keep
+  dat <- list(mtcars, mtcars)
+  kp <- c("mpg2", "cyl2", "disp")
+
+  res <- keep_data(dat, kp)
+
+  expect_equal(ncol(res[[1]]), 1)
+  expect_equal(ncol(res[[1]]), 1)
+
+
+  # Both lists, in order, wrong names
+  dat <- list(mtcars, mtcars)
+  kp <- list(c("mpg2", "cyl2", "disp"),
+             c("cyl2", "disp2", "drat2", "am"))
+
+  res <- keep_data(dat, kp)
+
+  expect_equal(ncol(res[[1]]), 1)
+  expect_equal(ncol(res[[2]]), 1)
+
+  # Error condition
+  dat <- mtcars
+  kp <- list(c("mpg2", "cyl2", "disp"),
+             c("cyl2", "disp2", "drat2", "am"))
+
+
+  expect_error(keep_data(dat, kp))
+
+})

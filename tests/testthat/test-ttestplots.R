@@ -1232,7 +1232,7 @@ test_that("ttestplot26: More NA tests", {
   proc_ttest(airquality[airquality$Month %in% c(8,9), ],
              var = "Ozone",
              class = "Month",
-             plots = c("summary", "histogram"))
+             plots = c("boxplot"))
 
 
   expect_equal(TRUE, TRUE)

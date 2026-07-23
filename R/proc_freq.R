@@ -137,6 +137,18 @@
 #' on output frequency tables.  By default, these columns are not included.
 #' The "outcum" option will include them.
 #' }
+#' \item{\strong{outpct}: Whether to include row and column percentages on
+#' two-way output datasets.  When specified, two columns are added to the
+#' output dataset: "PCT_ROW", which contains the row percentage for each
+#' cell, and "PCT_COL", which contains the column percentage for each cell.
+#' This option is only meaningful for two-way interactions; for one-way
+#' frequency tables it is silently ignored.
+#' }
+#' \item{\strong{varnames}: Replaces the standardized "CAT" and "BY" output
+#' column names with the original variable names from which those columns
+#' are derived.  The variable names are taken from the column labels.
+#' This option only affects data frame output, not the interactive report.
+#' }
 #' }
 #' @section Statistics Options:
 #' In addition to the above options, the \code{options} parameter accepts
@@ -274,7 +286,7 @@
 #' "chisq", "crosstab", "fisher", "list", "missing",
 #' "nlevels", "nocol",
 #' "nocum", "nofreq", "nopercent", "noprint",
-#' "nonobs", "norow", "nosparse", "notable", "outcum". See
+#' "nonobs", "norow", "nosparse", "notable", "outcum", "outpct", "varnames". See
 #' the \strong{Options} section for a description of these options.
 #' @param titles A vector of titles to assign to the interactive report.
 #' @param order Indicates how to order the function output. Options are "internal",
@@ -301,6 +313,12 @@
 #' If the input data is a tibble, the output data will be a
 #' tibble.  If the input data is a Base R data frame, the output data will be
 #' a Base R data frame.
+#' @param keep A vector of variables to keep on the frequency output dataset(s). If there
+#' are multiple tables, you may supply one keep vector for all tables, or
+#' a list of vectors, one for each table. If using a list of vectors, they
+#' may either be named or unnamed.  If named, names should match the table names.
+#' The keep vector will only apply to the frequency output dataset(s), not
+#' the interactive report, report datasets, nlevels, or any statistical output.
 #' @seealso For summary statistics, see \code{\link{proc_means}}.  To pivot
 #' or transpose the data coming from \code{proc_freq},
 #' see \code{\link{proc_transpose}}. For frequency plots,
@@ -514,7 +532,8 @@ proc_freq <- function(data,
                       titles = NULL,
                       order = "internal",
                       plots = NULL,
-                      where = NULL
+                      where = NULL,
+                      keep = NULL
                       ) {
 
   # Allow single-value NSE on some parameters
@@ -579,8 +598,10 @@ proc_freq <- function(data,
                "norow", "nosparse", "outcum",
                "sparse", "crosstab",
                "notable", "nonobs", "missing", "nlevels",
+               "outpct", # Output percentage options
                "chisq", "fisher", # Statistics options
-               "alpha" # Setting options
+               "alpha", # Setting options
+               "varnames" # Column naming options
                )
 
     # Future options
@@ -658,6 +679,7 @@ proc_freq <- function(data,
                               titles = titles,
                               order = order,
                               plots = plots)
+
   }
 
   if (length(outreq) > 0) {
@@ -668,7 +690,10 @@ proc_freq <- function(data,
                            options = options,
                            weight = weight,
                            output = outreq,
-                           order = order)
+                           order = order,
+                           keep = keep)
+
+
 
   }
 
@@ -1091,6 +1116,23 @@ freq_twoway <- function(data, tb1, tb2, weight, options,
   result$CUMSUM =  cumsum(result$CNT)
   result$CUMPCT = cumsum(result$PCT)
 
+  # Compute row/column percentages for outpct option (two-way output only)
+  pct_row_col <- NULL
+  if (out && has_option(options, "outpct")) {
+    cat1totals <- aggregate(result$CNT, list(as.character(result$CAT1)), FUN = sum)
+    cat2totals <- aggregate(result$CNT, list(as.character(result$CAT2)), FUN = sum)
+    lkp_row <- cat1totals$x
+    names(lkp_row) <- cat1totals$Group.1
+    lkp_col <- cat2totals$x
+    names(lkp_col) <- cat2totals$Group.1
+    pct_row_col <- data.frame(
+      PCT_ROW = result$CNT / lkp_row[as.character(result$CAT1)] * 100,
+      PCT_COL = result$CNT / lkp_col[as.character(result$CAT2)] * 100,
+      stringsAsFactors = FALSE
+    )
+    rownames(pct_row_col) <- NULL
+  }
+
   # Get labels on target variables if they exist
   lbl1 <- attr(data[[tb1]], "label")
   lbl2 <- attr(data[[tb2]], "label")
@@ -1157,6 +1199,14 @@ freq_twoway <- function(data, tb1, tb2, weight, options,
     fstats <- stats[toupper(stats) %in% names(result)]
 
     result <- result[ , c("CAT1", "CAT2", toupper(fstats))]
+  }
+
+  # Append PCT_ROW and PCT_COL if outpct was requested
+  if (!is.null(pct_row_col)) {
+    rownames(result) <- NULL
+    result <- cbind(result, pct_row_col)
+    labels(result) <- c(PCT_ROW = "Row Percent", PCT_COL = "Column Percent")
+    formats(result) <- list(PCT_ROW = "%.4f", PCT_COL = "%.4f")
   }
 
   # Add footnote for missing values
@@ -2160,7 +2210,8 @@ gen_output_freq <- function(data,
                             options = NULL,
                             weight = NULL,
                             output = NULL,
-                            order = NULL) {
+                            order = NULL,
+                            keep = NULL) {
 
   # Deal with sparse option
   dta <- get_nway_zero_fills(data, output, by, weight, options)
@@ -2173,6 +2224,8 @@ gen_output_freq <- function(data,
       bynms <- "BY"
     else
       bynms <- paste0("BY", seq(1, length(by)))
+
+    bylbls <- setNames(by, bynms)
 
     lst <- unclass(dta)[by]
     for (nm in names(lst))
@@ -2414,6 +2467,7 @@ gen_output_freq <- function(data,
 
         tmpres <- restore_datatypes(tmpres, data, by, bynms)
 
+        labels(tmpres) <- bylbls
       }
 
 
@@ -2434,18 +2488,49 @@ gen_output_freq <- function(data,
       if (!is.null(has_option(options, "nlevels")))
         res[[paste0("NLevels:", nm)]] <- nlevels
 
-      if (!has_option(options, "notable"))
+      if (!has_option(options, "notable")) {
+
+        # Perform keep operation
+        tmpres <- keep_data(tmpres, keep)
+
+
         res[[nm]] <- tmpres
 
-      if (!is.null(chisq))
-        res[[paste0("chisq:", nm)]] <- chisq
+      }
 
-      if (!is.null(fisher))
+      if (!is.null(chisq)) {
+        if (!is.null(by))
+          labels(chisq) <- bylbls
+        res[[paste0("chisq:", nm)]] <- chisq
+      }
+
+      if (!is.null(fisher)) {
+        if (!is.null(by))
+          labels(fisher) <- bylbls
         res[[paste0("fisher:", nm)]] <- fisher
+      }
 
     }
   }
 
+  # Rename CAT/BY columns to original variable names from labels
+  if (has_option(options, "varnames")) {
+    for (nm in names(res)) {
+      df <- res[[nm]]
+      if (is.data.frame(df)) {
+        nms <- names(df)
+        for (i in seq_along(nms)) {
+          if (grepl("^(CAT|BY)\\d*$", nms[i])) {
+            lbl <- attr(df[[nms[i]]], "label")
+            if (!is.null(lbl)) {
+              nms[i] <- lbl
+            }
+          }
+        }
+        names(res[[nm]]) <- nms
+      }
+    }
+  }
 
   return(res)
 

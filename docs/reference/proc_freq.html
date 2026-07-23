@@ -23,7 +23,7 @@ requested tables in a named list."><meta property="og:image" content="https://pr
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">procs</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.0.9</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.1.0</span>
       </span>
     </div>
 
@@ -175,7 +175,7 @@ The following options are available:
 "chisq", "crosstab", "fisher", "list", "missing",
 "nlevels", "nocol",
 "nocum", "nofreq", "nopercent", "noprint",
-"nonobs", "norow", "nosparse", "notable", "outcum". See
+"nonobs", "norow", "nosparse", "notable", "outcum", "outpct", "varnames". See
 the <strong>Options</strong> section for a description of these options.</p></dd>
 
 
@@ -338,6 +338,16 @@ want the Chi-Square statistic.</p></li>
 <li><p><strong>outcum</strong>: Whether to include the cumulative frequency and percent
 on output frequency tables.  By default, these columns are not included.
 The "outcum" option will include them.</p></li>
+<li><p><strong>outpct</strong>: Whether to include row and column percentages on
+two-way output datasets.  When specified, two columns are added to the
+output dataset: "PCT_ROW", which contains the row percentage for each
+cell, and "PCT_COL", which contains the column percentage for each cell.
+This option is only meaningful for two-way interactions; for one-way
+frequency tables it is silently ignored.</p></li>
+<li><p><strong>varnames</strong>: Replaces the standardized "CAT" and "BY" output
+column names with the original variable names from which those columns
+are derived.  The variable names are taken from the column labels.
+This option only affects data frame output, not the interactive report.</p></li>
 </ul></div>
     <div id="statistics-options">
     <h2>Statistics Options</h2>
