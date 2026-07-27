@@ -313,12 +313,29 @@
 #' If the input data is a tibble, the output data will be a
 #' tibble.  If the input data is a Base R data frame, the output data will be
 #' a Base R data frame.
+#' @param rename A named vector of variables to rename on the frequency output
+#' dataset(s), where the name is the existing variable name and the value is
+#' the desired new name. If there are multiple tables, you may supply one
+#' rename vector for all tables, or a list of vectors, one for each table.
+#' If using a list of vectors, they may either be named or unnamed. If named,
+#' names should match the table names. The rename vector will only apply to
+#' the frequency output dataset(s), not the interactive report, report
+#' datasets, nlevels, or any statistical output. The rename operation is
+#' performed before the \code{keep} and \code{drop} operations, so the
+#' \code{keep} and \code{drop} vectors should reference the new variable names.
 #' @param keep A vector of variables to keep on the frequency output dataset(s). If there
 #' are multiple tables, you may supply one keep vector for all tables, or
 #' a list of vectors, one for each table. If using a list of vectors, they
 #' may either be named or unnamed.  If named, names should match the table names.
 #' The keep vector will only apply to the frequency output dataset(s), not
 #' the interactive report, report datasets, nlevels, or any statistical output.
+#' @param drop A vector of variables to drop from the frequency output dataset(s). If there
+#' are multiple tables, you may supply one drop vector for all tables, or
+#' a list of vectors, one for each table. If using a list of vectors, they
+#' may either be named or unnamed.  If named, names should match the table names.
+#' The drop vector will only apply to the frequency output dataset(s), not
+#' the interactive report, report datasets, nlevels, or any statistical output.
+#' If both \code{keep} and \code{drop} are supplied, \code{keep} is applied first.
 #' @seealso For summary statistics, see \code{\link{proc_means}}.  To pivot
 #' or transpose the data coming from \code{proc_freq},
 #' see \code{\link{proc_transpose}}. For frequency plots,
@@ -533,7 +550,9 @@ proc_freq <- function(data,
                       order = "internal",
                       plots = NULL,
                       where = NULL,
-                      keep = NULL
+                      rename = NULL,
+                      keep = NULL,
+                      drop = NULL
                       ) {
 
   # Allow single-value NSE on some parameters
@@ -691,7 +710,9 @@ proc_freq <- function(data,
                            weight = weight,
                            output = outreq,
                            order = order,
-                           keep = keep)
+                           rename = rename,
+                           keep = keep,
+                           drop = drop)
 
 
 
@@ -2211,7 +2232,9 @@ gen_output_freq <- function(data,
                             weight = NULL,
                             output = NULL,
                             order = NULL,
-                            keep = NULL) {
+                            rename = NULL,
+                            keep = NULL,
+                            drop = NULL) {
 
   # Deal with sparse option
   dta <- get_nway_zero_fills(data, output, by, weight, options)
@@ -2490,8 +2513,20 @@ gen_output_freq <- function(data,
 
       if (!has_option(options, "notable")) {
 
+        # Select the rename/keep/drop vector that aligns with this table request
+        tidx <- match(nm, names(output))
+        trename <- get_table_vector(rename, nm, tidx)
+        tkeep <- get_table_vector(keep, nm, tidx)
+        tdrop <- get_table_vector(drop, nm, tidx)
+
+        # Perform rename operation
+        tmpres <- rename_data(tmpres, trename)
+
         # Perform keep operation
-        tmpres <- keep_data(tmpres, keep)
+        tmpres <- keep_data(tmpres, tkeep)
+
+        # Perform drop operation
+        tmpres <- drop_data(tmpres, tdrop)
 
 
         res[[nm]] <- tmpres

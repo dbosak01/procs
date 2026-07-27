@@ -2,6 +2,8 @@
 
 * Added "outpct" option to `proc_freq()`.   
 * Added "varnames" option to `proc_freq()`.
+* Added "keep and "drop" parameters to `proc_freq()`.
+* Added "rename" parameter to `proc_freq()`.
 
 # procs 1.0.9
 

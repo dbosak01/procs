@@ -1259,6 +1259,40 @@ subset_data <- function(data, where = NULL) {
   return(res)
 }
 
+# For a given keep/drop parameter, select the vector that aligns
+# with a particular table request. If the parameter is not a list,
+# it is assumed to apply to all table requests, and is returned as-is.
+# If it is a list, the vector is matched by table name first, falling
+# back to positional matching for any unnamed list elements.
+get_table_vector <- function(vec, nm, idx) {
+
+  if (is.null(vec) || !is.list(vec)) {
+    return(vec)
+  }
+
+  nms <- names(vec)
+  if (is.null(nms)) {
+    nms <- rep("", length(vec))
+  }
+
+  # Fill in missing names with positional sequence number
+  for (k in seq_along(nms)) {
+    if (is.na(nms[k]) || nms[k] == "") {
+      nms[k] <- as.character(k)
+    }
+  }
+  names(vec) <- nms
+
+  ret <- NULL
+  if (!is.null(nm) && nm %in% nms) {
+    ret <- vec[[nm]]
+  } else if (!is.null(idx) && !is.na(idx) && as.character(idx) %in% nms) {
+    ret <- vec[[as.character(idx)]]
+  }
+
+  return(ret)
+}
+
 keep_data <- function(data, keep = NULL) {
 
   datIsLst <- FALSE
@@ -1351,21 +1385,195 @@ keep_data <- function(data, keep = NULL) {
 
 drop_data <- function(data, drop = NULL) {
 
+  datIsLst <- FALSE
+  dropIsLst <- FALSE
 
+  if (!"data.frame" %in% class(data) & is.list(data) == TRUE) {
+    datIsLst <- TRUE
+  }
+
+  if (is.list(drop)) {
+    dropIsLst <- TRUE
+  }
+
+  if (!is.null(drop)) {
+
+    if (datIsLst == FALSE & dropIsLst == FALSE) {
+      nms <- names(data)
+      ret <- data[, !nms %in% drop, drop = FALSE]
+    } else if (datIsLst == FALSE & dropIsLst == TRUE) {
+
+      stop("Drop vectors not aligned with table specifications.")
+
+    } else if (datIsLst == TRUE & dropIsLst == FALSE) {
+
+      ret <- data
+      for (idx in seq(1, length(data))) {
+        nms <- names(ret[[idx]])
+
+        ret[[idx]] <- ret[[idx]][, !nms %in% drop, drop = FALSE]
+      }
+
+    } else if (datIsLst == TRUE & dropIsLst == TRUE) {
+
+      ret <- data
+
+      # Get names
+      dnms <- names(ret)
+      knms <- names(drop)
+
+      # Create sequences for missing names
+      dseq <- seq(1, length(ret))
+      kseq <- seq(1, length(drop))
+
+      # If there are no names, use sequences
+      if (is.null(dnms)) {
+        dnms <- as.character(dseq)
+      }
+      if (is.null(knms)) {
+        knms <- as.character(kseq)
+      }
+
+      # If some names are missing,
+      # replace missing names with sequence number
+      for (idx in seq(1, length(data))) {
+        if (dnms[idx] == "") {
+          dnms[idx] <- as.character(dseq[idx])
+        }
+
+        if (knms[idx] == "") {
+          knms[idx] <- as.character(kseq[idx])
+        }
+      }
+
+      # Assign corrected names
+      names(ret) <- dnms
+      names(drop) <- knms
+
+      # For each dataset, map drop vector and subset
+      for (idx in seq(1, length(data))) {
+
+        nm <- dnms[idx]
+        dp <- drop[[nm]]
+
+        dfnms <- names(ret[[nm]])
+        ret[[nm]] <- ret[[nm]][, !dfnms %in% dp, drop = FALSE]
+      }
+
+      # Restore names
+      names(ret) <- names(data)
+
+    }
+  } else {
+    ret <- data
+  }
+
+
+
+  return(ret)
 }
 
 
 rename_data <- function(data, rename = NULL) {
 
+  datIsLst <- FALSE
+  renameIsLst <- FALSE
 
+  if (!"data.frame" %in% class(data) & is.list(data) == TRUE) {
+    datIsLst <- TRUE
+  }
+
+  if (is.list(rename)) {
+    renameIsLst <- TRUE
+  }
+
+  if (!is.null(rename)) {
+
+    if (datIsLst == FALSE & renameIsLst == FALSE) {
+
+      ret <- data
+      nms <- names(ret)
+      mtch <- match(names(rename), nms)
+      vmtch <- !is.na(mtch)
+      nms[mtch[vmtch]] <- rename[vmtch]
+      names(ret) <- nms
+
+    } else if (datIsLst == FALSE & renameIsLst == TRUE) {
+
+      stop("Rename vectors not aligned with table specifications.")
+
+    } else if (datIsLst == TRUE & renameIsLst == FALSE) {
+
+      ret <- data
+      for (idx in seq(1, length(data))) {
+        nms <- names(ret[[idx]])
+
+        mtch <- match(names(rename), nms)
+        vmtch <- !is.na(mtch)
+        nms[mtch[vmtch]] <- rename[vmtch]
+        names(ret[[idx]]) <- nms
+      }
+
+    } else if (datIsLst == TRUE & renameIsLst == TRUE) {
+
+      ret <- data
+
+      # Get names
+      dnms <- names(ret)
+      knms <- names(rename)
+
+      # Create sequences for missing names
+      dseq <- seq(1, length(ret))
+      kseq <- seq(1, length(rename))
+
+      # If there are no names, use sequences
+      if (is.null(dnms)) {
+        dnms <- as.character(dseq)
+      }
+      if (is.null(knms)) {
+        knms <- as.character(kseq)
+      }
+
+      # If some names are missing,
+      # replace missing names with sequence number
+      for (idx in seq(1, length(data))) {
+        if (dnms[idx] == "") {
+          dnms[idx] <- as.character(dseq[idx])
+        }
+
+        if (knms[idx] == "") {
+          knms[idx] <- as.character(kseq[idx])
+        }
+      }
+
+      # Assign corrected names
+      names(ret) <- dnms
+      names(rename) <- knms
+
+      # For each dataset, map rename vector and apply
+      for (idx in seq(1, length(data))) {
+
+        nm <- dnms[idx]
+        rn <- rename[[nm]]
+
+        dfnms <- names(ret[[nm]])
+        mtch <- match(names(rn), dfnms)
+        vmtch <- !is.na(mtch)
+        dfnms[mtch[vmtch]] <- rn[vmtch]
+        names(ret[[nm]]) <- dfnms
+      }
+
+      # Restore names
+      names(ret) <- names(data)
+
+    }
+  } else {
+    ret <- data
+  }
+
+  return(ret)
 }
 
-
-mlst <- list("fork", hey = "bork")
-
-names(mlst)
-
-mlst[[""]]
 
 # Binning Experiments -----------------------------------------------------
 
