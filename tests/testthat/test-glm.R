@@ -318,3 +318,71 @@ test_that("glm19: lsmeans produces an LS-means table per effect.", {
   ls90 <- res90$LSMeans.Sex
   expect_lt(ls90$UCLM[1] - ls90$LCLM[1], ls$UCLM[1] - ls$LCLM[1])
 })
+
+
+test_that("glm20: contrast F-test equals the Type III test for a 2-level factor.", {
+
+  res <- proc_glm(cls, model = Weight ~ Sex + Height, class = "Sex",
+                  contrast = list("F vs M" = list(Sex = c(1, -1))),
+                  output = "report")
+
+  expect_true("Contrasts" %in% names(res))
+  ct <- res$Contrasts
+  expect_equal(ct$CONTRAST, "F vs M", ignore_attr = TRUE)
+
+  # A 1-df F vs M contrast reproduces the Type III SS for Sex (184.7145003)
+  expect_equal(ct$SUMSQ, 184.7145003, tolerance = 1e-5, ignore_attr = TRUE)
+})
+
+
+test_that("glm21: estimate reproduces the solution parameter for the level diff.", {
+
+  res <- proc_glm(cls, model = Weight ~ Sex + Height, class = "Sex",
+                  estimate = list("F vs M" = list(Sex = c(1, -1))),
+                  output = "report")
+
+  expect_true("Estimates" %in% names(res))
+  es <- res$Estimates
+
+  # F vs M equals the SexF solution estimate (SexM is the zeroed reference)
+  expect_equal(es$EST, -6.620843046, tolerance = 1e-6, ignore_attr = TRUE)
+  expect_equal(es$STDERR, 5.388699907, tolerance = 1e-6, ignore_attr = TRUE)
+
+  # No confidence limits by default (SAS shows them only with clparm)
+  expect_false(any(c("LCLM", "UCLM") %in% names(es)))
+
+  # clparm adds the confidence limits
+  res2 <- proc_glm(cls, model = Weight ~ Sex + Height, class = "Sex",
+                   estimate = list("F vs M" = list(Sex = c(1, -1))),
+                   stats = "clparm", output = "report")
+  expect_true(all(c("LCLM", "UCLM") %in% names(res2$Estimates)))
+})
+
+
+test_that("glm22: random produces an expected mean squares table.", {
+
+  res <- proc_glm(cls, model = Weight ~ Sex + Region,
+                  class = c("Sex", "Region"), random = "Sex",
+                  output = "report")
+
+  expect_true("RandomEffects" %in% names(res))
+  em <- res$RandomEffects
+  expect_equal(em$SOURCE, c("Sex", "Region"), ignore_attr = TRUE)
+
+  # Random effect -> Var(); fixed effect -> Q()
+  expect_true(grepl("Var(Sex)", em$EMS[em$SOURCE == "Sex"], fixed = TRUE))
+  expect_true(grepl("Q(Region)", em$EMS[em$SOURCE == "Region"], fixed = TRUE))
+})
+
+
+test_that("glm23: contrast/estimate/random parameter checks.", {
+
+  expect_error(proc_glm(cls, model = Weight ~ Sex + Height, class = "Sex",
+                        random = "Height"))                     # not a class var
+  expect_error(proc_glm(cls, model = Weight ~ Sex + Height, class = "Sex",
+                        contrast = list(list(Sex = c(1, -1)))))  # unnamed
+  # Wrong coefficient count for the effect
+  expect_error(proc_glm(cls, model = Weight ~ Sex + Height, class = "Sex",
+                        contrast = list("bad" = list(Sex = c(1, -1, 1))),
+                        output = "report"))
+})

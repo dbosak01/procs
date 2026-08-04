@@ -1566,7 +1566,7 @@ gen_report_ttest <- function(data,
           # type = NULL, byvals = NULL
           #outp <- out_spec(stats = stats, shape = "wide")
           grp_opts <- opts
-          if (!is.null(opts)) {
+          if (!is.null(class) && !is.null(opts)) {
             nms_o <- names(grp_opts)
             if (!is.null(nms_o) && "sides" %in% nms_o)
               grp_opts[nms_o == "sides"] <- "2"

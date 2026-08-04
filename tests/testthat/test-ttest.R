@@ -1530,6 +1530,45 @@ test_that("ttest34: freq with paired test.", {
 })
 
 
+test_that("ttest35: one-sided paired test honors sides= (issue #209).", {
+
+  paird <- read.table(text = "1  12 15
+                               2  14 16
+                               3  10 11
+                               4  15 18
+                               5  18 20
+                               6  20 22
+                               7  11 12
+                               8  13 14
+                               9  16 17
+                               10  9 13",
+                      col.names = c("id", "before", "after"))
+
+  # Difference before - after has mean -2, t = -6 on 9 df.
+  # Lower one-sided p = pt(-6, 9) = 0.00010125 (not the two-sided 0.00020250).
+  resL <- proc_ttest(paird, paired = "before * after",
+                     options = c(sides = "L"), output = "report")
+
+  expect_equal(as.numeric(resL[["diff1:TTests"]]$PROBT), 0.00010124966,
+               tolerance = 1e-7)
+  # Lower one-sided CL: (-Inf, finite upper)
+  expect_equal(as.numeric(resL[["diff1:ConfLimits"]]$LCLM), -Inf)
+  expect_true(is.finite(as.numeric(resL[["diff1:ConfLimits"]]$UCLM)))
+
+  # Upper one-sided is the complement
+  resU <- proc_ttest(paird, paired = "before * after",
+                     options = c(sides = "U"), output = "report")
+  expect_equal(as.numeric(resU[["diff1:TTests"]]$PROBT), 0.99989875,
+               tolerance = 1e-7)
+  expect_equal(as.numeric(resU[["diff1:ConfLimits"]]$UCLM), Inf)
+
+  # Two-sided remains double the lower tail
+  res2 <- proc_ttest(paird, paired = "before * after", output = "report")
+  expect_equal(as.numeric(res2[["diff1:TTests"]]$PROBT), 0.00020249932,
+               tolerance = 1e-7)
+})
+
+
 # Not sure how to do this.  Can't get lognormal dist to match SAS.
 # test_that("ttest28: Paired ttest with lognormal data works.", {
 #

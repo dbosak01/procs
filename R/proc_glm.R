@@ -22,10 +22,6 @@
 #' package.  It produces a dataset output by default, and, when working in
 #' RStudio, also produces an interactive report.  Statistical output is
 #' designed to match SAS.
-#'
-#' A model may be specified using R model syntax or SAS model syntax.  To use
-#' SAS syntax, the model statement must be quoted.
-#'
 #' @param data The input data frame for which to perform the analysis.
 #' This parameter is required.
 #' @param model A model for the analysis.  The model can be specified using
@@ -53,6 +49,20 @@
 #' least-squares means.  Each requested effect produces a least-squares means
 #' table on the interactive report.  The effect(s) must also appear on the
 #' \code{class} parameter.
+#' @param contrast A named list of contrast specifications.  Each element name
+#' is the contrast label, and each value is itself a named list mapping a model
+#' effect to a vector of coefficients over that effect's levels, in level order.
+#' For example, \code{contrast = list("F vs M" = list(Sex = c(1, -1)))} mirrors
+#' the SAS statement \code{contrast 'F vs M' Sex 1 -1}.  Each contrast produces
+#' an F-test row on the interactive report.
+#' @param estimate A named list of estimate specifications, using the same
+#' structure as the \code{contrast} parameter.  Each estimate produces a row on
+#' the interactive report with the estimate, standard error, t value, p value,
+#' and confidence limits.
+#' @param random The name of one or more class variables to treat as random
+#' effects.  Produces a table of Type III expected mean squares on the
+#' interactive report.  The effect(s) must also appear on the \code{class}
+#' parameter.
 #' @param options A vector of optional keywords.  Valid values are "alpha =",
 #' "noprint", "ss1", "ss2", "ss3", and "outstat".  The "outstat" option requests
 #' an output dataset of the model sums of squares.  This is the default output
@@ -75,6 +85,9 @@ proc_glm <- function(data,
                      output = NULL,
                      weight = NULL,
                      lsmeans = NULL,
+                     contrast = NULL,
+                     estimate = NULL,
+                     random = NULL,
                      options = NULL,
                      titles = NULL,
                      where = NULL
@@ -86,6 +99,7 @@ proc_glm <- function(data,
   by <- resolve_arg(by)
   stats <- resolve_arg(stats)
   lsmeans <- resolve_arg(lsmeans)
+  random <- resolve_arg(random)
   options <- resolve_arg(options, type = c("integer", "double", "character", "NULL"))
   output <- resolve_arg(output)
 
@@ -116,6 +130,19 @@ proc_glm <- function(data,
                  lsmeans[!lsmeans %in% class], "\n"))
     }
   }
+
+  if (!is.null(random)) {
+    if (!all(random %in% class)) {
+      stop(paste("The random effect must be a class variable: ",
+                 random[!random %in% class], "\n"))
+    }
+  }
+
+  if (!is.null(contrast) && is.null(names(contrast)))
+    stop("The contrast parameter must be a named list of coefficient specs.")
+
+  if (!is.null(estimate) && is.null(names(estimate)))
+    stop("The estimate parameter must be a named list of coefficient specs.")
 
   if (!is.null(by)) {
     if (!all(by %in% nms)) {
@@ -204,7 +231,10 @@ proc_glm <- function(data,
                              opts = options,
                              output = output,
                              weight = weight,
-                             lsmeans = lsmeans)
+                             lsmeans = lsmeans,
+                             contrast = contrast,
+                             estimate = estimate,
+                             random = random)
   }
 
   # Get output datasets if requested
@@ -236,6 +266,9 @@ proc_glm <- function(data,
           output = output,
           weight = weight,
           lsmeans = lsmeans,
+          random = random,
+          contrast = contrast,
+          estimate = estimate,
           view = view,
           titles = titles,
           options = options,
@@ -264,6 +297,9 @@ log_glm <- function(data,
                     output = NULL,
                     weight = NULL,
                     lsmeans = NULL,
+                    random = NULL,
+                    contrast = NULL,
+                    estimate = NULL,
                     view = TRUE,
                     titles = NULL,
                     options = NULL,
@@ -296,6 +332,15 @@ log_glm <- function(data,
 
   if (!is.null(lsmeans))
     ret[length(ret) + 1] <- paste0(indt, "lsmeans: ", paste(lsmeans, collapse = " "))
+
+  if (!is.null(random))
+    ret[length(ret) + 1] <- paste0(indt, "random: ", paste(random, collapse = " "))
+
+  if (!is.null(contrast))
+    ret[length(ret) + 1] <- paste0(indt, "contrast: ", paste(names(contrast), collapse = " "))
+
+  if (!is.null(estimate))
+    ret[length(ret) + 1] <- paste0(indt, "estimate: ", paste(names(estimate), collapse = " "))
 
   if (!is.null(view))
     ret[length(ret) + 1] <- paste0(indt, "view: ", paste(view, collapse = " "))
@@ -369,6 +414,44 @@ get_output_specs_glm <- function(model, class = NULL, opts = NULL,
 }
 
 
+# Build an L coefficient vector for a CONTRAST or ESTIMATE from a per-effect
+# specification.  The spec is a named list mapping an effect name (a term in the
+# model) to a numeric vector of coefficients over that effect's levels, in level
+# order (SAS style: "contrast 'F vs M' Sex 1 -1").  Coefficients for the
+# intercept and unlisted effects default to zero.  Returns a numeric vector
+# aligned to the columns of the model design matrix, as required by sasLM's
+# CONTR() and ESTM().
+#' @import sasLM
+build_glm_L <- function(formula, data, spec) {
+
+  mm <- ModelMatrix(formula, data)
+  cn <- colnames(mm$X)
+  asg <- mm$assign
+  tl <- attr(stats::terms(formula), "term.labels")
+
+  L <- rep(0, length(cn))
+  names(L) <- cn
+
+  for (eff in names(spec)) {
+
+    idx <- which(tl == eff)
+    if (length(idx) == 0)
+      stop(paste0("Effect '", eff, "' not found in the model."))
+
+    cols <- which(asg == idx)
+    coefs <- spec[[eff]]
+
+    if (length(coefs) != length(cols))
+      stop(paste0("Effect '", eff, "' expects ", length(cols),
+                  " coefficients but got ", length(coefs), "."))
+
+    L[cols] <- coefs
+  }
+
+  return(L)
+}
+
+
 # Convert the named `class` columns of `data` to factors before the model is
 # fit.  sasLM::GLM requires categorical predictors to be factors in order to
 # generate the correct design matrix and Type I/II/III sums of squares.
@@ -418,7 +501,8 @@ get_ss_types <- function(stats) {
 #' @import common
 #' @import fmtr
 get_glm_report <- function(data, var, model, class = NULL, opts = NULL,
-                           weight = NULL, stats = NULL, lsmeans = NULL) {
+                           weight = NULL, stats = NULL, lsmeans = NULL,
+                           contrast = NULL, estimate = NULL, random = NULL) {
 
   alph <- 1 - get_alpha(opts)
 
@@ -658,6 +742,101 @@ get_glm_report <- function(data, var, model, class = NULL, opts = NULL,
     }
   }
 
+  # Contrasts: an F-test per labeled contrast, via sasLM::CONTR.
+  if (!is.null(contrast)) {
+
+    crows <- NULL
+    for (lbl in names(contrast)) {
+      L <- build_glm_L(model, data, contrast[[lbl]])
+      cr <- CONTR(matrix(L, nrow = 1), model, data)
+      crows <- rbind(crows,
+                     data.frame(stub = lbl, DF = cr[1, 1], SUMSQ = cr[1, 2],
+                                MEANSQ = cr[1, 3], FVAL = cr[1, 4],
+                                PROBF = cr[1, 5], stringsAsFactors = FALSE))
+    }
+    rownames(crows) <- NULL
+
+    formats(crows) <- list(DF = "%d", SUMSQ = "%.6f", MEANSQ = "%.6f",
+                           FVAL = "%.2f", PROBF = pfmt)
+    labels(crows) <- list(stub = "Contrast", DF = "DF", SUMSQ = "Contrast SS",
+                          MEANSQ = "Mean Square", FVAL = "F Value",
+                          PROBF = "Pr > F")
+    ret[["Contrasts"]] <- crows
+  }
+
+  # Estimates: a linear-combination estimate per label, via sasLM::ESTM.
+  # Confidence limits are only added when clparm is requested, matching SAS
+  # (the ESTIMATE statement shows CL only with the clparm option).
+  if (!is.null(estimate)) {
+
+    pctl <- (1 - get_alpha(opts)) * 100
+    erows <- NULL
+    for (lbl in names(estimate)) {
+      L <- build_glm_L(model, data, estimate[[lbl]])
+      es <- ESTM(matrix(L, nrow = 1), model, data, conf.level = alph)
+      row <- data.frame(stub = lbl, EST = es[1, "Estimate"],
+                        STDERR = es[1, "Std. Error"], DF = es[1, "Df"],
+                        "T" = es[1, "t value"], PROBT = es[1, "Pr(>|t|)"],
+                        stringsAsFactors = FALSE, check.names = FALSE)
+      if (hasCL) {
+        row$LCLM <- es[1, "Lower CL"]
+        row$UCLM <- es[1, "Upper CL"]
+      }
+      erows <- rbind(erows, row)
+    }
+    rownames(erows) <- NULL
+
+    efmt <- list(EST = "%.7f", STDERR = "%.7f", DF = "%d",
+                 "T" = "%.2f", PROBT = pfmt)
+    elbl <- list(stub = "Parameter", EST = "Estimate",
+                 STDERR = "Standard Error", DF = "DF", "T" = "t Value",
+                 PROBT = "Pr > |t|")
+    if (hasCL) {
+      efmt <- c(efmt, list(LCLM = "%.7f", UCLM = "%.7f"))
+      elbl <- c(elbl, list(LCLM = paste0("Lower ", pctl, "% CL"),
+                           UCLM = paste0("Upper ", pctl, "% CL")))
+    }
+    formats(erows) <- efmt
+    labels(erows) <- elbl
+    ret[["Estimates"]] <- erows
+  }
+
+  # Random effects: the Type III expected mean squares table, via sasLM::EMS.
+  # SAS RANDOM prints, for each source, the expected mean square as a linear
+  # combination of the variance components.
+  if (!is.null(random)) {
+
+    ems <- EMS(model, data, Type = 3)
+    src <- rownames(ems)
+    qcol <- colnames(ems)
+
+    # Build the SAS-style expected mean square expression for each source.
+    exprs <- character(length(src))
+    for (i in seq_along(src)) {
+      terms_i <- c("Var(Error)")
+      for (j in seq_along(qcol)) {
+        co <- ems[i, j]
+        if (!is.na(co) && co != 0) {
+          comp <- qcol[j]
+          if (comp %in% random) {
+            # Random effect: variance component with its coefficient.
+            cf <- if (isTRUE(all.equal(co, 1))) "" else paste0(round(co, 4), " ")
+            terms_i[length(terms_i) + 1] <- paste0(cf, "Var(", comp, ")")
+          } else {
+            # Fixed effect: SAS writes a bare quadratic form, no coefficient.
+            terms_i[length(terms_i) + 1] <- paste0("Q(", comp, ")")
+          }
+        }
+      }
+      exprs[i] <- paste(terms_i, collapse = " + ")
+    }
+
+    emsdf <- data.frame(stub = src, EMS = exprs, stringsAsFactors = FALSE)
+    labels(emsdf) <- list(stub = "Source",
+                          EMS = "Type III Expected Mean Square")
+    ret[["RandomEffects"]] <- emsdf
+  }
+
   return(ret)
 }
 
@@ -734,7 +913,10 @@ gen_report_glm <- function(data,
                            view = TRUE,
                            titles = NULL,
                            weight = NULL,
-                           lsmeans = NULL) {
+                           lsmeans = NULL,
+                           contrast = NULL,
+                           estimate = NULL,
+                           random = NULL) {
 
   spcs <- get_output_specs_glm(model, class = class, opts = opts,
                                output = output, report = TRUE)
@@ -788,7 +970,9 @@ gen_report_glm <- function(data,
 
       byres[[bynm]] <- get_glm_report(dt, vnm, outp$formula, class = class,
                                       opts = opts, weight = weight,
-                                      stats = stats, lsmeans = lsmeans)
+                                      stats = stats, lsmeans = lsmeans,
+                                      contrast = contrast, estimate = estimate,
+                                      random = random)
 
       # Assign titles
       ttls <- c()
@@ -871,6 +1055,18 @@ gen_report_glm <- function(data,
 
     for (lnm in nmsret[startsWith(nmsret, "LSMeans.")])
       names(ret[[lnm]]) <- sub("stub", "LEVEL", names(ret[[lnm]]), fixed = TRUE)
+
+    if ("Contrasts" %in% nmsret)
+      names(ret$Contrasts) <- sub("stub", "CONTRAST", names(ret$Contrasts),
+                                  fixed = TRUE)
+
+    if ("Estimates" %in% nmsret)
+      names(ret$Estimates) <- sub("stub", "PARM", names(ret$Estimates),
+                                  fixed = TRUE)
+
+    if ("RandomEffects" %in% nmsret)
+      names(ret$RandomEffects) <- sub("stub", "SOURCE", names(ret$RandomEffects),
+                                      fixed = TRUE)
   }
 
   return(ret)
