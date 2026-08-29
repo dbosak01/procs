@@ -384,4 +384,4 @@ res10 <- proc_reg(cls, Weight ~ Height,
 <img src="../man/images/reg7d.png" alt="Proc reg plots 4"/>
 
 
-Next: [Data Manipulation](procs-dm.html)
+Next: [Procs-glm](procs-glm.html)

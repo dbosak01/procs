@@ -8,6 +8,7 @@ articles:
   - procs-means
   - procs-ttest
   - procs-reg
+  - procs-glm
   - procs-dm
   - procs-example1
   - procs-example2
