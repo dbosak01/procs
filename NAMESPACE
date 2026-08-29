@@ -2,6 +2,7 @@
 
 export(freqplot)
 export(proc_freq)
+export(proc_glm)
 export(proc_means)
 export(proc_print)
 export(proc_reg)

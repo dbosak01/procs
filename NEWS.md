@@ -4,6 +4,7 @@
 * Added "varnames" option to `proc_freq()`.
 * Added "rename", "keep and "drop" parameters to `proc_freq()`.
 * Added "rename", "keep and "drop" parameters to `proc_means()`.
+* Added `proc_glm()` function.
 
 # procs 1.0.9
 
