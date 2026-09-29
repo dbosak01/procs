@@ -1650,3 +1650,83 @@ force_width <- function(str, wdth) {
 
 
 
+
+
+
+
+# The SAS ZETA= option: the tolerance used when checking whether a contrast or
+# estimate is estimable.  Matches the default of sasLM's estmb().
+#' @noRd
+get_zeta <- function(opts) {
+
+  ret <- 1e-8
+
+  if (!is.null(opts)) {
+    nms <- tolower(names(opts))
+
+    if ("zeta" %in% nms) {
+
+      ret <- opts[["zeta"]]
+
+      if (!is.numeric(ret))
+        ret <- as.numeric(ret)
+    }
+  }
+
+  return(ret)
+}
+
+
+# The SAS SINGULAR= option: the tolerance used when checking a design matrix
+# column for a linear dependency on the columns before it.
+#' @noRd
+get_singular <- function(opts) {
+
+  ret <- 1e-8
+
+  if (!is.null(opts)) {
+    nms <- tolower(names(opts))
+
+    if ("singular" %in% nms) {
+
+      ret <- opts[["singular"]]
+
+      if (!is.numeric(ret))
+        ret <- as.numeric(ret)
+    }
+  }
+
+  return(ret)
+}
+
+
+# Turn a labeled numeric matrix into the stub + columns data frame shape the
+# report functions expect.  Used for the SAS matrix displays (X'X, its inverse,
+# and the estimable function tables), which have no natural stub column of
+# their own: the row names are the stub.
+#' @import fmtr
+#' @noRd
+matrix_table <- function(mat, stub_label = "Parameter") {
+
+  rn <- rownames(mat)
+
+  if (is.null(rn))
+    rn <- as.character(seq_len(nrow(mat)))
+
+  ret <- data.frame(stub = rn, stringsAsFactors = FALSE)
+  ret <- cbind(ret, as.data.frame(unname(unclass(mat))))
+
+  names(ret) <- c("stub", colnames(mat))
+  rownames(ret) <- NULL
+
+  lbls <- list(stub = stub_label)
+  fmts <- list()
+
+  for (nm in colnames(mat))
+    fmts[[nm]] <- "%.6f"
+
+  labels(ret) <- lbls
+  formats(ret) <- fmts
+
+  return(ret)
+}
