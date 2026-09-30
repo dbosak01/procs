@@ -275,6 +275,29 @@
 #' @param where An expression to filter the rows before the statistics are
 #' calculated. Use the \code{\link[base]{expression}} function to define
 #' the filter.
+#' @param rename A named vector of variables to rename on the output
+#' dataset(s), where the name is the existing variable name and the value is
+#' the desired new name. If there are multiple output datasets, you may supply one
+#' rename vector for all datasets, or a list of vectors, one for each dataset.
+#' If using a list of vectors, they may either be named or unnamed. If named,
+#' names should match the output dataset names. The rename vector will only apply to
+#' the output dataset(s), not the interactive report or report
+#' datasets. The rename operation is
+#' performed before the \code{keep} and \code{drop} operations, so the
+#' \code{keep} and \code{drop} vectors should reference the new variable names.
+#' @param keep A vector of variables to keep on the output dataset(s). If there
+#' are multiple output datasets, you may supply one keep vector for all datasets, or
+#' a list of vectors, one for each dataset. If using a list of vectors, they
+#' may either be named or unnamed.  If named, names should match the output dataset names.
+#' The keep vector will only apply to the output dataset(s), not
+#' the interactive report or report datasets.
+#' @param drop A vector of variables to drop from the output dataset(s). If there
+#' are multiple output datasets, you may supply one drop vector for all datasets, or
+#' a list of vectors, one for each dataset. If using a list of vectors, they
+#' may either be named or unnamed.  If named, names should match the output dataset names.
+#' The drop vector will only apply to the output dataset(s), not
+#' the interactive report or report datasets.
+#' If both \code{keep} and \code{drop} are supplied, \code{keep} is applied first.
 #' @return Normally, the requested summary statistics are shown interactively
 #' in the viewer, and output results are returned as a data frame.
 #' If the request produces multiple data frames, they will be returned in a list.
@@ -368,7 +391,10 @@ proc_means <- function(data,
                        weight = NULL,
                        options = NULL,
                        titles = NULL,
-                       where = NULL
+                       where = NULL,
+                       rename = NULL,
+                       keep = NULL,
+                       drop = NULL
 ) {
 
   # SAS seems to always ignore these
@@ -542,7 +568,10 @@ proc_means <- function(data,
                             freq = freq,
                             weight = weight,
                             output = outreq,
-                            opts = options
+                            opts = options,
+                            rename = rename,
+                            keep = keep,
+                            drop = drop
     )
   }
 
@@ -1558,7 +1587,10 @@ gen_output_means <- function(data,
                              freq = NULL,
                              weight = NULL,
                              output = NULL,
-                             opts = NULL) {
+                             opts = NULL,
+                             rename = NULL,
+                             keep = NULL,
+                             drop = NULL) {
 
   res <- list()
   if (length(output) > 0) {
@@ -1706,6 +1738,22 @@ gen_output_means <- function(data,
 
       # Reset rownames
       rownames(tmpres) <- NULL
+
+      # Select the rename/keep/drop vector that aligns with this output dataset
+      nm <- nms[i]
+      tidx <- match(nm, names(output))
+      trename <- get_table_vector(rename, nm, tidx)
+      tkeep <- get_table_vector(keep, nm, tidx)
+      tdrop <- get_table_vector(drop, nm, tidx)
+
+      # Perform rename operation
+      tmpres <- rename_data(tmpres, trename)
+
+      # Perform keep operation
+      tmpres <- keep_data(tmpres, tkeep)
+
+      # Perform drop operation
+      tmpres <- drop_data(tmpres, tdrop)
 
       # Cast to tibble if incoming data was a tibble
       if ("tbl_df" %in% class(data)) {

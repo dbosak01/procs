@@ -1,7 +1,7 @@
 Package: procs
 Type: Package
 Title: Recreates Some 'SAS®' Procedures in 'R'
-Version: 1.0.9
+Version: 1.1.0
 Authors@R: c(
     person(given = "David",
            family = "Bosak",
@@ -62,5 +62,5 @@ Imports: utils,
          withr
 VignetteBuilder: knitr
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.3.3
 Config/testthat/edition: 3
+Config/roxygen2/version: 8.0.0

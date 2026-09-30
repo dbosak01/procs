@@ -3049,3 +3049,392 @@ test_that("freq83: where expression works as expected.", {
 
 })
 
+
+test_that("freq84: outpct option adds PCT_ROW and PCT_COL to two-way output.", {
+
+  res <- proc_freq(dat, tables = "Eyes * Hair",
+                   weight = "Count",
+                   options = "outpct")
+
+  # PCT_ROW and PCT_COL columns should be present
+  expect_true("PCT_ROW" %in% names(res))
+  expect_true("PCT_COL" %in% names(res))
+
+  # Row percents within each Eyes category should sum to 100
+  row_sums <- aggregate(res$PCT_ROW, list(res$CAT1), FUN = sum)
+  expect_true(all(abs(row_sums$x - 100) < 1e-8))
+
+  # Col percents within each Hair category should sum to 100
+  col_sums <- aggregate(res$PCT_COL, list(res$CAT2), FUN = sum)
+  expect_true(all(abs(col_sums$x - 100) < 1e-8))
+
+})
+
+
+test_that("freq85: outpct option is silently ignored for one-way frequencies.", {
+
+  res <- proc_freq(dat, tables = "Hair",
+                   weight = "Count",
+                   options = "outpct")
+
+  # One-way output should not contain PCT_ROW or PCT_COL
+  expect_false("PCT_ROW" %in% names(res))
+  expect_false("PCT_COL" %in% names(res))
+
+})
+
+test_that("freq86: BY column label contains the by variable name.", {
+
+  # Single by variable
+  res <- proc_freq(dat, tables = "Eyes", by = "Region", weight = "Count")
+  expect_equal(attr(res$BY, "label"), "Region")
+
+  # Multiple by variables
+  spdat <- dat
+  spdat$Sex <- c(rep("M", 13), rep("F", 14))
+
+  res2 <- proc_freq(spdat, tables = "Eyes",
+                    by = c("Sex", "Region"), weight = "Count")
+  expect_equal(attr(res2$BY1, "label"), "Sex")
+  expect_equal(attr(res2$BY2, "label"), "Region")
+})
+
+
+test_that("freq87: varnames option renames CAT column for one-way.", {
+
+  res <- proc_freq(dat, tables = "Hair",
+                   weight = "Count",
+                   options = "varnames")
+
+  expect_true("Hair" %in% names(res))
+  expect_false("CAT" %in% names(res))
+})
+
+
+test_that("freq88: varnames option renames CAT1/CAT2 columns for two-way.", {
+
+  res <- proc_freq(dat, tables = "Eyes * Hair",
+                   weight = "Count",
+                   options = "varnames")
+
+  expect_true("Eyes" %in% names(res))
+  expect_true("Hair" %in% names(res))
+  expect_false("CAT1" %in% names(res))
+  expect_false("CAT2" %in% names(res))
+})
+
+
+test_that("freq89: varnames option renames BY column.", {
+
+  res <- proc_freq(dat, tables = "Eyes",
+                   by = "Region",
+                   weight = "Count",
+                   options = "varnames")
+
+  expect_true("Region" %in% names(res))
+  expect_false("BY" %in% names(res))
+  expect_true("Eyes" %in% names(res))
+  expect_false("CAT" %in% names(res))
+})
+
+
+test_that("freq90: varnames option renames multiple BY columns.", {
+
+  spdat <- dat
+  spdat$Sex <- c(rep("M", 13), rep("F", 14))
+
+  res <- proc_freq(spdat, tables = "Eyes",
+                   by = c("Sex", "Region"),
+                   weight = "Count",
+                   options = "varnames")
+
+  expect_true("Sex" %in% names(res))
+  expect_true("Region" %in% names(res))
+  expect_false("BY1" %in% names(res))
+  expect_false("BY2" %in% names(res))
+})
+
+
+test_that("freq91: without varnames option, CAT/BY names are preserved.", {
+
+  res <- proc_freq(dat, tables = "Eyes",
+                   by = "Region",
+                   weight = "Count")
+
+  expect_true("CAT" %in% names(res))
+  expect_true("BY" %in% names(res))
+  expect_false("Eyes" %in% names(res))
+  expect_false("Region" %in% names(res))
+})
+
+test_that("freq92: keep operation works as expected.", {
+
+  # One table, no by
+  res <- proc_freq(dat, tables = "Eyes",
+                   weight = "Count",
+                   keep = c("CAT", "CNT"))
+
+
+  expect_equal(names(res), c("CAT", "CNT"))
+
+  # Two tables, no by
+  res <- proc_freq(dat, tables = c("Eyes", "Hair"),
+                   weight = "Count",
+                   keep = c("CAT", "CNT"))
+
+  expect_equal(names(res[[1]]), c("CAT", "CNT"))
+  expect_equal(names(res[[2]]), c("CAT", "CNT"))
+
+
+  # One table, with by
+  res <- proc_freq(dat, tables = "Eyes",
+                   weight = "Count",
+                   by = Region,
+                   keep = c("BY", "CAT", "CNT"))
+
+
+  expect_equal(names(res), c("BY", "CAT", "CNT"))
+
+
+  # Two tables, with by
+  res <- proc_freq(dat, tables = c("Eyes", "Hair"),
+                   weight = "Count",
+                   by = Region,
+                   keep = c("BY", "CAT", "CNT"))
+
+  expect_equal(names(res[[1]]), c("BY", "CAT", "CNT"))
+  expect_equal(names(res[[2]]), c("BY", "CAT", "CNT"))
+
+  # Two-way table, no by
+  res <- proc_freq(dat, tables = "Eyes * Hair",
+                   weight = "Count",
+                   keep = c("CAT1", "CAT2", "CNT"))
+
+
+  expect_equal(names(res), c("CAT1", "CAT2", "CNT"))
+
+
+  # Two-way table, with by
+  res <- proc_freq(dat, tables = "Eyes * Hair",
+                   weight = "Count",
+                   by = Region,
+                   keep = c("BY", "CAT1", "CAT2", "CNT"))
+
+
+  expect_equal(names(res), c("BY", "CAT1", "CAT2", "CNT"))
+
+
+  # One table, with levels
+  res <- proc_freq(dat, tables = "Eyes",
+                   weight = "Count",
+                   options = nlevels,
+                   keep = c("CAT", "CNT"))
+
+
+  expect_equal(names(res$Eyes), c("CAT", "CNT"))
+
+
+  # One table, with levels and by
+  res <- proc_freq(dat, tables = "Eyes",
+                   weight = "Count",
+                   by = Region,
+                   options = nlevels,
+                   keep = c("BY", "CAT", "CNT"))
+
+
+  expect_equal(names(res$Eyes), c("BY", "CAT", "CNT"))
+
+
+  # Two tables, different keep vectors
+  res <- proc_freq(dat, tables = c("Eyes", "Hair"),
+                   weight = "Count",
+                   keep = list(Eyes = c("CAT", "CNT"),
+                               Hair = c("CAT", "N", "CNT")))
+
+})
+
+test_that("freq93: drop operation works as expected.", {
+
+  # One table, no by
+  res <- proc_freq(dat, tables = "Eyes",
+                   weight = "Count",
+                   drop = c("VAR", "N", "PCT"))
+
+
+  expect_equal(names(res), c("CAT", "CNT"))
+
+  # Two tables, no by
+  res <- proc_freq(dat, tables = c("Eyes", "Hair"),
+                   weight = "Count",
+                   drop = c("VAR", "N", "PCT"))
+
+  expect_equal(names(res[[1]]), c("CAT", "CNT"))
+  expect_equal(names(res[[2]]), c("CAT", "CNT"))
+
+
+  # One table, with by
+  res <- proc_freq(dat, tables = "Eyes",
+                   weight = "Count",
+                   by = Region,
+                   drop = c("VAR", "N", "PCT"))
+
+
+  expect_equal(names(res), c("BY", "CAT", "CNT"))
+
+
+  # Two tables, with by
+  res <- proc_freq(dat, tables = c("Eyes", "Hair"),
+                   weight = "Count",
+                   by = Region,
+                   drop = c("VAR", "N", "PCT"))
+
+  expect_equal(names(res[[1]]), c("BY", "CAT", "CNT"))
+  expect_equal(names(res[[2]]), c("BY", "CAT", "CNT"))
+
+  # Two-way table, no by
+  res <- proc_freq(dat, tables = "Eyes * Hair",
+                   weight = "Count",
+                   drop = c("VAR1", "VAR2", "N", "PCT"))
+
+
+  expect_equal(names(res), c("CAT1", "CAT2", "CNT"))
+
+
+  # Two-way table, with by
+  res <- proc_freq(dat, tables = "Eyes * Hair",
+                   weight = "Count",
+                   by = Region,
+                   drop = c("VAR1", "VAR2", "N", "PCT"))
+
+
+  expect_equal(names(res), c("BY", "CAT1", "CAT2", "CNT"))
+
+
+  # One table, with levels
+  res <- proc_freq(dat, tables = "Eyes",
+                   weight = "Count",
+                   options = nlevels,
+                   drop = c("VAR", "N", "PCT"))
+
+
+  expect_equal(names(res$Eyes), c("CAT", "CNT"))
+
+
+  # One table, with levels and by
+  res <- proc_freq(dat, tables = "Eyes",
+                   weight = "Count",
+                   by = Region,
+                   options = nlevels,
+                   drop = c("VAR", "N", "PCT"))
+
+
+  expect_equal(names(res$Eyes), c("BY", "CAT", "CNT"))
+
+
+
+
+})
+
+test_that("freq94: Two tables, different keep vectors", {
+
+
+  # Two tables, different drop vectors
+  res <- proc_freq(dat, tables = c("Eyes", "Hair"),
+                   weight = "Count",
+                   keep = list(Eyes = c("VAR", "N", "PCT"),
+                               Hair = c("VAR", "PCT")))
+
+
+  expect_equal(names(res$Eyes), c("VAR", "N", "PCT"))
+  expect_equal(names(res$Hair), c("VAR", "PCT"))
+
+})
+
+
+
+test_that("freq95: Two tables, different drop vectors", {
+
+
+  # Two tables, different drop vectors
+  res <- proc_freq(dat, tables = c("Eyes", "Hair"),
+                   weight = "Count",
+                   drop = list(Eyes = c("VAR", "N", "PCT"),
+                               Hair = c("VAR", "PCT")))
+
+
+  expect_equal(names(res$Eyes), c("CAT", "CNT"))
+  expect_equal(names(res$Hair), c("CAT", "N", "CNT"))
+
+})
+
+test_that("freq96: rename operation works as expected.", {
+
+  # One table, no by
+  res <- proc_freq(dat, tables = "Eyes",
+                   weight = "Count",
+                   rename = c(CAT = "Category", CNT = "Frequency"))
+
+
+  expect_equal(names(res), c("VAR", "Category", "N", "Frequency", "PCT"))
+
+  # Two tables, no by, single rename vector applies to both
+  res <- proc_freq(dat, tables = c("Eyes", "Hair"),
+                   weight = "Count",
+                   rename = c(CAT = "Category", CNT = "Frequency"))
+
+  expect_equal(names(res[[1]]), c("VAR", "Category", "N", "Frequency", "PCT"))
+  expect_equal(names(res[[2]]), c("VAR", "Category", "N", "Frequency", "PCT"))
+
+
+  # One table, with by
+  res <- proc_freq(dat, tables = "Eyes",
+                   weight = "Count",
+                   by = Region,
+                   rename = c(CAT = "Category"))
+
+
+  expect_equal(names(res), c("BY", "VAR", "Category", "N", "CNT", "PCT"))
+
+
+  # Two-way table, no by
+  res <- proc_freq(dat, tables = "Eyes * Hair",
+                   weight = "Count",
+                   rename = c(CAT1 = "Category1", CAT2 = "Category2"))
+
+
+  expect_equal(names(res), c("VAR1", "VAR2", "Category1", "Category2", "N", "CNT", "PCT"))
+
+
+  # Two tables, different rename vectors
+  res <- proc_freq(dat, tables = c("Eyes", "Hair"),
+                   weight = "Count",
+                   rename = list(Eyes = c(CAT = "EyeColor"),
+                                 Hair = c(CAT = "HairColor")))
+
+  expect_equal(names(res$Eyes), c("VAR", "EyeColor", "N", "CNT", "PCT"))
+  expect_equal(names(res$Hair), c("VAR", "HairColor", "N", "CNT", "PCT"))
+
+
+  # Rename applied before keep, so keep should reference new names
+  res <- proc_freq(dat, tables = c("Eyes", "Hair"),
+                   weight = "Count",
+                   rename = list(Eyes = c(CAT = "EyeColor"),
+                                 Hair = c(CAT = "HairColor")),
+                   keep = list(Eyes = c("EyeColor", "CNT"),
+                               Hair = c("HairColor", "CNT")))
+
+  expect_equal(names(res$Eyes), c("EyeColor", "CNT"))
+  expect_equal(names(res$Hair), c("HairColor", "CNT"))
+
+
+  # Rename applied before drop, so drop should reference new names
+  res <- proc_freq(dat, tables = "Eyes",
+                   weight = "Count",
+                   rename = c(CAT = "Category"),
+                   drop = c("VAR", "N", "PCT"))
+
+  expect_equal(names(res), c("Category", "CNT"))
+
+})
+
+

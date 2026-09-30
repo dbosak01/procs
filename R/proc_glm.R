@@ -139,7 +139,7 @@
 #' datasets are requested they are returned as a list.
 #' @import fmtr
 #' @import tibble
-#' @seealso [proc_reg()], [proc_anova()]
+#' @seealso [proc_reg()]
 #' @export
 proc_glm <- function(data,
                      model,
