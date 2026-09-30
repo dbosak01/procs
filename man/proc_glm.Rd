@@ -9,6 +9,7 @@ proc_glm(
   data,
   model,
   class = NULL,
+  order = NULL,
   by = NULL,
   stats = NULL,
   output = NULL,
@@ -36,16 +37,63 @@ To pass multiple models, use a list (R syntax) or a vector of strings
 fitting the model.  Pass quoted, or unquoted using the
 \code{\link[common]{v}} function.}
 
+\item{order}{Controls the sort order of the class variable levels.  Valid
+values are "internal", "formatted", "data", and "freq", matching the
+\code{order} parameter on \code{\link{proc_freq}} and \code{\link{proc_ttest}}.
+The default "internal" uses the natural order of the values: character values
+sort alphabetically, numeric values sort by value, and an existing factor
+keeps its level order.  "formatted" applies the variable's format and uses
+the order defined by the format.  "data" uses order of appearance, and "freq"
+sorts by descending frequency.  Pass one keyword per \code{class} variable, or
+a single keyword to apply to all of them.
+
+Note that for \code{proc_glm} the level order is not merely cosmetic.  The
+last level of a class variable is the reference level, so \code{order}
+changes the Type III and "solution" results.  It also determines how
+\code{contrast} and \code{estimate} coefficients are mapped onto levels: the
+coefficients are read in level order, so the same coefficient vector means
+different things under different \code{order} values.
+
+The "formatted" keyword goes further still.  If the format maps several
+values onto one label, those values become a single level, and the model
+loses the degrees of freedom that separated them.  This matches the SAS
+practice of using a format to group a class variable, but it means
+\code{order = "formatted"} can change the model and not just its
+presentation.  Only a user-defined format created with
+\code{\link[fmtr]{value}} carries a level order, so that is the only kind of
+format "formatted" accepts.}
+
 \item{by}{An optional by group.  If specified, the input data will be subset
 on the by variable(s) prior to performing the analysis.}
 
-\item{stats}{Optional statistics keywords.  Valid values are "ss1", "ss2",
-"ss3", "solution", "clparm", "p", "est", and "clb".  The "solution" keyword
-adds a parameter estimates table to the interactive report ("est" is an
-accepted alias).  The "clparm" keyword adds confidence limits for the
-estimates, using the alpha value from the \code{options} parameter ("clb" is
-an accepted alias).  The "p" keyword adds predicted values and residuals to
-the interactive report.}
+\item{stats}{Optional statistics keywords, corresponding to the options on
+the "model" statement in SAS.  Valid values are "ss1", "ss2", "ss3",
+"solution", "est", "clparm", "p", "clm", "cli", "noint", "xpx", "inverse",
+"e1", "e2", and "e3".
+\itemize{
+\item{\strong{solution}: Adds a parameter estimates table to the interactive
+report.  "est" is an accepted alias.}
+\item{\strong{clparm}: Adds confidence limits for the parameter estimates,
+using the alpha value from the \code{options} parameter.}
+\item{\strong{p}: Adds predicted values and residuals to the interactive
+report.}
+\item{\strong{clm}: Adds the standard error and confidence limits of the
+mean predicted value to the predicted values table.  Implies "p".}
+\item{\strong{cli}: Adds confidence limits for an individual predicted value
+to the predicted values table.  These are wider than the "clm" limits
+because they include the error variance.  Implies "p".}
+\item{\strong{noint}: Fits the model without an intercept.  Every downstream
+statistic reflects this, and the total sum of squares is no longer corrected
+for the mean.}
+\item{\strong{xpx}: Adds the augmented X'X crossproducts matrix, which
+carries the dependent variable as an extra row and column.}
+\item{\strong{inverse}: Adds the generalized inverse of the augmented X'X
+matrix.  Its bottom right cell is the error sum of squares.}
+\item{\strong{e1}, \strong{e2}, \strong{e3}: Add the Type I, Type II and
+Type III estimable function tables.}
+\item{\strong{ss1}, \strong{ss2}, \strong{ss3}: Select which sums of squares
+to produce.  The default is Type I and Type III, as in SAS.}
+}}
 
 \item{output}{Whether or not to return datasets from the function.  Valid
 values are "out", "none", and "report", plus the data shaping keywords
@@ -60,15 +108,29 @@ table on the interactive report.  The effect(s) must also appear on the
 
 \item{contrast}{A named list of contrast specifications.  Each element name
 is the contrast label, and each value is itself a named list mapping a model
-effect to a vector of coefficients over that effect's levels, in level order.
-For example, \code{contrast = list("F vs M" = list(Sex = c(1, -1)))} mirrors
-the SAS statement \code{contrast 'F vs M' Sex 1 -1}.  Each contrast produces
-an F-test row on the interactive report.}
+effect to its coefficients over that effect's levels, in level order.  For
+example, \code{contrast = list("F vs M" = list(Sex = c(1, -1)))} mirrors the
+SAS statement \code{contrast 'F vs M' Sex 1 -1}.  Each contrast produces an
+F-test row on the interactive report.
+
+Give an effect a matrix instead of a vector to reproduce the comma syntax of
+a SAS \code{CONTRAST} statement: each row of the matrix is one row of the
+contrast, and the result is a single test whose degrees of freedom equal the
+number of linearly independent rows.  So
+\code{list("Any diff" = list(AgeGroup = rbind(c(-1, 0, 1), c(0, -1, 1))))}
+is the SAS statement
+\code{contrast 'Any diff' AgeGroup -1 0 1, AgeGroup 0 -1 1;}.
+
+Interactions may be spelled either way: the SAS operator \code{"a*b"} is
+accepted and normalized to the R operator \code{"a:b"}.  Any effect not named
+gets a coefficient of zero, as does the intercept.  A contrast that is not
+estimable is dropped with a warning rather than reported.}
 
 \item{estimate}{A named list of estimate specifications, using the same
 structure as the \code{contrast} parameter.  Each estimate produces a row on
 the interactive report with the estimate, standard error, t value, p value,
-and confidence limits.}
+and confidence limits.  Unlike \code{contrast}, \code{estimate} accepts only
+single-row specifications, since it estimates one linear combination.}
 
 \item{random}{The name of one or more class variables to treat as random
 effects.  Produces a table of Type III expected mean squares on the
@@ -76,9 +138,13 @@ interactive report.  The effect(s) must also appear on the \code{class}
 parameter.}
 
 \item{options}{A vector of optional keywords.  Valid values are "alpha =",
-"noprint", "ss1", "ss2", "ss3", and "outstat".  The "outstat" option requests
-an output dataset of the model sums of squares.  This is the default output
-dataset, so the option does not normally need to be passed.}
+"noprint", "ss1", "ss2", "ss3", "outstat", "singular =", and "zeta =".  The
+"outstat" option requests an output dataset of the model sums of squares.
+This is the default output dataset, so the option does not normally need to
+be passed.  The "singular =" option sets the tolerance for detecting a linear
+dependency among the design matrix columns, and "zeta =" sets the tolerance
+of the estimability check applied to each \code{contrast} and
+\code{estimate}.  Both default to 1e-8.}
 
 \item{titles}{A vector of one or more titles to use for the report output.}
 
@@ -110,5 +176,5 @@ RStudio, also produces an interactive report.  Statistical output is
 designed to match SAS.
 }
 \seealso{
-\code{\link[=proc_reg]{proc_reg()}}
+\code{\link[=proc_reg]{proc_reg()}}, \code{\link[=proc_anova]{proc_anova()}}
 }
