@@ -176,5 +176,5 @@ RStudio, also produces an interactive report.  Statistical output is
 designed to match SAS.
 }
 \seealso{
-\code{\link[=proc_reg]{proc_reg()}}, \code{\link[=proc_anova]{proc_anova()}}
+\code{\link[=proc_reg]{proc_reg()}}
 }

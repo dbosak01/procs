@@ -121,6 +121,7 @@ additional customization of the results.</p>
 <span>  <span class="va">data</span>,</span>
 <span>  <span class="va">model</span>,</span>
 <span>  class <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  order <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  by <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  stats <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  output <span class="op">=</span> <span class="cn">NULL</span>,</span>
@@ -158,19 +159,64 @@ fitting the model.  Pass quoted, or unquoted using the
 <code><a href="https://common.r-sassy.org/reference/v.html" class="external-link">v</a></code> function.</p></dd>
 
 
+<dt id="arg-order">order<a class="anchor" aria-label="anchor" href="#arg-order"></a></dt>
+<dd><p>Controls the sort order of the class variable levels.  Valid
+values are "internal", "formatted", "data", and "freq", matching the
+<code>order</code> parameter on <code><a href="proc_freq.html">proc_freq</a></code> and <code><a href="proc_ttest.html">proc_ttest</a></code>.
+The default "internal" uses the natural order of the values: character values
+sort alphabetically, numeric values sort by value, and an existing factor
+keeps its level order.  "formatted" applies the variable's format and uses
+the order defined by the format.  "data" uses order of appearance, and "freq"
+sorts by descending frequency.  Pass one keyword per <code>class</code> variable, or
+a single keyword to apply to all of them.</p>
+<p>Note that for <code>proc_glm</code> the level order is not merely cosmetic.  The
+last level of a class variable is the reference level, so <code>order</code>
+changes the Type III and "solution" results.  It also determines how
+<code>contrast</code> and <code>estimate</code> coefficients are mapped onto levels: the
+coefficients are read in level order, so the same coefficient vector means
+different things under different <code>order</code> values.</p>
+<p>The "formatted" keyword goes further still.  If the format maps several
+values onto one label, those values become a single level, and the model
+loses the degrees of freedom that separated them.  This matches the SAS
+practice of using a format to group a class variable, but it means
+<code>order = "formatted"</code> can change the model and not just its
+presentation.  Only a user-defined format created with
+<code><a href="https://fmtr.r-sassy.org/reference/value.html" class="external-link">value</a></code> carries a level order, so that is the only kind of
+format "formatted" accepts.</p></dd>
+
+
 <dt id="arg-by">by<a class="anchor" aria-label="anchor" href="#arg-by"></a></dt>
 <dd><p>An optional by group.  If specified, the input data will be subset
 on the by variable(s) prior to performing the analysis.</p></dd>
 
 
 <dt id="arg-stats">stats<a class="anchor" aria-label="anchor" href="#arg-stats"></a></dt>
-<dd><p>Optional statistics keywords.  Valid values are "ss1", "ss2",
-"ss3", "solution", "clparm", "p", "est", and "clb".  The "solution" keyword
-adds a parameter estimates table to the interactive report ("est" is an
-accepted alias).  The "clparm" keyword adds confidence limits for the
-estimates, using the alpha value from the <code>options</code> parameter ("clb" is
-an accepted alias).  The "p" keyword adds predicted values and residuals to
-the interactive report.</p></dd>
+<dd><p>Optional statistics keywords, corresponding to the options on
+the "model" statement in SAS.  Valid values are "ss1", "ss2", "ss3",
+"solution", "est", "clparm", "p", "clm", "cli", "noint", "xpx", "inverse",
+"e1", "e2", and "e3".</p><ul><li><p><strong>solution</strong>: Adds a parameter estimates table to the interactive
+report.  "est" is an accepted alias.</p></li>
+<li><p><strong>clparm</strong>: Adds confidence limits for the parameter estimates,
+using the alpha value from the <code>options</code> parameter.</p></li>
+<li><p><strong>p</strong>: Adds predicted values and residuals to the interactive
+report.</p></li>
+<li><p><strong>clm</strong>: Adds the standard error and confidence limits of the
+mean predicted value to the predicted values table.  Implies "p".</p></li>
+<li><p><strong>cli</strong>: Adds confidence limits for an individual predicted value
+to the predicted values table.  These are wider than the "clm" limits
+because they include the error variance.  Implies "p".</p></li>
+<li><p><strong>noint</strong>: Fits the model without an intercept.  Every downstream
+statistic reflects this, and the total sum of squares is no longer corrected
+for the mean.</p></li>
+<li><p><strong>xpx</strong>: Adds the augmented X'X crossproducts matrix, which
+carries the dependent variable as an extra row and column.</p></li>
+<li><p><strong>inverse</strong>: Adds the generalized inverse of the augmented X'X
+matrix.  Its bottom right cell is the error sum of squares.</p></li>
+<li><p><strong>e1</strong>, <strong>e2</strong>, <strong>e3</strong>: Add the Type I, Type II and
+Type III estimable function tables.</p></li>
+<li><p><strong>ss1</strong>, <strong>ss2</strong>, <strong>ss3</strong>: Select which sums of squares
+to produce.  The default is Type I and Type III, as in SAS.</p></li>
+</ul></dd>
 
 
 <dt id="arg-output">output<a class="anchor" aria-label="anchor" href="#arg-output"></a></dt>
@@ -193,17 +239,29 @@ table on the interactive report.  The effect(s) must also appear on the
 <dt id="arg-contrast">contrast<a class="anchor" aria-label="anchor" href="#arg-contrast"></a></dt>
 <dd><p>A named list of contrast specifications.  Each element name
 is the contrast label, and each value is itself a named list mapping a model
-effect to a vector of coefficients over that effect's levels, in level order.
-For example, <code>contrast = list("F vs M" = list(Sex = c(1, -1)))</code> mirrors
-the SAS statement <code>contrast 'F vs M' Sex 1 -1</code>.  Each contrast produces
-an F-test row on the interactive report.</p></dd>
+effect to its coefficients over that effect's levels, in level order.  For
+example, <code>contrast = list("F vs M" = list(Sex = c(1, -1)))</code> mirrors the
+SAS statement <code>contrast 'F vs M' Sex 1 -1</code>.  Each contrast produces an
+F-test row on the interactive report.</p>
+<p>Give an effect a matrix instead of a vector to reproduce the comma syntax of
+a SAS <code>CONTRAST</code> statement: each row of the matrix is one row of the
+contrast, and the result is a single test whose degrees of freedom equal the
+number of linearly independent rows.  So
+<code>list("Any diff" = list(AgeGroup = rbind(c(-1, 0, 1), c(0, -1, 1))))</code>
+is the SAS statement
+<code>contrast 'Any diff' AgeGroup -1 0 1, AgeGroup 0 -1 1;</code>.</p>
+<p>Interactions may be spelled either way: the SAS operator <code>"a*b"</code> is
+accepted and normalized to the R operator <code>"a:b"</code>.  Any effect not named
+gets a coefficient of zero, as does the intercept.  A contrast that is not
+estimable is dropped with a warning rather than reported.</p></dd>
 
 
 <dt id="arg-estimate">estimate<a class="anchor" aria-label="anchor" href="#arg-estimate"></a></dt>
 <dd><p>A named list of estimate specifications, using the same
 structure as the <code>contrast</code> parameter.  Each estimate produces a row on
 the interactive report with the estimate, standard error, t value, p value,
-and confidence limits.</p></dd>
+and confidence limits.  Unlike <code>contrast</code>, <code>estimate</code> accepts only
+single-row specifications, since it estimates one linear combination.</p></dd>
 
 
 <dt id="arg-random">random<a class="anchor" aria-label="anchor" href="#arg-random"></a></dt>
@@ -215,9 +273,13 @@ parameter.</p></dd>
 
 <dt id="arg-options">options<a class="anchor" aria-label="anchor" href="#arg-options"></a></dt>
 <dd><p>A vector of optional keywords.  Valid values are "alpha =",
-"noprint", "ss1", "ss2", "ss3", and "outstat".  The "outstat" option requests
-an output dataset of the model sums of squares.  This is the default output
-dataset, so the option does not normally need to be passed.</p></dd>
+"noprint", "ss1", "ss2", "ss3", "outstat", "singular =", and "zeta =".  The
+"outstat" option requests an output dataset of the model sums of squares.
+This is the default output dataset, so the option does not normally need to
+be passed.  The "singular =" option sets the tolerance for detecting a linear
+dependency among the design matrix columns, and "zeta =" sets the tolerance
+of the estimability check applied to each <code>contrast</code> and
+<code>estimate</code>.  Both default to 1e-8.</p></dd>
 
 
 <dt id="arg-titles">titles<a class="anchor" aria-label="anchor" href="#arg-titles"></a></dt>
