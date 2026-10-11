@@ -791,7 +791,7 @@ get_glm_report <- function(data, var, model, class = NULL, opts = NULL,
 
   # DEPMEAN uses 4 decimals to match SAS PROC GLM's dependent mean display
   # (PROC REG uses 5, so the format is intentionally not shared with reg_fc).
-  glm_fc <- fcat(DF = "%d", SUMSQ = "%.5f", MEANSQ = "%.5f", FVAL = "%.2f",
+  glm_fc <- fcat(DF = "%d", SUMSQ = "%.7f", MEANSQ = "%.7f", FVAL = "%.2f",
                  PROBF = pfmt, RMSE = "%.5f", DEPMEAN = "%.4f", COEFVAR = "%.5f",
                  RSQ = "%.6f", ADJRSQ = "%.6f", log = FALSE)
 
