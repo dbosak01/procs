@@ -193,8 +193,7 @@ on the by variable(s) prior to performing the analysis.</p></dd>
 <dt id="arg-stats">stats<a class="anchor" aria-label="anchor" href="#arg-stats"></a></dt>
 <dd><p>Optional statistics keywords, corresponding to the options on
 the "model" statement in SAS.  Valid values are "ss1", "ss2", "ss3",
-"solution", "est", "clparm", "p", "clm", "cli", "noint", "xpx", "inverse",
-"e1", "e2", and "e3".</p><ul><li><p><strong>solution</strong>: Adds a parameter estimates table to the interactive
+"solution", "est", "clparm", "p", "clm", "cli", "noint", "xpx", and "inverse".</p><ul><li><p><strong>solution</strong>: Adds a parameter estimates table to the interactive
 report.  "est" is an accepted alias.</p></li>
 <li><p><strong>clparm</strong>: Adds confidence limits for the parameter estimates,
 using the alpha value from the <code>options</code> parameter.</p></li>
@@ -212,8 +211,6 @@ for the mean.</p></li>
 carries the dependent variable as an extra row and column.</p></li>
 <li><p><strong>inverse</strong>: Adds the generalized inverse of the augmented X'X
 matrix.  Its bottom right cell is the error sum of squares.</p></li>
-<li><p><strong>e1</strong>, <strong>e2</strong>, <strong>e3</strong>: Add the Type I, Type II and
-Type III estimable function tables.</p></li>
 <li><p><strong>ss1</strong>, <strong>ss2</strong>, <strong>ss3</strong>: Select which sums of squares
 to produce.  The default is Type I and Type III, as in SAS.</p></li>
 </ul></dd>

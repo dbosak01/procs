@@ -218,6 +218,9 @@ output_report <- function(lst,
 
         }
 
+      } else if ("character" %in% class(dt)) {
+        rpt <- add_content(rpt, create_text(dt, align = "center"),
+                           align = 'left', page_break = brk)
       }
 
     } # Tables
@@ -1575,6 +1578,30 @@ rename_data <- function(data, rename = NULL) {
 }
 
 
+fmt_col <- function(vct, len) {
+
+  v1 <- vct[!is.na(vct)]
+
+  vl <- as.character(v1)
+
+  pos <- regexpr(".", vl, fixed = TRUE)
+
+  ics <- substring(vl, 1, pos)
+
+  flen <- max(nchar(ics))
+
+  if (flen < len) {
+    ret <- paste0("%.", len - flen, "f")
+  } else {
+    ret <- paste0("best", len)
+  }
+
+
+  return(ret)
+
+}
+
+
 # Binning Experiments -----------------------------------------------------
 
 
@@ -2038,7 +2065,7 @@ matrix_table <- function(mat, stub_label = "Parameter") {
   fmts <- list()
 
   for (nm in colnames(mat))
-    fmts[[nm]] <- "%.6f"
+    fmts[[nm]] <- "best12"
 
   labels(ret) <- lbls
   formats(ret) <- fmts

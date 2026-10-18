@@ -68,8 +68,7 @@ on the by variable(s) prior to performing the analysis.}
 
 \item{stats}{Optional statistics keywords, corresponding to the options on
 the "model" statement in SAS.  Valid values are "ss1", "ss2", "ss3",
-"solution", "est", "clparm", "p", "clm", "cli", "noint", "xpx", "inverse",
-"e1", "e2", and "e3".
+"solution", "est", "clparm", "p", "clm", "cli", "noint", "xpx", and "inverse".
 \itemize{
 \item{\strong{solution}: Adds a parameter estimates table to the interactive
 report.  "est" is an accepted alias.}
@@ -89,8 +88,6 @@ for the mean.}
 carries the dependent variable as an extra row and column.}
 \item{\strong{inverse}: Adds the generalized inverse of the augmented X'X
 matrix.  Its bottom right cell is the error sum of squares.}
-\item{\strong{e1}, \strong{e2}, \strong{e3}: Add the Type I, Type II and
-Type III estimable function tables.}
 \item{\strong{ss1}, \strong{ss2}, \strong{ss3}: Select which sums of squares
 to produce.  The default is Type I and Type III, as in SAS.}
 }}
