@@ -2203,7 +2203,7 @@ render_boxplot2 <- function(dat, var, plt, class, res) {
            col = "grey20",
            lwd = 1.6,
            cex = 1.25)
-
+    # browser()
     # Add labels
     if (plt$label) {
       if (is.null(plt$id)) {
@@ -3198,11 +3198,9 @@ boxplot_stats1 <- function(dt1, freq = NULL) {
   # Calculate outlier limits
   lm1 <- c(q1[2] - iqr1, q1[4] + iqr1)
 
-  # Remove NAs
-  dt1 <- dt1[!is.na(dt1)]
-
   # Determine if there are outliers
   ol1 <- dt1 <= lm1[1] | dt1 >= lm1[2]
+  ol1 <- ifelse(is.na(ol1), FALSE, ol1)
   out1 <- dt1[ol1]
 
   # Change min and max to remove outliers
@@ -3238,6 +3236,7 @@ boxplot_stats1 <- function(dt1, freq = NULL) {
 # everything manually.
 #' @noRd
 boxplot_stats2 <- function(dt1, dt2, nms1, nms2, fvls, freq1, freq2) {
+  # browser()
 
   if (!is.null(freq1)) {
     f1 <- floor(freq1)
@@ -3263,14 +3262,13 @@ boxplot_stats2 <- function(dt1, dt2, nms1, nms2, fvls, freq1, freq2) {
   lm1 <- c(q1[2] - iqr1, q1[4] + iqr1)
   lm2 <- c(q2[2] - iqr2, q2[4] + iqr2)
 
-  # Remove NAs
-  dt1 <- dt1[!is.na(dt1)]
-  dt2 <- dt2[!is.na(dt2)]
 
   # Determine if there are outliers
   ol1 <- dt1 <= lm1[1] | dt1 >= lm1[2]
+  ol1 <- ifelse(is.na(ol1), FALSE, ol1)
   out1 <- dt1[ol1]
   ol2 <- dt2 <= lm2[1] | dt2 >= lm2[2]
+  ol2 <- ifelse(is.na(ol2), FALSE, ol2)
   out2 <- dt2[ol2]
 
   # Change min and max to remove outliers

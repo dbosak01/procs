@@ -2413,3 +2413,104 @@ test_that("means75: freq with weight together works.", {
 
 
 
+
+
+test_that("means76: keep operation works as expected.", {
+
+  # Default output, no by/class
+  res <- proc_means(iris,
+                    var = c("Sepal.Length", "Sepal.Width"),
+                    keep = c("VAR", "N", "MEAN"))
+
+  expect_equal(names(res), c("VAR", "N", "MEAN"))
+  expect_equal(nrow(res), 2)
+
+  # With by
+  res <- proc_means(iris,
+                    var = "Sepal.Length",
+                    by = Species,
+                    keep = c("BY", "VAR", "N", "MEAN"))
+
+  expect_equal(names(res), c("BY", "VAR", "N", "MEAN"))
+
+  # With class
+  res <- proc_means(iris,
+                    var = "Sepal.Length",
+                    class = Species,
+                    options = v(notype, nofreq),
+                    keep = c("CLASS", "VAR", "N", "MEAN"))
+
+  expect_equal(names(res), c("CLASS", "VAR", "N", "MEAN"))
+
+})
+
+
+test_that("means77: drop operation works as expected.", {
+
+  # Default output, drop TYPE and FREQ
+  res <- proc_means(iris,
+                    var = c("Sepal.Length", "Sepal.Width"),
+                    drop = c("TYPE", "FREQ"))
+
+  expect_equal(names(res), c("VAR", "N", "MEAN", "STD", "MIN", "MAX"))
+  expect_equal(nrow(res), 2)
+
+  # With by, drop STD and MIN
+  res <- proc_means(iris,
+                    var = "Sepal.Length",
+                    by = Species,
+                    drop = c("TYPE", "FREQ", "STD", "MIN"))
+
+  expect_equal(names(res), c("BY", "VAR", "N", "MEAN", "MAX"))
+
+})
+
+
+test_that("means78: rename operation works as expected.", {
+
+  # Rename a few columns
+  res <- proc_means(iris,
+                    var = c("Sepal.Length", "Sepal.Width"),
+                    rename = c(VAR = "Variable", MEAN = "Average"))
+
+  expect_true("Variable" %in% names(res))
+  expect_true("Average" %in% names(res))
+  expect_false("VAR" %in% names(res))
+  expect_false("MEAN" %in% names(res))
+
+  # Rename with by
+  res <- proc_means(iris,
+                    var = "Sepal.Length",
+                    by = Species,
+                    rename = c(BY = "Species_Name"))
+
+  expect_true("Species_Name" %in% names(res))
+  expect_false("BY" %in% names(res))
+
+})
+
+
+test_that("means79: rename applied before keep.", {
+
+  res <- proc_means(iris,
+                    var = c("Sepal.Length", "Sepal.Width"),
+                    rename = c(VAR = "Variable", MEAN = "Average"),
+                    keep = c("Variable", "N", "Average"))
+
+  expect_equal(names(res), c("Variable", "N", "Average"))
+
+})
+
+
+test_that("means80: rename applied before drop.", {
+
+  res <- proc_means(iris,
+                    var = c("Sepal.Length", "Sepal.Width"),
+                    rename = c(MEAN = "Average"),
+                    drop = c("TYPE", "FREQ", "Average"))
+
+  expect_false("Average" %in% names(res))
+  expect_false("MEAN" %in% names(res))
+  expect_equal(names(res), c("VAR", "N", "STD", "MIN", "MAX"))
+
+})

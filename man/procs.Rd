@@ -52,6 +52,7 @@ Useful links:
 
 Authors:
 \itemize{
+  \item David Bosak \email{dbosak01@gmail.com}
   \item Diyu Yang \email{yang0diyu@gmail.com}
   \item Athenkosi Nkonyeni \email{athenkosi.nkonyeni@outlook.com}
 }

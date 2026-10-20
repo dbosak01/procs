@@ -1247,3 +1247,266 @@ test_that("subset_data12: handles compound logical expressions correctly", {
 
   expect_identical(res, expected)
 })
+
+test_that("utils31: keep_data() works as expected", {
+
+  # No lists
+  dat <- mtcars
+  kp <- c("mpg", "cyl", "disp")
+
+  res <- keep_data(dat, kp)
+
+  expect_equal(ncol(res), 3)
+
+  # List of datasets, one keep
+  dat <- list(mtcars, mtcars)
+  kp <- c("mpg", "cyl", "disp")
+
+  res <- keep_data(dat, kp)
+
+  expect_equal(ncol(res[[1]]), 3)
+  expect_equal(ncol(res[[1]]), 3)
+
+  # Both lists, in order
+  dat <- list(mtcars, mtcars)
+  kp <- list(c("mpg", "cyl", "disp"),
+             c("cyl", "disp", "drat", "am"))
+
+  res <- keep_data(dat, kp)
+
+  expect_equal(ncol(res[[1]]), 3)
+  expect_equal(ncol(res[[2]]), 4)
+
+  # Both lists, Out of order, but names line up
+  dat <- list(A = mtcars, B = mtcars)
+  kp <- list(B = c("cyl", "disp", "drat", "am"),
+             A = c("mpg", "cyl", "disp"))
+
+  res <- keep_data(dat, kp)
+
+  expect_equal(ncol(res[[1]]), 3)
+  expect_equal(ncol(res[[2]]), 4)
+
+
+  # Both lists, Out of order, but names don't line up
+  dat <- list(A = mtcars, B = mtcars)
+  kp <- list(C = c("cyl", "disp", "drat", "am"),
+             A = c("mpg", "cyl", "disp"))
+
+  res <- keep_data(dat, kp)
+
+  expect_equal(ncol(res[[1]]), 3)
+  expect_equal(ncol(res[[2]]), 0)
+
+
+  # Keep list wrong
+  dat <- mtcars
+  kp <- c("mpg2", "cyl2", "disp")
+
+  res <- keep_data(dat, kp)
+
+  expect_equal(ncol(res), 1)
+
+
+  # List of datasets, one wrong keep
+  dat <- list(mtcars, mtcars)
+  kp <- c("mpg2", "cyl2", "disp")
+
+  res <- keep_data(dat, kp)
+
+  expect_equal(ncol(res[[1]]), 1)
+  expect_equal(ncol(res[[1]]), 1)
+
+
+  # Both lists, in order, wrong names
+  dat <- list(mtcars, mtcars)
+  kp <- list(c("mpg2", "cyl2", "disp"),
+             c("cyl2", "disp2", "drat2", "am"))
+
+  res <- keep_data(dat, kp)
+
+  expect_equal(ncol(res[[1]]), 1)
+  expect_equal(ncol(res[[2]]), 1)
+
+  # Error condition
+  dat <- mtcars
+  kp <- list(c("mpg2", "cyl2", "disp"),
+             c("cyl2", "disp2", "drat2", "am"))
+
+
+  expect_error(keep_data(dat, kp))
+
+})
+
+test_that("utils32: drop_data() works as expected", {
+
+  # No lists
+  dat <- mtcars
+  dp <- c("mpg", "cyl", "disp")
+
+  res <- drop_data(dat, dp)
+
+  expect_equal(ncol(res), 8)
+
+  # List of datasets, one drop
+  dat <- list(mtcars, mtcars)
+  dp <- c("mpg", "cyl", "disp")
+
+  res <- drop_data(dat, dp)
+
+  expect_equal(ncol(res[[1]]), 8)
+  expect_equal(ncol(res[[2]]), 8)
+
+  # Both lists, in order
+  dat <- list(mtcars, mtcars)
+  dp <- list(c("mpg", "cyl", "disp"),
+             c("cyl", "disp", "drat", "am"))
+
+  res <- drop_data(dat, dp)
+
+  expect_equal(ncol(res[[1]]), 8)
+  expect_equal(ncol(res[[2]]), 7)
+
+  # Both lists, Out of order, but names line up
+  dat <- list(A = mtcars, B = mtcars)
+  dp <- list(B = c("cyl", "disp", "drat", "am"),
+             A = c("mpg", "cyl", "disp"))
+
+  res <- drop_data(dat, dp)
+
+  expect_equal(ncol(res[[1]]), 8)
+  expect_equal(ncol(res[[2]]), 7)
+
+
+  # Both lists, Out of order, but names don't line up
+  dat <- list(A = mtcars, B = mtcars)
+  dp <- list(C = c("cyl", "disp", "drat", "am"),
+             A = c("mpg", "cyl", "disp"))
+
+  res <- drop_data(dat, dp)
+
+  expect_equal(ncol(res[[1]]), 8)
+  expect_equal(ncol(res[[2]]), 11)
+
+
+  # Drop list wrong
+  dat <- mtcars
+  dp <- c("mpg2", "cyl2", "disp")
+
+  res <- drop_data(dat, dp)
+
+  expect_equal(ncol(res), 10)
+
+
+  # List of datasets, one wrong drop
+  dat <- list(mtcars, mtcars)
+  dp <- c("mpg2", "cyl2", "disp")
+
+  res <- drop_data(dat, dp)
+
+  expect_equal(ncol(res[[1]]), 10)
+  expect_equal(ncol(res[[2]]), 10)
+
+
+  # Both lists, in order, wrong names
+  dat <- list(mtcars, mtcars)
+  dp <- list(c("mpg2", "cyl2", "disp"),
+             c("cyl2", "disp2", "drat2", "am"))
+
+  res <- drop_data(dat, dp)
+
+  expect_equal(ncol(res[[1]]), 10)
+  expect_equal(ncol(res[[2]]), 10)
+
+  # Error condition
+  dat <- mtcars
+  dp <- list(c("mpg2", "cyl2", "disp"),
+             c("cyl2", "disp2", "drat2", "am"))
+
+
+  expect_error(drop_data(dat, dp))
+
+})
+
+test_that("utils33: rename_data() works as expected", {
+
+  # No lists
+  dat <- mtcars
+  rn <- c(mpg = "MPG", cyl = "CYL")
+
+  res <- rename_data(dat, rn)
+
+  expect_equal(names(res)[1:2], c("MPG", "CYL"))
+  expect_equal(ncol(res), ncol(dat))
+
+  # No rename supplied
+  dat <- mtcars
+
+  res <- rename_data(dat, NULL)
+
+  expect_equal(names(res), names(dat))
+
+  # List of datasets, one rename vector
+  dat <- list(mtcars, mtcars)
+  rn <- c(mpg = "MPG", cyl = "CYL")
+
+  res <- rename_data(dat, rn)
+
+  expect_equal(names(res[[1]])[1:2], c("MPG", "CYL"))
+  expect_equal(names(res[[2]])[1:2], c("MPG", "CYL"))
+
+  # Both lists, in order
+  dat <- list(mtcars, mtcars)
+  rn <- list(c(mpg = "MPG"),
+             c(cyl = "CYL"))
+
+  res <- rename_data(dat, rn)
+
+  expect_equal(names(res[[1]])[1:2], c("MPG", "cyl"))
+  expect_equal(names(res[[2]])[1:2], c("mpg", "CYL"))
+
+  # Both lists, out of order, but names line up
+  dat <- list(A = mtcars, B = mtcars)
+  rn <- list(B = c(cyl = "CYL"),
+             A = c(mpg = "MPG"))
+
+  res <- rename_data(dat, rn)
+
+  expect_equal(names(res$A)[1:2], c("MPG", "cyl"))
+  expect_equal(names(res$B)[1:2], c("mpg", "CYL"))
+
+  # Both lists, out of order, names don't line up
+  dat <- list(A = mtcars, B = mtcars)
+  rn <- list(C = c(cyl = "CYL"),
+             A = c(mpg = "MPG"))
+
+  res <- rename_data(dat, rn)
+
+  expect_equal(names(res$A)[1:2], c("MPG", "cyl"))
+  expect_equal(names(res$B)[1:2], c("mpg", "cyl"))
+
+  # Rename list wrong, no matching names
+  dat <- mtcars
+  rn <- c(mpg2 = "MPG", cyl2 = "CYL")
+
+  res <- rename_data(dat, rn)
+
+  expect_equal(names(res), names(dat))
+
+  # List of datasets, one wrong rename
+  dat <- list(mtcars, mtcars)
+  rn <- c(mpg2 = "MPG", cyl2 = "CYL")
+
+  res <- rename_data(dat, rn)
+
+  expect_equal(names(res[[1]]), names(mtcars))
+  expect_equal(names(res[[2]]), names(mtcars))
+
+  # Error condition
+  dat <- mtcars
+  rn <- list(c(mpg = "MPG"),
+             c(cyl = "CYL"))
+
+  expect_error(rename_data(dat, rn))
+
+})

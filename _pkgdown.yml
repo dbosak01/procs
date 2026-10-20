@@ -24,6 +24,7 @@ reference:
   - proc_means
   - proc_ttest
   - proc_reg
+  - proc_glm
 
 - title: Data Manipulation
   desc: Functions to manipulate data.

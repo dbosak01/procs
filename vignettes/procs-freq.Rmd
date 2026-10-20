@@ -270,6 +270,82 @@ is much simpler than the corresponding mechanism in SAS®.  With `proc_freq()`,
 by default, all requested tables and statistics will be
 returned in a list. No other output parameters are needed.
 
+## Renaming, Keeping, and Dropping Columns
+
+The `proc_freq()` function offers three parameters that let you reshape the
+columns on the output dataset(s) without any additional data manipulation:
+`rename`, `keep`, and `drop`. These parameters only affect the output
+dataset(s) returned from the function (the "out" datasets); they have no
+effect on the interactive report, the "report" datasets, the "nlevels"
+dataset, or any statistical output.
+
+* The `rename` parameter accepts a named vector, where the name is the
+existing column name and the value is the desired new name.
+* The `keep` parameter accepts a vector of column names to retain on the
+output dataset. Any column not named on the `keep` vector is removed.
+* The `drop` parameter accepts a vector of column names to remove from the
+output dataset. All other columns are retained.
+
+If there is more than one table request, you may supply a single vector
+on `rename`, `keep`, or `drop` that will be applied to every table, or a
+list of vectors&mdash;one for each table. The list may be named or unnamed.
+If named, the names should match the table names (either the table
+specification itself, or the name assigned on a named table request); if
+unnamed, the vectors are matched to the table requests positionally.
+
+These three operations are always applied in the same order: `rename` is
+performed first, followed by `keep`, and finally `drop`. Because `rename`
+happens first, the `keep` and `drop` vectors should refer to the *new*
+column names, not the original ones.
+
+Here is an example that renames, then keeps, columns on a single table
+request:
+```{r eval=FALSE, echo=TRUE} 
+# Rename and keep columns on a single table
+res <- proc_freq(dat, tables = y,
+                 rename = c(CAT = "Category", CNT = "Frequency"),
+                 keep = c("Category", "Frequency"))
+
+# View results
+res
+#   Category Frequency
+# 1        A         3
+# 2        B         2
+# 3        C         3
+
+```
+
+For multiple table requests, you can supply a list of vectors to target
+each table individually. Here, the "y" table is renamed and reduced to two
+columns, while the "x" table is only renamed:
+```{r eval=FALSE, echo=TRUE} 
+# Rename columns differently for each table
+res <- proc_freq(dat, tables = v(x, y),
+                 rename = list(y = c(CAT = "Category", CNT = "Frequency"),
+                               x = c(CAT = "Category")),
+                 keep = list(y = c("Category", "Frequency"),
+                             x = c("VAR", "Category", "N")))
+
+# View results
+res
+# $x
+#   VAR Category N
+# 1   x        2 8
+# 2   x        3 8
+# 3   x        5 8
+# 4   x        6 8
+#
+# $y
+#   Category Frequency
+# 1        A         3
+# 2        B         2
+# 3        C         3
+
+```
+Because `keep` and `drop` are applied after `rename`, note that the `keep`
+vector for the "y" table above refers to "Category" and "Frequency" (the
+renamed columns), not the original "CAT" and "CNT" column names.
+
 ## Output Ordering
 
 The `order` parameter allows the user to control the sort order of the outputs

@@ -15,7 +15,10 @@ proc_freq(
   titles = NULL,
   order = "internal",
   plots = NULL,
-  where = NULL
+  where = NULL,
+  rename = NULL,
+  keep = NULL,
+  drop = NULL
 )
 }
 \arguments{
@@ -57,7 +60,7 @@ The following options are available:
 "chisq", "crosstab", "fisher", "list", "missing",
 "nlevels", "nocol",
 "nocum", "nofreq", "nopercent", "noprint",
-"nonobs", "norow", "nosparse", "notable", "outcum". See
+"nonobs", "norow", "nosparse", "notable", "outcum", "outpct", "varnames". See
 the \strong{Options} section for a description of these options.}
 
 \item{titles}{A vector of titles to assign to the interactive report.}
@@ -77,6 +80,32 @@ align one-to-one for each table request.}
 \item{where}{An expression to filter the rows before the frequencies are
 calculated. Use the \code{\link[base]{expression}} function to define
 the filter.}
+
+\item{rename}{A named vector of variables to rename on the frequency output
+dataset(s), where the name is the existing variable name and the value is
+the desired new name. If there are multiple tables, you may supply one
+rename vector for all tables, or a list of vectors, one for each table.
+If using a list of vectors, they may either be named or unnamed. If named,
+names should match the table names. The rename vector will only apply to
+the frequency output dataset(s), not the interactive report, report
+datasets, nlevels, or any statistical output. The rename operation is
+performed before the \code{keep} and \code{drop} operations, so the
+\code{keep} and \code{drop} vectors should reference the new variable names.}
+
+\item{keep}{A vector of variables to keep on the frequency output dataset(s). If there
+are multiple tables, you may supply one keep vector for all tables, or
+a list of vectors, one for each table. If using a list of vectors, they
+may either be named or unnamed.  If named, names should match the table names.
+The keep vector will only apply to the frequency output dataset(s), not
+the interactive report, report datasets, nlevels, or any statistical output.}
+
+\item{drop}{A vector of variables to drop from the frequency output dataset(s). If there
+are multiple tables, you may supply one drop vector for all tables, or
+a list of vectors, one for each table. If using a list of vectors, they
+may either be named or unnamed.  If named, names should match the table names.
+The drop vector will only apply to the frequency output dataset(s), not
+the interactive report, report datasets, nlevels, or any statistical output.
+If both \code{keep} and \code{drop} are supplied, \code{keep} is applied first.}
 }
 \value{
 The function will return all requested datasets by default.  This is
@@ -233,6 +262,18 @@ want the Chi-Square statistic.
 \item{\strong{outcum}: Whether to include the cumulative frequency and percent
 on output frequency tables.  By default, these columns are not included.
 The "outcum" option will include them.
+}
+\item{\strong{outpct}: Whether to include row and column percentages on
+two-way output datasets.  When specified, two columns are added to the
+output dataset: "PCT_ROW", which contains the row percentage for each
+cell, and "PCT_COL", which contains the column percentage for each cell.
+This option is only meaningful for two-way interactions; for one-way
+frequency tables it is silently ignored.
+}
+\item{\strong{varnames}: Replaces the standardized "CAT" and "BY" output
+column names with the original variable names from which those columns
+are derived.  The variable names are taken from the column labels.
+This option only affects data frame output, not the interactive report.
 }
 }
 }

@@ -16,7 +16,10 @@ proc_means(
   weight = NULL,
   options = NULL,
   titles = NULL,
-  where = NULL
+  where = NULL,
+  rename = NULL,
+  keep = NULL,
+  drop = NULL
 )
 }
 \arguments{
@@ -100,6 +103,32 @@ for further explanation of these values.}
 \item{where}{An expression to filter the rows before the statistics are
 calculated. Use the \code{\link[base]{expression}} function to define
 the filter.}
+
+\item{rename}{A named vector of variables to rename on the output
+dataset(s), where the name is the existing variable name and the value is
+the desired new name. If there are multiple output datasets, you may supply one
+rename vector for all datasets, or a list of vectors, one for each dataset.
+If using a list of vectors, they may either be named or unnamed. If named,
+names should match the output dataset names. The rename vector will only apply to
+the output dataset(s), not the interactive report or report
+datasets. The rename operation is
+performed before the \code{keep} and \code{drop} operations, so the
+\code{keep} and \code{drop} vectors should reference the new variable names.}
+
+\item{keep}{A vector of variables to keep on the output dataset(s). If there
+are multiple output datasets, you may supply one keep vector for all datasets, or
+a list of vectors, one for each dataset. If using a list of vectors, they
+may either be named or unnamed.  If named, names should match the output dataset names.
+The keep vector will only apply to the output dataset(s), not
+the interactive report or report datasets.}
+
+\item{drop}{A vector of variables to drop from the output dataset(s). If there
+are multiple output datasets, you may supply one drop vector for all datasets, or
+a list of vectors, one for each dataset. If using a list of vectors, they
+may either be named or unnamed.  If named, names should match the output dataset names.
+The drop vector will only apply to the output dataset(s), not
+the interactive report or report datasets.
+If both \code{keep} and \code{drop} are supplied, \code{keep} is applied first.}
 }
 \value{
 Normally, the requested summary statistics are shown interactively
