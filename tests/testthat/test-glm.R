@@ -1322,3 +1322,4 @@ test_that("glm39: estimable function coefficients use the SAS 6-character width.
   expect_equal(vapply(ix, function(s) cell(e3t, s, "RunTime"), ""),
                rep("0.3333*L2", 3), ignore_attr = TRUE)
 })
+

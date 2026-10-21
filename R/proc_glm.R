@@ -61,8 +61,8 @@
 #' on the by variable(s) prior to performing the analysis.
 #' @param stats Optional statistics keywords, corresponding to the options on
 #' the "model" statement in SAS.  Valid values are "ss1", "ss2", "ss3",
-#' "solution", "est", "clparm", "p", "clm", "cli", "noint", "xpx", and "inverse".
-# "e1", "e2", and "e3".
+#' "solution", "est", "clparm", "p", "clm", "cli", "noint", "xpx", "inverse", and
+#' "e1", "e2", and "e3".
 #' \itemize{
 #' \item{\strong{solution}: Adds a parameter estimates table to the interactive
 #' report.  "est" is an accepted alias.}
@@ -82,8 +82,8 @@
 #' carries the dependent variable as an extra row and column.}
 #' \item{\strong{inverse}: Adds the generalized inverse of the augmented X'X
 #' matrix.  Its bottom right cell is the error sum of squares.}
-# \item{\strong{e1}, \strong{e2}, \strong{e3}: Add the Type I, Type II and
-# Type III estimable function tables.}
+#' \item{\strong{e1}, \strong{e2}, \strong{e3}: Add the Type I, Type II and
+#' Type III estimable function tables.}
 #' \item{\strong{ss1}, \strong{ss2}, \strong{ss3}: Select which sums of squares
 #' to produce.  The default is Type I and Type III, as in SAS.}
 #' }
@@ -243,7 +243,7 @@ proc_glm <- function(data,
   if (!is.null(stats)) {
 
     sopts <- c("ss1", "ss2", "ss3", "solution", "clparm", "p",
-               "est", "clb", "alpha", "noint", "xpx", "inverse", # "e1", "e2", "e3", # try again later
+               "est", "clb", "alpha", "noint", "xpx", "inverse", "e1", "e2", "e3", # try again later
                "clm", "cli")
 
     nsopts <- names(stats)
