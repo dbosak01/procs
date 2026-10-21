@@ -340,6 +340,7 @@ proc_glm <- function(data,
 
       } else {
         # Internal is the default.  The factor conversion below handles it.
+
       }
 
       if (!is.factor(data[[cl]]))
@@ -1098,7 +1099,7 @@ get_glm_report <- function(data, var, model, class = NULL, opts = NULL,
       # EMEAN returns the standard error, the confidence limits and the error
       # degrees of freedom alongside the mean itself.  The t test of the mean
       # against zero is the one piece SAS prints that is not in the table.
-      tval <- erows$LSmean / erows$SE
+      # tval <- erows$LSmean / erows$SE
 
       ls <- data.frame(stub = elvls,
                        LSMEAN = erows$LSmean,
