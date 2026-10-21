@@ -1126,24 +1126,24 @@ get_glm_report <- function(data, var, model, class = NULL, opts = NULL,
 
 
 
-  # Type I, II and III estimable functions (e1, e2, e3).  Each row of the
-  # returned matrix is the general form of an estimable function for one
-  # parameter of the model.
+  # Type I, II and III estimable functions (e1, e2, e3).  sasLM returns the
+  # basis rows; estimable_table() turns them into the SAS symbolic table, one
+  # row per parameter and one column per effect.
   if (hasE1 || hasE2 || hasE3) {
 
     mm <- ModelMatrix(model, data)
 
     if (hasE1)
       ret[["TypeIEstimableFunctions"]] <-
-        matrix_table(e1(crossprod(mm$X), eps = sing), "Effect")
+        estimable_table(e1(crossprod(mm$X), eps = sing), mm)
 
     if (hasE2)
-      ret[["TypeIIEstimableFunctions"]] <- matrix_table(e2(mm, eps = sing),
-                                                        "Effect")
+      ret[["TypeIIEstimableFunctions"]] <-
+        estimable_table(e2(mm, eps = sing), mm)
 
     if (hasE3)
-      ret[["TypeIIIEstimableFunctions"]] <- matrix_table(e3(mm, eps = sing),
-                                                         "Effect")
+      ret[["TypeIIIEstimableFunctions"]] <-
+        estimable_table(e3(mm, eps = sing), mm)
   }
 
   # Contrasts: an F-test per labeled contrast, via sasLM::CONTR.
@@ -1446,6 +1446,14 @@ gen_report_glm <- function(data,
         attr(ret$ANOVA, "spans") <- list(spn)
       }
 
+      eflbls <- c(TypeIEstimableFunctions = "Type I Estimable Functions",
+                  TypeIIEstimableFunctions = "Type II Estimable Functions",
+                  TypeIIIEstimableFunctions = "Type III Estimable Functions")
+      for (tnm in intersect(names(eflbls), nmsret)) {
+        spn2 <- span(1, ncol(ret[[tnm]]), label = eflbls[[tnm]], level = 2)
+        spn1 <- span(2, ncol(ret[[tnm]]), label = "Coefficients", level = 1)
+        attr(ret[[tnm]], "spans") <- list(spn2, spn1)
+      }
       if ("XPX" %in% nmsret) {
         spn <- span(1, ncol(ret$XPX), label = "X'X Matrix", level = 1)
         attr(ret$XPX, "spans") <- list(spn)

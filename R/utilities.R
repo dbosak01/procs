@@ -2043,9 +2043,9 @@ get_singular <- function(opts) {
 
 
 # Turn a labeled numeric matrix into the stub + columns data frame shape the
-# report functions expect.  Used for the SAS matrix displays (X'X, its inverse,
-# and the estimable function tables), which have no natural stub column of
-# their own: the row names are the stub.
+# report functions expect.  Used for the SAS matrix displays (X'X and its
+# inverse), which have no natural stub column of their own: the row names are
+# the stub.
 #' @import fmtr
 #' @noRd
 matrix_table <- function(mat, stub_label = "Parameter") {
@@ -2071,4 +2071,158 @@ matrix_table <- function(mat, stub_label = "Parameter") {
   formats(ret) <- fmts
 
   return(ret)
+}
+
+
+# Build the SAS estimable function table (e1, e2, e3) from a sasLM basis.
+#
+# sasLM's e1(), e2() and e3() return one row per model parameter: row k is the
+# hypothesis row whose free symbol is Lk, with one column per design matrix
+# column.  The rows are not normalized (the Type I rows carry the X'X
+# elimination scale) and a class effect has one all-zero row for its aliased
+# level.  SAS instead prints one row per parameter and one column per effect,
+# with each cell an expression in the free symbols, e.g. "L3", "-L3-L4" or
+# "0.0107*L2".
+#
+# For each effect, the rows belonging to that effect are row reduced with the
+# pivots taken over the effect's own columns in level order.  This puts the
+# free symbols on the first levels and leaves the last level as a combination
+# of them, the way SAS does.
+#' @noRd
+estimable_table <- function(E, mm, eps = 1e-8) {
+
+  pn <- colnames(mm$X)
+  ti <- mm$termIndices
+  effs <- names(ti)[names(ti) != "(Intercept)"]
+
+  # SAS labels: "Intercept", "RunTime", "AgeGroup Middle", "A*B a1 b2"
+  stub <- character(length(pn))
+  for (eff in names(ti))
+    stub[ti[[eff]]] <- estimable_labels(eff, pn[ti[[eff]]])
+
+  ret <- data.frame(stub = stub, stringsAsFactors = FALSE)
+
+  for (eff in effs) {
+
+    pos <- ti[[eff]]
+    B <- E[pos, , drop = FALSE]
+    tol <- eps * max(1, max(abs(B)))
+
+    # Gauss-Jordan with pivots restricted to this effect's columns
+    piv <- integer(0)
+    for (j in pos) {
+
+      r <- length(piv)
+      if (r == nrow(B))
+        break
+
+      cand <- (r + 1):nrow(B)
+      k <- cand[which.max(abs(B[cand, j]))]
+      if (abs(B[k, j]) < tol)
+        next
+
+      B[c(r + 1, k), ] <- B[c(k, r + 1), ]
+      r <- r + 1
+      B[r, ] <- B[r, ] / B[r, j]
+      for (i in seq_len(nrow(B))[-r])
+        B[i, ] <- B[i, ] - B[i, j] * B[r, ]
+
+      piv <- c(piv, j)
+    }
+
+    B <- B[seq_along(piv), , drop = FALSE]
+
+    ret[[gsub(":", "*", eff, fixed = TRUE)]] <-
+      vapply(seq_along(pn), function(j) estimable_cell(B[, j], piv, eps),
+             character(1))
+  }
+
+  labels(ret) <- list(stub = "Effect")
+
+  return(ret)
+}
+
+
+# Render one cell of an estimable function table: the sum of coef * Lk over
+# the free symbols, written the SAS way ("L3", "-L3-L4", "0.0107*L2", "0").
+#' @noRd
+estimable_cell <- function(coefs, piv, eps = 1e-8) {
+
+  trms <- character(0)
+
+  for (i in seq_along(piv)) {
+
+    co <- coefs[i]
+    sym <- paste0("L", piv[i])
+
+    if (abs(co - 1) < eps)
+      trm <- sym
+    else if (abs(co + 1) < eps)
+      trm <- paste0("-", sym)
+    else {
+      val <- estimable_num(abs(co))
+      if (val == "0")
+        next
+      trm <- paste0(if (co < 0) "-" else "", val, "*", sym)
+    }
+
+    if (length(trms) > 0 && substr(trm, 1, 1) != "-")
+      trm <- paste0("+", trm)
+
+    trms <- c(trms, trm)
+  }
+
+  if (length(trms) == 0)
+    return("0")
+
+  return(paste(trms, collapse = ""))
+}
+
+
+# Format a non-negative coefficient the way SAS writes it in an estimable
+# function: 6 characters wide, so the decimals are whatever the integer part
+# leaves (0.4823, 10.481, 105.48), with trailing zeros dropped (0.5, 0.779).
+# The sign is written by the caller and does not count toward the width.
+#' @noRd
+estimable_num <- function(x) {
+
+  intd <- if (x >= 1) floor(log10(x)) + 1 else 1
+  dec <- max(0, 6 - intd - 1)
+  rx <- round(x, dec)
+
+  # Rounding can carry into a new integer digit (9.99996 -> 10)
+  if (rx >= 10^intd)
+    dec <- max(0, dec - 1)
+
+  val <- formatC(rx, format = "f", digits = dec)
+
+  if (grepl(".", val, fixed = TRUE))
+    val <- sub("\\.?0+$", "", val)
+
+  return(val)
+}
+
+
+# SAS row labels for the parameters of one effect.  The design matrix column
+# names are the variable names run together with their levels
+# ("AgeGroupMiddle", "AgeGroupOld:AgeCat<50"); SAS writes the effect name and
+# then the levels separated by spaces ("AgeGroup*AgeCat Old <50").
+#' @noRd
+estimable_labels <- function(eff, cols) {
+
+  if (eff == "(Intercept)")
+    return(rep("Intercept", length(cols)))
+
+  vars <- strsplit(eff, ":", fixed = TRUE)[[1]]
+  efflbl <- paste(vars, collapse = "*")
+
+  vapply(cols, function(cl) {
+    parts <- strsplit(cl, ":", fixed = TRUE)[[1]]
+    lvls <- substring(parts, nchar(vars) + 1)
+    lvls <- lvls[lvls != ""]
+    if (length(lvls) == 0)
+      efflbl
+    else
+      paste(efflbl, paste(lvls, collapse = " "))
+  }, character(1), USE.NAMES = FALSE)
 }
