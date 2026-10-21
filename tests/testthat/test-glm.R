@@ -1032,42 +1032,39 @@ test_that("glm32: xpx and inverse match the SAS matrices.", {
 })
 
 
-# test_that("glm33: e1, e2 and e3 produce the estimable function tables.", {
-#
-#   # SAS: model Weight = Sex Height / e1 e2 e3;
-#   #
-#   # Note that SAS presents these symbolically (rows are model parameters,
-#   # columns are effects, cells are expressions in L2 and L4).  Here the raw
-#   # coefficient matrix is returned instead: one row per free parameter, one
-#   # column per design matrix column.  The information is the same, the shape is
-#   # not.
-#   res <- proc_glm(cls, model = Weight ~ Sex + Height, class = "Sex",
-#                   stats = c("e1", "e2", "e3"), output = "report")
-#
-#   expect_true(all(c("TypeIEstimableFunctions", "TypeIIEstimableFunctions",
-#                     "TypeIIIEstimableFunctions") %in% names(res)))
-#
-#   e3t <- res$TypeIIIEstimableFunctions
-#   expect_equal(names(e3t), c("stub", "(Intercept)", "SexF", "SexM", "Height"))
-#   expect_equal(e3t$stub, c("L1", "L2", "L3", "L4"), ignore_attr = TRUE)
-#
-#   # SAS Type III: Sex F = L2, Sex M = -L2, Intercept = 0, Height = 0.  The row
-#   # here carries the same comparison with the opposite sign convention.
-#   expect_equal(c(e3t$SexF[2], e3t$SexM[2]), c(-1, 1), ignore_attr = TRUE)
-#   expect_equal(c(e3t[["(Intercept)"]][2], e3t$Height[2]), c(0, 0),
-#                ignore_attr = TRUE)
-#
-#   # SAS Type II is identical to Type III for this model
-#   e2t <- res$TypeIIEstimableFunctions
-#   expect_equal(abs(e2t$SexF[2]), 1, ignore_attr = TRUE)
-#   expect_equal(e2t$Height[2], 0, ignore_attr = TRUE)
-#
-#   # Keywords are independent
-#   res1 <- proc_glm(cls, model = Weight ~ Sex + Height, class = "Sex",
-#                    stats = "e1", output = "report")
-#   expect_true("TypeIEstimableFunctions" %in% names(res1))
-#   expect_false("TypeIIIEstimableFunctions" %in% names(res1))
-# })
+test_that("glm33: e1, e2 and e3 produce the estimable function tables.", {
+
+  # SAS: model Weight = Sex Height / e1 e2 e3;
+  #
+  # SAS presents these symbolically: rows are model parameters, columns are the
+  # effects being tested, and cells are expressions in the free symbols L1, L2,
+  # ... where Lk belongs to the k-th parameter.
+  res <- proc_glm(cls, model = Weight ~ Sex + Height, class = "Sex",
+                  stats = c("e1", "e2", "e3"), output = "report")
+
+  expect_true(all(c("TypeIEstimableFunctions", "TypeIIEstimableFunctions",
+                    "TypeIIIEstimableFunctions") %in% names(res)))
+
+  e3t <- res$TypeIIIEstimableFunctions
+  expect_equal(names(e3t), c("stub", "Sex", "Height"))
+  expect_equal(e3t$stub, c("Intercept", "Sex F", "Sex M", "Height"),
+               ignore_attr = TRUE)
+
+  # SAS Type III: Sex F = L2, Sex M = -L2, Intercept = 0, Height = 0
+  expect_equal(e3t$Sex, c("0", "L2", "-L2", "0"), ignore_attr = TRUE)
+  expect_equal(e3t$Height, c("0", "0", "0", "L4"), ignore_attr = TRUE)
+
+  # SAS Type II is identical to Type III for this model
+  e2t <- res$TypeIIEstimableFunctions
+  expect_equal(e2t$Sex, e3t$Sex, ignore_attr = TRUE)
+  expect_equal(e2t$Height, e3t$Height, ignore_attr = TRUE)
+
+  # Keywords are independent
+  res1 <- proc_glm(cls, model = Weight ~ Sex + Height, class = "Sex",
+                   stats = "e1", output = "report")
+  expect_true("TypeIEstimableFunctions" %in% names(res1))
+  expect_false("TypeIIIEstimableFunctions" %in% names(res1))
+})
 
 
 test_that("glm34: singular and zeta options are accepted and used.", {
@@ -1173,3 +1170,138 @@ test_that("glm36: order = formatted requires a user-defined format.", {
                ignore_attr = TRUE)
 })
 
+
+# The SAS fitness data, used by the estimable function tests below.
+fitness <- read.table(header = TRUE, text = '
+Age Weight Oxygen RunTime
+44 89.47 44.609 11.37
+40 75.07 45.313 10.07
+44 85.84 54.297  8.65
+42 68.15 59.571  8.17
+38 89.02 49.874  9.22
+47 77.45 44.811 11.63
+40 75.98 45.681 11.95
+43 81.19 49.091 10.85
+44 81.42 39.442 13.08
+38 81.87 60.055  8.63
+44 73.03 50.541 10.13
+45 87.66 37.388 14.03
+45 66.45 44.754 11.12
+47 79.15 47.273 10.60
+54 83.12 51.855 10.33
+49 81.42 49.156  8.95
+51 69.63 40.836 10.95
+51 77.91 46.672 10.00
+48 91.63 46.774 10.25
+49 73.37 50.388 10.08
+57 73.37 39.407 12.63
+54 79.38 46.080 11.17
+52 76.32 45.441  9.63
+50 70.87 54.625  8.92
+51 67.25 45.118 11.08
+54 91.63 39.203 12.88
+51 73.71 45.790 10.47
+57 59.08 50.545  9.93
+49 76.32 48.673  9.40
+48 61.24 47.920 11.50
+52 82.78 47.467 10.50')
+
+
+test_that("glm37: estimable functions for a continuous effect match SAS.", {
+
+  # SAS (proc_glm-011): model Oxygen = RunTime / e1 e2 e3;
+  # All three tables are the same: Intercept = 0, RunTime = L2.  The Type I
+  # basis from sasLM carries the X'X elimination scale (the RunTime row is
+  # 57.747535, the corrected sum of squares of RunTime), which SAS normalizes
+  # away so the free symbol has a coefficient of one.
+  res <- proc_glm(fitness, model = Oxygen ~ RunTime,
+                  stats = c("e1", "e2", "e3"), output = "report")
+
+  for (tnm in c("TypeIEstimableFunctions", "TypeIIEstimableFunctions",
+                "TypeIIIEstimableFunctions")) {
+    ef <- res[[tnm]]
+    expect_equal(names(ef), c("stub", "RunTime"))
+    expect_equal(ef$stub, c("Intercept", "RunTime"), ignore_attr = TRUE)
+    expect_equal(ef$RunTime, c("0", "L2"), ignore_attr = TRUE)
+  }
+})
+
+
+test_that("glm38: estimable functions for a class effect match SAS.", {
+
+  # SAS:
+  #   proc glm data=fitness3;
+  #     class AgeGroup;
+  #     model Oxygen = RunTime AgeGroup / e1 e2 e3;
+  #   run;
+  #
+  # AgeGroup is character, so the levels sort as SAS sorts them: Middle, Old,
+  # Young.  The first levels of the effect carry the free symbols and the last
+  # level is their negative sum.
+  fitness3 <- fitness
+  fitness3$AgeGroup <- ifelse(fitness3$Age <= 44, "Young",
+                              ifelse(fitness3$Age <= 50, "Middle", "Old"))
+
+  res <- proc_glm(fitness3, model = Oxygen ~ RunTime + AgeGroup,
+                  class = "AgeGroup", stats = c("e1", "e2", "e3"),
+                  output = "report")
+
+  stubs <- c("Intercept", "RunTime", "AgeGroup Middle", "AgeGroup Old",
+             "AgeGroup Young")
+  agcol <- c("0", "0", "L3", "L4", "-L3-L4")
+
+  e1t <- res$TypeIEstimableFunctions
+  expect_equal(names(e1t), c("stub", "RunTime", "AgeGroup"))
+  expect_equal(e1t$stub, stubs, ignore_attr = TRUE)
+  expect_equal(e1t$RunTime,
+               c("0", "L2", "0.0107*L2", "0.0541*L2", "-0.0648*L2"),
+               ignore_attr = TRUE)
+  expect_equal(e1t$AgeGroup, agcol, ignore_attr = TRUE)
+
+  for (tnm in c("TypeIIEstimableFunctions", "TypeIIIEstimableFunctions")) {
+    ef <- res[[tnm]]
+    expect_equal(ef$stub, stubs, ignore_attr = TRUE)
+    expect_equal(ef$RunTime, c("0", "L2", "0", "0", "0"), ignore_attr = TRUE)
+    expect_equal(ef$AgeGroup, agcol, ignore_attr = TRUE)
+  }
+})
+
+
+test_that("glm39: estimable function coefficients use the SAS 6-character width.", {
+
+  # SAS:
+  #   proc glm data=fitness3;
+  #     class AgeGroup;
+  #     model Oxygen = RunTime AgeGroup RunTime*AgeGroup / e1 e2 e3;
+  #   run;
+  #
+  # SAS writes each coefficient in 6 characters, not a fixed number of
+  # decimals: 0.4823 but 10.481, and 10.4864562717 becomes 10.486.  Trailing
+  # zeros are dropped (0.779, 0.5).  Rows are looked up by label because the
+  # interaction rows are not yet in SAS order.
+  fitness3 <- fitness
+  fitness3$AgeGroup <- ifelse(fitness3$Age <= 44, "Young",
+                              ifelse(fitness3$Age <= 50, "Middle", "Old"))
+
+  res <- proc_glm(fitness3, model = Oxygen ~ RunTime + AgeGroup + RunTime:AgeGroup,
+                  class = "AgeGroup", stats = c("e1", "e2", "e3"),
+                  output = "report")
+
+  cell <- function(tbl, stub, col) tbl[[col]][tbl$stub == stub]
+  ix <- paste("RunTime*AgeGroup", c("Middle", "Old", "Young"))
+
+  e1t <- res$TypeIEstimableFunctions
+  expect_equal(vapply(ix, function(s) cell(e1t, s, "RunTime"), ""),
+               c("0.4823*L2", "0.779*L2", "-0.2613*L2"), ignore_attr = TRUE)
+  expect_equal(vapply(ix, function(s) cell(e1t, s, "AgeGroup"), ""),
+               c("10.481*L3-0.2524*L4", "-0.0869*L3+10.739*L4",
+                 "-10.394*L3-10.486*L4"), ignore_attr = TRUE)
+
+  e2t <- res$TypeIIEstimableFunctions
+  expect_equal(vapply(ix, function(s) cell(e2t, s, "RunTime"), ""),
+               c("0.3836*L2", "0.1993*L2", "0.4171*L2"), ignore_attr = TRUE)
+
+  e3t <- res$TypeIIIEstimableFunctions
+  expect_equal(vapply(ix, function(s) cell(e3t, s, "RunTime"), ""),
+               rep("0.3333*L2", 3), ignore_attr = TRUE)
+})
