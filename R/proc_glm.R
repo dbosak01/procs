@@ -61,8 +61,8 @@
 #' on the by variable(s) prior to performing the analysis.
 #' @param stats Optional statistics keywords, corresponding to the options on
 #' the "model" statement in SAS.  Valid values are "ss1", "ss2", "ss3",
-#' "solution", "est", "clparm", "p", "clm", "cli", "noint", "xpx", "inverse",
-#' "e1", "e2", and "e3".
+#' "solution", "est", "clparm", "p", "clm", "cli", "noint", "xpx", and "inverse".
+# "e1", "e2", and "e3".
 #' \itemize{
 #' \item{\strong{solution}: Adds a parameter estimates table to the interactive
 #' report.  "est" is an accepted alias.}
@@ -82,8 +82,8 @@
 #' carries the dependent variable as an extra row and column.}
 #' \item{\strong{inverse}: Adds the generalized inverse of the augmented X'X
 #' matrix.  Its bottom right cell is the error sum of squares.}
-#' \item{\strong{e1}, \strong{e2}, \strong{e3}: Add the Type I, Type II and
-#' Type III estimable function tables.}
+# \item{\strong{e1}, \strong{e2}, \strong{e3}: Add the Type I, Type II and
+# Type III estimable function tables.}
 #' \item{\strong{ss1}, \strong{ss2}, \strong{ss3}: Select which sums of squares
 #' to produce.  The default is Type I and Type III, as in SAS.}
 #' }
@@ -243,7 +243,7 @@ proc_glm <- function(data,
   if (!is.null(stats)) {
 
     sopts <- c("ss1", "ss2", "ss3", "solution", "clparm", "p",
-               "est", "clb", "alpha", "noint", "xpx", "inverse", "e1", "e2", "e3",
+               "est", "clb", "alpha", "noint", "xpx", "inverse", # "e1", "e2", "e3", # try again later
                "clm", "cli")
 
     nsopts <- names(stats)
@@ -791,8 +791,8 @@ get_glm_report <- function(data, var, model, class = NULL, opts = NULL,
 
   # DEPMEAN uses 4 decimals to match SAS PROC GLM's dependent mean display
   # (PROC REG uses 5, so the format is intentionally not shared with reg_fc).
-  glm_fc <- fcat(DF = "%d", SUMSQ = "%.5f", MEANSQ = "%.5f", FVAL = "%.2f",
-                 PROBF = pfmt, RMSE = "%.5f", DEPMEAN = "%.4f", COEFVAR = "%.5f",
+  glm_fc <- fcat(DF = "%d", SUMSQ = "best", MEANSQ = "best", FVAL = "%.2f",
+                 PROBF = pfmt, RMSE = "%.6f", DEPMEAN = "%.5f", COEFVAR = "%.6f",
                  RSQ = "%.6f", ADJRSQ = "%.6f", log = FALSE)
 
   lkp <- c("Df" = "DF", "Sum.Sq" = "SUMSQ", "Mean.Sq" = "MEANSQ",
@@ -824,6 +824,44 @@ get_glm_report <- function(data, var, model, class = NULL, opts = NULL,
   # NObs
   ret[["NObs"]] <- get_obs(data, model)
 
+  # The augmented X'X crossproducts matrix (xpx) and its generalized inverse
+  # (inverse).  "Augmented" means the dependent variable is carried as an extra
+  # row and column, so the bottom right cell of the inverse is the error sum of
+  # squares, the way SAS prints it.
+  if (hasXPX || hasINV) {
+
+    vdat <- get_valid_obs(data, model)
+    aug <- cbind(ModelMatrix(model, data)$X, vdat[[var]])
+    colnames(aug)[ncol(aug)] <- var
+
+    if (!is.null(weight))
+      aug <- aug * sqrt(vdat[[weight]])
+
+    xpx <- crossprod(aug)
+
+
+
+    if (hasXPX)
+      ret[["XPX"]] <- matrix_table(xpx, "Parameter")
+
+    # G2SWEEP(Augmented = TRUE), not g2inv(): g2inv() writes its result into the
+    # leading rank-by-rank block, which is only correct when the singular
+    # columns come last.  G2SWEEP keeps every column in place, carries the
+    # dimnames, and puts the error sum of squares in the bottom right cell, the
+    # way SAS prints it.
+    if (hasINV) {
+
+      inv <- G2SWEEP(xpx, Augmented = TRUE, eps = sing)
+
+      # G2SWEEP leaves the augmented row holding -beta while the augmented
+      # column holds beta.  SAS prints this matrix symmetric, with beta on both
+      # sides, so mirror the column onto the row.
+      inv[nrow(inv), ] <- inv[, ncol(inv)]
+
+      ret[["Inverse"]] <- matrix_table(inv, "Parameter")
+    }
+  }
+
   # Overall model ANOVA.  Without an intercept the total is not corrected for
   # the mean, and SAS labels that row "Uncorrected Total".  The sum of squares
   # sasLM returns is already the uncorrected one; only the label changes.
@@ -834,6 +872,8 @@ get_glm_report <- function(data, var, model, class = NULL, opts = NULL,
                     aov, stringsAsFactors = FALSE)
   rownames(aov) <- NULL
   names(aov) <- fapply(names(aov), lkp)
+  glm_fc$SUMSQ <- fmt_col(aov$SUMSQ, 11)
+  glm_fc$MEANSQ <- fmt_col(aov$MEANSQ, 11)
   formats(aov) <- glm_fc
   labels(aov) <- glbls
   ret[["ANOVA"]] <- aov
@@ -846,6 +886,10 @@ get_glm_report <- function(data, var, model, class = NULL, opts = NULL,
   labels(fitr) <- glbls
   ret[["FitStatistics"]] <- fitr
 
+  if ("noint" %in% stats) {
+    ret[["Note"]] <- "Note: No intercept term is used: R-Square is not corrected for the mean."
+  }
+
   # Type I / II / III sum-of-squares tables
   sslbl <- c("Type I" = "Type I SS", "Type II" = "Type II SS",
              "Type III" = "Type III SS")
@@ -855,6 +899,8 @@ get_glm_report <- function(data, var, model, class = NULL, opts = NULL,
     ss <- data.frame(stub = rownames(glm[[ty]]), ss, stringsAsFactors = FALSE)
     rownames(ss) <- NULL
     names(ss) <- fapply(names(ss), lkp)
+    glm_fc$SUMSQ <- fmt_col(ss$SUMSQ, 11)
+    glm_fc$MEANSQ <- fmt_col(ss$MEANSQ, 11)
     formats(ss) <- glm_fc
     gl2 <- glbls
     gl2[["SUMSQ"]] <- sslbl[[ty]]
@@ -919,6 +965,16 @@ get_glm_report <- function(data, var, model, class = NULL, opts = NULL,
     formats(pe) <- pe_fc
     labels(pe) <- pe_lbls
 
+    # Clear out BIASED if all NA
+    if (all(is.na(pe$BIASED))) {
+      pe$BIASED <- NULL
+    }
+
+    # Clear out BIASED if all blank
+    if (all(pe$BIASED == "")) {
+      pe$BIASED <- NULL
+    }
+
     ret[["ParameterEstimates"]] <- pe
   }
 
@@ -954,7 +1010,7 @@ get_glm_report <- function(data, var, model, class = NULL, opts = NULL,
         es <- est(mmX, mmX, rx, conf.level = alph)
 
         if (hasCLM) {
-          st$STDMEAN <- es[, "Std. Error"]
+          # st$STDMEAN <- es[, "Std. Error"] # Not sure why this added.  Not in SAS.
           st$LCLM <- es[, "Lower CL"]
           st$UCLM <- es[, "Upper CL"]
           stlbl <- c(stlbl, list(STDMEAN = "Std Error Mean Predict",
@@ -985,6 +1041,17 @@ get_glm_report <- function(data, var, model, class = NULL, opts = NULL,
       }
 
       labels(st) <- stlbl
+      stfmt$DEPVAL <- fmt_col(st$DEPVAL, 11)
+      stfmt$PREVAL <- fmt_col(st$PREVAL, 11)
+      stfmt$RESID <- fmt_col(st$RESID, 11)
+      if (hasCLM) {
+        stfmt$LCLM <- fmt_col(st$LCLM, 11)
+        stfmt$UCLM <- fmt_col(st$UCLM, 11)
+      }
+      if (hasCLI) {
+        stfmt$LCLI <- fmt_col(st$LCLI, 11)
+        stfmt$UCLI <- fmt_col(st$UCLI, 11)
+      }
       formats(st) <- stfmt
       ret[["OutputStatistics"]] <- st
 
@@ -1004,7 +1071,7 @@ get_glm_report <- function(data, var, model, class = NULL, opts = NULL,
                                    sumsq - errss, foa, dw),
                          stringsAsFactors = FALSE)
       labels(resi) <- list(VALUE = "Value")
-      formats(resi) <- list(VALUE = "%.6f")
+      formats(resi) <- list(VALUE = fmt_col(resi$VALUE, 11))
       ret[["ResidualStatistics"]] <- resi
 
     } else {
@@ -1035,10 +1102,10 @@ get_glm_report <- function(data, var, model, class = NULL, opts = NULL,
 
       ls <- data.frame(stub = elvls,
                        LSMEAN = erows$LSmean,
-                       STDERR = erows$SE,
-                       PROBT = 2 * stats::pt(-abs(tval), erows$Df),
-                       LCLM = erows$LowerCL,
-                       UCLM = erows$UpperCL,
+                       # STDERR = erows$SE,    # These stats not present in SAS
+                       # PROBT = 2 * stats::pt(-abs(tval), erows$Df),
+                       # LCLM = erows$LowerCL,
+                       # UCLM = erows$UpperCL,
                        stringsAsFactors = FALSE)
 
       pctl <- (1 - get_alpha(opts)) * 100
@@ -1056,41 +1123,7 @@ get_glm_report <- function(data, var, model, class = NULL, opts = NULL,
     }
   }
 
-  # The augmented X'X crossproducts matrix (xpx) and its generalized inverse
-  # (inverse).  "Augmented" means the dependent variable is carried as an extra
-  # row and column, so the bottom right cell of the inverse is the error sum of
-  # squares, the way SAS prints it.
-  if (hasXPX || hasINV) {
 
-    vdat <- get_valid_obs(data, model)
-    aug <- cbind(ModelMatrix(model, data)$X, vdat[[var]])
-    colnames(aug)[ncol(aug)] <- var
-
-    if (!is.null(weight))
-      aug <- aug * sqrt(vdat[[weight]])
-
-    xpx <- crossprod(aug)
-
-    if (hasXPX)
-      ret[["XPX"]] <- matrix_table(xpx, "Parameter")
-
-    # G2SWEEP(Augmented = TRUE), not g2inv(): g2inv() writes its result into the
-    # leading rank-by-rank block, which is only correct when the singular
-    # columns come last.  G2SWEEP keeps every column in place, carries the
-    # dimnames, and puts the error sum of squares in the bottom right cell, the
-    # way SAS prints it.
-    if (hasINV) {
-
-      inv <- G2SWEEP(xpx, Augmented = TRUE, eps = sing)
-
-      # G2SWEEP leaves the augmented row holding -beta while the augmented
-      # column holds beta.  SAS prints this matrix symmetric, with beta on both
-      # sides, so mirror the column onto the row.
-      inv[nrow(inv), ] <- inv[, ncol(inv)]
-
-      ret[["Inverse"]] <- matrix_table(inv, "Parameter")
-    }
-  }
 
   # Type I, II and III estimable functions (e1, e2, e3).  sasLM returns the
   # basis rows; estimable_table() turns them into the SAS symbolic table, one
@@ -1419,6 +1452,15 @@ gen_report_glm <- function(data,
         spn2 <- span(1, ncol(ret[[tnm]]), label = eflbls[[tnm]], level = 2)
         spn1 <- span(2, ncol(ret[[tnm]]), label = "Coefficients", level = 1)
         attr(ret[[tnm]], "spans") <- list(spn2, spn1)
+      }
+      if ("XPX" %in% nmsret) {
+        spn <- span(1, ncol(ret$XPX), label = "X'X Matrix", level = 1)
+        attr(ret$XPX, "spans") <- list(spn)
+      }
+
+      if ("Inverse" %in% nmsret) {
+        spn <- span(1, ncol(ret$Inverse), label = "X'X Inverse Matrix", level = 1)
+        attr(ret$Inverse, "spans") <- list(spn)
       }
 
       out <- output_report(ret, dir_name = dirname(vrfl),

@@ -1510,3 +1510,45 @@ test_that("utils33: rename_data() works as expected", {
   expect_error(rename_data(dat, rn))
 
 })
+
+test_that("utils34: fmt_col works correctly", {
+
+  vls <- c(123.45638383838384, 98773.238383299383)
+
+  res <- fmt_col(vls, 11)
+
+  expect_equal(res, "%.5f")
+
+
+
+  vls <- c(123.45638383838384, 9773.238383299383)
+
+  res <- fmt_col(vls, 11)
+
+  expect_equal(res, "%.6f")
+
+
+  vls <- c(123.45638383838384, 987730.238383299383)
+
+  res <- fmt_col(vls, 11)
+
+  expect_equal(res, "%.4f")
+
+
+  vls <- c(123.45638383838384, 987730.238383299383, NA)
+
+  res <- fmt_col(vls, 11)
+
+  expect_equal(res, "%.4f")
+
+
+  vls <- c(123.456, 9730.238, NA)
+
+  res <- fmt_col(vls, 11)
+
+  expect_equal(res, "%.6f")
+
+
+})
+
+
