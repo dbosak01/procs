@@ -303,12 +303,13 @@ test_that("glm7a: biased column is removed from parameter estimates table approp
   #                          breaks = c(-Inf, 44, 50, Inf),
   #                          labels = c("Young", "Middle", "Old"))
   # fitness3$AgeCat <- ifelse(fitness3$Age < 50, "<50", ">=50")
-  # #fitness3$AgeGroup <- factor(fitness3$AgeGroup)
+  # fitness3$AgeGroup <- factor(fitness3$AgeGroup)
   #
   # proc_glm(fitness3,
   #          model = Oxygen ~ RunTime + AgeGroup,
   #          class = "AgeGroup",
-  #          lsmeans = "AgeGroup")
+  #          lsmeans = "AgeGroup",
+  #          output = "report")
 
 
 
@@ -428,6 +429,22 @@ test_that("glm10: lsmeans match SAS.", {
   #                   output = "report")
   # ls90 <- res90$LSMeans.Sex
   # expect_lt(ls90$UCLM[1] - ls90$LCLM[1], ls$UCLM[1] - ls$LCLM[1])
+
+  # fitness3 <- fitness
+  # fitness3$AgeGroup <- cut(fitness3$Age,
+  #                          breaks = c(-Inf, 44, 50, Inf),
+  #                          labels = c("Young", "Middle", "Old"))
+  # fitness3$AgeCat <- ifelse(fitness3$Age < 50, "<50", ">=50")
+  # fitness3$AgeGroup <- factor(fitness3$AgeGroup)
+  #
+  # proc_glm(fitness3,
+  #          model = Oxygen ~ RunTime + AgeGroup,
+  #          order = "internal",
+  #          class = "AgeGroup",
+  #          lsmeans = "AgeGroup")
+
+
+
 })
 
 
