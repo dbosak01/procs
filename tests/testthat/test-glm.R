@@ -233,7 +233,7 @@ test_that("glm7: parameter estimates (solution) match SAS.", {
                   stats = "solution", output = "report")
   pe <- res$ParameterEstimates
 
-  expect_equal(pe$PARM, c("Intercept", "SexF", "SexM", "Height"),
+  expect_equal(pe$PARM, c("Intercept", "Sex F", "Sex M", "Height"),
                ignore_attr = TRUE)
 
   # Singular (class-related + intercept) parameters are flagged biased "B";
@@ -263,8 +263,8 @@ test_that("glm7: parameter estimates (solution) match SAS.", {
   expect_equal(pe$PROBT[4], 4.09250060773e-06, ignore_attr = TRUE)
 
   # Reference level SexM is zeroed with blank t / p
-  expect_equal(pe$EST[pe$PARM == "SexM"], 0, ignore_attr = TRUE)
-  expect_true(is.na(pe$T[pe$PARM == "SexM"]))
+  expect_equal(pe$EST[pe$PARM == "Sex M"], 0, ignore_attr = TRUE)
+  expect_true(is.na(pe$T[pe$PARM == "Sex M"]))
 
   # "est" is an accepted alias for "solution"
   resa <- proc_glm(cls, model = Weight ~ Sex + Height, class = "Sex",
@@ -334,7 +334,7 @@ test_that("glm8: clparm confidence limits match SAS.", {
   expect_equal(pe95$UCLM[4], 4.82188395458, ignore_attr = TRUE)
 
   # Reference (zeroed) level has no confidence limits
-  expect_true(is.na(pe95$LCLM[pe95$PARM == "SexM"]))
+  expect_true(is.na(pe95$LCLM[pe95$PARM == "Sex M"]))
 
   # 90% limits (alpha = 0.10)
   res90 <- proc_glm(cls, model = Weight ~ Sex + Height, class = "Sex",
@@ -625,23 +625,23 @@ test_that("glm19: order controls the class level order and reference level.", {
   res <- proc_glm(cls, model = Weight ~ Sex + Height, class = "Sex",
                   stats = "solution", output = "report")
   pe <- res$ParameterEstimates
-  expect_equal(pe$PARM, c("Intercept", "SexF", "SexM", "Height"),
+  expect_equal(pe$PARM, c("Intercept", "Sex F", "Sex M", "Height"),
                ignore_attr = TRUE)
-  expect_equal(pe$EST[pe$PARM == "SexM"], 0, ignore_attr = TRUE)
+  expect_equal(pe$EST[pe$PARM == "Sex M"], 0, ignore_attr = TRUE)
 
   # order = "data" puts M first (Alfred is row 1), so F becomes the reference.
   resd <- proc_glm(cls, model = Weight ~ Sex + Height, class = "Sex",
                    order = "data", stats = "solution", output = "report")
   ped <- resd$ParameterEstimates
-  expect_equal(ped$PARM, c("Intercept", "SexM", "SexF", "Height"),
+  expect_equal(ped$PARM, c("Intercept", "Sex M", "Sex F", "Height"),
                ignore_attr = TRUE)
-  expect_equal(ped$EST[ped$PARM == "SexF"], 0, ignore_attr = TRUE)
+  expect_equal(ped$EST[ped$PARM == "Sex F"], 0, ignore_attr = TRUE)
 
   # order = "freq" puts the most frequent level first.  There are 10 M and 9 F.
   resf <- proc_glm(cls, model = Weight ~ Sex + Height, class = "Sex",
                    order = "freq", stats = "solution", output = "report")
   expect_equal(resf$ParameterEstimates$PARM,
-               c("Intercept", "SexM", "SexF", "Height"), ignore_attr = TRUE)
+               c("Intercept", "Sex M", "Sex F", "Height"), ignore_attr = TRUE)
 
   # Invalid keywords are rejected
   expect_error(proc_glm(cls, model = Weight ~ Sex + Height, class = "Sex",
@@ -671,7 +671,7 @@ test_that("glm21: order is vectorized across class variables.", {
                   class = c("Sex", "Region"), order = c("data", "internal"),
                   stats = "solution", output = "report")
   expect_equal(res$ParameterEstimates$PARM,
-               c("Intercept", "SexM", "SexF", "RegionA", "RegionB"),
+               c("Intercept", "Sex M", "Sex F", "Region A", "Region B"),
                ignore_attr = TRUE)
 
   # A single keyword is recycled across all class variables
@@ -679,7 +679,7 @@ test_that("glm21: order is vectorized across class variables.", {
                    class = c("Sex", "Region"), order = "data",
                    stats = "solution", output = "report")
   expect_equal(res2$ParameterEstimates$PARM,
-               c("Intercept", "SexM", "SexF", "RegionA", "RegionB"),
+               c("Intercept", "Sex M", "Sex F", "Region A", "Region B"),
                ignore_attr = TRUE)
 
   # Misaligned keywords are an error
@@ -705,7 +705,7 @@ test_that("glm22: a numeric class variable is factored, not treated as continuou
   dat2 <- data.frame(g = c(10, 10, 2, 2), y = c(1, 2, 3, 4))
   res2 <- proc_glm(dat2, model = y ~ g, class = "g", stats = "solution",
                    output = "report")
-  expect_equal(res2$ParameterEstimates$PARM, c("Intercept", "g2", "g10"),
+  expect_equal(res2$ParameterEstimates$PARM, c("Intercept", "g 2", "g 10"),
                ignore_attr = TRUE)
 })
 
@@ -722,7 +722,7 @@ test_that("glm23: order = formatted applies a user-defined format.", {
 
   # The format supplies both the labels and their order
   expect_equal(res$ParameterEstimates$PARM,
-               c("Intercept", "gLow", "gMid", "gHigh"), ignore_attr = TRUE)
+               c("Intercept", "g Low", "g Mid", "g High"), ignore_attr = TRUE)
 
   # A format that collapses values collapses levels, and the model loses the
   # degrees of freedom that separated them.  This mirrors the SAS practice of
@@ -934,7 +934,7 @@ test_that("glm30: noint drops the intercept and uncorrects the total.", {
 
   # With no intercept there is no reference level, so both Sex levels are
   # estimated rather than one of them being aliased to zero.
-  expect_equal(pe$PARM, c("SexF", "SexM", "Height"), ignore_attr = TRUE)
+  expect_equal(pe$PARM, c("Sex F", "Sex M", "Height"), ignore_attr = TRUE)
 
   # SAS: -132.7895379 / -126.1686948 / 3.6789031
   expect_equal(pe$EST, c(-132.7895379, -126.1686948, 3.6789031),
@@ -1183,7 +1183,7 @@ test_that("glm36: order = formatted requires a user-defined format.", {
   dat2 <- data.frame(g = c(10, 10, 2, 2), y = c(1, 2, 3, 4))
   res <- proc_glm(dat2, model = y ~ g, class = "g", order = "formatted",
                   stats = "solution", output = "report")
-  expect_equal(res$ParameterEstimates$PARM, c("Intercept", "g2", "g10"),
+  expect_equal(res$ParameterEstimates$PARM, c("Intercept", "g 2", "g 10"),
                ignore_attr = TRUE)
 })
 
@@ -1227,10 +1227,7 @@ Age Weight Oxygen RunTime
 test_that("glm37: estimable functions for a continuous effect match SAS.", {
 
   # SAS (proc_glm-011): model Oxygen = RunTime / e1 e2 e3;
-  # All three tables are the same: Intercept = 0, RunTime = L2.  The Type I
-  # basis from sasLM carries the X'X elimination scale (the RunTime row is
-  # 57.747535, the corrected sum of squares of RunTime), which SAS normalizes
-  # away so the free symbol has a coefficient of one.
+  # All three tables are the same: Intercept = 0, RunTime = L2.
   res <- proc_glm(fitness, model = Oxygen ~ RunTime,
                   stats = c("e1", "e2", "e3"), output = "report")
 
@@ -1292,10 +1289,7 @@ test_that("glm39: estimable function coefficients use the SAS 6-character width.
   #     model Oxygen = RunTime AgeGroup RunTime*AgeGroup / e1 e2 e3;
   #   run;
   #
-  # SAS writes each coefficient in 6 characters, not a fixed number of
-  # decimals: 0.4823 but 10.481, and 10.4864562717 becomes 10.486.  Trailing
-  # zeros are dropped (0.779, 0.5).  Rows are looked up by label because the
-  # interaction rows are not yet in SAS order.
+  # SAS writes each coefficient in 6 characters with trailing zeros dropped.
   fitness3 <- fitness
   fitness3$AgeGroup <- ifelse(fitness3$Age <= 44, "Young",
                               ifelse(fitness3$Age <= 50, "Middle", "Old"))
@@ -1323,3 +1317,716 @@ test_that("glm39: estimable function coefficients use the SAS 6-character width.
                rep("0.3333*L2", 3), ignore_attr = TRUE)
 })
 
+
+
+test_that("glm40: estimable functions for a class*class interaction match SAS.", {
+
+  # SAS:
+  #   data fitness4;
+  #     set fitness3;
+  #     if RunTime <= 10.5 then RunCat = 'Fast'; else RunCat = 'Slow';
+  #   run;
+  #   proc glm data=fitness4;
+  #     class AgeGroup RunCat;
+  #     model Oxygen = AgeGroup RunCat AgeGroup*RunCat / e1 e2 e3;
+  #   run;
+  #
+  # SAS orders the interaction parameters by the levels of each factor, the
+  # first factor varying slowest.
+  fitness4 <- fitness
+  fitness4$AgeGroup <- ifelse(fitness4$Age <= 44, "Young",
+                              ifelse(fitness4$Age <= 50, "Middle", "Old"))
+  fitness4$RunCat <- ifelse(fitness4$RunTime <= 10.5, "Fast", "Slow")
+
+  res <- proc_glm(fitness4, model = Oxygen ~ AgeGroup + RunCat + AgeGroup:RunCat,
+                  class = c("AgeGroup", "RunCat"), stats = c("e1", "e2", "e3"),
+                  output = "report")
+
+  stubs <- c("Intercept", "AgeGroup Middle", "AgeGroup Old", "AgeGroup Young",
+             "RunCat Fast", "RunCat Slow",
+             paste("AgeGroup*RunCat", c("Middle Fast", "Middle Slow",
+                                        "Old Fast", "Old Slow",
+                                        "Young Fast", "Young Slow")))
+  rccol <- c("0", "0", "0", "0", "L5", "-L5", "0.3278*L5", "-0.3278*L5",
+             "0.3576*L5", "-0.3576*L5", "0.3147*L5", "-0.3147*L5")
+  ixcol <- c(rep("0", 6), "L7", "-L7", "L9", "-L9", "-L7-L9", "L7+L9")
+
+  e1t <- res$TypeIEstimableFunctions
+  expect_equal(names(e1t), c("stub", "AgeGroup", "RunCat", "AgeGroup*RunCat"))
+  expect_equal(e1t$stub, stubs, ignore_attr = TRUE)
+  expect_equal(e1t$AgeGroup,
+               c("0", "L2", "L3", "-L2-L3", "-0.1*L2-0.0545*L3",
+                 "0.1*L2+0.0545*L3", "0.5*L2", "0.5*L2", "0.5455*L3",
+                 "0.4545*L3", "-0.6*L2-0.6*L3", "-0.4*L2-0.4*L3"),
+               ignore_attr = TRUE)
+  expect_equal(e1t$RunCat, rccol, ignore_attr = TRUE)
+  expect_equal(e1t[["AgeGroup*RunCat"]], ixcol, ignore_attr = TRUE)
+
+  e2t <- res$TypeIIEstimableFunctions
+  expect_equal(e2t$stub, stubs, ignore_attr = TRUE)
+  expect_equal(e2t$AgeGroup,
+               c("0", "L2", "L3", "-L2-L3", "0", "0",
+                 "0.5328*L2+0.0179*L3", "0.4672*L2-0.0179*L3",
+                 "0.0358*L2+0.565*L3", "-0.0358*L2+0.435*L3",
+                 "-0.5685*L2-0.5828*L3", "-0.4315*L2-0.4172*L3"),
+               ignore_attr = TRUE)
+  expect_equal(e2t$RunCat, rccol, ignore_attr = TRUE)
+  expect_equal(e2t[["AgeGroup*RunCat"]], ixcol, ignore_attr = TRUE)
+
+  e3t <- res$TypeIIIEstimableFunctions
+  expect_equal(e3t$stub, stubs, ignore_attr = TRUE)
+  expect_equal(e3t$AgeGroup,
+               c("0", "L2", "L3", "-L2-L3", "0", "0", "0.5*L2", "0.5*L2",
+                 "0.5*L3", "0.5*L3", "-0.5*L2-0.5*L3", "-0.5*L2-0.5*L3"),
+               ignore_attr = TRUE)
+  expect_equal(e3t$RunCat,
+               c("0", "0", "0", "0", "L5", "-L5",
+                 rep(c("0.3333*L5", "-0.3333*L5"), 3)),
+               ignore_attr = TRUE)
+  expect_equal(e3t[["AgeGroup*RunCat"]], ixcol, ignore_attr = TRUE)
+})
+
+
+test_that("glm41: estimable functions for a continuous*class interaction match SAS.", {
+
+  # SAS:
+  #   proc glm data=fitness3;
+  #     class AgeGroup;
+  #     model Oxygen = RunTime AgeGroup RunTime*AgeGroup / e1 e2 e3;
+  #   run;
+  fitness3 <- fitness
+  fitness3$AgeGroup <- ifelse(fitness3$Age <= 44, "Young",
+                              ifelse(fitness3$Age <= 50, "Middle", "Old"))
+
+  res <- proc_glm(fitness3, model = Oxygen ~ RunTime + AgeGroup + RunTime:AgeGroup,
+                  class = "AgeGroup", stats = c("e1", "e2", "e3"),
+                  output = "report")
+
+  stubs <- c("Intercept", "RunTime", "AgeGroup Middle", "AgeGroup Old",
+             "AgeGroup Young", "RunTime*AgeGroup Middle",
+             "RunTime*AgeGroup Old", "RunTime*AgeGroup Young")
+  agcol <- c("0", "0", "L3", "L4", "-L3-L4", "0", "0", "0")
+  ixcol <- c(rep("0", 5), "L6", "L7", "-L6-L7")
+
+  e1t <- res$TypeIEstimableFunctions
+  expect_equal(e1t$stub, stubs, ignore_attr = TRUE)
+  expect_equal(e1t$RunTime,
+               c("0", "L2", "0.0107*L2", "0.0541*L2", "-0.0648*L2",
+                 "0.4823*L2", "0.779*L2", "-0.2613*L2"), ignore_attr = TRUE)
+  expect_equal(e1t$AgeGroup,
+               c("0", "0", "L3", "L4", "-L3-L4", "10.481*L3-0.2524*L4",
+                 "-0.0869*L3+10.739*L4", "-10.394*L3-10.486*L4"),
+               ignore_attr = TRUE)
+  expect_equal(e1t[["RunTime*AgeGroup"]], ixcol, ignore_attr = TRUE)
+
+  e2t <- res$TypeIIEstimableFunctions
+  expect_equal(e2t$stub, stubs, ignore_attr = TRUE)
+  expect_equal(e2t$RunTime,
+               c("0", "L2", "0", "0", "0", "0.3836*L2", "0.1993*L2",
+                 "0.4171*L2"), ignore_attr = TRUE)
+  # The Type II AgeGroup column is checked in glm42
+  expect_equal(e2t[["RunTime*AgeGroup"]], ixcol, ignore_attr = TRUE)
+
+  e3t <- res$TypeIIIEstimableFunctions
+  expect_equal(e3t$stub, stubs, ignore_attr = TRUE)
+  expect_equal(e3t$RunTime,
+               c("0", "L2", "0", "0", "0", rep("0.3333*L2", 3)),
+               ignore_attr = TRUE)
+  expect_equal(e3t$AgeGroup, agcol, ignore_attr = TRUE)
+  expect_equal(e3t[["RunTime*AgeGroup"]], ixcol, ignore_attr = TRUE)
+})
+
+
+test_that("glm42: Type II follows the SAS containment rule for continuous*class effects.", {
+
+  # SAS only treats E1 as contained in E2 when both involve the same continuous
+  # variables, so AgeGroup is not contained in RunTime*AgeGroup.
+
+  # SAS:
+  #   proc glm data=fitness3;
+  #     class AgeGroup;
+  #     model Oxygen = RunTime AgeGroup RunTime*AgeGroup / ss1 ss2 ss3 e2;
+  #   run;
+  fitness3 <- fitness
+  fitness3$AgeGroup <- ifelse(fitness3$Age <= 44, "Young",
+                              ifelse(fitness3$Age <= 50, "Middle", "Old"))
+
+  res <- proc_glm(fitness3, model = Oxygen ~ RunTime + AgeGroup + RunTime:AgeGroup,
+                  class = "AgeGroup", stats = c("ss1", "ss2", "ss3", "e2"),
+                  output = "report")
+
+  # SAS Type II SS: RunTime 554.8205507, AgeGroup 17.2123192,
+  # RunTime*AgeGroup 13.6269196.
+  expect_equal(res$TypeII$SUMSQ, c(554.8205507, 17.2123192, 13.6269196),
+               ignore_attr = TRUE, tolerance = 1e-7)
+
+  expect_equal(res$TypeIIEstimableFunctions$AgeGroup,
+               c("0", "0", "L3", "L4", "-L3-L4", "0", "0", "0"),
+               ignore_attr = TRUE)
+})
+
+
+test_that("glm43: interaction contrast and estimate coefficients follow SAS level order.", {
+
+  # SAS:
+  #   proc glm data=fitness4;
+  #     class AgeGroup RunCat;
+  #     model Oxygen = AgeGroup RunCat AgeGroup*RunCat;
+  #     contrast 'ix' AgeGroup*RunCat 1 -1 -1 1 0 0;
+  #     estimate 'ix' AgeGroup*RunCat 1 -1 -1 1 0 0;
+  #   run;
+  #
+  # The coefficients are read in SAS order, Middle Fast, Middle Slow, Old Fast,
+  # Old Slow, Young Fast, Young Slow, so this is (Middle Fast - Middle Slow) -
+  # (Old Fast - Old Slow).  The model is saturated, so the expected values
+  # are the cell mean contrast, and they match a real SAS run:
+  #   Contrast ix  DF 1  SS 0.14977907  F 0.01  Pr > F 0.9235
+  #   Estimate ix  -0.33886667  Std Error 3.49570498  t -0.10  Pr > |t| 0.9235
+  fitness4 <- fitness
+  fitness4$AgeGroup <- ifelse(fitness4$Age <= 44, "Young",
+                              ifelse(fitness4$Age <= 50, "Middle", "Old"))
+  fitness4$RunCat <- ifelse(fitness4$RunTime <= 10.5, "Fast", "Slow")
+
+  ix <- list("AgeGroup*RunCat" = c(1, -1, -1, 1, 0, 0))
+  res <- proc_glm(fitness4, model = Oxygen ~ AgeGroup + RunCat + AgeGroup:RunCat,
+                  class = c("AgeGroup", "RunCat"),
+                  contrast = list("ix" = ix), estimate = list("ix" = ix),
+                  output = "report")
+
+  expect_equal(res$Estimates$EST, -0.3388666667, ignore_attr = TRUE,
+               tolerance = 1e-8)
+  expect_equal(res$Estimates$STDERR, 3.4957049846, ignore_attr = TRUE,
+               tolerance = 1e-8)
+  expect_equal(res$Contrasts$SUMSQ, 0.1497790667, ignore_attr = TRUE,
+               tolerance = 1e-8)
+  expect_equal(round(res$Contrasts$FVAL, 2), 0.01, ignore_attr = TRUE)
+  expect_equal(round(res$Contrasts$PROBF, 4), 0.9235, ignore_attr = TRUE)
+  expect_equal(round(res$Estimates$PROBT, 4), 0.9235, ignore_attr = TRUE)
+
+  # A factor keeps its own level order, which need not be alphabetical.  With
+  # Young, Middle, Old the same vector is (Young diff - Middle diff).
+  fitness5 <- fitness4
+  fitness5$AgeGroup <- factor(fitness5$AgeGroup,
+                              levels = c("Young", "Middle", "Old"))
+  res2 <- proc_glm(fitness5, model = Oxygen ~ AgeGroup + RunCat + AgeGroup:RunCat,
+                   class = c("AgeGroup", "RunCat"), estimate = list("ix" = ix),
+                   output = "report")
+
+  m <- tapply(fitness5$Oxygen, list(fitness5$AgeGroup, fitness5$RunCat), mean)
+  expect_equal(res2$Estimates$EST,
+               (m["Young", "Fast"] - m["Young", "Slow"]) -
+                 (m["Middle", "Fast"] - m["Middle", "Slow"]),
+               ignore_attr = TRUE, tolerance = 1e-8)
+})
+
+
+test_that("glm44: class*class contrasts and estimates match SAS.", {
+
+  # SAS (fitness4 as in glm40):
+  #   proc glm data=fitness4;
+  #     class AgeGroup RunCat;
+  #     model Oxygen = AgeGroup RunCat AgeGroup*RunCat;
+  #     contrast 'Middle: Fast vs Slow' RunCat 1 -1 AgeGroup*RunCat 1 -1 0 0 0 0;
+  #     contrast 'Young: Fast vs Slow'  RunCat 1 -1 AgeGroup*RunCat 0 0 0 0 1 -1;
+  #     contrast 'Fast: Middle vs Old'  AgeGroup 1 -1 0 AgeGroup*RunCat 1 0 -1 0 0 0;
+  #     contrast 'ix Middle vs Young'   AgeGroup*RunCat 1 -1 0 0 -1 1;
+  #     contrast 'ix 2df'               AgeGroup*RunCat 1 -1 -1 1 0 0,
+  #                                     AgeGroup*RunCat 1 -1 0 0 -1 1;
+  #     estimate ... (the first four, same coefficients)
+  #   run;
+  #
+  # The first three mix a main effect with the interaction, so both parts
+  # have to land on the right parameters.  "ix 2df" spans the whole
+  # interaction, so its SS equals the Type III interaction SS.
+  fitness4 <- fitness
+  fitness4$AgeGroup <- ifelse(fitness4$Age <= 44, "Young",
+                              ifelse(fitness4$Age <= 50, "Middle", "Old"))
+  fitness4$RunCat <- ifelse(fitness4$RunTime <= 10.5, "Fast", "Slow")
+
+  ix <- "AgeGroup*RunCat"
+  specs <- list(
+    "Middle: Fast vs Slow" = setNames(list(c(1, -1), c(1, -1, 0, 0, 0, 0)),
+                                      c("RunCat", ix)),
+    "Young: Fast vs Slow"  = setNames(list(c(1, -1), c(0, 0, 0, 0, 1, -1)),
+                                      c("RunCat", ix)),
+    "Fast: Middle vs Old"  = setNames(list(c(1, -1, 0), c(1, 0, -1, 0, 0, 0)),
+                                      c("AgeGroup", ix)),
+    "ix Middle vs Young"   = setNames(list(c(1, -1, 0, 0, -1, 1)), ix))
+
+  res <- proc_glm(fitness4, model = Oxygen ~ AgeGroup + RunCat + AgeGroup:RunCat,
+                  class = c("AgeGroup", "RunCat"),
+                  contrast = c(specs, list("ix 2df" = setNames(
+                    list(rbind(c(1, -1, -1, 1, 0, 0), c(1, -1, 0, 0, -1, 1))), ix))),
+                  estimate = specs, output = "report")
+
+  ct <- res$Contrasts
+  expect_equal(ct$DF, c(1, 1, 1, 1, 2), ignore_attr = TRUE)
+  expect_equal(ct$SUMSQ, c(75.4600900, 176.2437648, 10.4934900, 11.5814543,
+                           13.9694816), ignore_attr = TRUE, tolerance = 1e-8)
+  expect_equal(round(ct$FVAL, 2), c(4.73, 11.06, 0.66, 0.73, 0.44),
+               ignore_attr = TRUE)
+  expect_equal(round(ct$PROBF, 4), c(0.0392, 0.0027, 0.4248, 0.4021, 0.6500),
+               ignore_attr = TRUE)
+
+  es <- res$Estimates
+  expect_equal(es$EST, c(5.49400000, 8.56941667, 1.96153333, -3.07541667),
+               ignore_attr = TRUE, tolerance = 1e-8)
+  expect_equal(es$STDERR, c(2.52500056, 2.57706791, 2.41750398, 3.60789507),
+               ignore_attr = TRUE, tolerance = 1e-8)
+  expect_equal(round(es$PROBT, 4), c(0.0392, 0.0027, 0.4248, 0.4021),
+               ignore_attr = TRUE)
+})
+
+
+test_that("glm45: continuous*class contrasts and estimates match SAS.", {
+
+  # SAS:
+  #   proc glm data=fitness4;
+  #     class AgeGroup;
+  #     model Oxygen = RunTime AgeGroup RunTime*AgeGroup;
+  #     contrast 'slope Middle vs Old' RunTime*AgeGroup 1 -1 0;
+  #     contrast 'slopes equal'        RunTime*AgeGroup 1 -1 0,
+  #                                    RunTime*AgeGroup 1 0 -1;
+  #     estimate 'slope Middle'        RunTime 1 RunTime*AgeGroup 1 0 0;
+  #     estimate 'slope Young'         RunTime 1 RunTime*AgeGroup 0 0 1;
+  #     estimate 'slope Middle vs Old' RunTime*AgeGroup 1 -1 0;
+  #   run;
+  #
+  # "slopes equal" spans the whole interaction, so its SS equals the Type III
+  # RunTime*AgeGroup SS.
+  fitness3 <- fitness
+  fitness3$AgeGroup <- ifelse(fitness3$Age <= 44, "Young",
+                              ifelse(fitness3$Age <= 50, "Middle", "Old"))
+
+  jx <- "RunTime*AgeGroup"
+  res <- proc_glm(fitness3, model = Oxygen ~ RunTime + AgeGroup + RunTime:AgeGroup,
+                  class = "AgeGroup",
+                  contrast = list(
+                    "slope Middle vs Old" = setNames(list(c(1, -1, 0)), jx),
+                    "slopes equal" = setNames(list(rbind(c(1, -1, 0),
+                                                         c(1, 0, -1))), jx)),
+                  estimate = list(
+                    "slope Middle" = setNames(list(1, c(1, 0, 0)), c("RunTime", jx)),
+                    "slope Young"  = setNames(list(1, c(0, 0, 1)), c("RunTime", jx)),
+                    "slope Middle vs Old" = setNames(list(c(1, -1, 0)), jx)),
+                  output = "report")
+
+  ct <- res$Contrasts
+  expect_equal(ct$DF, c(1, 2), ignore_attr = TRUE)
+  expect_equal(ct$SUMSQ, c(1.30826227, 13.62691955), ignore_attr = TRUE,
+               tolerance = 1e-8)
+  expect_equal(round(ct$PROBF, 4), c(0.6688, 0.3907), ignore_attr = TRUE)
+
+  es <- res$Estimates
+  expect_equal(es$EST, c(-2.62010681, -3.72128167, 0.42424529),
+               ignore_attr = TRUE, tolerance = 1e-8)
+  expect_equal(es$STDERR, c(0.57301077, 0.54952203, 0.97999496),
+               ignore_attr = TRUE, tolerance = 1e-8)
+  expect_equal(round(es$T, 2), c(-4.57, -6.77, 0.43), ignore_attr = TRUE)
+})
+
+
+test_that("glm46: an interaction model keeps its observations for class levels, p and lsmeans.", {
+
+  fitness3 <- fitness
+  fitness3$AgeGroup <- ifelse(fitness3$Age <= 44, "Young",
+                              ifelse(fitness3$Age <= 50, "Middle", "Old"))
+
+  res <- proc_glm(fitness3, model = Oxygen ~ RunTime + AgeGroup + RunTime:AgeGroup,
+                  class = "AgeGroup", stats = "p", lsmeans = "AgeGroup",
+                  output = "report")
+
+  # SAS: AgeGroup  3  Middle Old Young
+  expect_equal(res$ClassLevels$LEVELS, 3, ignore_attr = TRUE)
+  expect_equal(res$ClassLevels$VALUES, "Middle Old Young", ignore_attr = TRUE)
+
+  expect_equal(nrow(res$OutputStatistics), 31)
+  expect_equal(res$LSMeans.AgeGroup$LEVEL, c("Middle", "Old", "Young"),
+               ignore_attr = TRUE)
+})
+
+
+test_that("glm47: sums of squares tables spell interactions the SAS way.", {
+
+  # SAS writes RunTime*AgeGroup, not RunTime:AgeGroup
+  fitness3 <- fitness
+  fitness3$AgeGroup <- ifelse(fitness3$Age <= 44, "Young",
+                              ifelse(fitness3$Age <= 50, "Middle", "Old"))
+  mdl <- Oxygen ~ RunTime + AgeGroup + RunTime:AgeGroup
+  src <- c("RunTime", "AgeGroup", "RunTime*AgeGroup")
+
+  res <- proc_glm(fitness3, model = mdl, class = "AgeGroup",
+                  stats = c("ss1", "ss2", "ss3"), output = "report")
+  expect_equal(res$TypeI$SOURCE, src, ignore_attr = TRUE)
+  expect_equal(res$TypeII$SOURCE, src, ignore_attr = TRUE)
+  expect_equal(res$TypeIII$SOURCE, src, ignore_attr = TRUE)
+
+  dat <- proc_glm(fitness3, model = mdl, class = "AgeGroup",
+                  stats = c("ss1", "ss2", "ss3"))
+  expect_equal(unique(dat$SOURCE[dat$SOURCE != "ERROR"]), src,
+               ignore_attr = TRUE)
+})
+
+
+test_that("glm48: Type II matches SAS for class*class and weighted models.", {
+
+  # SAS (fitness4 as in glm40):
+  #   model Oxygen = AgeGroup RunCat AgeGroup*RunCat / ss2;
+  #   Type II SS: AgeGroup 91.4818672, RunCat 330.5225556,
+  #               AgeGroup*RunCat 13.9694816
+  fitness4 <- fitness
+  fitness4$AgeGroup <- ifelse(fitness4$Age <= 44, "Young",
+                              ifelse(fitness4$Age <= 50, "Middle", "Old"))
+  fitness4$RunCat <- ifelse(fitness4$RunTime <= 10.5, "Fast", "Slow")
+
+  res <- proc_glm(fitness4, model = Oxygen ~ AgeGroup + RunCat + AgeGroup:RunCat,
+                  class = c("AgeGroup", "RunCat"), stats = "ss2",
+                  output = "report")
+  expect_equal(res$TypeII$SUMSQ, c(91.4818672, 330.5225556, 13.9694816),
+               ignore_attr = TRUE, tolerance = 1e-8)
+  expect_equal(round(res$TypeII$PROBF, 4), c(0.0755, 0.0001, 0.6500),
+               ignore_attr = TRUE)
+
+  # In an additive model Type II equals Type III, and the weighted Type III
+  # for this model is checked against SAS in glm13.
+  resw <- proc_glm(cls, model = Weight ~ Sex + Height, class = "Sex",
+                   weight = "Age", stats = "ss2", output = "report")
+  expect_equal(resw$TypeII$SUMSQ, c(2184.34600582, 74778.51236596),
+               ignore_attr = TRUE, tolerance = 1e-9)
+})
+
+
+test_that("glm49: solution for a class*class interaction matches SAS.", {
+
+  # SAS (fitness4 as in glm40):
+  #   model Oxygen = AgeGroup RunCat AgeGroup*RunCat / solution;
+  #
+  # SAS zeroes every parameter that involves the last level of any factor.
+  fitness4 <- fitness
+  fitness4$AgeGroup <- ifelse(fitness4$Age <= 44, "Young",
+                              ifelse(fitness4$Age <= 50, "Middle", "Old"))
+  fitness4$RunCat <- ifelse(fitness4$RunTime <= 10.5, "Fast", "Slow")
+
+  res <- proc_glm(fitness4, model = Oxygen ~ AgeGroup + RunCat + AgeGroup:RunCat,
+                  class = c("AgeGroup", "RunCat"), stats = "solution",
+                  output = "report")
+  pe <- res$ParameterEstimates
+
+  expect_equal(pe$PARM,
+               c("Intercept", "AgeGroup Middle", "AgeGroup Old",
+                 "AgeGroup Young", "RunCat Fast", "RunCat Slow",
+                 paste("AgeGroup*RunCat", c("Middle Fast", "Middle Slow",
+                                            "Old Fast", "Old Slow",
+                                            "Young Fast", "Young Slow"))),
+               ignore_attr = TRUE)
+  expect_equal(pe$EST,
+               c(44.70575000, -0.27655000, -2.57695000, 0, 8.56941667, 0,
+                 -3.07541667, 0, -2.73655000, 0, 0, 0),
+               ignore_attr = TRUE, tolerance = 1e-8)
+  expect_equal(pe$STDERR[c(1, 2, 3, 5, 7, 9)],
+               c(1.99618822, 2.67816753, 2.67816753, 2.57706791, 3.60789507,
+                 3.53349749), ignore_attr = TRUE, tolerance = 1e-8)
+  expect_equal(round(pe$PROBT[c(2, 3, 5, 7, 9)], 4),
+               c(0.9186, 0.3452, 0.0027, 0.4021, 0.4459), ignore_attr = TRUE)
+  expect_true(all(pe$BIASED == "B"))
+})
+
+
+test_that("glm50: solution for a continuous*class interaction matches SAS.", {
+
+  # SAS:
+  #   model Oxygen = RunTime AgeGroup RunTime*AgeGroup / solution;
+  #
+  # RunTime is the slope of the reference group, Young.
+  fitness3 <- fitness
+  fitness3$AgeGroup <- ifelse(fitness3$Age <= 44, "Young",
+                              ifelse(fitness3$Age <= 50, "Middle", "Old"))
+
+  res <- proc_glm(fitness3, model = Oxygen ~ RunTime + AgeGroup + RunTime:AgeGroup,
+                  class = "AgeGroup", stats = "solution", output = "report")
+  pe <- res$ParameterEstimates
+
+  expect_equal(pe$PARM,
+               c("Intercept", "RunTime", "AgeGroup Middle", "AgeGroup Old",
+                 "AgeGroup Young", "RunTime*AgeGroup Middle",
+                 "RunTime*AgeGroup Old", "RunTime*AgeGroup Young"),
+               ignore_attr = TRUE)
+  expect_equal(pe$EST,
+               c(87.84912840, -3.72128167, -12.77403113, -9.44665751, 0,
+                 1.10117486, 0.67692958, 0),
+               ignore_attr = TRUE, tolerance = 1e-8)
+  expect_equal(pe$STDERR[c(1, 2, 3, 4, 6, 7)],
+               c(5.67357688, 0.54952203, 8.37346227, 10.36846280, 0.79392431,
+                 0.96644877), ignore_attr = TRUE, tolerance = 1e-8)
+  expect_equal(round(pe$PROBT[c(3, 4, 6, 7)], 4),
+               c(0.1397, 0.3709, 0.1777, 0.4901), ignore_attr = TRUE)
+})
+
+
+test_that("glm51: estimable functions use the weights.", {
+
+  # SAS:
+  #   proc glm data=fitness3;
+  #     class AgeGroup;
+  #     weight Weight;
+  #     model Oxygen = RunTime AgeGroup RunTime*AgeGroup / e1 e2 e3;
+  #   run;
+  fitness3 <- fitness
+  fitness3$AgeGroup <- ifelse(fitness3$Age <= 44, "Young",
+                              ifelse(fitness3$Age <= 50, "Middle", "Old"))
+
+  res <- proc_glm(fitness3, model = Oxygen ~ RunTime + AgeGroup + RunTime:AgeGroup,
+                  class = "AgeGroup", weight = "Weight",
+                  stats = c("e1", "e2", "e3"), output = "report")
+
+  agcol <- c("0", "0", "L3", "L4", "-L3-L4", "0", "0", "0")
+  ixcol <- c(rep("0", 5), "L6", "L7", "-L6-L7")
+
+  e1t <- res$TypeIEstimableFunctions
+  expect_equal(e1t$RunTime,
+               c("0", "L2", "0.0107*L2", "0.0544*L2", "-0.0651*L2",
+                 "0.4874*L2", "0.7831*L2", "-0.2704*L2"), ignore_attr = TRUE)
+  expect_equal(e1t$AgeGroup,
+               c("0", "0", "L3", "L4", "-L3-L4", "10.499*L3-0.2659*L4",
+                 "-0.0876*L3+10.776*L4", "-10.411*L3-10.51*L4"),
+               ignore_attr = TRUE)
+  expect_equal(e1t[["RunTime*AgeGroup"]], ixcol, ignore_attr = TRUE)
+
+  e2t <- res$TypeIIEstimableFunctions
+  expect_equal(e2t$RunTime,
+               c("0", "L2", "0", "0", "0", "0.3899*L2", "0.1978*L2",
+                 "0.4124*L2"), ignore_attr = TRUE)
+  expect_equal(e2t$AgeGroup, agcol, ignore_attr = TRUE)
+
+  e3t <- res$TypeIIIEstimableFunctions
+  expect_equal(e3t$RunTime, c("0", "L2", "0", "0", "0", rep("0.3333*L2", 3)),
+               ignore_attr = TRUE)
+  expect_equal(e3t$AgeGroup, agcol, ignore_attr = TRUE)
+})
+
+
+test_that("glm52: a 3x3 class*class model matches SAS.", {
+
+  # SAS:
+  #   data fitness5;
+  #     set fitness3;
+  #     if Weight < 76 then WtCat = 'Lo';
+  #     else if Weight < 82 then WtCat = 'Mid';
+  #     else WtCat = 'High';
+  #   run;
+  #   proc glm data=fitness5;
+  #     class AgeGroup WtCat;
+  #     model Oxygen = AgeGroup WtCat AgeGroup*WtCat / ss2 solution e1;
+  #     lsmeans AgeGroup WtCat;
+  #     contrast 'ix MO HL' AgeGroup*WtCat 1 -1 0 -1 1 0 0 0 0;
+  #     contrast 'ix 4df'   AgeGroup*WtCat 1 -1 0 -1 1 0 0 0 0,
+  #                         AgeGroup*WtCat 1 0 -1 -1 0 1 0 0 0,
+  #                         AgeGroup*WtCat 1 -1 0 0 0 0 -1 1 0,
+  #                         AgeGroup*WtCat 1 0 -1 0 0 0 -1 0 1;
+  #     estimate 'Young: High vs Mid' WtCat 1 0 -1
+  #                                   AgeGroup*WtCat 0 0 0 0 0 0 1 0 -1;
+  #   run;
+  fitness5 <- fitness
+  fitness5$AgeGroup <- ifelse(fitness5$Age <= 44, "Young",
+                              ifelse(fitness5$Age <= 50, "Middle", "Old"))
+  fitness5$WtCat <- ifelse(fitness5$Weight < 76, "Lo",
+                           ifelse(fitness5$Weight < 82, "Mid", "High"))
+
+  ix <- "AgeGroup*WtCat"
+  res <- proc_glm(fitness5, model = Oxygen ~ AgeGroup + WtCat + AgeGroup:WtCat,
+                  class = c("AgeGroup", "WtCat"),
+                  stats = c("ss2", "solution", "e1"),
+                  lsmeans = c("AgeGroup", "WtCat"),
+                  contrast = list(
+                    "ix MO HL" = setNames(list(c(1, -1, 0, -1, 1, 0, 0, 0, 0)), ix),
+                    "ix 4df" = setNames(list(rbind(c(1, -1, 0, -1, 1, 0, 0, 0, 0),
+                                                   c(1, 0, -1, -1, 0, 1, 0, 0, 0),
+                                                   c(1, -1, 0, 0, 0, 0, -1, 1, 0),
+                                                   c(1, 0, -1, 0, 0, 0, -1, 0, 1))), ix)),
+                  estimate = list(
+                    "Young: High vs Mid" = setNames(list(c(1, 0, -1),
+                                                         c(0, 0, 0, 0, 0, 0, 1, 0, -1)),
+                                                    c("WtCat", ix))),
+                  output = "report")
+
+  expect_equal(res$ClassLevels$VALUES, c("Middle Old Young", "High Lo Mid"),
+               ignore_attr = TRUE)
+  expect_equal(res$TypeII$SUMSQ, c(110.8953211, 12.0801224, 70.2745688),
+               ignore_attr = TRUE, tolerance = 1e-8)
+
+  pe <- res$ParameterEstimates
+  expect_equal(pe$PARM[8:16],
+               paste("AgeGroup*WtCat", c("Middle High", "Middle Lo", "Middle Mid",
+                                         "Old High", "Old Lo", "Old Mid",
+                                         "Young High", "Young Lo", "Young Mid")),
+               ignore_attr = TRUE)
+  expect_equal(pe$EST,
+               c(49.52933333, -2.05108333, -3.46500000, 0, 0.06400000,
+                 0.74716667, 0, -5.46125000, 1.19633333, 0, 0.04666667,
+                 -2.47230000, 0, 0, 0, 0),
+               ignore_attr = TRUE, tolerance = 1e-8)
+  expect_equal(pe$STDERR[c(8, 9, 11, 12)],
+               c(6.52223454, 5.70352865, 6.32749692, 5.79061046),
+               ignore_attr = TRUE, tolerance = 1e-8)
+
+  expect_equal(res$LSMeans.AgeGroup$LSMEAN,
+               c(46.3270000, 45.5261778, 49.7997222), ignore_attr = TRUE,
+               tolerance = 1e-8)
+  expect_equal(res$LSMeans.WtCat$LSMEAN,
+               c(45.9497778, 48.0124833, 47.6906389), ignore_attr = TRUE,
+               tolerance = 1e-8)
+
+  expect_equal(res$Contrasts$SUMSQ, c(65.61745707, 70.27456882),
+               ignore_attr = TRUE, tolerance = 1e-8)
+  expect_equal(res$Estimates$EST, 0.06400000, ignore_attr = TRUE,
+               tolerance = 1e-8)
+  expect_equal(res$Estimates$STDERR, 4.47421598, ignore_attr = TRUE,
+               tolerance = 1e-8)
+
+  e1t <- res$TypeIEstimableFunctions
+  expect_equal(e1t[["AgeGroup*WtCat"]],
+               c(rep("0", 7), "L8", "L9", "-L8-L9", "L11", "L12", "-L11-L12",
+                 "-L8-L11", "-L9-L12", "L8+L9+L11+L12"), ignore_attr = TRUE)
+  expect_equal(e1t$WtCat[c(8, 14)],
+               c("0.2838*L5+0.0205*L6", "0.3571*L5+0.0002*L6"),
+               ignore_attr = TRUE)
+})
+
+
+test_that("glm53: a weighted continuous*class model matches SAS.", {
+
+  # SAS:
+  #   proc glm data=fitness3;
+  #     class AgeGroup;
+  #     weight Weight;
+  #     model Oxygen = RunTime AgeGroup RunTime*AgeGroup / ss2 solution;
+  #     lsmeans AgeGroup;
+  #     contrast 'slopes equal'          RunTime*AgeGroup 1 -1 0,
+  #                                      RunTime*AgeGroup 1 0 -1;
+  #     estimate 'slope Old'             RunTime 1 RunTime*AgeGroup 0 1 0;
+  #     estimate 'slope Middle vs Young' RunTime*AgeGroup 1 0 -1;
+  #   run;
+  fitness3 <- fitness
+  fitness3$AgeGroup <- ifelse(fitness3$Age <= 44, "Young",
+                              ifelse(fitness3$Age <= 50, "Middle", "Old"))
+
+  jx <- "RunTime*AgeGroup"
+  res <- proc_glm(fitness3, model = Oxygen ~ RunTime + AgeGroup + RunTime:AgeGroup,
+                  class = "AgeGroup", weight = "Weight",
+                  stats = c("ss2", "solution"), lsmeans = "AgeGroup",
+                  contrast = list(
+                    "slopes equal" = setNames(list(rbind(c(1, -1, 0),
+                                                         c(1, 0, -1))), jx)),
+                  estimate = list(
+                    "slope Old" = setNames(list(1, c(0, 1, 0)), c("RunTime", jx)),
+                    "slope Middle vs Young" = setNames(list(c(1, 0, -1)), jx)),
+                  output = "report")
+
+  expect_equal(res$TypeII$SUMSQ, c(44025.78541, 1322.80710, 1035.03376),
+               ignore_attr = TRUE, tolerance = 1e-9)
+
+  pe <- res$ParameterEstimates
+  expect_equal(pe$EST,
+               c(87.46541534, -3.69006658, -12.48874132, -9.32272000, 0,
+                 1.06703309, 0.67283551, 0),
+               ignore_attr = TRUE, tolerance = 1e-8)
+  expect_equal(pe$STDERR[c(1, 2, 3, 4, 6, 7)],
+               c(5.57558277, 0.53921280, 8.17365186, 10.19289633, 0.77348227,
+                 0.94709214), ignore_attr = TRUE, tolerance = 1e-8)
+
+  expect_equal(res$LSMeans.AgeGroup$LSMEAN,
+               c(47.2089030, 46.2018979, 48.4018944), ignore_attr = TRUE,
+               tolerance = 1e-8)
+
+  expect_equal(res$Contrasts$SUMSQ, 1035.033758, ignore_attr = TRUE,
+               tolerance = 1e-9)
+  expect_equal(res$Estimates$EST, c(-3.01723107, 1.06703309),
+               ignore_attr = TRUE, tolerance = 1e-8)
+  expect_equal(res$Estimates$STDERR, c(0.77860971, 0.77348227),
+               ignore_attr = TRUE, tolerance = 1e-8)
+})
+
+
+test_that("glm54: order = data carries through to an interaction.", {
+
+  # SAS:
+  #   proc glm data=fitness4 order=data;
+  #     class AgeGroup RunCat;
+  #     model Oxygen = AgeGroup RunCat AgeGroup*RunCat / solution e3;
+  #     contrast 'ix' AgeGroup*RunCat 1 -1 -1 1 0 0;
+  #     estimate 'Young: Slow vs Fast' RunCat 1 -1 AgeGroup*RunCat 1 -1 0 0 0 0;
+  #   run;
+  #
+  # Levels in order of appearance: AgeGroup Young Middle Old, RunCat Slow Fast.
+  fitness4 <- fitness
+  fitness4$AgeGroup <- ifelse(fitness4$Age <= 44, "Young",
+                              ifelse(fitness4$Age <= 50, "Middle", "Old"))
+  fitness4$RunCat <- ifelse(fitness4$RunTime <= 10.5, "Fast", "Slow")
+
+  kx <- "AgeGroup*RunCat"
+  res <- proc_glm(fitness4, model = Oxygen ~ AgeGroup + RunCat + AgeGroup:RunCat,
+                  class = c("AgeGroup", "RunCat"), order = "data",
+                  stats = c("solution", "e3"),
+                  contrast = list("ix" = setNames(list(c(1, -1, -1, 1, 0, 0)), kx)),
+                  estimate = list(
+                    "Young: Slow vs Fast" = setNames(list(c(1, -1),
+                                                          c(1, -1, 0, 0, 0, 0)),
+                                                     c("RunCat", kx))),
+                  output = "report")
+
+  expect_equal(res$ClassLevels$VALUES, c("Young Middle Old", "Slow Fast"),
+               ignore_attr = TRUE)
+
+  pe <- res$ParameterEstimates
+  expect_equal(pe$PARM[7:12],
+               paste("AgeGroup*RunCat", c("Young Slow", "Young Fast",
+                                          "Middle Slow", "Middle Fast",
+                                          "Old Slow", "Old Fast")),
+               ignore_attr = TRUE)
+  expect_equal(pe$EST,
+               c(47.96166667, 5.31350000, 1.96153333, 0, -5.83286667, 0,
+                 -2.73655000, 0, 0.33886667, 0, 0, 0),
+               ignore_attr = TRUE, tolerance = 1e-8)
+
+  expect_equal(res$Contrasts$SUMSQ, 11.58145429, ignore_attr = TRUE,
+               tolerance = 1e-8)
+  expect_equal(res$Estimates$EST, -8.56941667, ignore_attr = TRUE,
+               tolerance = 1e-8)
+
+  expect_equal(res$TypeIIIEstimableFunctions[[kx]],
+               c(rep("0", 6), "L7", "-L7", "L9", "-L9", "-L7-L9", "L7+L9"),
+               ignore_attr = TRUE)
+})
+
+
+test_that("glm55: noint with an interaction matches SAS.", {
+
+  # SAS:
+  #   proc glm data=fitness4;
+  #     class AgeGroup RunCat;
+  #     model Oxygen = AgeGroup RunCat AgeGroup*RunCat / noint solution;
+  #   run;
+  fitness4 <- fitness
+  fitness4$AgeGroup <- ifelse(fitness4$Age <= 44, "Young",
+                              ifelse(fitness4$Age <= 50, "Middle", "Old"))
+  fitness4$RunCat <- ifelse(fitness4$RunTime <= 10.5, "Fast", "Slow")
+
+  res <- proc_glm(fitness4, model = Oxygen ~ AgeGroup + RunCat + AgeGroup:RunCat,
+                  class = c("AgeGroup", "RunCat"),
+                  stats = c("noint", "solution", "ss1"), output = "report")
+
+  expect_equal(res$TypeI$SUMSQ[1], 69686.89091, ignore_attr = TRUE,
+               tolerance = 1e-9)
+
+  pe <- res$ParameterEstimates
+  expect_equal(pe$PARM[1:4],
+               c("AgeGroup Middle", "AgeGroup Old", "AgeGroup Young",
+                 "RunCat Fast"), ignore_attr = TRUE)
+  expect_equal(pe$EST,
+               c(44.42920000, 42.12880000, 44.70575000, 8.56941667, 0,
+                 -3.07541667, 0, -2.73655000, 0, 0, 0),
+               ignore_attr = TRUE, tolerance = 1e-8)
+  expect_equal(pe$STDERR[1:4],
+               c(1.78544502, 1.78544502, 1.99618822, 2.57706791),
+               ignore_attr = TRUE, tolerance = 1e-8)
+})
