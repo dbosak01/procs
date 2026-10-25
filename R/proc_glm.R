@@ -571,13 +571,14 @@ get_output_specs_glm <- function(model, class = NULL, opts = NULL,
 #
 # SAS spells interactions "a*b" where R spells them "a:b", and the model
 # parameter already accepts both, so the spec does too.
-#' @import sasLM
-build_glm_L <- function(formula, data, spec, label = "") {
+#
+# mm comes from glm_model_matrix(); coefficients are placed through mm$perm.
+build_glm_L <- function(formula, mm, spec, label = "") {
 
-  mm <- ModelMatrix(formula, data)
   cn <- colnames(mm$X)
   asg <- mm$assign
   tl <- attr(stats::terms(formula), "term.labels")
+  perm <- mm$perm
 
   nms <- gsub("*", ":", names(spec), fixed = TRUE)
 
@@ -624,7 +625,7 @@ build_glm_L <- function(formula, data, spec, label = "") {
       stop(paste0("Effect '", eff, "' on '", label, "' expects ", length(cols),
                   " coefficients but got ", ncol(coefs), "."))
 
-    L[, cols] <- coefs
+    L[, perm[cols]] <- coefs
   }
 
   return(L)
@@ -757,6 +758,9 @@ get_glm_report <- function(data, var, model, class = NULL, opts = NULL,
                BETA = needBeta, Resid = hasP, EMEAN = hasLS)
   }
 
+  # Put the fit into SAS terms
+  glm <- sas_glm(glm, model, data, class = class, weight = weight)
+
   # One fit of the model, reused by the estimability check, the contrasts, the
   # estimates and the clm/cli limits.
   #
@@ -770,12 +774,19 @@ get_glm_report <- function(data, var, model, class = NULL, opts = NULL,
   mmX <- NULL
   g2u <- NULL
 
+  # Model matrix in SAS parameter order, shared by contrast, estimate and the
+  # estimable function tables
+  mm <- NULL
+  if (hasCLM || hasCLI || hasE1 || hasE2 || hasE3 ||
+      !is.null(contrast) || !is.null(estimate))
+    mm <- glm_model_matrix(model, data)
+
   if (hasCLM || hasCLI || !is.null(contrast) || !is.null(estimate)) {
 
     wts <- if (is.null(weight)) 1 else data[[weight]]
 
     rx <- REG(model, data, Weights = wts, summarize = FALSE)
-    mmX <- ModelMatrix(model, data)$X
+    mmX <- mm$X
 
     # Estimability is a property of the row space of the design matrix, so it
     # does not depend on the weights.  In a weighted fit rx$g2 is the inverse of
@@ -1126,24 +1137,25 @@ get_glm_report <- function(data, var, model, class = NULL, opts = NULL,
 
 
 
-  # Type I, II and III estimable functions (e1, e2, e3).  sasLM returns the
-  # basis rows; estimable_table() turns them into the SAS symbolic table, one
-  # row per parameter and one column per effect.
+  # Type I, II and III estimable functions (e1, e2, e3)
   if (hasE1 || hasE2 || hasE3) {
 
-    mm <- ModelMatrix(model, data)
+    # Weighted design matrix, as in the fit
+    mmw <- mm
+    if (!is.null(weight))
+      mmw$X <- sqrt(data[[weight]]) * mm$X
 
     if (hasE1)
       ret[["TypeIEstimableFunctions"]] <-
-        estimable_table(e1(crossprod(mm$X), eps = sing), mm)
+        estimable_table(e1(crossprod(mmw$X), eps = sing), mmw)
 
     if (hasE2)
       ret[["TypeIIEstimableFunctions"]] <-
-        estimable_table(e2(mm, eps = sing), mm)
+        estimable_table(sas_e2(mmw, class, eps = sing), mmw)
 
     if (hasE3)
       ret[["TypeIIIEstimableFunctions"]] <-
-        estimable_table(e3(mm, eps = sing), mm)
+        estimable_table(e3(mmw, eps = sing), mmw)
   }
 
   # Contrasts: an F-test per labeled contrast, via sasLM::CONTR.
@@ -1154,7 +1166,7 @@ get_glm_report <- function(data, var, model, class = NULL, opts = NULL,
     crows <- NULL
     for (lbl in names(contrast)) {
 
-      L <- build_glm_L(model, data, contrast[[lbl]], lbl)
+      L <- build_glm_L(model, mm, contrast[[lbl]], lbl)
 
       # A non-estimable contrast is dropped, the way SAS drops it.
       if (!check_estimable(L, mmX, g2u, lbl, zeta))
@@ -1192,7 +1204,7 @@ get_glm_report <- function(data, var, model, class = NULL, opts = NULL,
     erows <- NULL
     for (lbl in names(estimate)) {
 
-      L <- build_glm_L(model, data, estimate[[lbl]], lbl)
+      L <- build_glm_L(model, mm, estimate[[lbl]], lbl)
 
       if (!check_estimable(L, mmX, g2u, lbl, zeta))
         next
@@ -1285,6 +1297,9 @@ get_glm_output <- function(data, var, model, modelname, class = NULL,
   } else {
     glm <- GLM(model, data, conf.level = alph)
   }
+
+  # Put the fit into SAS terms
+  glm <- sas_glm(glm, model, data, class = class, weight = weight)
 
   tycode <- c("Type I" = "SS1", "Type II" = "SS2", "Type III" = "SS3")
 

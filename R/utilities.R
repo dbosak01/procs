@@ -1131,18 +1131,16 @@ get_vars <- function(formula) {
 
 get_valid_obs <- function(data, formula) {
 
-  vrs <- get_vars(formula)
+  # Filter on the model variables, not the model terms
+  if (is.character(formula))
+    formula <- stats::as.formula(formula)
 
-  tvrs <- c(vrs$dvar, vrs$ivar)
+  tvrs <- intersect(all.vars(formula), names(data))
 
-  naobs <- !is.na(data[[tvrs[1]]])
+  naobs <- rep(TRUE, nrow(data))
 
-  for (i in seq_len(length(tvrs) - 1)) {
-
-    v2 <- !is.na(data[[tvrs[i + 1]]])
-
-    naobs <- naobs & v2
-  }
+  for (v in tvrs)
+    naobs <- naobs & !is.na(data[[v]])
 
   if (nrow(data) > 0)
     ret <- data[naobs, ]
@@ -2074,28 +2072,182 @@ matrix_table <- function(mat, stub_label = "Parameter") {
 }
 
 
-# Build the SAS estimable function table (e1, e2, e3) from a sasLM basis.
-#
-# sasLM's e1(), e2() and e3() return one row per model parameter: row k is the
-# hypothesis row whose free symbol is Lk, with one column per design matrix
-# column.  The rows are not normalized (the Type I rows carry the X'X
-# elimination scale) and a class effect has one all-zero row for its aliased
-# level.  SAS instead prints one row per parameter and one column per effect,
-# with each cell an expression in the free symbols, e.g. "L3", "-L3-L4" or
-# "0.0107*L2".
-#
-# For each effect, the rows belonging to that effect are row reduced with the
-# pivots taken over the effect's own columns in level order.  This puts the
-# free symbols on the first levels and leaves the last level as a combination
-# of them, the way SAS does.
+# The permutation that puts the design matrix columns into SAS parameter order:
+# within each interaction, by the level order of each factor, the first factor
+# varying slowest.  Columns only move within their own effect.
+#' @noRd
+sas_col_order <- function(mm, data) {
+
+  cn <- colnames(mm$X)
+  perm <- seq_along(cn)
+
+  for (eff in names(mm$termIndices)) {
+
+    vars <- strsplit(eff, ":", fixed = TRUE)[[1]]
+    if (length(vars) < 2)
+      next
+
+    pos <- mm$termIndices[[eff]]
+    parts <- strsplit(cn[pos], ":", fixed = TRUE)
+
+    # One sort key per factor: the level index, or 0 for a continuous variable
+    keys <- lapply(seq_along(vars), function(i) {
+
+      v <- vars[i]
+      x <- data[[v]]
+      if (is.null(x) || (is.numeric(x) && !is.factor(x)))
+        return(rep(0L, length(pos)))
+
+      lvl <- vapply(parts, function(p) substring(p[i], nchar(v) + 1),
+                    character(1))
+      match(lvl, levels(as.factor(x)))
+    })
+
+    if (any(vapply(keys, anyNA, logical(1))))
+      next
+
+    perm[pos] <- pos[do.call(order, unname(keys))]
+  }
+
+  return(perm)
+}
+
+
+# The sasLM model matrix with its SAS parameter order attached as mm$perm:
+# mm$perm[k] is the column holding the k-th parameter in SAS order.
+# keep_order keeps the effects in the order the model was written.
+#' @import sasLM
+#' @noRd
+glm_model_matrix <- function(formula, data, keep_order = FALSE) {
+
+  mm <- ModelMatrix(formula, data, KeepOrder = keep_order)
+  mm$perm <- sas_col_order(mm, data)
+
+  return(mm)
+}
+
+
+# Whether effect e2 contains effect e1, by the SAS PROC GLM rule: e2 has every
+# variable of e1, both have the same continuous variables, and e2 has more
+# class variables.
+#' @noRd
+sas_contains <- function(e2, e1, class) {
+
+  v1 <- strsplit(e1, ":", fixed = TRUE)[[1]]
+  v2 <- strsplit(e2, ":", fixed = TRUE)[[1]]
+
+  return(e1 != e2 &&
+           all(v1 %in% v2) &&
+           setequal(setdiff(v1, class), setdiff(v2, class)) &&
+           sum(v2 %in% class) > sum(v1 %in% class))
+}
+
+
+# The Type II hypothesis rows for every effect under the SAS containment rule:
+# X_E' M X, where M projects out the intercept and every other effect that
+# does not contain E.  Rows sit at E's own parameter positions.
+#' @import sasLM
+#' @noRd
+sas_e2 <- function(mm, class, eps = 1e-8) {
+
+  X <- mm$X
+  ti <- mm$termIndices
+  effs <- setdiff(names(ti), "(Intercept)")
+
+  E <- matrix(0, ncol(X), ncol(X), dimnames = list(NULL, colnames(X)))
+
+  for (e in effs) {
+
+    adj <- effs[!vapply(effs, function(o) o == e || sas_contains(o, e, class),
+                        logical(1))]
+    c0 <- unlist(ti[c(intersect("(Intercept)", names(ti)), adj)],
+                 use.names = FALSE)
+
+    MX <- X
+    if (length(c0) > 0) {
+      X0 <- X[, c0, drop = FALSE]
+      MX <- X - X0 %*% G2SWEEP(crossprod(X0), Augmented = FALSE, eps = eps) %*%
+        crossprod(X0, X)
+    }
+
+    E[ti[[e]], ] <- crossprod(X[, ti[[e]], drop = FALSE], MX)
+  }
+
+  return(E)
+}
+
+
+# Put a sasLM::GLM() result into SAS terms: Type II under the SAS containment
+# rule, parameter estimates fit in SAS parameter order with SAS labels, and
+# interaction sources spelled with "*".  Weights are applied as sasLM::GLM()
+# applies them.
+#' @import sasLM
+#' @noRd
+sas_glm <- function(glm, model, data, class = NULL, weight = NULL,
+                    eps = 1e-8) {
+
+  srwi <- if (is.null(weight)) 1 else sqrt(data[[weight]])
+  y <- srwi * stats::model.frame(model, data)[, 1]
+
+  if (!is.null(glm[["Type II"]])) {
+
+    mm <- glm_model_matrix(model, data)
+    mm$X <- srwi * mm$X
+    rw <- lfit(mm, y, eps = eps)
+    E2 <- sas_e2(mm, class, eps = eps)
+
+    # A matrix with class "anova"; assign into the bare matrix
+    T2 <- unclass(glm[["Type II"]])
+    for (e in intersect(rownames(T2), names(mm$termIndices))) {
+      cs <- cSS(E2[mm$termIndices[[e]], , drop = FALSE], rw, eps = eps)
+      T2[e, colnames(cs)] <- as.numeric(cs[1, ])
+    }
+    class(T2) <- "anova"
+    glm[["Type II"]] <- T2
+  }
+
+  if (!is.null(glm$Parameter)) {
+
+    mm <- glm_model_matrix(model, data, keep_order = TRUE)
+    cn <- colnames(mm$X)[mm$perm]
+    x <- list(X = srwi * mm$X[, mm$perm, drop = FALSE])
+
+    P <- sumREG(lfit(x, y, eps = eps), x$X)
+
+    lbls <- character(length(cn))
+    for (eff in names(mm$termIndices))
+      lbls[mm$termIndices[[eff]]] <-
+        estimable_labels(eff, cn[mm$termIndices[[eff]]])
+    rownames(P) <- lbls
+
+    glm$Parameter <- P
+  }
+
+  for (ty in c("Type I", "Type II", "Type III")) {
+    if (!is.null(glm[[ty]]))
+      rownames(glm[[ty]]) <- gsub(":", "*", rownames(glm[[ty]]), fixed = TRUE)
+  }
+
+  return(glm)
+}
+
+
+# Build the SAS estimable function table (e1, e2, e3) from a basis with one
+# hypothesis row per parameter: one row per parameter, one column per effect,
+# each cell an expression in the free symbols L1, L2, ...  The basis is put in
+# SAS parameter order, and each effect's rows are row reduced with pivots on
+# the effect's own columns in level order.
 #' @noRd
 estimable_table <- function(E, mm, eps = 1e-8) {
 
-  pn <- colnames(mm$X)
+  perm <- mm$perm
+  E <- E[perm, perm, drop = FALSE]
+
+  pn <- colnames(mm$X)[perm]
   ti <- mm$termIndices
   effs <- names(ti)[names(ti) != "(Intercept)"]
 
-  # SAS labels: "Intercept", "RunTime", "AgeGroup Middle", "A*B a1 b2"
+  # SAS row labels
   stub <- character(length(pn))
   for (eff in names(ti))
     stub[ti[[eff]]] <- estimable_labels(eff, pn[ti[[eff]]])
@@ -2144,7 +2296,7 @@ estimable_table <- function(E, mm, eps = 1e-8) {
 
 
 # Render one cell of an estimable function table: the sum of coef * Lk over
-# the free symbols, written the SAS way ("L3", "-L3-L4", "0.0107*L2", "0").
+# the free symbols, written the SAS way.
 #' @noRd
 estimable_cell <- function(coefs, piv, eps = 1e-8) {
 
@@ -2180,9 +2332,8 @@ estimable_cell <- function(coefs, piv, eps = 1e-8) {
 
 
 # Format a non-negative coefficient the way SAS writes it in an estimable
-# function: 6 characters wide, so the decimals are whatever the integer part
-# leaves (0.4823, 10.481, 105.48), with trailing zeros dropped (0.5, 0.779).
-# The sign is written by the caller and does not count toward the width.
+# function: 6 characters wide, trailing zeros dropped.  The sign is written by
+# the caller.
 #' @noRd
 estimable_num <- function(x) {
 
@@ -2203,10 +2354,8 @@ estimable_num <- function(x) {
 }
 
 
-# SAS row labels for the parameters of one effect.  The design matrix column
-# names are the variable names run together with their levels
-# ("AgeGroupMiddle", "AgeGroupOld:AgeCat<50"); SAS writes the effect name and
-# then the levels separated by spaces ("AgeGroup*AgeCat Old <50").
+# SAS row labels for the parameters of one effect: the effect name, then the
+# levels separated by spaces.
 #' @noRd
 estimable_labels <- function(eff, cols) {
 
