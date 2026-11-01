@@ -78,6 +78,12 @@ Age Weight Oxygen RunTime
 48 61.24 47.920 11.50
 52 82.78 47.467 10.50')
 
+# A three-level class variable, so multi-row contrasts have something to test.
+# Levels under the default "internal" order are Middle, Old, Young -- the same
+# order SAS reports under its Class Level Information.
+clsa <- cls
+clsa$AgeGroup <- ifelse(clsa$Age <= 12, "Young",
+                        ifelse(clsa$Age <= 14, "Middle", "Old"))
 
 dev <- FALSE
 
@@ -757,12 +763,7 @@ test_that("glm23: order = formatted applies a user-defined format.", {
 
 # contrast and estimate ------------------------------------------------------
 
-# A three-level class variable, so multi-row contrasts have something to test.
-# Levels under the default "internal" order are Middle, Old, Young -- the same
-# order SAS reports under its Class Level Information.
-clsa <- cls
-clsa$AgeGroup <- ifelse(clsa$Age <= 12, "Young",
-                        ifelse(clsa$Age <= 14, "Middle", "Old"))
+
 
 
 test_that("glm24: single-row contrasts match SAS.", {

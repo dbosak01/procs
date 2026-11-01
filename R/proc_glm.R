@@ -1230,7 +1230,9 @@ get_glm_report <- function(data, var, model, class = NULL, opts = NULL,
     if (!is.null(erows)) {
       rownames(erows) <- NULL
 
-      efmt <- list(EST = "%.7f", STDERR = "%.7f", DF = "%d",
+      efmt <- list(EST = fmt_col(erows, 11), # "%.7f",
+                   STDERR = fmt_col(erows, 11), # "%.7f",
+                   DF = "%d",
                    "T" = "%.2f", PROBT = pfmt)
       elbl <- list(stub = "Parameter", EST = "Estimate",
                    STDERR = "Standard Error", DF = "DF", "T" = "t Value",
