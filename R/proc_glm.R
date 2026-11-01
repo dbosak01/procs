@@ -979,7 +979,9 @@ get_glm_report <- function(data, var, model, class = NULL, opts = NULL,
 
     pe$ESTIMABLE <- NULL
 
-    pe_fc <- fcat(EST = "%.8f", STDERR = "%.8f", DF = "%d", "T" = "%.2f",
+    pe_fc <- fcat(EST = fmt_col(pe$EST, 11), # "%.8f",
+                  STDERR = fmt_col(pe$STDERR, 11), # "%.8f",
+                  DF = "%d", "T" = "%.2f",
                   PROBT = pfmt, LCLM = "%.8f", UCLM = "%.8f", log = FALSE)
 
     pctl <- (1 - get_alpha(opts)) * 100

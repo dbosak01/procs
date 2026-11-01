@@ -319,6 +319,17 @@ test_that("glm7a: biased column is removed from parameter estimates table approp
   #                          "Young vs Old"    = list(AgeGroup = c(1, 0, -1)),
   #                          "Middle vs Old"   = list(AgeGroup = c(0, 1, -1))))
 
+  # fitness2 <- fitness
+  # fitness2$AgeCat <- ifelse(fitness$Age < 50,
+  #                           "<50", ">=50")
+  #
+  # # Test 26 - zeta option
+  # proc_glm(fitness2,
+  #          # class = AgeCat,
+  #          model = Oxygen ~ RunTime + AgeCat,
+  #          contrast = list("F only" = list(AgeCat = c(1, 0))),
+  #          output = "report",
+  #          options = c("zeta" = 1e6))
 
 
 })
