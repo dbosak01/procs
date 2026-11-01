@@ -836,6 +836,27 @@ get_glm_report <- function(data, var, model, class = NULL, opts = NULL,
   # NObs
   ret[["NObs"]] <- get_obs(data, model)
 
+  # Type I, II and III estimable functions (e1, e2, e3)
+  if (hasE1 || hasE2 || hasE3) {
+
+    # Weighted design matrix, as in the fit
+    mmw <- mm
+    if (!is.null(weight))
+      mmw$X <- sqrt(data[[weight]]) * mm$X
+
+    if (hasE1)
+      ret[["TypeIEstimableFunctions"]] <-
+        estimable_table(e1(crossprod(mmw$X), eps = sing), mmw)
+
+    if (hasE2)
+      ret[["TypeIIEstimableFunctions"]] <-
+        estimable_table(sas_e2(mmw, class, eps = sing), mmw)
+
+    if (hasE3)
+      ret[["TypeIIIEstimableFunctions"]] <-
+        estimable_table(e3(mmw, eps = sing), mmw)
+  }
+
   # The augmented X'X crossproducts matrix (xpx) and its generalized inverse
   # (inverse).  "Augmented" means the dependent variable is carried as an extra
   # row and column, so the bottom right cell of the inverse is the error sum of
@@ -1137,26 +1158,7 @@ get_glm_report <- function(data, var, model, class = NULL, opts = NULL,
 
 
 
-  # Type I, II and III estimable functions (e1, e2, e3)
-  if (hasE1 || hasE2 || hasE3) {
 
-    # Weighted design matrix, as in the fit
-    mmw <- mm
-    if (!is.null(weight))
-      mmw$X <- sqrt(data[[weight]]) * mm$X
-
-    if (hasE1)
-      ret[["TypeIEstimableFunctions"]] <-
-        estimable_table(e1(crossprod(mmw$X), eps = sing), mmw)
-
-    if (hasE2)
-      ret[["TypeIIEstimableFunctions"]] <-
-        estimable_table(sas_e2(mmw, class, eps = sing), mmw)
-
-    if (hasE3)
-      ret[["TypeIIIEstimableFunctions"]] <-
-        estimable_table(e3(mmw, eps = sing), mmw)
-  }
 
   # Contrasts: an F-test per labeled contrast, via sasLM::CONTR.
   if (!is.null(contrast)) {
@@ -1184,7 +1186,9 @@ get_glm_report <- function(data, var, model, class = NULL, opts = NULL,
     if (!is.null(crows)) {
       rownames(crows) <- NULL
 
-      formats(crows) <- list(DF = "%d", SUMSQ = "%.6f", MEANSQ = "%.6f",
+      formats(crows) <- list(DF = "%d",
+                             SUMSQ = fmt_col(crows$SUMSQ, 11),  #"%.6f",
+                             MEANSQ = fmt_col(crows$MEANSQ, 11), # "%.6f",
                              FVAL = "%.2f", PROBF = pfmt)
       labels(crows) <- list(stub = "Contrast", DF = "DF", SUMSQ = "Contrast SS",
                             MEANSQ = "Mean Square", FVAL = "F Value",

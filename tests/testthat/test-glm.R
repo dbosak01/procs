@@ -297,13 +297,13 @@ test_that("glm7a: biased column is removed from parameter estimates table approp
   # pe2 <- proc_glm(fitness, output = "report",
   #                 model = Oxygen ~ RunTime,
   # stats = v(e1, e2, e3))
-  #
+
   # fitness3 <- fitness
   # fitness3$AgeGroup <- cut(fitness3$Age,
   #                          breaks = c(-Inf, 44, 50, Inf),
   #                          labels = c("Young", "Middle", "Old"))
   # fitness3$AgeCat <- ifelse(fitness3$Age < 50, "<50", ">=50")
-  # fitness3$AgeGroup <- factor(fitness3$AgeGroup)
+  # fitness3$AgeGroup <- as.character(fitness3$AgeGroup)
   #
   # proc_glm(fitness3,
   #          model = Oxygen ~ RunTime + AgeGroup,
@@ -311,6 +311,13 @@ test_that("glm7a: biased column is removed from parameter estimates table approp
   #          lsmeans = "AgeGroup",
   #          output = "report")
 
+  # proc_glm(fitness3,
+  #          model = Oxygen ~ RunTime + AgeGroup,
+  #          class = "AgeGroup",
+  #          lsmeans = "AgeGroup",
+  #          contrast = list("Young vs Middle" = list(AgeGroup = c(1, -1, 0)),
+  #                          "Young vs Old"    = list(AgeGroup = c(1, 0, -1)),
+  #                          "Middle vs Old"   = list(AgeGroup = c(0, 1, -1))))
 
 
 
