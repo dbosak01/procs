@@ -1317,7 +1317,7 @@ get_glm_output <- function(data, var, model, modelname, class = NULL,
                     TYPE = "ERROR",
                     DF = glm$ANOVA[2, 1],
                     SS = glm$ANOVA[2, 2],
-                    MEANSQ = glm$ANOVA[2, 3],
+                    # MEANSQ = glm$ANOVA[2, 3],  # SAS does not have.  Not validated.
                     FVAL = glm$ANOVA[2, 4],
                     PROBF = glm$ANOVA[2, 5],
                     stringsAsFactors = FALSE)
@@ -1326,8 +1326,10 @@ get_glm_output <- function(data, var, model, modelname, class = NULL,
 
     mat <- glm[[ty]]
     ss <- as.data.frame(unclass(mat), stringsAsFactors = FALSE)
-    names(ss) <- c("DF", "SS", "MEANSQ", "FVAL", "PROBF")
+    names(ss) <- c("DF", "SS", "MEANSQ",
+                   "FVAL", "PROBF")
     rownames(ss) <- NULL
+    ss$MEANSQ <- NULL  # Kill this one
 
     df1 <- data.frame(MODEL = modelname,
                       DEPVAR = var,
