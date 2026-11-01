@@ -29,6 +29,7 @@ The package includes the following functions:
 * `proc_means()`: A function to simulate the MEANS or SUMMARY procedure.
 * `proc_ttest()`: A function to perform T-Tests and calculate confidence limits. 
 * `proc_reg()`: A function to perform a regression.
+* `proc_glm()`: A function to perform a generalized linear regression.
 * `proc_transpose()`: A function to pivot data similar in syntax to the 
 TRANSPOSE procedure.
 * `proc_sort()`: A function to sort and dedupe datasets.

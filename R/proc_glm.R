@@ -15,7 +15,8 @@
 #' parameter allows you to subset the data into groups and run the model on
 #' each group.  The \code{weight} parameter lets you assign a weight to each
 #' observation.  The \code{output} and \code{options} parameters provide
-#' additional customization of the results.
+#' additional customization of the results. The \code{proc_glm} function currently
+#' does not generate plots.
 #' @details
 #' The \code{proc_glm} function is a general-purpose linear modeling function
 #' built on top of the \code{\link[sasLM]{GLM}} function from the \strong{sasLM}
@@ -124,13 +125,15 @@
 #' interactive report.  The effect(s) must also appear on the \code{class}
 #' parameter.
 #' @param options A vector of optional keywords.  Valid values are "alpha =",
-#' "noprint", "ss1", "ss2", "ss3", "outstat", "singular =", and "zeta =".  The
+#' "noprint", "ss1", "ss2", "ss3", "outstat".  The
+#  "noprint", "ss1", "ss2", "ss3", "outstat", "singular =", and "zeta =".  The
 #' "outstat" option requests an output dataset of the model sums of squares.
 #' This is the default output dataset, so the option does not normally need to
-#' be passed.  The "singular =" option sets the tolerance for detecting a linear
-#' dependency among the design matrix columns, and "zeta =" sets the tolerance
-#' of the estimability check applied to each \code{contrast} and
-#' \code{estimate}.  Both default to 1e-8.
+#' be passed.
+# The "singular =" option sets the tolerance for detecting a linear
+# dependency among the design matrix columns, and "zeta =" sets the tolerance
+# of the estimability check applied to each \code{contrast} and
+# \code{estimate}.  Both default to 1e-8.
 #' @param titles A vector of one or more titles to use for the report output.
 #' @param where An expression to filter the rows before statistics are
 #' calculated.  Use the \code{\link[base]{expression}} function.
@@ -140,6 +143,115 @@
 #' @import fmtr
 #' @import tibble
 #' @seealso [proc_reg()]
+#' @examples
+#' # Turn off printing for CRAN checks
+#' options("procs.print" = FALSE)
+#'
+#' # Example 1: Basic model
+#' res1 <- proc_glm(mtcars, mpg ~ hp + wt)
+#'
+#' # View results
+#' res1
+#' #    MODEL DEPVAR SOURCE  TYPE DF        SS     MEANSQ      FVAL        PROBF
+#' # 1 MODEL1    mpg  ERROR ERROR 29 195.04775   6.725785        NA           NA
+#' # 2 MODEL1    mpg     hp   SS1  1 678.37287 678.372874 100.86152 5.987344e-11
+#' # 3 MODEL1    mpg     wt   SS1  1 252.62656 252.626559  37.56091 1.119647e-06
+#' # 4 MODEL1    mpg     hp   SS3  1  83.27418  83.274183  12.38133 1.451229e-03
+#' # 5 MODEL1    mpg     wt   SS3  1 252.62656 252.626559  37.56091 1.119647e-06
+#'
+#' # Example 2: Report output
+#' res2 <- proc_glm(mtcars, mpg ~ hp + wt,
+#'                  output = "report")
+#'
+#' # View results
+#' res2
+#' # $NObs
+#' #                         LABEL NOBS
+#' # 1 Number of Observations Read   32
+#' # 2 Number of Observations Used   32
+#' #
+#' # $ANOVA
+#' #            SOURCE DF     SUMSQ     MEANSQ     FVAL        PROBF
+#' # 1           Model  2  930.9994 465.499716 69.21121 9.109047e-12
+#' # 2           Error 29  195.0478   6.725785       NA           NA
+#' # 3 Corrected Total 31 1126.0472         NA       NA           NA
+#' #
+#' # $FitStatistics
+#' #         RSQ  COEFVAR     RMSE  DEPMEAN
+#' # 1 0.8267855 12.90857 2.593412 20.09062
+#' #
+#' # $TypeI
+#' #   SOURCE DF    SUMSQ   MEANSQ      FVAL        PROBF
+#' # 1     hp  1 678.3729 678.3729 100.86152 5.987344e-11
+#' # 2     wt  1 252.6266 252.6266  37.56091 1.119647e-06
+#' #
+#' # $TypeIII
+#' #   SOURCE DF     SUMSQ    MEANSQ     FVAL        PROBF
+#' # 1     hp  1  83.27418  83.27418 12.38133 1.451229e-03
+#' # 2     wt  1 252.62656 252.62656 37.56091 1.119647e-06
+#' #
+#' # $ParameterEstimates
+#' #        PARM         EST     STDERR         T        PROBT
+#' # 1 Intercept 37.22727012 1.59878754 23.284689 0.000000e+00
+#' # 2        hp -0.03177295 0.00902971 -3.518712 1.451229e-03
+#' # 3        wt -3.87783074 0.63273349 -6.128695 1.119647e-06
+#'
+#' #'
+#' # Example 3: By variable
+#' res3 <- proc_glm(mtcars, mpg ~ hp + wt,
+#'                  by = cyl)
+#'
+#' # View results
+#' res3
+#' #    BY  MODEL DEPVAR SOURCE  TYPE DF         SS     MEANSQ       FVAL      PROBF
+#' # 1   4 MODEL1    mpg  ERROR ERROR  8 64.9396474  8.1174559         NA         NA
+#' # 2   4 MODEL1    mpg     hp   SS1  1 55.7389699 55.7389699  6.8665565 0.03063088
+#' # 3   4 MODEL1    mpg     wt   SS1  1 82.7068372 82.7068372 10.1887633 0.01276524
+#' # 4   4 MODEL1    mpg     hp   SS3  1 34.9973354 34.9973354  4.3113675 0.07151610
+#' # 5   4 MODEL1    mpg     wt   SS3  1 82.7068372 82.7068372 10.1887633 0.01276524
+#' # 6   6 MODEL1    mpg  ERROR ERROR  4  5.2112707  1.3028177         NA         NA
+#' # 7   6 MODEL1    mpg     hp   SS1  1  0.2046882  0.2046882  0.1571119 0.71206529
+#' # 8   6 MODEL1    mpg     wt   SS1  1  7.2611839  7.2611839  5.5734459 0.07759393
+#' # 9   6 MODEL1    mpg     hp   SS3  1  1.5772106  1.5772106  1.2106150 0.33297540
+#' # 10  6 MODEL1    mpg     wt   SS3  1  7.2611839  7.2611839  5.5734459 0.07759393
+#' # 11  8 MODEL1    mpg  ERROR ERROR 11 42.8497010  3.8954274         NA         NA
+#' # 12  8 MODEL1    mpg     hp   SS1  1  6.8542713  6.8542713  1.7595685 0.21155901
+#' # 13  8 MODEL1    mpg     wt   SS1  1 35.4960277 35.4960277  9.1122294 0.01168393
+#' # 14  8 MODEL1    mpg     hp   SS3  1  6.3136353  6.3136353  1.6207812 0.22923028
+#' # 15  8 MODEL1    mpg     wt   SS3  1 35.4960277 35.4960277  9.1122294 0.01168393
+#'
+#' # Example 4: Long output
+#' res4 <- proc_glm(mtcars, mpg ~ hp + wt,
+#'                  output = "long")
+#'
+#' # View results
+#' res4
+#' #     MODEL DEPVAR SOURCE  TYPE   STAT         COL1
+#' # 1  MODEL1    mpg  ERROR ERROR     DF 2.900000e+01
+#' # 2  MODEL1    mpg  ERROR ERROR     SS 1.950478e+02
+#' # 3  MODEL1    mpg  ERROR ERROR MEANSQ 6.725785e+00
+#' # 4  MODEL1    mpg  ERROR ERROR   FVAL           NA
+#' # 5  MODEL1    mpg  ERROR ERROR  PROBF           NA
+#' # 6  MODEL1    mpg     hp   SS1     DF 1.000000e+00
+#' # 7  MODEL1    mpg     hp   SS1     SS 6.783729e+02
+#' # 8  MODEL1    mpg     hp   SS1 MEANSQ 6.783729e+02
+#' # 9  MODEL1    mpg     hp   SS1   FVAL 1.008615e+02
+#' # 10 MODEL1    mpg     hp   SS1  PROBF 5.987344e-11
+#' # 11 MODEL1    mpg     wt   SS1     DF 1.000000e+00
+#' # 12 MODEL1    mpg     wt   SS1     SS 2.526266e+02
+#' # 13 MODEL1    mpg     wt   SS1 MEANSQ 2.526266e+02
+#' # 14 MODEL1    mpg     wt   SS1   FVAL 3.756091e+01
+#' # 15 MODEL1    mpg     wt   SS1  PROBF 1.119647e-06
+#' # 16 MODEL1    mpg     hp   SS3     DF 1.000000e+00
+#' # 17 MODEL1    mpg     hp   SS3     SS 8.327418e+01
+#' # 18 MODEL1    mpg     hp   SS3 MEANSQ 8.327418e+01
+#' # 19 MODEL1    mpg     hp   SS3   FVAL 1.238133e+01
+#' # 20 MODEL1    mpg     hp   SS3  PROBF 1.451229e-03
+#' # 21 MODEL1    mpg     wt   SS3     DF 1.000000e+00
+#' # 22 MODEL1    mpg     wt   SS3     SS 2.526266e+02
+#' # 23 MODEL1    mpg     wt   SS3 MEANSQ 2.526266e+02
+#' # 24 MODEL1    mpg     wt   SS3   FVAL 3.756091e+01
+#' # 25 MODEL1    mpg     wt   SS3  PROBF 1.119647e-06
 #' @export
 proc_glm <- function(data,
                      model,
@@ -1317,7 +1429,7 @@ get_glm_output <- function(data, var, model, modelname, class = NULL,
                     TYPE = "ERROR",
                     DF = glm$ANOVA[2, 1],
                     SS = glm$ANOVA[2, 2],
-                    # MEANSQ = glm$ANOVA[2, 3],  # SAS does not have.  Not validated.
+                    MEANSQ = glm$ANOVA[2, 3],
                     FVAL = glm$ANOVA[2, 4],
                     PROBF = glm$ANOVA[2, 5],
                     stringsAsFactors = FALSE)
@@ -1329,7 +1441,6 @@ get_glm_output <- function(data, var, model, modelname, class = NULL,
     names(ss) <- c("DF", "SS", "MEANSQ",
                    "FVAL", "PROBF")
     rownames(ss) <- NULL
-    ss$MEANSQ <- NULL  # Kill this one
 
     df1 <- data.frame(MODEL = modelname,
                       DEPVAR = var,
