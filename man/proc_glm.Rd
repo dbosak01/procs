@@ -69,31 +69,8 @@ on the by variable(s) prior to performing the analysis.}
 \item{stats}{Optional statistics keywords, corresponding to the options on
 the "model" statement in SAS.  Valid values are "ss1", "ss2", "ss3",
 "solution", "est", "clparm", "p", "clm", "cli", "noint", "xpx", "inverse", and
-"e1", "e2", and "e3".
-\itemize{
-\item{\strong{solution}: Adds a parameter estimates table to the interactive
-report.  "est" is an accepted alias.}
-\item{\strong{clparm}: Adds confidence limits for the parameter estimates,
-using the alpha value from the \code{options} parameter.}
-\item{\strong{p}: Adds predicted values and residuals to the interactive
-report.}
-\item{\strong{clm}: Adds the standard error and confidence limits of the
-mean predicted value to the predicted values table.  Implies "p".}
-\item{\strong{cli}: Adds confidence limits for an individual predicted value
-to the predicted values table.  These are wider than the "clm" limits
-because they include the error variance.  Implies "p".}
-\item{\strong{noint}: Fits the model without an intercept.  Every downstream
-statistic reflects this, and the total sum of squares is no longer corrected
-for the mean.}
-\item{\strong{xpx}: Adds the augmented X'X crossproducts matrix, which
-carries the dependent variable as an extra row and column.}
-\item{\strong{inverse}: Adds the generalized inverse of the augmented X'X
-matrix.  Its bottom right cell is the error sum of squares.}
-\item{\strong{e1}, \strong{e2}, \strong{e3}: Add the Type I, Type II and
-Type III estimable function tables.}
-\item{\strong{ss1}, \strong{ss2}, \strong{ss3}: Select which sums of squares
-to produce.  The default is Type I and Type III, as in SAS.}
-}}
+"e1", "e2", and "e3".  See the "Statistics Keywords" section for an explanation
+of these options.}
 
 \item{output}{Whether or not to return datasets from the function.  Valid
 values are "out", "none", and "report", plus the data shaping keywords
@@ -138,7 +115,7 @@ interactive report.  The effect(s) must also appear on the \code{class}
 parameter.}
 
 \item{options}{A vector of optional keywords.  Valid values are "alpha =",
-"noprint", "ss1", "ss2", "ss3", "outstat".  The
+"noprint", "outstat".  The
 "outstat" option requests an output dataset of the model sums of squares.
 This is the default output dataset, so the option does not normally need to
 be passed.}
@@ -172,7 +149,137 @@ built on top of the \code{\link[sasLM]{GLM}} function from the \strong{sasLM}
 package.  It produces a dataset output by default, and, when working in
 RStudio, also produces an interactive report.  Statistical output is
 designed to match SAS.
+
+A model may be specified using R model syntax or SAS model syntax.  To use
+SAS syntax, the model statement must be quoted.  To pass multiple models using
+R syntax, pass them to the \code{model} parameter in a list.  To pass multiple
+models using SAS syntax, pass them to the \code{model} parameter as a vector
+of strings.
 }
+\section{Interactive Output}{
+
+By default, \code{proc_glm} results will
+be sent to the viewer as an HTML report.  This functionality
+makes it easy to get a quick analysis of your data. To turn off the
+interactive report, pass the "noprint" keyword
+to the \code{options} parameter.
+
+The \code{titles} parameter allows you to set one or more titles for your
+report.  Pass these titles as a vector of strings.
+
+The exact datasets used for the interactive report can be returned as a list.
+To return these datasets, pass
+the "report" keyword on the \code{output} parameter. This list may in
+turn be passed to \code{\link{proc_print}} to write the report to a file.
+}
+
+\section{Dataset Output}{
+
+Dataset results are also returned from the function by default.
+\code{proc_glm} typically returns a single dataset.
+
+The default output dataset is optimized for data manipulation.
+The column names have been standardized, and additional variables may
+be present to help with data manipulation. The data values in the
+output dataset are intentionally not rounded or formatted
+to give you the most accurate numeric results.
+
+You may also request
+to return the datasets used in the interactive report. To request these
+datasets, pass the "report" option to the \code{output} parameter.  Each report
+dataset will be named according to the category of statistical
+results.  There are six standard categories: "NObs",
+"ANOVA", "FitStatistics", "TypeI", "TypeIII", and "ParameterEstimates".
+Statistics options may generate additional tables in the interactive
+report.
+
+If you don't want any datasets returned, pass the "none" option on the
+\code{output} parameter.
+}
+
+\section{Statistics Keywords}{
+
+The following statistics keywords can be passed on the \code{stats}
+parameter. You may pass statistic keywords as a
+quoted vector of strings, or an unquoted vector using the \code{v()} function.
+An individual statistics keyword can be passed without quoting.
+\itemize{
+\item{\strong{solution}: Adds a parameter estimates table to the interactive
+report.  "est" is an accepted alias.}
+\item{\strong{clparm}: Adds confidence limits for the parameter estimates,
+using the alpha value from the \code{options} parameter.}
+\item{\strong{p}: Adds predicted values and residuals to the interactive
+report.}
+\item{\strong{clm}: Adds the standard error and confidence limits of the
+mean predicted value to the predicted values table.  Implies "p".}
+\item{\strong{cli}: Adds confidence limits for an individual predicted value
+to the predicted values table.  These are wider than the "clm" limits
+because they include the error variance.  Implies "p".}
+\item{\strong{noint}: Fits the model without an intercept.  Every downstream
+statistic reflects this, and the total sum of squares is no longer corrected
+for the mean.}
+\item{\strong{xpx}: Adds the augmented X'X crossproducts matrix, which
+carries the dependent variable as an extra row and column.}
+\item{\strong{inverse}: Adds the generalized inverse of the augmented X'X
+matrix.  Its bottom right cell is the error sum of squares.}
+\item{\strong{e1}, \strong{e2}, \strong{e3}: Add the Type I, Type II and
+Type III estimable function tables.}
+\item{\strong{ss1}, \strong{ss2}, \strong{ss3}: Select which sums of squares
+to produce.  The default is Type I and Type III, as in SAS.}
+}
+}
+
+\section{Options}{
+
+The \code{proc_glm} function recognizes the following options.  Options may
+be passed as a quoted vector of strings, or an unquoted vector using the
+\code{v()} function.
+\itemize{
+\item{\strong{alpha = }: The "alpha = " option will set the alpha
+value for confidence limit statistics.  Set the alpha as a decimal value
+between 0 and 1.  For example, you can set a 90\% confidence limit as
+\code{alpha = 0.1}.
+}
+\item{\strong{noprint}: Whether to print the interactive report to the
+viewer.  By default, the report is printed to the viewer. The "noprint"
+option will inhibit printing.  You may inhibit printing globally by
+setting the package print option to false:
+\code{options("procs.print" = FALSE)}.
+}
+\item{\strong{outstat}: The "outstat" option is used to request the
+TypeI and TypeIII model sum of squares, F, and P values be sent to the
+output dataset.
+The "outstat" dataset is the default output dataset, and this option
+does not normally need to be passed.
+}
+}
+}
+
+\section{Data Shaping}{
+
+The output datasets produced by the function can be shaped
+in different ways. These shaping options allow you to decide whether the
+data should be returned long and skinny, or short and wide. The shaping
+options can reduce the amount of data manipulation necessary to get the
+data into the desired form. The
+shaping options are as follows:
+\itemize{
+\item{\strong{long}: Transposes the output datasets
+so that statistics are in rows and variables are in columns.
+}
+\item{\strong{stacked}: Requests that output datasets
+be returned in "stacked" form, such that both statistics and
+variables are in rows.
+}
+\item{\strong{wide}: Requests that output datasets
+be returned in "wide" form, such that statistics are across the top in
+columns, and variables are in rows. This shaping option is the default.
+}
+}
+These shaping options are passed on the \code{output} parameter.  For example,
+to return the data in "long" form, use \code{output = "long"}.
+}
+
 \examples{
 # Turn off printing for CRAN checks
 options("procs.print" = FALSE)

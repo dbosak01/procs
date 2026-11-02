@@ -232,6 +232,7 @@ test_that("glm6: Type I / II / III sums of squares match SAS.", {
                     stats = "ss3")
   expect_equal(sort(unique(ress3$TYPE)), c("ERROR", "SS3"))
   expect_equal(nrow(ress3), 3)                     # 2 sources + 1 error row
+
 })
 
 

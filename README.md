@@ -1,7 +1,7 @@
 <!-- badges: start -->
 
 [![procs version](https://www.r-pkg.org/badges/version/procs)](https://cran.r-project.org/package=procs)
-[![procs lifecycle](https://img.shields.io/badge/lifecycle-maturing-blue.svg)](https://cran.r-project.org/package=procs)
+[![procs lifecycle](https://img.shields.io/badge/lifecycle-mature-blue.svg)](https://cran.r-project.org/package=procs)
 [![procs downloads](https://cranlogs.r-pkg.org/badges/procs)](https://cran.r-project.org/package=procs)
 [![procs total downloads](https://cranlogs.r-pkg.org/badges/grand-total/procs)](https://cran.r-project.org/package=procs)
 [![R-CMD-check](https://github.com/dbosak01/procs/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/dbosak01/procs/actions/workflows/R-CMD-check.yaml)
@@ -16,7 +16,7 @@
 The purpose of the **procs** package is to recreate commonly used SAS® 
 procedures in R.  This version of the package will attempt to simulate
 PROC FREQ, PROC MEANS, PROC TTEST, PROC REG, and PROC GLM. 
-Subsequent versions of the package will add more statistical procedures.  
+Subsequent versions of the package will add plots for all statistical functions.  
 
 The package will also include a conceptual reproduction of PROC TRANSPOSE,
 PROC SORT, and PROC PRINT.

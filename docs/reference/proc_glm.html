@@ -196,29 +196,8 @@ on the by variable(s) prior to performing the analysis.</p></dd>
 <dd><p>Optional statistics keywords, corresponding to the options on
 the "model" statement in SAS.  Valid values are "ss1", "ss2", "ss3",
 "solution", "est", "clparm", "p", "clm", "cli", "noint", "xpx", "inverse", and
-"e1", "e2", and "e3".</p><ul><li><p><strong>solution</strong>: Adds a parameter estimates table to the interactive
-report.  "est" is an accepted alias.</p></li>
-<li><p><strong>clparm</strong>: Adds confidence limits for the parameter estimates,
-using the alpha value from the <code>options</code> parameter.</p></li>
-<li><p><strong>p</strong>: Adds predicted values and residuals to the interactive
-report.</p></li>
-<li><p><strong>clm</strong>: Adds the standard error and confidence limits of the
-mean predicted value to the predicted values table.  Implies "p".</p></li>
-<li><p><strong>cli</strong>: Adds confidence limits for an individual predicted value
-to the predicted values table.  These are wider than the "clm" limits
-because they include the error variance.  Implies "p".</p></li>
-<li><p><strong>noint</strong>: Fits the model without an intercept.  Every downstream
-statistic reflects this, and the total sum of squares is no longer corrected
-for the mean.</p></li>
-<li><p><strong>xpx</strong>: Adds the augmented X'X crossproducts matrix, which
-carries the dependent variable as an extra row and column.</p></li>
-<li><p><strong>inverse</strong>: Adds the generalized inverse of the augmented X'X
-matrix.  Its bottom right cell is the error sum of squares.</p></li>
-<li><p><strong>e1</strong>, <strong>e2</strong>, <strong>e3</strong>: Add the Type I, Type II and
-Type III estimable function tables.</p></li>
-<li><p><strong>ss1</strong>, <strong>ss2</strong>, <strong>ss3</strong>: Select which sums of squares
-to produce.  The default is Type I and Type III, as in SAS.</p></li>
-</ul></dd>
+"e1", "e2", and "e3".  See the "Statistics Keywords" section for an explanation
+of these options.</p></dd>
 
 
 <dt id="arg-output">output<a class="anchor" aria-label="anchor" href="#arg-output"></a></dt>
@@ -275,7 +254,7 @@ parameter.</p></dd>
 
 <dt id="arg-options">options<a class="anchor" aria-label="anchor" href="#arg-options"></a></dt>
 <dd><p>A vector of optional keywords.  Valid values are "alpha =",
-"noprint", "ss1", "ss2", "ss3", "outstat".  The
+"noprint", "outstat".  The
 "outstat" option requests an output dataset of the model sums of squares.
 This is the default output dataset, so the option does not normally need to
 be passed.</p></dd>
@@ -303,6 +282,120 @@ built on top of the <code><a href="https://rdrr.io/pkg/sasLM/man/GLM.html" class
 package.  It produces a dataset output by default, and, when working in
 RStudio, also produces an interactive report.  Statistical output is
 designed to match SAS.</p>
+<p>A model may be specified using R model syntax or SAS model syntax.  To use
+SAS syntax, the model statement must be quoted.  To pass multiple models using
+R syntax, pass them to the <code>model</code> parameter in a list.  To pass multiple
+models using SAS syntax, pass them to the <code>model</code> parameter as a vector
+of strings.</p>
+    </div>
+    <div id="interactive-output">
+    <h2>Interactive Output</h2>
+
+
+<p>By default, <code>proc_glm</code> results will
+be sent to the viewer as an HTML report.  This functionality
+makes it easy to get a quick analysis of your data. To turn off the
+interactive report, pass the "noprint" keyword
+to the <code>options</code> parameter.</p>
+<p>The <code>titles</code> parameter allows you to set one or more titles for your
+report.  Pass these titles as a vector of strings.</p>
+<p>The exact datasets used for the interactive report can be returned as a list.
+To return these datasets, pass
+the "report" keyword on the <code>output</code> parameter. This list may in
+turn be passed to <code><a href="proc_print.html">proc_print</a></code> to write the report to a file.</p>
+    </div>
+    <div id="dataset-output">
+    <h2>Dataset Output</h2>
+
+
+<p>Dataset results are also returned from the function by default.
+<code>proc_glm</code> typically returns a single dataset.</p>
+<p>The default output dataset is optimized for data manipulation.
+The column names have been standardized, and additional variables may
+be present to help with data manipulation. The data values in the
+output dataset are intentionally not rounded or formatted
+to give you the most accurate numeric results.</p>
+<p>You may also request
+to return the datasets used in the interactive report. To request these
+datasets, pass the "report" option to the <code>output</code> parameter.  Each report
+dataset will be named according to the category of statistical
+results.  There are six standard categories: "NObs",
+"ANOVA", "FitStatistics", "TypeI", "TypeIII", and "ParameterEstimates".
+Statistics options may generate additional tables in the interactive
+report.</p>
+<p>If you don't want any datasets returned, pass the "none" option on the
+<code>output</code> parameter.</p>
+    </div>
+    <div id="statistics-keywords">
+    <h2>Statistics Keywords</h2>
+
+
+<p>The following statistics keywords can be passed on the <code>stats</code>
+parameter. You may pass statistic keywords as a
+quoted vector of strings, or an unquoted vector using the <code><a href="https://common.r-sassy.org/reference/v.html" class="external-link">v()</a></code> function.
+An individual statistics keyword can be passed without quoting.</p><ul><li><p><strong>solution</strong>: Adds a parameter estimates table to the interactive
+report.  "est" is an accepted alias.</p></li>
+<li><p><strong>clparm</strong>: Adds confidence limits for the parameter estimates,
+using the alpha value from the <code>options</code> parameter.</p></li>
+<li><p><strong>p</strong>: Adds predicted values and residuals to the interactive
+report.</p></li>
+<li><p><strong>clm</strong>: Adds the standard error and confidence limits of the
+mean predicted value to the predicted values table.  Implies "p".</p></li>
+<li><p><strong>cli</strong>: Adds confidence limits for an individual predicted value
+to the predicted values table.  These are wider than the "clm" limits
+because they include the error variance.  Implies "p".</p></li>
+<li><p><strong>noint</strong>: Fits the model without an intercept.  Every downstream
+statistic reflects this, and the total sum of squares is no longer corrected
+for the mean.</p></li>
+<li><p><strong>xpx</strong>: Adds the augmented X'X crossproducts matrix, which
+carries the dependent variable as an extra row and column.</p></li>
+<li><p><strong>inverse</strong>: Adds the generalized inverse of the augmented X'X
+matrix.  Its bottom right cell is the error sum of squares.</p></li>
+<li><p><strong>e1</strong>, <strong>e2</strong>, <strong>e3</strong>: Add the Type I, Type II and
+Type III estimable function tables.</p></li>
+<li><p><strong>ss1</strong>, <strong>ss2</strong>, <strong>ss3</strong>: Select which sums of squares
+to produce.  The default is Type I and Type III, as in SAS.</p></li>
+</ul></div>
+    <div id="options">
+    <h2>Options</h2>
+
+
+<p>The <code>proc_glm</code> function recognizes the following options.  Options may
+be passed as a quoted vector of strings, or an unquoted vector using the
+<code><a href="https://common.r-sassy.org/reference/v.html" class="external-link">v()</a></code> function.</p><ul><li><p><strong>alpha = </strong>: The "alpha = " option will set the alpha
+value for confidence limit statistics.  Set the alpha as a decimal value
+between 0 and 1.  For example, you can set a 90% confidence limit as
+<code>alpha = 0.1</code>.</p></li>
+<li><p><strong>noprint</strong>: Whether to print the interactive report to the
+viewer.  By default, the report is printed to the viewer. The "noprint"
+option will inhibit printing.  You may inhibit printing globally by
+setting the package print option to false:
+<code>options("procs.print" = FALSE)</code>.</p></li>
+<li><p><strong>outstat</strong>: The "outstat" option is used to request the
+TypeI and TypeIII model sum of squares, F, and P values be sent to the
+output dataset.
+The "outstat" dataset is the default output dataset, and this option
+does not normally need to be passed.</p></li>
+</ul></div>
+    <div id="data-shaping">
+    <h2>Data Shaping</h2>
+
+
+<p>The output datasets produced by the function can be shaped
+in different ways. These shaping options allow you to decide whether the
+data should be returned long and skinny, or short and wide. The shaping
+options can reduce the amount of data manipulation necessary to get the
+data into the desired form. The
+shaping options are as follows:</p><ul><li><p><strong>long</strong>: Transposes the output datasets
+so that statistics are in rows and variables are in columns.</p></li>
+<li><p><strong>stacked</strong>: Requests that output datasets
+be returned in "stacked" form, such that both statistics and
+variables are in rows.</p></li>
+<li><p><strong>wide</strong>: Requests that output datasets
+be returned in "wide" form, such that statistics are across the top in
+columns, and variables are in rows. This shaping option is the default.</p></li>
+</ul><p>These shaping options are passed on the <code>output</code> parameter.  For example,
+to return the data in "long" form, use <code>output = "long"</code>.</p>
     </div>
     <div id="see-also">
     <h2>See also</h2>

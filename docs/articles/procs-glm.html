@@ -274,6 +274,60 @@ Computes predicted and residual values and sends them to separate tables
 on the interactive report.
 </td>
 </tr>
+<tr>
+<td>
+clm
+</td>
+<td>
+Adds the standard error and confidence limits of the mean predicted
+value to the predicted values table. Implies “p”.
+</td>
+</tr>
+<tr>
+<td>
+cli
+</td>
+<td>
+Adds confidence limits for an individual predicted value to the
+predicted values table. These are wider than the “clm” limits because
+they include the error variance. Implies “p”.
+</td>
+</tr>
+<tr>
+<td>
+noint
+</td>
+<td>
+Fits the model without an intercept. Every downstream statistic reflects
+this, and the total sum of squares is no longer corrected for the mean.
+</td>
+</tr>
+<tr>
+<td>
+xpx
+</td>
+<td>
+Adds the augmented X’X crossproducts matrix, which carries the dependent
+variable as an extra row and column.
+</td>
+</tr>
+<tr>
+<td>
+inverse
+</td>
+<td>
+Adds the generalized inverse of the augmented X’X matrix. Its bottom
+right cell is the error sum of squares.
+</td>
+</tr>
+<tr>
+<td>
+e1, e2, e3
+</td>
+<td>
+Add the Type I, Type II and Type III estimable function tables.
+</td>
+</tr>
 </table>
 <p>Here is a table of the <code>options</code> keywords:</p>
 <table class="table">

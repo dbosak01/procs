@@ -10,7 +10,6 @@ multi-row contrasts for multiple degree of freedom F tests.
 * Added "order" parameter to `proc_glm()`.
 * Added "noint", "xpx", "inverse", "e1", "e2", "e3", "clm", and "cli" statistics
 keywords to `proc_glm()`.
-* Added "singular" and "zeta" options to `proc_glm()`.
 
 # procs 1.0.9
 
